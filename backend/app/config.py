@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     llm_model_id: str | None = None
     gemini_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
     groq_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
-    # Unconfigured is explicit: financial services must require this in later phases.
+    # Preserve raw configuration; BusinessClock applies the specified day-90 default.
     business_as_of: date | None = None
     database_url: str = Field(default="sqlite:///./shgad.db", repr=False, exclude=True)
     app_env: str = "development"

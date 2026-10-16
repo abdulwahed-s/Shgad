@@ -6,8 +6,10 @@ with figures that can be traced back to their source rows.
 
 Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
-> **Available now:** a working backend health endpoint and localized Flutter shell.
-> Merchant features below remain planned; no benchmark results or demo dataset exist yet.
+> **Available now:** a tested backend health endpoint, strict ledger schemas,
+> SQLite migrations, a business clock and deterministic financial primitives.
+> Flutter remains a static localized shell. Merchant features below remain planned;
+> no benchmark results or demo dataset exist yet.
 
 ## Planned features
 
@@ -74,7 +76,35 @@ Activate the environment first (`.venv/Scripts/Activate.ps1` in PowerShell or
 returns `{"status":"ok","version":"0.1.0"}` without configuration values.
 Settings read process environment variables; `.env.example` lists the names.
 No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
-stays unset until explicitly configured; it never defaults to the server date.
+stays unset in raw settings until configured. The domain `BusinessClock.from_settings`
+uses the configured date, or **2026-09-28** (synthetic day 90) when absent; it never
+uses the server date. Weeks run Saturday–Friday, and naming today's weekday requires
+clarification. Baghdad business dates are derived from offset-aware timestamps;
+storage uses UTC.
+
+The backend foundation includes strict integer-IQD Pydantic records, digit and IQD
+text parsing, and deterministic primitives for cash movements, counted cash,
+outstanding balances and derived cash sales. SQLite schema version 1 has all eleven
+ledger, provenance and audit tables, with foreign keys, unique idempotency keys,
+partial-payment allocations, overpayment guards and immutable source evidence.
+Amounts remain separate from revenue, debt, expenses and drawings. Unknown opening
+cash raises a typed error.
+
+Migrations use the standard-library SQLite driver and require SQLite **3.37+**
+(STRICT tables); local verification used SQLite 3.50.4. To create an empty schema,
+run this Python from `backend/` with its environment activated:
+
+```python
+from contextlib import closing
+from app.db.connection import connect_database
+from app.db.migrations import apply_migrations
+
+with closing(connect_database("shgad.db")) as connection:
+    apply_migrations(connection)
+```
+
+This creates the schema only. Import, reconciliation workflows, financial HTTP
+endpoints and a populated merchant ledger are not implemented yet.
 
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
@@ -100,9 +130,15 @@ flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=ht
 
 The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; Android builds
 and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
-No merchant chat, import, ledger, forecast or model integration is implemented yet.
+No merchant chat, import workflow, ledger HTTP queries, forecast or model integration
+is implemented yet.
 
-Verified locally: 5 backend tests, Ruff lint/format checks, 4 Flutter widget tests
+Verified locally: **166 backend tests**, Ruff lint and format checks
+(23 Python files). Financial-rule tests were written before their implementation;
+coverage includes cash/credit/collection separation, missing opening cash, supplier
+dues, drawings, closing counts and the business clock. No LLM is connected.
+
+Flutter verification: 4 widget tests
 (360×800, Arabic/English, text scales 1.0/1.3), Dart formatting and Flutter analysis.
 The health endpoint also returned HTTP 200 from a separate clean checkout. The release
 web shell launched in headless Chrome without runtime exceptions; RTL screenshots at
