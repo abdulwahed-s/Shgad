@@ -4,6 +4,7 @@ All SQL below is fixed application schema, never an agent or user argument.
 Runtime row values must be supplied with sqlite3 parameters.
 """
 
+import re
 import sqlite3
 
 
@@ -310,7 +311,208 @@ CREATE TRIGGER {_table}_immutable_{_operation.lower()} BEFORE {_operation} ON {_
 BEGIN SELECT RAISE(ABORT, '{_table} is immutable'); END;
 """
 
-_MIGRATIONS = (_SCHEMA_V1,)
+# Preserve the historical v1 definition. Reuse its exact constraints and guards
+# for the v2 table rebuild, adding only the revised vocabulary and provenance.
+_v1_transaction_body = _SCHEMA_V1.split("CREATE TABLE transactions (", 1)[1].split(
+    ") STRICT;", 1
+)[0]
+_v2_transaction_body = _v1_transaction_body.replace(
+    "'DAILY_CASH_COUNT', 'OWNER_DRAWING'",
+    "'DAILY_CASH_COUNT', 'OWNER_DRAWING', 'CAPITAL_INJECTION'",
+).replace(
+    "    UNIQUE (source_system, source_id),",
+    f"""    source TEXT NOT NULL DEFAULT 'synthetic_csv' CHECK
+        (source IN ('synthetic_csv', 'manual_entry', 'daily_close_review')),
+    client_entry_id TEXT UNIQUE CHECK (client_entry_id IS NULL OR
+        length(client_entry_id) > 0),
+    recorded_at TEXT NOT NULL CHECK ({_timestamp("recorded_at")}),
+    UNIQUE (transaction_id, source_id),
+    CHECK (source != 'daily_close_review' OR (
+        source_system = 'synthetic_entry' AND client_entry_id IS NOT NULL
+        AND type IN ('CASH_SALE', 'CAPITAL_INJECTION', 'OPERATING_EXPENSE',
+        'OWNER_DRAWING')
+        AND category_id IS NULL)),
+    UNIQUE (source_system, source_id),""",
+)
+_v1_triggers = re.findall(r"CREATE TRIGGER (\w+).*?END;", _SCHEMA_V1, re.DOTALL)
+_SCHEMA_V2 = "\n".join(f"DROP TRIGGER IF EXISTS {name};" for name in _v1_triggers)
+_SCHEMA_V2 += f"""
+CREATE TABLE transactions_new ({_v2_transaction_body}) STRICT;
+INSERT INTO transactions_new
+SELECT t.*, CASE WHEN t.source_system = 'synthetic_entry' THEN 'manual_entry'
+    ELSE 'synthetic_csv' END, NULL, b.imported_at
+FROM transactions t JOIN import_batches b USING (import_batch_id);
+DROP TABLE transactions;
+ALTER TABLE transactions_new RENAME TO transactions;
+"""
+_SCHEMA_V2 += "\n".join(re.findall(r"CREATE TRIGGER \w+.*?END;", _SCHEMA_V1, re.DOTALL))
+_SCHEMA_V2 += "\n".join(
+    re.findall(r"CREATE INDEX \w+ ON transactions[^;]+;", _SCHEMA_V1)
+)
+_SCHEMA_V2 += f"""
+CREATE TABLE entry_voids (
+    void_id TEXT PRIMARY KEY NOT NULL CHECK (length(void_id) > 0),
+    transaction_id TEXT NOT NULL UNIQUE,
+    source_id TEXT NOT NULL,
+    client_entry_id TEXT NOT NULL UNIQUE CHECK (length(client_entry_id) > 0),
+    reason TEXT NOT NULL CHECK (length(trim(reason,
+        char(9)||char(10)||char(13)||' ')) > 0),
+    voided_at TEXT NOT NULL CHECK ({_timestamp("voided_at")}),
+    FOREIGN KEY (transaction_id, source_id) REFERENCES
+        transactions(transaction_id, source_id)
+) STRICT;
+
+CREATE TRIGGER void_chronology BEFORE INSERT ON entry_voids
+WHEN EXISTS (SELECT 1 FROM transactions t WHERE t.transaction_id = NEW.transaction_id
+    AND (NEW.voided_at < t.occurred_at OR NEW.voided_at < t.recorded_at))
+BEGIN SELECT RAISE(ABORT, 'void cannot precede its original evidence'); END;
+
+CREATE TABLE difference_reviews (
+    review_id TEXT PRIMARY KEY NOT NULL CHECK (length(review_id) > 0),
+    client_entry_id TEXT NOT NULL UNIQUE CHECK (length(client_entry_id) > 0),
+    business_date TEXT NOT NULL CHECK ({_date("business_date")}),
+    resolution TEXT NOT NULL CHECK (resolution IN ('cash_sale_unitemized',
+        'capital_injection', 'expense_unrecorded', 'owner_drawing_unrecorded',
+        'leave_unexplained')),
+    amount_iqd INTEGER CHECK (amount_iqd > 0),
+    note TEXT,
+    created_at TEXT NOT NULL CHECK ({_timestamp("created_at")}),
+    previous_count_transaction_id TEXT NOT NULL REFERENCES transactions(transaction_id),
+    closing_count_transaction_id TEXT NOT NULL REFERENCES transactions(transaction_id),
+    transaction_id TEXT UNIQUE REFERENCES transactions(transaction_id),
+    CHECK ((resolution = 'leave_unexplained' AND amount_iqd IS NULL AND
+        transaction_id IS NULL)
+        OR (resolution != 'leave_unexplained' AND amount_iqd IS NOT NULL AND
+        transaction_id IS NOT NULL))
+) STRICT;
+
+CREATE TRIGGER review_counts BEFORE INSERT ON difference_reviews
+WHEN NOT EXISTS (
+    SELECT 1 FROM transactions c, transactions p
+    WHERE c.transaction_id = NEW.closing_count_transaction_id
+    AND p.transaction_id = NEW.previous_count_transaction_id
+    AND c.type = 'DAILY_CASH_COUNT' AND p.type = 'DAILY_CASH_COUNT'
+    AND c.business_date = NEW.business_date
+    AND p.business_date = date(NEW.business_date, '-1 day')
+    AND c.recorded_at <= NEW.created_at AND p.recorded_at <= NEW.created_at
+    AND c.occurred_at <= NEW.created_at AND p.occurred_at <= NEW.created_at
+    AND NOT EXISTS (SELECT 1 FROM entry_voids v WHERE
+        v.transaction_id IN (c.transaction_id, p.transaction_id) AND v.voided_at
+        <= NEW.created_at)
+    AND NOT EXISTS (SELECT 1 FROM transactions later
+        WHERE later.type = 'DAILY_CASH_COUNT' AND later.recorded_at <= NEW.created_at
+        AND later.occurred_at <= NEW.created_at
+        AND ((later.business_date = c.business_date AND later.transaction_id !=
+        c.transaction_id AND later.occurred_at >= c.occurred_at)
+            OR (later.business_date = p.business_date AND later.transaction_id
+        != p.transaction_id AND later.occurred_at >= p.occurred_at))
+        AND NOT EXISTS (SELECT 1 FROM entry_voids v WHERE v.transaction_id =
+        later.transaction_id AND v.voided_at <= NEW.created_at))
+)
+BEGIN SELECT RAISE(ABORT, 'MISSING_COUNT'); END;
+
+CREATE TRIGGER review_created_entry BEFORE INSERT ON difference_reviews
+WHEN NEW.resolution != 'leave_unexplained' AND NOT EXISTS (
+    SELECT 1 FROM transactions t JOIN transactions c
+        ON c.transaction_id = NEW.closing_count_transaction_id
+    WHERE t.transaction_id = NEW.transaction_id AND t.client_entry_id =
+        NEW.client_entry_id
+    AND t.source = 'daily_close_review' AND t.source_system = 'synthetic_entry'
+    AND t.business_date = NEW.business_date AND t.occurred_at = c.occurred_at
+    AND t.recorded_at = NEW.created_at AND t.amount_iqd = NEW.amount_iqd
+    AND t.category_id IS NULL AND t.description = COALESCE(NEW.note, '')
+    AND t.type = CASE NEW.resolution WHEN 'cash_sale_unitemized' THEN 'CASH_SALE'
+        WHEN 'capital_injection' THEN 'CAPITAL_INJECTION'
+        WHEN 'expense_unrecorded' THEN 'OPERATING_EXPENSE'
+        WHEN 'owner_drawing_unrecorded' THEN 'OWNER_DRAWING' END
+    AND NOT EXISTS (SELECT 1 FROM entry_voids v WHERE v.transaction_id =
+        t.transaction_id AND v.voided_at <= NEW.created_at)
+)
+BEGIN SELECT RAISE(ABORT, 'review must match its created entry'); END;
+"""
+
+# Reconstruct the pre-review residual from active recorded events. The created
+# row is already in the transaction, so omit it from this validation sum only.
+_review_remaining = """(
+    SELECT c.amount_iqd - p.amount_iqd - COALESCE((
+        SELECT SUM(CASE WHEN t.type IN ('CASH_SALE', 'CREDIT_COLLECTION',
+        'CAPITAL_INJECTION') THEN t.amount_iqd
+            WHEN t.type IN ('SUPPLIER_PAYMENT', 'OPERATING_EXPENSE',
+        'OWNER_DRAWING') THEN -t.amount_iqd ELSE 0 END)
+        FROM transactions t WHERE t.business_date = NEW.business_date
+        AND t.transaction_id IS NOT NEW.transaction_id AND t.recorded_at <=
+        NEW.created_at
+        AND t.occurred_at <= NEW.created_at
+        AND NOT EXISTS (SELECT 1 FROM entry_voids v WHERE v.transaction_id =
+        t.transaction_id AND v.voided_at <= NEW.created_at)
+    ), 0) FROM transactions c, transactions p
+    WHERE c.transaction_id = NEW.closing_count_transaction_id
+    AND p.transaction_id = NEW.previous_count_transaction_id
+)"""
+_SCHEMA_V2 += f"""
+CREATE TRIGGER review_sign BEFORE INSERT ON difference_reviews
+WHEN NEW.resolution != 'leave_unexplained' AND (
+    ({_review_remaining} > 0 AND NEW.resolution NOT IN ('cash_sale_unitemized',
+        'capital_injection'))
+    OR ({_review_remaining} < 0 AND NEW.resolution NOT IN ('expense_unrecorded',
+        'owner_drawing_unrecorded')))
+BEGIN SELECT RAISE(ABORT, 'DIFFERENCE_SIGN_MISMATCH'); END;
+
+CREATE TRIGGER review_remaining_amount BEFORE INSERT ON difference_reviews
+WHEN NEW.resolution != 'leave_unexplained' AND NEW.amount_iqd > abs({_review_remaining})
+BEGIN SELECT RAISE(ABORT, 'DIFFERENCE_EXCEEDED'); END;
+
+DROP TRIGGER payment_link_identity;
+CREATE TRIGGER payment_link_identity BEFORE INSERT ON payment_links
+WHEN NOT EXISTS (
+    SELECT 1 FROM transactions p JOIN obligations o ON o.obligation_id =
+        NEW.obligation_id
+    JOIN transactions origin ON origin.transaction_id = o.origin_transaction_id
+    WHERE p.transaction_id = NEW.payment_transaction_id AND p.counterparty_id =
+        o.counterparty_id
+    AND p.type = CASE WHEN o.kind = 'receivable' THEN 'CREDIT_COLLECTION' ELSE
+        'SUPPLIER_PAYMENT' END
+    AND p.occurred_at >= origin.occurred_at
+    AND p.occurred_at <= NEW.created_at AND origin.occurred_at <= NEW.created_at
+    AND p.recorded_at <= NEW.created_at AND origin.recorded_at <= NEW.created_at
+    AND NOT EXISTS (SELECT 1 FROM entry_voids v WHERE v.transaction_id IN
+        (p.transaction_id, origin.transaction_id)
+        AND v.voided_at <= NEW.created_at)
+)
+BEGIN
+    SELECT RAISE(ABORT, 'link requires active type, counterparty and chronology');
+END;
+
+DROP TRIGGER payment_link_overallocation;
+CREATE TRIGGER payment_link_overallocation BEFORE INSERT ON payment_links
+WHEN NEW.amount_iqd > (
+    SELECT p.amount_iqd - COALESCE((SELECT SUM(l.amount_iqd) FROM payment_links l
+        WHERE l.payment_transaction_id = p.transaction_id), 0)
+    FROM transactions p WHERE p.transaction_id = NEW.payment_transaction_id
+) OR NEW.amount_iqd > (
+    SELECT o.original_amount_iqd - COALESCE((SELECT SUM(l.amount_iqd)
+        FROM payment_links l JOIN transactions p ON p.transaction_id =
+        l.payment_transaction_id
+        WHERE l.obligation_id = o.obligation_id
+        AND NOT EXISTS (SELECT 1 FROM entry_voids v WHERE v.transaction_id =
+        p.transaction_id
+            AND v.voided_at <= NEW.created_at)), 0)
+    FROM obligations o WHERE o.obligation_id = NEW.obligation_id
+)
+BEGIN SELECT RAISE(ABORT, 'payment overallocation or obligation overpayment'); END;
+
+CREATE INDEX entry_voids_cutoff ON entry_voids(voided_at);
+CREATE INDEX difference_reviews_date ON difference_reviews(business_date, created_at);
+CREATE INDEX transactions_recorded_at ON transactions(recorded_at);
+"""
+for _table in ("entry_voids", "difference_reviews"):
+    for _operation in ("UPDATE", "DELETE"):
+        _SCHEMA_V2 += f"""
+CREATE TRIGGER {_table}_immutable_{_operation.lower()} BEFORE {_operation} ON {_table}
+BEGIN SELECT RAISE(ABORT, '{_table} is immutable'); END;
+"""
+
+_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2)
 
 
 def apply_migrations(connection: sqlite3.Connection) -> None:
@@ -324,14 +526,28 @@ def apply_migrations(connection: sqlite3.Connection) -> None:
         raise ValueError("Database schema is newer than this application")
     if version == len(_MIGRATIONS):
         return
-    statements = ["BEGIN IMMEDIATE;"]
-    for index in range(version, len(_MIGRATIONS)):
-        statements.append(_MIGRATIONS[index])
-        statements.append(f"PRAGMA user_version = {index + 1};")
-    statements.append("COMMIT;")
+    # SQLite's documented table-rebuild sequence requires FK enforcement off
+    # before BEGIN. Validate every FK before committing and restore enforcement
+    # on both success and failure. No caller transaction is ever disturbed.
+    connection.execute("PRAGMA foreign_keys = OFF")
     try:
-        connection.executescript("\n".join(statements))
+        connection.execute("BEGIN IMMEDIATE")
+        for index in range(version, len(_MIGRATIONS)):
+            statement = ""
+            for character in _MIGRATIONS[index]:
+                statement += character
+                if character == ";" and sqlite3.complete_statement(statement):
+                    connection.execute(statement)
+                    statement = ""
+            if statement.strip():
+                raise sqlite3.DatabaseError("Incomplete migration statement")
+            connection.execute(f"PRAGMA user_version = {index + 1}")
+        if connection.execute("PRAGMA foreign_key_check").fetchone() is not None:
+            raise sqlite3.IntegrityError("Migration foreign key check failed")
+        connection.commit()
     except sqlite3.DatabaseError:
         if connection.in_transaction:
             connection.rollback()
         raise
+    finally:
+        connection.execute("PRAGMA foreign_keys = ON")

@@ -82,13 +82,19 @@ uses the server date. Weeks run Saturday–Friday, and naming today's weekday re
 clarification. Baghdad business dates are derived from offset-aware timestamps;
 storage uses UTC.
 
-The backend foundation includes strict integer-IQD Pydantic records, digit and IQD
-text parsing, and deterministic primitives for cash movements, counted cash,
-outstanding balances and derived cash sales. SQLite schema version 1 has all eleven
-ledger, provenance and audit tables, with foreign keys, unique idempotency keys,
-partial-payment allocations, overpayment guards and immutable source evidence.
-Amounts remain separate from revenue, debt, expenses and drawings. Unknown opening
-cash raises a typed error.
+The backend foundation includes strict integer-IQD records, digit/IQD parsing,
+and deterministic cash, sales and settlement primitives. Recorded cash sales stay
+separate from signed unexplained differences; missing consecutive counts remain
+unavailable. Capital injections add cash without sales, revenue or collections.
+Drawings remain separate from business expenses.
+
+SQLite schema version 2 has thirteen STRICT tables, with foreign keys, unique
+idempotency keys, guarded partial-payment allocations and immutable source evidence.
+Difference review and void/correction work at the domain/database level, with client
+idempotency and cutoff-aware calculations. Voiding a collection restores outstanding
+debt while retaining original transactions, raw rows and linked reason/timestamp audits.
+Versioned migrations preserve v1 data and roll back atomically. Unknown opening cash
+raises a typed error.
 
 Migrations use the standard-library SQLite driver and require SQLite **3.37+**
 (STRICT tables); local verification used SQLite 3.50.4. To create an empty schema,
@@ -132,11 +138,14 @@ The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; And
 and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
 No merchant chat, import workflow, ledger HTTP queries, forecast or model integration
 is implemented yet.
+Entry, difference-review and void HTTP endpoints, and the next-seven-days view,
+remain planned. The tested review/void primitives have no merchant-facing workflow.
 
-Verified locally: **166 backend tests**, Ruff lint and format checks
-(23 Python files). Financial-rule tests were written before their implementation;
-coverage includes cash/credit/collection separation, missing opening cash, supplier
-dues, drawings, closing counts and the business clock. No LLM is connected.
+Verified locally: **236 backend tests**, Ruff lint and format checks
+(28 Python files). Revised financial rules were tested before implementation.
+Checks include recorded sales and signed differences, capital, review validation,
+void-adjusted balances and knowledge cutoffs, v1 upgrades, replay and atomic rollback.
+Concurrent review requests cannot explain the same cash twice. No LLM is connected.
 
 Flutter verification: 4 widget tests
 (360×800, Arabic/English, text scales 1.0/1.3), Dart formatting and Flutter analysis.

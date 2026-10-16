@@ -78,6 +78,7 @@ class EventType(StrEnum):
     OPERATING_EXPENSE = "OPERATING_EXPENSE"
     DAILY_CASH_COUNT = "DAILY_CASH_COUNT"
     OWNER_DRAWING = "OWNER_DRAWING"
+    CAPITAL_INJECTION = "CAPITAL_INJECTION"
     CASH_ADJUSTMENT = "CASH_ADJUSTMENT"
     INTERNAL_TRANSFER = "INTERNAL_TRANSFER"
 
@@ -92,6 +93,11 @@ class SourceRecord(LedgerModel):
 class Transaction(SourceRecord):
     transaction_id: Identifier
     occurred_at: Timestamp
+    recorded_at: Timestamp | None = None
+    source: Literal["synthetic_csv", "manual_entry", "daily_close_review"] = (
+        "synthetic_csv"
+    )
+    client_entry_id: Identifier | None = None
     business_date: BusinessDate | None = None
     type: EventType
     amount_iqd: PositiveIQD
@@ -114,6 +120,8 @@ class Transaction(SourceRecord):
         if self.business_date is not None and self.business_date != local_date:
             raise ValueError("business_date disagrees with Baghdad timestamp")
         object.__setattr__(self, "business_date", local_date)
+        if self.recorded_at is None:
+            object.__setattr__(self, "recorded_at", self.occurred_at)
         sales = {EventType.CASH_SALE, EventType.CREDIT_SALE}
         origins = {EventType.CREDIT_SALE, EventType.SUPPLIER_INVOICE}
         payments = {EventType.CREDIT_COLLECTION, EventType.SUPPLIER_PAYMENT}
@@ -137,7 +145,74 @@ class Transaction(SourceRecord):
             raise ValueError("Sale category and quantity must be supplied together")
         if self.type not in sales and self.category_id is not None:
             raise ValueError("Category and quantity apply only to sales")
+        if self.source == "daily_close_review" and (
+            self.source_system != "synthetic_entry"
+            or self.client_entry_id is None
+            or self.type
+            not in {
+                EventType.CASH_SALE,
+                EventType.CAPITAL_INJECTION,
+                EventType.OPERATING_EXPENSE,
+                EventType.OWNER_DRAWING,
+            }
+            or self.category_id is not None
+        ):
+            raise ValueError(
+                "Review rows require client provenance and an unitemized event"
+            )
         return self
+
+
+class DifferenceResolution(StrEnum):
+    CASH_SALE_UNITEMIZED = "cash_sale_unitemized"
+    CAPITAL_INJECTION = "capital_injection"
+    EXPENSE_UNRECORDED = "expense_unrecorded"
+    OWNER_DRAWING_UNRECORDED = "owner_drawing_unrecorded"
+    LEAVE_UNEXPLAINED = "leave_unexplained"
+
+
+class DifferenceReviewRequest(LedgerModel):
+    client_entry_id: Identifier
+    resolution: DifferenceResolution
+    amount_iqd: PositiveIQD | None
+    note: str | None = None
+
+    @model_validator(mode="after")
+    def validate_amount(self) -> Self:
+        if (self.resolution == DifferenceResolution.LEAVE_UNEXPLAINED) != (
+            self.amount_iqd is None
+        ):
+            raise ValueError("Only leave_unexplained requires a null amount")
+        return self
+
+
+class DifferenceReview(DifferenceReviewRequest):
+    review_id: Identifier
+    business_date: BusinessDate
+    created_at: Timestamp
+    previous_count_transaction_id: Identifier
+    closing_count_transaction_id: Identifier
+    transaction_id: Identifier | None
+
+    @model_validator(mode="after")
+    def validate_created_row(self) -> Self:
+        if (self.resolution == DifferenceResolution.LEAVE_UNEXPLAINED) != (
+            self.transaction_id is None
+        ):
+            raise ValueError("Only leave_unexplained has no created row")
+        return self
+
+
+class VoidRequest(LedgerModel):
+    client_entry_id: Identifier
+    reason: Annotated[str, StringConstraints(strict=True, min_length=1, pattern=r"\S")]
+
+
+class EntryVoid(VoidRequest):
+    void_id: Identifier
+    transaction_id: Identifier
+    source_id: Identifier
+    voided_at: Timestamp
 
 
 class Counterparty(LedgerModel):

@@ -8,111 +8,6 @@ from app.db.connection import connect_database
 from app.db.migrations import apply_migrations
 
 
-@pytest.fixture
-def ledger(tmp_path):
-    connection = connect_database(tmp_path / "synthetic.sqlite")
-    apply_migrations(connection)
-    with connection:
-        connection.execute(
-            """INSERT INTO import_batches
-            (import_batch_id, source_system, account_scope, file_sha256, imported_at,
-             row_count, accepted_count, flagged_count, rejected_count, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (
-                "BATCH-001",
-                "synthetic_csv",
-                "aggregate_cash",
-                "0" * 64,
-                "2026-09-28T12:00:00+00:00",
-                100,
-                0,
-                0,
-                0,
-                "pending",
-            ),
-        )
-        connection.executemany(
-            "INSERT INTO counterparties VALUES (?, ?, ?)",
-            [
-                ("CUST-01", "أبو حيدر", "customer"),
-                ("CUST-02", "أبو حيدر", "customer"),
-                ("SUP-01", "Synthetic supplier", "supplier"),
-            ],
-        )
-        connection.execute(
-            "INSERT INTO categories VALUES (?, ?, ?, ?)",
-            ("CAT-01", "Synthetic goods", 1_000, 5_000),
-        )
-    yield connection
-    connection.close()
-
-
-@pytest.fixture
-def insert_event(ledger, transaction_factory):
-    next_row = 0
-
-    def insert(**overrides):
-        nonlocal next_row
-        next_row += 1
-        source_id = overrides.pop("source_id", f"TX-{next_row:03}")
-        event = transaction_factory(source_id, source_row=next_row, **overrides)
-        ledger.execute(
-            """INSERT INTO raw_import_rows
-            (raw_row_id, import_batch_id, source_row, row_json, errors_json, status)
-            VALUES (?, ?, ?, ?, ?, ?)""",
-            (
-                f"RAW-{next_row}",
-                "BATCH-001",
-                next_row,
-                '{"synthetic":true}',
-                "[]",
-                "accepted",
-            ),
-        )
-        ledger.execute(
-            """INSERT INTO transactions
-            (transaction_id, source_id, source_system, source_row, import_batch_id,
-             occurred_at, business_date, type, amount_iqd, counterparty_id,
-             obligation_id, due_date, category_id, quantity, description, status,
-             idempotency_key)
-            VALUES (:transaction_id, :source_id, :source_system, :source_row,
-             :import_batch_id, :occurred_at, :business_date, :type, :amount_iqd,
-             :counterparty_id, :obligation_id, :due_date, :category_id, :quantity,
-             :description, :status, :idempotency_key)""",
-            event.model_dump(mode="json"),
-        )
-        return event
-
-    return insert
-
-
-@pytest.fixture
-def create_obligation(ledger, insert_event):
-    def create(obligation_id="OB-001", *, kind="receivable", amount=70_000):
-        customer = kind == "receivable"
-        source = insert_event(
-            type="CREDIT_SALE" if customer else "SUPPLIER_INVOICE",
-            amount_iqd=amount,
-            counterparty_id="CUST-01" if customer else "SUP-01",
-            obligation_id=obligation_id,
-            due_date="2026-09-30",
-        )
-        ledger.execute(
-            "INSERT INTO obligations VALUES (?, ?, ?, ?, ?, ?)",
-            (
-                obligation_id,
-                kind,
-                source.transaction_id,
-                source.counterparty_id,
-                amount,
-                "2026-09-30",
-            ),
-        )
-        return source
-
-    return create
-
-
 def add_link(connection, link_id, payment, obligation_id, amount):
     connection.execute(
         "INSERT INTO payment_links VALUES (?, ?, ?, ?, ?, ?)",
@@ -152,6 +47,8 @@ def test_migrations_create_all_strict_tables_and_are_repeatable(tmp_path):
         "reconciliation_flags",
         "agent_runs",
         "tool_calls",
+        "entry_voids",
+        "difference_reviews",
     }
     tables = {row["name"]: row for row in connection.execute("PRAGMA table_list")}
     assert expected <= tables.keys()
@@ -164,7 +61,7 @@ def test_migrations_create_all_strict_tables_and_are_repeatable(tmp_path):
         connection.execute("SELECT sql FROM sqlite_schema ORDER BY name").fetchall()
         == schema
     )
-    assert connection.execute("PRAGMA user_version").fetchone()[0] == 1
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
     connection.close()
     reopened = connect_database(path)
     assert reopened.execute("PRAGMA foreign_keys").fetchone()[0] == 1

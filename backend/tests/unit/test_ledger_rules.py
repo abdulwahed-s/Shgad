@@ -8,7 +8,6 @@ from app.schemas.ledger import Category
 from app.services.errors import FinancialRuleError
 from app.services.ledger_rules import (
     cash_on_hand,
-    derived_cash_sales,
     event_effect,
     outstanding_balance,
 )
@@ -152,21 +151,6 @@ def test_t21_owner_drawing_reduces_cash_without_expense_or_margin(
     )
 
 
-def test_t22_derived_cash_sales_uses_every_formula_term():
-    # FINANCIAL_RULES §3: 380k - 300k - 30k + 20k + 10k + 25k = 105k.
-    assert (
-        derived_cash_sales(
-            previous_count_iqd=300_000,
-            closing_count_iqd=380_000,
-            collections_iqd=30_000,
-            supplier_payments_iqd=20_000,
-            operating_expenses_iqd=10_000,
-            owner_drawings_iqd=25_000,
-        )
-        == 105_000
-    )
-
-
 def test_t22_count_is_a_snapshot_and_later_flows_are_added(transaction_factory):
     previous = transaction_factory(
         "CNT-089",
@@ -243,15 +227,6 @@ def test_outstanding_does_not_net_overpayment():
 def test_formula_boundaries_reject_non_integer_or_negative_money(bad):
     with pytest.raises(FinancialRuleError):
         outstanding_balance(70_000, [bad])
-    with pytest.raises(FinancialRuleError):
-        derived_cash_sales(
-            previous_count_iqd=bad,
-            closing_count_iqd=380_000,
-            collections_iqd=0,
-            supplier_payments_iqd=0,
-            operating_expenses_iqd=0,
-            owner_drawings_iqd=0,
-        )
 
 
 def test_operating_expense_moves_cash_and_only_recorded_expenses(
@@ -264,51 +239,6 @@ def test_operating_expense_moves_cash_and_only_recorded_expenses(
     assert effect.revenue_delta_iqd == effect.owner_drawings_iqd == 0
     result = cash_on_hand([expense], as_of=AS_OF, opening_balance=opening_balance)
     assert result.amount_iqd == 180_000
-
-
-def test_t22_consecutive_count_records_and_events_reproduce_derived_sales(
-    transaction_factory,
-):
-    previous = transaction_factory(
-        "CNT-1",
-        type="DAILY_CASH_COUNT",
-        amount_iqd=300_000,
-        occurred_at="2026-09-27T21:00:00+03:00",
-    )
-    closing = transaction_factory(
-        "CNT-2",
-        type="DAILY_CASH_COUNT",
-        amount_iqd=380_000,
-        occurred_at="2026-09-28T21:00:00+03:00",
-    )
-    collection = transaction_factory(
-        "COLLECT",
-        type="CREDIT_COLLECTION",
-        amount_iqd=30_000,
-        counterparty_id="CUST-01",
-        obligation_id="OB-CUST",
-    )
-    payment = transaction_factory(
-        "PAY",
-        type="SUPPLIER_PAYMENT",
-        amount_iqd=20_000,
-        counterparty_id="SUP-01",
-        obligation_id="OB-SUP",
-    )
-    expense = transaction_factory("EXP", type="OPERATING_EXPENSE", amount_iqd=10_000)
-    drawing = transaction_factory("DRAW", type="OWNER_DRAWING", amount_iqd=25_000)
-    assert (closing.business_date - previous.business_date).days == 1
-    assert (
-        derived_cash_sales(
-            previous_count_iqd=previous.amount_iqd,
-            closing_count_iqd=closing.amount_iqd,
-            collections_iqd=event_effect(collection).cash_delta_iqd,
-            supplier_payments_iqd=-event_effect(payment).cash_delta_iqd,
-            operating_expenses_iqd=event_effect(expense).operating_expenses_iqd,
-            owner_drawings_iqd=event_effect(drawing).owner_drawings_iqd,
-        )
-        == 105_000
-    )
 
 
 def test_duplicate_input_and_simultaneous_counts_require_review(transaction_factory):
