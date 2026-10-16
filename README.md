@@ -6,8 +6,8 @@ with figures that can be traced back to their source rows.
 
 Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
-> **Status: initial repository setup.** The application, demo dataset and tests have not been
-> implemented. All features below are planned; no benchmark results or demo are available yet.
+> **Status: Phase 0 in progress.** The backend health endpoint and configuration tests work.
+> Merchant features below remain planned; no benchmark results or demo dataset exist yet.
 
 ## Planned features
 
@@ -50,9 +50,33 @@ and dates from verified results. Provider calls and API keys will stay in the ba
 
 ## Development status
 
-Python 3.11+ and Flutter are the planned development prerequisites. SDK versions, installation
-commands, demo seed/import instructions and test commands will be added after they are verified.
-There is currently no runnable backend, frontend or evaluation harness.
+The backend requires Python 3.11+ and was verified locally with Python 3.14.7.
+From the repository root, create an environment and install the pinned dependencies:
+
+```sh
+python -m venv backend/.venv
+# Windows PowerShell:
+backend/.venv/Scripts/python -m pip install -e 'backend[dev]'
+# macOS / Linux: use backend/.venv/bin/python in place of the Windows path.
+```
+
+Then, from `backend/`, use that environment's Python:
+
+```sh
+python -m pytest -q
+python -m ruff check .
+python -m ruff format --check .
+python -m uvicorn app.main:app --reload
+```
+
+Activate the environment first (`.venv/Scripts/Activate.ps1` in PowerShell or
+`source .venv/bin/activate` on macOS/Linux). `GET http://127.0.0.1:8000/health`
+returns `{"status":"ok","version":"0.1.0"}` without configuration values.
+Settings read process environment variables; `.env.example` lists the names.
+No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
+stays unset until explicitly configured; it never defaults to the server date.
+
+Flutter setup, CI results and demo seed/import instructions remain pending.
 
 ## Data and scope
 

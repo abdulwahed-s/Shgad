@@ -9,6 +9,7 @@ heldout_60_questions*
 __pycache__/
 *.pyc
 .pytest_cache/
+.ruff_cache/
 *.egg-info/
 # databases (commit deliberate fixtures explicitly with git add -f)
 *.db
