@@ -1,0 +1,18 @@
+{
+  "@@locale": "ar",
+  "appTitle": "شكد",
+  "@appTitle": {
+    "description": "Shgad app display name.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chatTitle": "محادثة المحل",
+  "@chatTitle": {
+    "description": "Section label for the Phase 0 chat shell.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chatSetupNotice": "المحادثة بعد ما متاحة بهالنسخة.",
+  "@chatSetupNotice": {
+    "description": "Honest notice: this skeleton cannot send or answer questions yet.",
+    "x-review": "pending Iraqi Arabic review"
+  }
+}

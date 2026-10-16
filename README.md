@@ -6,7 +6,7 @@ with figures that can be traced back to their source rows.
 
 Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
-> **Status: Phase 0 in progress.** The backend health endpoint and configuration tests work.
+> **Status: Phase 0 in progress.** The backend health endpoint and localized Flutter shell work.
 > Merchant features below remain planned; no benchmark results or demo dataset exist yet.
 
 ## Planned features
@@ -76,7 +76,41 @@ Settings read process environment variables; `.env.example` lists the names.
 No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
 stays unset until explicitly configured; it never defaults to the server date.
 
-Flutter setup, CI results and demo seed/import instructions remain pending.
+The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
+chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
+its license. Backend requests use one Dio client configured with `API_BASE_URL`;
+the static shell does not call the backend or any model provider.
+
+From `frontend/`:
+
+```sh
+flutter pub get --enforce-lockfile
+flutter gen-l10n
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze
+flutter test
+flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8000
+```
+
+To build the web shell with runtime assets served locally:
+
+```sh
+flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=http://127.0.0.1:8000
+```
+
+The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; Android builds
+and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
+No merchant chat, import, ledger, forecast or model integration is implemented yet.
+
+Verified locally: 5 backend tests, Ruff lint/format checks, 4 Flutter widget tests
+(360×800, Arabic/English, text scales 1.0/1.3), Dart formatting and Flutter analysis.
+The health endpoint also returned HTTP 200 from a separate clean checkout. The release
+web shell launched in headless Chrome without runtime exceptions; RTL screenshots at
+normal and enlarged text sizes were inspected. A separate Dio smoke check reached the
+running health endpoint using `--dart-define`. Remote CI results are pending publication
+of the workflow. There are no financial benchmarks or model evaluations.
+
+Demo seed/import instructions and a merchant demo remain pending.
 
 ## Data and scope
 

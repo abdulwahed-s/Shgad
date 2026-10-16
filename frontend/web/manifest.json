@@ -1,0 +1,35 @@
+{
+    "name": "شكد",
+    "short_name": "شكد",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#F6F2ED",
+    "theme_color": "#1F5246",
+    "description": "Shgad synthetic merchant cash-flow assistant.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

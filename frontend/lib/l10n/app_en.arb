@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "appTitle": "Shgad",
+  "@appTitle": {"description": "App display name."},
+  "chatTitle": "Shop chat",
+  "@chatTitle": {"description": "Section label for the Phase 0 chat shell."},
+  "chatSetupNotice": "Chat is not available in this version yet.",
+  "@chatSetupNotice": {"description": "Honest notice for the static chat shell."}
+}
