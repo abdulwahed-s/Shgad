@@ -6,7 +6,7 @@ with figures that can be traced back to their source rows.
 
 Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
-> **Status: Phase 0 in progress.** The backend health endpoint and localized Flutter shell work.
+> **Status: runnable Phase 0 skeleton.** The backend health endpoint and localized Flutter shell work.
 > Merchant features below remain planned; no benchmark results or demo dataset exist yet.
 
 ## Planned features
@@ -107,8 +107,12 @@ Verified locally: 5 backend tests, Ruff lint/format checks, 4 Flutter widget tes
 The health endpoint also returned HTTP 200 from a separate clean checkout. The release
 web shell launched in headless Chrome without runtime exceptions; RTL screenshots at
 normal and enlarged text sizes were inspected. A separate Dio smoke check reached the
-running health endpoint using `--dart-define`. Remote CI results are pending publication
-of the workflow. There are no financial benchmarks or model evaluations.
+running health endpoint using `--dart-define`.
+
+[GitHub Actions](https://github.com/abdulwahed-s/Shgad/actions/workflows/test.yml)
+runs backend lint/format/tests and Flutter localization, formatting, analysis and tests
+on pushes and pull requests. Its linked run history shows the measured CI results.
+There are no financial benchmarks or model evaluations.
 
 Demo seed/import instructions and a merchant demo remain pending.
 
