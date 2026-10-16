@@ -6,7 +6,7 @@ with figures that can be traced back to their source rows.
 
 Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
-> **Status: runnable Phase 0 skeleton.** The backend health endpoint and localized Flutter shell work.
+> **Available now:** a working backend health endpoint and localized Flutter shell.
 > Merchant features below remain planned; no benchmark results or demo dataset exist yet.
 
 ## Planned features
