@@ -37,7 +37,7 @@ and expected non-overdue collections stay outside the seven-day window ending
 owner withdrawal to reach the target. Recorded cash sales cover about 92–95% of
 true cash sales. Gaps remain signed unexplained differences in observed records.
 
-Only these primary files are candidates for a later application import:
+These primary files describe the observed source/reference records:
 
 - observed_90d.csv
 - merchant_profile.json, opening_balance.json
@@ -45,8 +45,14 @@ Only these primary files are candidates for a later application import:
 - payment_links.csv, entry_voids.csv
 
 The obligation/link files contain only records known by the observed cutoff.
-The application currently has no data loader or forecast; runtime enforcement
-must also be checked when those are implemented.
+The canonical importer now accepts the primary observed CSV, allowlisted canonical
+fixtures and explicitly synthetic external uploads. Other packaged files are refused
+before opening. Categories/counterparties/opening records must be separately verified
+and preloaded; the importer derives obligations and definite payment allocations from
+transaction rows. It does not autodiscover or import support/link/void files.
+The production forecast reads cutoff-filtered SQLite only, without file access.
+Real runtime tests verify file replay, observed boundaries and later entry/link/void
+exclusion; these checks are not forecast accuracy measurements.
 
 Future CSVs, all_120d_canonical.csv, evaluation_only/, forecast_eval_shops/,
 generation metadata, lateness design profiles and true-cause/anomaly labels are

@@ -8,7 +8,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
 > **Available now:** a tested backend health endpoint, strict ledger schemas,
 > SQLite migrations, deterministic financial primitives and reproducible fictional
-> merchant CSVs with independent development truth. Flutter remains a static
+> merchant CSVs with independent development truth, a canonical CSV importer and
+> a cutoff-safe three-scenario cash-estimate service. Flutter remains a static
 > localized shell. Merchant workflows remain planned; no model benchmarks have run.
 
 ## Planned features
@@ -112,8 +113,28 @@ with closing(connect_database("shgad.db")) as connection:
     apply_migrations(connection)
 ```
 
-This creates the schema only. Import, reconciliation workflows, financial HTTP
-endpoints and a populated merchant ledger are not implemented yet.
+This creates the schema only. Merchant-facing import/reconciliation workflows,
+financial HTTP endpoints and automatic demo-data loading remain planned.
+
+The Python service `app.services.ingest.import_csv` imports explicitly fictional
+canonical CSV files into a migrated SQLite connection. Preload verified categories,
+counterparties and opening records separately. It validates UTF-8/BOM files up to
+5 MiB / 10,000 rows, normalizes Arabic-Indic amounts, preserves raw cells and errors,
+and commits validated rows and quarantine evidence atomically. Explicit compatible
+obligation references create payment allocations. Unmatched payments and suspected
+duplicates remain flagged for review. Exact file replay adds no transactions,
+cash, revenue, obligations or allocations; receipts distinguish accepted, rejected,
+exact-duplicate and flagged rows. Column mapping and import HTTP routes are pending.
+
+`app.services.forecast.forecast` reads only a cutoff-filtered SQLite snapshot and
+returns 30 integer-IQD daily estimates for base, conservative and stress scenarios.
+Recorded sales and signed unexplained differences remain separate drivers; conservative
+collections use observed settlement lateness, stress collections are zero, and overdue
+receivables are excluded. Unknown starting cash, essential history or due dates produce
+typed clarification errors. Later entries, payment links and voids cannot change an
+earlier forecast. The service enforces the observed calendar boundary and loads no
+files or evaluation answers. Forecast HTTP/UI integration and accuracy evaluation
+remain pending.
 
 Seeded fictional data and offline development truth are available. From the
 repository root (standard library only):
@@ -130,8 +151,9 @@ capital, credit and supplier settlements, and isolated review/void fixtures.
 The independent calculator imports no backend financial services. Its
 development expectations include sales, debts, estimated gross margin,
 seven-day positions and three forecast scenarios at historical cutoffs.
-These are offline reference values; application tools and a production
-forecast are still pending. Development score windows stop at day 90.
+These are offline reference values; the separate production forecast service uses
+the financial specification and SQLite history. Application agent tools remain
+pending. Development score windows stop at day 90.
 
 See [data/README.md](data/README.md) for file boundaries and generation
 metadata. Same-seed regeneration was byte-identical in a fresh process,
@@ -164,13 +186,14 @@ flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=ht
 
 The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; Android builds
 and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
-No merchant chat, import workflow, ledger HTTP queries, forecast or model integration
-is implemented yet.
+No merchant chat, import workflow, ledger HTTP queries, forecast screen or model
+integration is implemented yet. Import and forecast currently have Python service interfaces.
 Entry, difference-review and void HTTP endpoints, and the next-seven-days view,
 remain planned. The tested review/void primitives have no merchant-facing workflow.
 
-Verified locally: **279 backend tests**, including 43 offline data/evaluation
-checks, plus Ruff lint and formatting for 38 Python files. Financial-rule
+Verified locally: **333 backend tests**, including 54 importer/forecast runtime
+regressions and 43 offline data/evaluation checks, plus Ruff lint and formatting
+for 48 Python files. Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and
@@ -191,7 +214,8 @@ runs backend lint/format/tests and Flutter localization, formatting, analysis an
 on pushes and pull requests. Its linked run history shows the measured CI results.
 There are no financial benchmarks or model evaluations.
 
-Synthetic CSV generation is available; ledger import and a merchant demo remain pending.
+Synthetic CSV generation, ledger-import and forecast services are available;
+a merchant-facing demo remains pending. No forecast accuracy or model result is claimed.
 
 ## Data and scope
 
