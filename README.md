@@ -15,10 +15,13 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
 - Import synthetic CSV records into a validated SQLite ledger.
 - Answer everyday financial questions in Iraqi Arabic, with source evidence for every figure.
-- Keep cash, sales, customer debts, supplier bills and owner drawings separate.
+- Record debts, partial payments, expenses, owner drawings and cash counts through a simple entry form or CSV.
+- Keep recorded cash sales separate from unexplained cash differences; never infer the gap's cause.
+- Show today's counted cash and debts first, including next-seven-days obligations with confirmed cash versus expected collections.
 - Flag unmatched payments and suspected duplicates for review.
-- Summarise the week, including gross margin when cost data is sufficient.
-- Project cash flow over the next 30 days, with explicit collection assumptions.
+- Summarise the week, including estimated gross margin when cost data is sufficient.
+- Offer a secondary 30-day cash estimate with base, conservative and stress scenarios and explicit assumptions.
+- Preserve saved entries and source evidence through user-initiated undo/void and correction.
 
 ## Merchant questions
 
@@ -29,8 +32,8 @@ These examples describe the intended experience:
 | عندي فلوس تكفي أدفع للمجهز الخميس؟ | Cash available for a supplier payment, separating confirmed cash from expected collections. |
 | منو بعده بذمته فلوس؟ | Outstanding customer debts and their due dates. |
 | أكو دفعات ما تطابقت؟ | Unmatched payments and possible duplicates, with explanations. |
-| شلون كان شغلنا هالأسبوع؟ | A week-to-date summary of sales, collections, spending and gross margin coverage. |
-| الشهر الجاي أكدر أوفي التزاماتي؟ | A cash-flow projection with base and conservative scenarios. |
+| شلون كان شغلنا هالأسبوع؟ | A week-to-date summary of sales, collections, spending and estimated gross margin coverage. |
+| الشهر الجاي أكدر أوفي التزاماتي؟ | A secondary cash estimate with base, conservative and stress scenarios. |
 
 ## Planned architecture
 
