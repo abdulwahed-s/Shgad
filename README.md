@@ -157,7 +157,8 @@ pending. Development score windows stop at day 90.
 
 See [data/README.md](data/README.md) for file boundaries and generation
 metadata. Same-seed regeneration was byte-identical in a fresh process,
-including the manifest. Arabic and plausibility reviews are pending.
+including the manifest. The development questions and generation mechanics have
+recorded human review; two cash-sale note templates still await approval.
 Held-out questions remain outside the repository; only the format and a
 human-run hash/count helper are prepared. No sealed set or model evaluation
 is claimed.
@@ -191,9 +192,9 @@ integration is implemented yet. Import and forecast currently have Python servic
 Entry, difference-review and void HTTP endpoints, and the next-seven-days view,
 remain planned. The tested review/void primitives have no merchant-facing workflow.
 
-Verified locally: **333 backend tests**, including 54 importer/forecast runtime
-regressions and 43 offline data/evaluation checks, plus Ruff lint and formatting
-for 48 Python files. Financial-rule
+Verified locally: **339 backend tests**, including 54 importer/forecast runtime
+regressions and 49 offline data/evaluation checks, plus Ruff lint and formatting
+for 49 Python files. Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and

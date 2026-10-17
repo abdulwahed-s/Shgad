@@ -19,7 +19,9 @@ if __package__ in {None, ""}:
         TRANSACTION_FIELDS,
         VOID_FIELDS,
         capture_artifacts,
+        question_review_signature,
         read_json,
+        review_signature,
         sha256,
         validate_question,
         write_csv,
@@ -35,7 +37,9 @@ else:
         TRANSACTION_FIELDS,
         VOID_FIELDS,
         capture_artifacts,
+        question_review_signature,
         read_json,
+        review_signature,
         sha256,
         validate_question,
         write_csv,
@@ -58,6 +62,43 @@ def business_day(number):
 
 def timestamp(day, clock="12:00"):
     return f"{day}T{clock}:00+03:00"
+
+
+def human_review_status(mechanics, templates, questions):
+    """Recompute scopes from evidence; edits cannot inherit cached approval."""
+    evidence = templates.get("human_review", {})
+    approved_questions = evidence.get("approved_questions", {})
+    approved_notes = evidence.get("approved_notes", {})
+    approved_scenarios = evidence.get("approved_scenarios", {})
+    pending = [
+        question["id"]
+        for question in questions
+        if approved_questions.get(question["id"]) != question_review_signature(question)
+    ]
+    note_number = 0
+    for values in templates["notes"].values():
+        for text in values:
+            note_number += 1
+            identifier = f"NOTE-{note_number:02}"
+            if approved_notes.get(identifier) != review_signature(text):
+                pending.append(identifier)
+    for number, scenario in enumerate(templates["scenarios"], 1):
+        identifier = f"SCENE-{number:02}"
+        content = {key: value for key, value in scenario.items() if key != "review"}
+        if approved_scenarios.get(identifier) != review_signature(content):
+            pending.append(identifier)
+    total = len(questions) + note_number + len(templates["scenarios"])
+    return {
+        "arabic": "approved"
+        if not pending
+        else "pending"
+        if len(pending) == total
+        else "partial",
+        "plausibility": "approved"
+        if evidence.get("approved_mechanics") == review_signature(mechanics)
+        else "pending",
+        "pending_arabic_items": pending,
+    }
 
 
 class Builder:
@@ -482,14 +523,17 @@ def write_shop(folder, builder, initial, labels, mechanics, *, evaluation_only=F
         folder / "merchant_profile.json",
         {
             "merchant_id": builder.prefix,
-            "display_name": f"محل الرف التجريبي {builder.prefix}",
+            "display_name": "محل الرف",
             "fictional": True,
             "real_people_or_records_used": False,
             "business_as_of": str(OBSERVED_END),
             "account_scope": "aggregate_cash",
             "timezone": "Asia/Baghdad",
             "week_start": "saturday",
-            "human_plausibility_review": "pending",
+            "human_plausibility_review": builder.templates["human_reviews"][
+                "plausibility"
+            ],
+            "human_review_scope": "shared_generation_mechanics_not_individual_outcomes",
             "use": "frozen_final_forecast_evaluation_only"
             if evaluation_only
             else "primary_demo",
@@ -659,7 +703,7 @@ def fixtures(folder, mechanics, templates, primary):
             "transaction_id": wrong["transaction_id"],
             "source_id": wrong["source_id"],
             "client_entry_id": "T27-VOID-CLIENT",
-            "reason": "تصحيح دفعة تجريبية بطلب صاحب المحل",
+            "reason": "تصحيح دفعة بطلب صاحب المحل",
             "voided_at": timestamp(OBSERVED_END, "20:00"),
         }
     )
@@ -891,6 +935,15 @@ def _generate(*, seed, output_root, generated_paths):
     mechanics_path = ROOT / "data/generation/business_mechanics.json"
     templates_path = ROOT / "data/generation/scenario_templates.json"
     mechanics, templates = read_json(mechanics_path), read_json(templates_path)
+    questions = development_questions(
+        approved_signatures=templates.get("human_review", {}).get(
+            "approved_questions", {}
+        )
+    )
+    review_status = human_review_status(mechanics, templates, questions)
+    templates["human_reviews"] = {
+        key: review_status[key] for key in ("arabic", "plausibility")
+    }
     if type(seed) is not int or not 0 <= seed <= 2**63 - 1:
         raise ValueError("Seed must be a nonnegative 64-bit integer")
     primary, initial, labels = build_shop(
@@ -923,7 +976,6 @@ def _generate(*, seed, output_root, generated_paths):
             evaluation_only=True,
         )
         extra.append({"shop_id": name, "seed": extra_seed})
-    questions = development_questions()
     for question in questions:
         validate_question(question)
     write_jsonl(output_root / "evaluation/development_questions.jsonl", questions)
@@ -1059,6 +1111,12 @@ def _generate(*, seed, output_root, generated_paths):
         "calendar": mechanics["calendar"],
         "scenario_drafting": templates["scenario_drafting"],
         "human_reviews": templates["human_reviews"],
+        "human_review": {
+            key: value
+            for key, value in templates.get("human_review", {}).items()
+            if not key.startswith("approved_")
+        }
+        | {"pending_arabic_items": review_status["pending_arabic_items"]},
         "implementation": (
             "Python standard library; random.Random integer draws; UTF-8 LF"
         ),

@@ -57,7 +57,10 @@ def test_manifest_hashes_cover_all_generated_artifacts(dataset):
     assert manifest["seed"] == 20260701
     assert manifest["scenario_drafting"]["prompt"]
     assert manifest["scenario_drafting"]["model_id_status"] == "not_exposed_by_session"
-    assert manifest["human_reviews"] == {"arabic": "pending", "plausibility": "pending"}
+    assert manifest["human_reviews"] == {
+        "arabic": "partial",
+        "plausibility": "approved",
+    }
 
 
 def test_t10_t30_j1_exact_and_other_dues_outside_window(dataset):
@@ -237,7 +240,7 @@ def test_development_questions_have_joint_labels_and_no_numeric_answers(dataset)
             "calculation",
             "parameters",
         }
-        assert q["arabic_review"] == "pending"
+        assert q["arabic_review"] == "approved"
     assert not (dataset / "evaluation/heldout_60_manifest.json").exists()
 
 

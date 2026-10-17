@@ -19,33 +19,34 @@
     },
     {
       "counterparty_id": "CUST-04",
-      "display_name": "أم نور التجريبية",
+      "display_name": "أم نور",
       "kind": "customer"
     },
     {
       "counterparty_id": "CUST-05",
-      "display_name": "أبو سجاد التجريبي",
+      "display_name": "أبو سجاد",
       "kind": "customer"
     },
     {
       "counterparty_id": "CUST-06",
-      "display_name": "أم زين التجريبية",
+      "display_name": "أم زين",
       "kind": "customer"
     },
     {
       "counterparty_id": "SUP-01",
-      "display_name": "مجهز الرف التجريبي",
+      "display_name": "مجهز الرف",
       "kind": "supplier"
     },
     {
       "counterparty_id": "SUP-02",
-      "display_name": "مجهز السلة التجريبي",
+      "display_name": "مجهز السلة",
       "kind": "supplier"
     }
   ],
-  "display_name": "محل الرف التجريبي SHOP-01",
+  "display_name": "محل الرف",
   "fictional": true,
-  "human_plausibility_review": "pending",
+  "human_plausibility_review": "approved",
+  "human_review_scope": "shared_generation_mechanics_not_individual_outcomes",
   "merchant_id": "SHOP-01",
   "real_people_or_records_used": false,
   "timezone": "Asia/Baghdad",

@@ -8,25 +8,136 @@
     "model_id_status": "not_exposed_by_session",
     "drafted_on": "2026-10-17",
     "prompt": "Draft fictional Iraqi neighbourhood grocery scenarios and short Iraqi Arabic transaction notes for Shgad. Include cash baskets, customer credit and partial late collections, weekly supplier invoices, recorded expenses, household drawings and a counted drawer. Preserve the specified Abu Haider and Thursday invoice case. Suggest neutral notes without assigning causes to cash-count differences. Every person, merchant and record must be invented. Draft templates only: deterministic seeded Python owns all dates, quantities, IQD amounts, balances and labels. Mark Arabic and plausibility reviews pending.",
-    "settings": {"temperature": null, "top_p": null, "generation_seed": null, "settings_status": "not_exposed_by_session"},
+    "settings": {
+      "temperature": null,
+      "top_p": null,
+      "generation_seed": null,
+      "settings_status": "not_exposed_by_session"
+    },
     "split": "The coding-session LLM drafted these notes, category/customer names and mechanics suggestions. Python constructs every numeric transaction and validates it; no provider API call or generated candidate ledger was used."
   },
-  "human_reviews": {"arabic": "pending", "plausibility": "pending"},
+  "human_reviews": {
+    "arabic": "partial",
+    "plausibility": "approved"
+  },
   "notes": {
-    "CASH_SALE": ["بيع نقدي من الرف التجريبي", "مبيعات سلة المحل التجريبي"],
-    "CREDIT_SALE": ["بيع بالدين مسجل بالدفتر التجريبي", "بضاعة على الحساب التجريبي"],
-    "CREDIT_COLLECTION": ["استلمت دفعة من الحساب التجريبي", "تسديد جزء من الدين التجريبي"],
-    "SUPPLIER_INVOICE": ["فاتورة تجهيز للمحل التجريبي"],
-    "SUPPLIER_PAYMENT": ["دفعة للمجهز التجريبي"],
-    "OPERATING_EXPENSE": ["مصاريف نقل وتنظيف تجريبية"],
-    "OWNER_DRAWING": ["سحب صاحب المحل للبيت - تجريبي"],
-    "CAPITAL_INJECTION": ["إضافة رأس مال مسجلة - تجريبي"],
-    "DAILY_CASH_COUNT": ["عد الصندوق بنهاية اليوم - تجريبي"]
+    "CASH_SALE": [
+      "بيع كاش",
+      "مبيعات كاش"
+    ],
+    "CREDIT_SALE": [
+      "بيع بالدين مسجل بالدفتر",
+      "بضاعة على الحساب"
+    ],
+    "CREDIT_COLLECTION": [
+      "استلمت دفعة من الحساب",
+      "تسديد جزء من الدين"
+    ],
+    "SUPPLIER_INVOICE": [
+      "فاتورة تجهيز للمحل"
+    ],
+    "SUPPLIER_PAYMENT": [
+      "دفعة للمجهز"
+    ],
+    "OPERATING_EXPENSE": [
+      "مصاريف نقل وتنظيف"
+    ],
+    "OWNER_DRAWING": [
+      "سحب صاحب المحل للبيت"
+    ],
+    "CAPITAL_INJECTION": [
+      "إضافة رأس مال مسجلة"
+    ],
+    "DAILY_CASH_COUNT": [
+      "عد الصندوق بنهاية اليوم"
+    ]
   },
   "scenarios": [
-    {"id": "partial_late", "description_ar": "الزبون يدفع قسم من الحساب بموعده والباقي يتأخر.", "review": "pending"},
-    {"id": "friday", "description_ar": "يوم الجمعة حركة البيع أكثر بالمحل التجريبي.", "review": "pending"},
-    {"id": "slow_week", "description_ar": "أسبوع هادي والبيع أقل من المعتاد.", "review": "pending"},
-    {"id": "cash_close", "description_ar": "عد الصندوق يختلف عن المتوقع؛ الفرق يبقى غير مفسر.", "review": "pending"}
-  ]
+    {
+      "id": "partial_late",
+      "description_ar": "الزبون يدفع قسم من الحساب بموعده والباقي يتأخر.",
+      "review": "approved"
+    },
+    {
+      "id": "friday",
+      "description_ar": "يوم الجمعة حركة البيع أكثر بالمحل .",
+      "review": "approved"
+    },
+    {
+      "id": "slow_week",
+      "description_ar": "أسبوع هادي والبيع أقل من المعتاد.",
+      "review": "approved"
+    },
+    {
+      "id": "cash_close",
+      "description_ar": "عد الصندوق يختلف عن المتوقع؛ الفرق يبقى غير مفسر.",
+      "review": "approved"
+    }
+  ],
+  "human_review": {
+    "reviewed_on": "2026-10-17",
+    "reviewer_identity": "recorded_locally",
+    "responses_sha256": "e9ce6f628af18d13e0f82df4c3fcf7d4312c7c77d6f1120d7b0ee2941e836002",
+    "source_snapshot_id": "3ebec8097621f78e06119006ab5d1b9ae5ff58f7934e5813394540604c260f11",
+    "response_counts": {
+      "needs_change": 8,
+      "accepted": 94,
+      "unsure": 2
+    },
+    "scope": "Shared fictional generation mechanics and development language; no merchant validation or held-out approval.",
+    "requested_copy_cleanup": "Iraqi Arabic merchant wording; remove synthetic labels from display names while retaining fictional provenance.",
+    "approved_questions": {
+      "DEV-001": "1a2b981e74570d9fe563282f157b439ee8218aa6a91b1a9afc9e07c105ea94f2",
+      "DEV-002": "5635a22152a45849def36ed9547e403d4e2aa24fe04fbd3cb5d51269fbc77391",
+      "DEV-003": "47b3f66987a8612f65cf9c980776ccc5567232517b782602a741090fa4685e74",
+      "DEV-004": "62fbb830a8a1d36d4bee95b88a0ec12cce5910b7b499f51ce716abf8c7e9a9c6",
+      "DEV-005": "6e8ad188fca3aa52917ffbdf2ad1fa6e67dfb334247fd19c24d3eaf7de7b2fdf",
+      "DEV-006": "4ad56e89d6c83e596bd793ce3a30b77f5d443774306aba529b268f17fd70af0d",
+      "DEV-007": "866315a5341f178f64eba53be3d1759f9e01e600a0731d5782c396bac46cf4a6",
+      "DEV-008": "dcce99c14ded0c685ee8f630e1af1f36339caec23d8d4a1d894f53f420bafe25",
+      "DEV-009": "a3962468ab2a64b990b15f2a42215afc1fe5cca5e9c3f49575e3ffb0a97fb575",
+      "DEV-010": "e979842f424ba03601270618c1b74c29ca08ecc99d698345f44381c9a4726a07",
+      "DEV-011": "591126ae971d8207eeb7c3bd68eee1e3eec6362e57916dcacbac5b79c0ddb6cf",
+      "DEV-012": "2072d667f89551873b9cbe41a876d1b5a1d2fa6edd849afd8ce72a6e13652c32",
+      "DEV-013": "10a4d5624061a4d8134562f2e5c8962354e8844976028a1d9a4517932b6911b1",
+      "DEV-014": "eabeb23ae0f949c9cf2dcbc25a5c1233229104ed52db435201192f27323d75fa",
+      "DEV-015": "900ac7fec1a5180f2155d91ea4047109775d2e5342bda561f69927b58463c92a",
+      "DEV-016": "eeecad6c44149e5a306417bd574d36035dbc8f949839f3c41ff9e2df8cfc4167",
+      "DEV-017": "d225d71ab7817d7675da4ec4230a3bb9bb619aef1da342e7e1f7604b7d60311f",
+      "DEV-018": "37d3b0977599479d4c1319a45080f347ef21aeefa99e57dbaab47b1c8f87136f",
+      "DEV-019": "5aedef38546e1c32ecb73a04d362504ddbe5d4fd38899bb9ca8b2b688c75945d",
+      "DEV-020": "9698d8b4e5c878c1a5e4a99a886e9471cc5e010f52dbbed671da32edc44aae19",
+      "DEV-021": "2711996bf5b83de417be745cb42376588552118eaf7814632e8a9b6f7cfdba59",
+      "DEV-022": "31615571e0bf05078342043a5950ca4568b36d9a85b0ce6f4c4efe0a52fff559",
+      "DEV-023": "c4eb9d5c6c34159e32a83950b429edd2d9eae1e628e24584020153c72ae77feb",
+      "DEV-024": "5cbe0312ff9bd5d6617fe85112e47bd1a6ff73b8cc561579e86db35aaadcec58",
+      "DEV-025": "107bf2a59eb1fd02102f63d60dd9e57b952ed7ec0550d9edc5edcc17790c7ebe",
+      "DEV-026": "e94f643f2b1bcbd54a76a7f75fccb5db4dbf672bde42ba05b75b7f241e6b2c3a",
+      "DEV-027": "882f0bb16ffe01451bb2a325a6506744c6b99257126a851285c18068f0a2d8c5",
+      "DEV-028": "3322f114f00980a504207fd51eaf721f5eb645332d1caeea5d2239cbe88df9d9",
+      "DEV-029": "1b20144afd399dc0a67926989adca15b12124758283d5f6761f556636ee6151d",
+      "DEV-030": "7be1de969bc17c64113b76d92fd03df1961903ab358231e8324f1011c5316ffe",
+      "DEV-031": "513a918576dac7d7a61e8a06158b4d83bd79cc1f972611f8c3f4d2549eeb3027",
+      "DEV-032": "c7645d67f8214e66afd543658fbae75a85658dc23691cb5edc048322e9221143"
+    },
+    "approved_notes": {
+      "NOTE-03": "f999aea85bebe31b24ebb0076ed9594c3ad62d14e9da5018a84c1648b205a2f5",
+      "NOTE-04": "b9b87518f7f946a72ce33562625822d679812da5fd89e2a1fc2141738e53b922",
+      "NOTE-05": "ba29734e20b6c0af1d9217b95926c1c6cd37e7a0eca8faf343a3d9a06e26869c",
+      "NOTE-06": "e0a91f00a0dc0e5fabde98765c95f5c1ccaefac1040bd3a456e8fd2996fa7706",
+      "NOTE-07": "bc7795ecc6c5ccf9deaeb705eb71730e9af7c28bff2765344c2a3dc2ab889bd5",
+      "NOTE-08": "551b364f08a52e64fbc7a1b382000d2be98ad9ec5547731cdfc64c9cfd6aa14d",
+      "NOTE-09": "0a03d4344b7b842d28218a25b6dc73f22f2a76312706b8809249a1f183fa10c3",
+      "NOTE-10": "5921cfe5fb50c003ca3934b235bcd2acfd76bbc2b46e2b833bcef0709d00f0e4",
+      "NOTE-11": "40ac014e5d33ed3afe21e399f6d8aec9d9407879f6716bfe522f73739e67b3d3",
+      "NOTE-12": "deadf9a8403203ba059d674333468f72849fdf5f72d4b92b8d9e831d0547ad32"
+    },
+    "approved_scenarios": {
+      "SCENE-01": "06f8ebc60ce2de648035ea3bf9c1f04ceb312dd29fea6eec235f0a330356ab32",
+      "SCENE-02": "11830e3145f5fb103d3280fdcb5068367cf63c331500c72ab3abb877076da4df",
+      "SCENE-03": "929ee0e87e1ff9537d9386e24b5a89f68d8b5fc8386cae663c48ad7781b5341a",
+      "SCENE-04": "ff69d80c300f46407aad87b19dfa3ea3447776ef8f3d7660ed25330131926ba5"
+    },
+    "approved_mechanics": "f8b5d33e3582efaa69a3da0d8d3220f371e2c67dff4c39e4023abcadf8939a0d"
+  }
 }

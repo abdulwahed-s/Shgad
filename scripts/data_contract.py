@@ -192,6 +192,20 @@ def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def review_signature(value):
+    """Bind human approval to exact reviewed text or structured labels."""
+    payload = json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def question_review_signature(question):
+    return review_signature(
+        {key: value for key, value in question.items() if key != "arabic_review"}
+    )
+
+
 def validate_question(question):
     """Validate only the public format. Errors never include question content."""
 

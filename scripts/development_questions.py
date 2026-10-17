@@ -1,7 +1,12 @@
-"""LLM-drafted development questions only. Iraqi Arabic human review pending."""
+"""Development questions; approval is tied to human-reviewed text and labels."""
+
+if __package__ in {None, ""}:
+    from data_contract import question_review_signature
+else:
+    from .data_contract import question_review_signature
 
 
-def development_questions():
+def development_questions(*, approved_signatures=None):
     questions = []
 
     def add(
@@ -43,9 +48,7 @@ def development_questions():
             }
         )
 
-    add(
-        "sales", "شكد بعنا cash هالأسبوع؟", "sales", ["get_sales"], "sales", kind="cash"
-    )
+    add("sales", "شكد بعنا كاش هالأسبوع؟", "sales", ["get_sales"], "sales", kind="cash")
     add(
         "sales",
         "مبيعات الدين هالأسبوع شكد صارت؟",
@@ -66,7 +69,7 @@ def development_questions():
     )
     add(
         "relative_dates",
-        "الأسبوع الماضي شكد كان البيع النقدي؟",
+        "الأسبوع الماضي شكد جان البيع من غير دين؟",
         "sales",
         ["get_sales"],
         "sales",
@@ -76,7 +79,7 @@ def development_questions():
     )
     add(
         "sales",
-        "شكد نقدي وشكد دين بشهر آب؟",
+        "شكد نقد وشكد دين بشهر آب؟",
         "sales",
         ["get_sales"],
         "sales",
@@ -115,7 +118,7 @@ def development_questions():
     )
     add(
         "supplier_dues",
-        "شكد بذمتي للمجهز التجريبي مال الرف؟",
+        "شكد بذمتي للمجهز مال الرف؟",
         "debts",
         ["get_debts"],
         "debts",
@@ -145,7 +148,7 @@ def development_questions():
     )
     add(
         "supplier_dues",
-        "وريني التزامات السبعة أيام الجاية ويا المتوقع من الزباين",
+        "راويني شكد لازم أدفع بالسبع أيام الجاية، وشكد متوقّع أگبض من الزباين",
         "upcoming_obligations",
         ["get_debts"],
         "upcoming",
@@ -155,7 +158,7 @@ def development_questions():
     )
     add(
         "weekly_summary",
-        "شلون كان شغل المحل هالأسبوع؟",
+        "شلون جان شغل المحل هالأسبوع؟",
         "weekly_summary",
         ["get_sales", "get_debts", "get_margin", "reconcile"],
         "weekly_summary",
@@ -187,7 +190,7 @@ def development_questions():
     )
     add(
         "drawings_expenses",
-        "فلوس البيت هالأسبوع لا تخلطها بمصاريف المحل، وريني كل وحدة",
+        "فلوس البيت هالأسبوع لا تخلطها بمصاريف المحل، راويني كل وحدة",
         "weekly_summary",
         ["get_sales", "get_margin", "reconcile", "get_debts"],
         "weekly_summary",
@@ -212,7 +215,7 @@ def development_questions():
     )
     add(
         "debt_balance",
-        "بالدفعات التجريبية الثلاث والتصحيح، شكد بقي على الزبون؟",
+        "بالدفعات الثلاث والتصحيح، شكد بقي على الزبون؟",
         "debts",
         ["get_debts"],
         "debts",
@@ -223,7 +226,7 @@ def development_questions():
     )
     add(
         "missing_data",
-        "بهالملف الصغير شكد نقدي متوفر؟",
+        "حسب هالملف الصغير، شكد فلوس عدنا هسه بالصندوق؟",
         "upcoming_obligations",
         ["get_debts"],
         "cash",
@@ -342,4 +345,8 @@ def development_questions():
         behavior="clarify",
         error="MISSING_COSTS",
     )
+    signatures = approved_signatures or {}
+    for question in questions:
+        if signatures.get(question["id"]) == question_review_signature(question):
+            question["arabic_review"] = "approved"
     return questions

@@ -1,7 +1,9 @@
 # Fictional merchant data
 
-All names, merchants and records are invented. Iraqi Arabic and business
-plausibility reviews are pending; these records are not merchant validation.
+All names, merchants and records are invented. Human review of the shared
+business mechanics and development questions was recorded on 17 October 2026;
+two cash-sale note templates still await approval. Display names use natural
+Iraqi wording; metadata retains fictional provenance. This is not merchant validation.
 
 From the repository root, using Python 3.11+ (standard library only):
 
@@ -80,7 +82,12 @@ evaluation results or a production forecast.
 evaluation/development_questions.jsonl has 32 draft development cases;
 dialect_intents.jsonl carries the joint intent/tool/customer/period labels.
 QUESTION_SPEC.md defines the portable question format without numeric answers.
-Both development language and scenario plausibility await human review.
+All 32 development questions and the shared generation mechanics have recorded
+human review, including requested Iraqi wording and removal of synthetic labels
+from display names. Two cash-sale note drafts remain pending. Approval signatures
+cover the exact question text, customer/date/tool labels, note/scenario content
+and mechanics; later edits invalidate the affected approval. Reviewer identity
+is recorded locally, while generation metadata carries the evidence hash/date.
 
 evaluation/sealing_input_manifest.json lists and hashes only observed inputs,
 fixtures, the format and development questions for external independent staging.
