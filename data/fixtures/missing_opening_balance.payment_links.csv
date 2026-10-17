@@ -1,0 +1,2 @@
+payment_link_id,payment_transaction_id,obligation_id,amount_iqd,match_basis,created_at
+HAPPY-00003-LINK,HAPPY-00003,HAPPY-R,30000,confirmed,2026-07-02T12:00:00+03:00

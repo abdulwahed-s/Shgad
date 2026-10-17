@@ -1,0 +1,2516 @@
+{
+  "cutoffs": {
+    "60": {
+      "baseline": {
+        "daily_change_iqd": -2257,
+        "days": [
+          {
+            "closing_iqd": 700443,
+            "date": "2026-08-30"
+          },
+          {
+            "closing_iqd": 698186,
+            "date": "2026-08-31"
+          },
+          {
+            "closing_iqd": 695929,
+            "date": "2026-09-01"
+          },
+          {
+            "closing_iqd": 693672,
+            "date": "2026-09-02"
+          },
+          {
+            "closing_iqd": 691415,
+            "date": "2026-09-03"
+          },
+          {
+            "closing_iqd": 689158,
+            "date": "2026-09-04"
+          },
+          {
+            "closing_iqd": 686901,
+            "date": "2026-09-05"
+          },
+          {
+            "closing_iqd": 684644,
+            "date": "2026-09-06"
+          },
+          {
+            "closing_iqd": 682387,
+            "date": "2026-09-07"
+          },
+          {
+            "closing_iqd": 680130,
+            "date": "2026-09-08"
+          },
+          {
+            "closing_iqd": 677873,
+            "date": "2026-09-09"
+          },
+          {
+            "closing_iqd": 675616,
+            "date": "2026-09-10"
+          },
+          {
+            "closing_iqd": 673359,
+            "date": "2026-09-11"
+          },
+          {
+            "closing_iqd": 671102,
+            "date": "2026-09-12"
+          },
+          {
+            "closing_iqd": 668845,
+            "date": "2026-09-13"
+          },
+          {
+            "closing_iqd": 666588,
+            "date": "2026-09-14"
+          },
+          {
+            "closing_iqd": 664331,
+            "date": "2026-09-15"
+          },
+          {
+            "closing_iqd": 662074,
+            "date": "2026-09-16"
+          },
+          {
+            "closing_iqd": 659817,
+            "date": "2026-09-17"
+          },
+          {
+            "closing_iqd": 657560,
+            "date": "2026-09-18"
+          },
+          {
+            "closing_iqd": 655303,
+            "date": "2026-09-19"
+          },
+          {
+            "closing_iqd": 653046,
+            "date": "2026-09-20"
+          },
+          {
+            "closing_iqd": 650789,
+            "date": "2026-09-21"
+          },
+          {
+            "closing_iqd": 648532,
+            "date": "2026-09-22"
+          },
+          {
+            "closing_iqd": 646275,
+            "date": "2026-09-23"
+          },
+          {
+            "closing_iqd": 644018,
+            "date": "2026-09-24"
+          },
+          {
+            "closing_iqd": 641761,
+            "date": "2026-09-25"
+          },
+          {
+            "closing_iqd": 639504,
+            "date": "2026-09-26"
+          },
+          {
+            "closing_iqd": 637247,
+            "date": "2026-09-27"
+          },
+          {
+            "closing_iqd": 634990,
+            "date": "2026-09-28"
+          }
+        ],
+        "source_ids": [
+          "DEMO-01-CNT-053",
+          "DEMO-01-CNT-060",
+          "DEMO-01-CNT-060"
+        ]
+      },
+      "cutoff": "2026-08-29",
+      "prediction_days": 30,
+      "scenarios": {
+        "base": {
+          "assumption_keys": [
+            "collections_expected_not_guaranteed",
+            "sales_from_weekday_averages",
+            "unlinked_cash_projected_from_counts"
+          ],
+          "days": [
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 802592,
+              "collections_iqd": 68000,
+              "date": "2026-08-30",
+              "expenses_iqd": 9964,
+              "opening_iqd": 702700,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 899922,
+              "collections_iqd": 0,
+              "date": "2026-08-31",
+              "expenses_iqd": 9964,
+              "opening_iqd": 802592,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 952001,
+              "collections_iqd": 0,
+              "date": "2026-09-01",
+              "expenses_iqd": 9964,
+              "opening_iqd": 899922,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 332456,
+              "collections_iqd": 80000,
+              "date": "2026-09-02",
+              "expenses_iqd": 9964,
+              "opening_iqd": 952001,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 761000,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 444785,
+              "collections_iqd": 0,
+              "date": "2026-09-03",
+              "expenses_iqd": 9964,
+              "opening_iqd": 332456,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 582615,
+              "collections_iqd": 0,
+              "date": "2026-09-04",
+              "expenses_iqd": 9964,
+              "opening_iqd": 444785,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 704570,
+              "collections_iqd": 54000,
+              "date": "2026-09-05",
+              "expenses_iqd": 9964,
+              "opening_iqd": 582615,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 736462,
+              "collections_iqd": 0,
+              "date": "2026-09-06",
+              "expenses_iqd": 9964,
+              "opening_iqd": 704570,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 833792,
+              "collections_iqd": 0,
+              "date": "2026-09-07",
+              "expenses_iqd": 9964,
+              "opening_iqd": 736462,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 885871,
+              "collections_iqd": 0,
+              "date": "2026-09-08",
+              "expenses_iqd": 9964,
+              "opening_iqd": 833792,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 947326,
+              "collections_iqd": 0,
+              "date": "2026-09-09",
+              "expenses_iqd": 9964,
+              "opening_iqd": 885871,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 1059655,
+              "collections_iqd": 0,
+              "date": "2026-09-10",
+              "expenses_iqd": 9964,
+              "opening_iqd": 947326,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 1197485,
+              "collections_iqd": 0,
+              "date": "2026-09-11",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1059655,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 1265440,
+              "collections_iqd": 0,
+              "date": "2026-09-12",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1197485,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 1297332,
+              "collections_iqd": 0,
+              "date": "2026-09-13",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1265440,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 1394662,
+              "collections_iqd": 0,
+              "date": "2026-09-14",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1297332,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 1446741,
+              "collections_iqd": 0,
+              "date": "2026-09-15",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1394662,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 1508196,
+              "collections_iqd": 0,
+              "date": "2026-09-16",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1446741,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 1620525,
+              "collections_iqd": 0,
+              "date": "2026-09-17",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1508196,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 1758355,
+              "collections_iqd": 0,
+              "date": "2026-09-18",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1620525,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 1826310,
+              "collections_iqd": 0,
+              "date": "2026-09-19",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1758355,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 1858202,
+              "collections_iqd": 0,
+              "date": "2026-09-20",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1826310,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 1955532,
+              "collections_iqd": 0,
+              "date": "2026-09-21",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1858202,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 2007611,
+              "collections_iqd": 0,
+              "date": "2026-09-22",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1955532,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 2069066,
+              "collections_iqd": 0,
+              "date": "2026-09-23",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2007611,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 2181395,
+              "collections_iqd": 0,
+              "date": "2026-09-24",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2069066,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 2319225,
+              "collections_iqd": 0,
+              "date": "2026-09-25",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2181395,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 2387180,
+              "collections_iqd": 0,
+              "date": "2026-09-26",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2319225,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 2419072,
+              "collections_iqd": 0,
+              "date": "2026-09-27",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2387180,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 2516402,
+              "collections_iqd": 0,
+              "date": "2026-09-28",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2419072,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            }
+          ],
+          "first_shortfall_date": null,
+          "lowest": {
+            "closing_iqd": 332456,
+            "date": "2026-09-02"
+          },
+          "top_inflows": [
+            [
+              "recorded_cash_sales",
+              6103821
+            ],
+            [
+              "unlinked_cash",
+              410261
+            ],
+            [
+              "expected_collections",
+              202000
+            ]
+          ],
+          "top_outflows": [
+            [
+              "owner_drawings",
+              3842460
+            ],
+            [
+              "supplier_payments",
+              761000
+            ],
+            [
+              "expenses",
+              298920
+            ]
+          ]
+        },
+        "conservative": {
+          "assumption_keys": [
+            "collections_expected_not_guaranteed",
+            "sales_from_weekday_averages",
+            "unlinked_cash_projected_from_counts"
+          ],
+          "days": [
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 802592,
+              "collections_iqd": 68000,
+              "date": "2026-08-30",
+              "expenses_iqd": 9964,
+              "opening_iqd": 702700,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 899922,
+              "collections_iqd": 0,
+              "date": "2026-08-31",
+              "expenses_iqd": 9964,
+              "opening_iqd": 802592,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 952001,
+              "collections_iqd": 0,
+              "date": "2026-09-01",
+              "expenses_iqd": 9964,
+              "opening_iqd": 899922,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 252456,
+              "collections_iqd": 0,
+              "date": "2026-09-02",
+              "expenses_iqd": 9964,
+              "opening_iqd": 952001,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 761000,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 364785,
+              "collections_iqd": 0,
+              "date": "2026-09-03",
+              "expenses_iqd": 9964,
+              "opening_iqd": 252456,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 502615,
+              "collections_iqd": 0,
+              "date": "2026-09-04",
+              "expenses_iqd": 9964,
+              "opening_iqd": 364785,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 624570,
+              "collections_iqd": 54000,
+              "date": "2026-09-05",
+              "expenses_iqd": 9964,
+              "opening_iqd": 502615,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 656462,
+              "collections_iqd": 0,
+              "date": "2026-09-06",
+              "expenses_iqd": 9964,
+              "opening_iqd": 624570,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 753792,
+              "collections_iqd": 0,
+              "date": "2026-09-07",
+              "expenses_iqd": 9964,
+              "opening_iqd": 656462,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 805871,
+              "collections_iqd": 0,
+              "date": "2026-09-08",
+              "expenses_iqd": 9964,
+              "opening_iqd": 753792,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 867326,
+              "collections_iqd": 0,
+              "date": "2026-09-09",
+              "expenses_iqd": 9964,
+              "opening_iqd": 805871,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 979655,
+              "collections_iqd": 0,
+              "date": "2026-09-10",
+              "expenses_iqd": 9964,
+              "opening_iqd": 867326,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 1197485,
+              "collections_iqd": 80000,
+              "date": "2026-09-11",
+              "expenses_iqd": 9964,
+              "opening_iqd": 979655,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 1265440,
+              "collections_iqd": 0,
+              "date": "2026-09-12",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1197485,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 1297332,
+              "collections_iqd": 0,
+              "date": "2026-09-13",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1265440,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 1394662,
+              "collections_iqd": 0,
+              "date": "2026-09-14",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1297332,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 1446741,
+              "collections_iqd": 0,
+              "date": "2026-09-15",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1394662,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 1508196,
+              "collections_iqd": 0,
+              "date": "2026-09-16",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1446741,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 1620525,
+              "collections_iqd": 0,
+              "date": "2026-09-17",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1508196,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 1758355,
+              "collections_iqd": 0,
+              "date": "2026-09-18",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1620525,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 1826310,
+              "collections_iqd": 0,
+              "date": "2026-09-19",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1758355,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 1858202,
+              "collections_iqd": 0,
+              "date": "2026-09-20",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1826310,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 1955532,
+              "collections_iqd": 0,
+              "date": "2026-09-21",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1858202,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 2007611,
+              "collections_iqd": 0,
+              "date": "2026-09-22",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1955532,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 2069066,
+              "collections_iqd": 0,
+              "date": "2026-09-23",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2007611,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 2181395,
+              "collections_iqd": 0,
+              "date": "2026-09-24",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2069066,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 2319225,
+              "collections_iqd": 0,
+              "date": "2026-09-25",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2181395,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 2387180,
+              "collections_iqd": 0,
+              "date": "2026-09-26",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2319225,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 2419072,
+              "collections_iqd": 0,
+              "date": "2026-09-27",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2387180,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 2516402,
+              "collections_iqd": 0,
+              "date": "2026-09-28",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2419072,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            }
+          ],
+          "first_shortfall_date": null,
+          "lowest": {
+            "closing_iqd": 252456,
+            "date": "2026-09-02"
+          },
+          "top_inflows": [
+            [
+              "recorded_cash_sales",
+              6103821
+            ],
+            [
+              "unlinked_cash",
+              410261
+            ],
+            [
+              "expected_collections",
+              202000
+            ]
+          ],
+          "top_outflows": [
+            [
+              "owner_drawings",
+              3842460
+            ],
+            [
+              "supplier_payments",
+              761000
+            ],
+            [
+              "expenses",
+              298920
+            ]
+          ]
+        },
+        "stress": {
+          "assumption_keys": [
+            "collections_expected_not_guaranteed",
+            "sales_from_weekday_averages",
+            "unlinked_cash_projected_from_counts"
+          ],
+          "days": [
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 734592,
+              "collections_iqd": 0,
+              "date": "2026-08-30",
+              "expenses_iqd": 9964,
+              "opening_iqd": 702700,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 831922,
+              "collections_iqd": 0,
+              "date": "2026-08-31",
+              "expenses_iqd": 9964,
+              "opening_iqd": 734592,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 884001,
+              "collections_iqd": 0,
+              "date": "2026-09-01",
+              "expenses_iqd": 9964,
+              "opening_iqd": 831922,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 184456,
+              "collections_iqd": 0,
+              "date": "2026-09-02",
+              "expenses_iqd": 9964,
+              "opening_iqd": 884001,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 761000,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 296785,
+              "collections_iqd": 0,
+              "date": "2026-09-03",
+              "expenses_iqd": 9964,
+              "opening_iqd": 184456,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 434615,
+              "collections_iqd": 0,
+              "date": "2026-09-04",
+              "expenses_iqd": 9964,
+              "opening_iqd": 296785,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 502570,
+              "collections_iqd": 0,
+              "date": "2026-09-05",
+              "expenses_iqd": 9964,
+              "opening_iqd": 434615,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 534462,
+              "collections_iqd": 0,
+              "date": "2026-09-06",
+              "expenses_iqd": 9964,
+              "opening_iqd": 502570,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 631792,
+              "collections_iqd": 0,
+              "date": "2026-09-07",
+              "expenses_iqd": 9964,
+              "opening_iqd": 534462,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 683871,
+              "collections_iqd": 0,
+              "date": "2026-09-08",
+              "expenses_iqd": 9964,
+              "opening_iqd": 631792,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 745326,
+              "collections_iqd": 0,
+              "date": "2026-09-09",
+              "expenses_iqd": 9964,
+              "opening_iqd": 683871,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 857655,
+              "collections_iqd": 0,
+              "date": "2026-09-10",
+              "expenses_iqd": 9964,
+              "opening_iqd": 745326,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 995485,
+              "collections_iqd": 0,
+              "date": "2026-09-11",
+              "expenses_iqd": 9964,
+              "opening_iqd": 857655,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 1063440,
+              "collections_iqd": 0,
+              "date": "2026-09-12",
+              "expenses_iqd": 9964,
+              "opening_iqd": 995485,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 1095332,
+              "collections_iqd": 0,
+              "date": "2026-09-13",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1063440,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 1192662,
+              "collections_iqd": 0,
+              "date": "2026-09-14",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1095332,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 1244741,
+              "collections_iqd": 0,
+              "date": "2026-09-15",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1192662,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 1306196,
+              "collections_iqd": 0,
+              "date": "2026-09-16",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1244741,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 1418525,
+              "collections_iqd": 0,
+              "date": "2026-09-17",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1306196,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 1556355,
+              "collections_iqd": 0,
+              "date": "2026-09-18",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1418525,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 1624310,
+              "collections_iqd": 0,
+              "date": "2026-09-19",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1556355,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 1656202,
+              "collections_iqd": 0,
+              "date": "2026-09-20",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1624310,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 1753532,
+              "collections_iqd": 0,
+              "date": "2026-09-21",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1656202,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            },
+            {
+              "cash_sales_iqd": 177750,
+              "closing_iqd": 1805611,
+              "collections_iqd": 0,
+              "date": "2026-09-22",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1753532,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12375
+            },
+            {
+              "cash_sales_iqd": 186563,
+              "closing_iqd": 1867066,
+              "collections_iqd": 0,
+              "date": "2026-09-23",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1805611,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12938
+            },
+            {
+              "cash_sales_iqd": 227375,
+              "closing_iqd": 1979395,
+              "collections_iqd": 0,
+              "date": "2026-09-24",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1867066,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 23000
+            },
+            {
+              "cash_sales_iqd": 268188,
+              "closing_iqd": 2117225,
+              "collections_iqd": 0,
+              "date": "2026-09-25",
+              "expenses_iqd": 9964,
+              "opening_iqd": 1979395,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7688
+            },
+            {
+              "cash_sales_iqd": 192563,
+              "closing_iqd": 2185180,
+              "collections_iqd": 0,
+              "date": "2026-09-26",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2117225,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13438
+            },
+            {
+              "cash_sales_iqd": 159000,
+              "closing_iqd": 2217072,
+              "collections_iqd": 0,
+              "date": "2026-09-27",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2185180,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10938
+            },
+            {
+              "cash_sales_iqd": 219813,
+              "closing_iqd": 2314402,
+              "collections_iqd": 0,
+              "date": "2026-09-28",
+              "expenses_iqd": 9964,
+              "opening_iqd": 2217072,
+              "owner_drawings_iqd": 128082,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15563
+            }
+          ],
+          "first_shortfall_date": null,
+          "lowest": {
+            "closing_iqd": 184456,
+            "date": "2026-09-02"
+          },
+          "top_inflows": [
+            [
+              "recorded_cash_sales",
+              6103821
+            ],
+            [
+              "unlinked_cash",
+              410261
+            ],
+            [
+              "expected_collections",
+              0
+            ]
+          ],
+          "top_outflows": [
+            [
+              "owner_drawings",
+              3842460
+            ],
+            [
+              "supplier_payments",
+              761000
+            ],
+            [
+              "expenses",
+              298920
+            ]
+          ]
+        }
+      },
+      "score_end": "2026-09-28",
+      "scored_days": 30
+    },
+    "75": {
+      "baseline": {
+        "daily_change_iqd": -8214,
+        "days": [
+          {
+            "closing_iqd": 862286,
+            "date": "2026-09-14"
+          },
+          {
+            "closing_iqd": 854072,
+            "date": "2026-09-15"
+          },
+          {
+            "closing_iqd": 845858,
+            "date": "2026-09-16"
+          },
+          {
+            "closing_iqd": 837644,
+            "date": "2026-09-17"
+          },
+          {
+            "closing_iqd": 829430,
+            "date": "2026-09-18"
+          },
+          {
+            "closing_iqd": 821216,
+            "date": "2026-09-19"
+          },
+          {
+            "closing_iqd": 813002,
+            "date": "2026-09-20"
+          },
+          {
+            "closing_iqd": 804788,
+            "date": "2026-09-21"
+          },
+          {
+            "closing_iqd": 796574,
+            "date": "2026-09-22"
+          },
+          {
+            "closing_iqd": 788360,
+            "date": "2026-09-23"
+          },
+          {
+            "closing_iqd": 780146,
+            "date": "2026-09-24"
+          },
+          {
+            "closing_iqd": 771932,
+            "date": "2026-09-25"
+          },
+          {
+            "closing_iqd": 763718,
+            "date": "2026-09-26"
+          },
+          {
+            "closing_iqd": 755504,
+            "date": "2026-09-27"
+          },
+          {
+            "closing_iqd": 747290,
+            "date": "2026-09-28"
+          },
+          {
+            "closing_iqd": 739076,
+            "date": "2026-09-29"
+          },
+          {
+            "closing_iqd": 730862,
+            "date": "2026-09-30"
+          },
+          {
+            "closing_iqd": 722648,
+            "date": "2026-10-01"
+          },
+          {
+            "closing_iqd": 714434,
+            "date": "2026-10-02"
+          },
+          {
+            "closing_iqd": 706220,
+            "date": "2026-10-03"
+          },
+          {
+            "closing_iqd": 698006,
+            "date": "2026-10-04"
+          },
+          {
+            "closing_iqd": 689792,
+            "date": "2026-10-05"
+          },
+          {
+            "closing_iqd": 681578,
+            "date": "2026-10-06"
+          },
+          {
+            "closing_iqd": 673364,
+            "date": "2026-10-07"
+          },
+          {
+            "closing_iqd": 665150,
+            "date": "2026-10-08"
+          },
+          {
+            "closing_iqd": 656936,
+            "date": "2026-10-09"
+          },
+          {
+            "closing_iqd": 648722,
+            "date": "2026-10-10"
+          },
+          {
+            "closing_iqd": 640508,
+            "date": "2026-10-11"
+          },
+          {
+            "closing_iqd": 632294,
+            "date": "2026-10-12"
+          },
+          {
+            "closing_iqd": 624080,
+            "date": "2026-10-13"
+          }
+        ],
+        "source_ids": [
+          "DEMO-01-CNT-068",
+          "DEMO-01-CNT-075",
+          "DEMO-01-CNT-075"
+        ]
+      },
+      "cutoff": "2026-09-13",
+      "prediction_days": 30,
+      "scenarios": {
+        "base": {
+          "assumption_keys": [
+            "collections_expected_not_guaranteed",
+            "sales_from_weekday_averages",
+            "unlinked_cash_projected_from_counts"
+          ],
+          "days": [
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 975253,
+              "collections_iqd": 0,
+              "date": "2026-09-14",
+              "expenses_iqd": 10321,
+              "opening_iqd": 870500,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 1035069,
+              "collections_iqd": 0,
+              "date": "2026-09-15",
+              "expenses_iqd": 10321,
+              "opening_iqd": 975253,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 348260,
+              "collections_iqd": 0,
+              "date": "2026-09-16",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1035069,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 757000,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 472888,
+              "collections_iqd": 0,
+              "date": "2026-09-17",
+              "expenses_iqd": 10321,
+              "opening_iqd": 348260,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 632891,
+              "collections_iqd": 0,
+              "date": "2026-09-18",
+              "expenses_iqd": 10321,
+              "opening_iqd": 472888,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 711707,
+              "collections_iqd": 0,
+              "date": "2026-09-19",
+              "expenses_iqd": 10321,
+              "opening_iqd": 632891,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 747022,
+              "collections_iqd": 0,
+              "date": "2026-09-20",
+              "expenses_iqd": 10321,
+              "opening_iqd": 711707,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 851775,
+              "collections_iqd": 0,
+              "date": "2026-09-21",
+              "expenses_iqd": 10321,
+              "opening_iqd": 747022,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 911591,
+              "collections_iqd": 0,
+              "date": "2026-09-22",
+              "expenses_iqd": 10321,
+              "opening_iqd": 851775,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 981782,
+              "collections_iqd": 0,
+              "date": "2026-09-23",
+              "expenses_iqd": 10321,
+              "opening_iqd": 911591,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 1106410,
+              "collections_iqd": 0,
+              "date": "2026-09-24",
+              "expenses_iqd": 10321,
+              "opening_iqd": 981782,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 1266413,
+              "collections_iqd": 0,
+              "date": "2026-09-25",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1106410,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 1345229,
+              "collections_iqd": 0,
+              "date": "2026-09-26",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1266413,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 1380544,
+              "collections_iqd": 0,
+              "date": "2026-09-27",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1345229,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 1485297,
+              "collections_iqd": 0,
+              "date": "2026-09-28",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1380544,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 1545113,
+              "collections_iqd": 0,
+              "date": "2026-09-29",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1485297,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 1615304,
+              "collections_iqd": 0,
+              "date": "2026-09-30",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1545113,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 1739932,
+              "collections_iqd": 0,
+              "date": "2026-10-01",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1615304,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 1899935,
+              "collections_iqd": 0,
+              "date": "2026-10-02",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1739932,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 1978751,
+              "collections_iqd": 0,
+              "date": "2026-10-03",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1899935,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 2014066,
+              "collections_iqd": 0,
+              "date": "2026-10-04",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1978751,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 2118819,
+              "collections_iqd": 0,
+              "date": "2026-10-05",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2014066,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 2178635,
+              "collections_iqd": 0,
+              "date": "2026-10-06",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2118819,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 2248826,
+              "collections_iqd": 0,
+              "date": "2026-10-07",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2178635,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 2373454,
+              "collections_iqd": 0,
+              "date": "2026-10-08",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2248826,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 2533457,
+              "collections_iqd": 0,
+              "date": "2026-10-09",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2373454,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 2612273,
+              "collections_iqd": 0,
+              "date": "2026-10-10",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2533457,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 2647588,
+              "collections_iqd": 0,
+              "date": "2026-10-11",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2612273,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 2752341,
+              "collections_iqd": 0,
+              "date": "2026-10-12",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2647588,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 2812157,
+              "collections_iqd": 0,
+              "date": "2026-10-13",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2752341,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            }
+          ],
+          "first_shortfall_date": null,
+          "lowest": {
+            "closing_iqd": 348260,
+            "date": "2026-09-16"
+          },
+          "top_inflows": [
+            [
+              "recorded_cash_sales",
+              5998194
+            ],
+            [
+              "unlinked_cash",
+              399763
+            ],
+            [
+              "expected_collections",
+              0
+            ]
+          ],
+          "top_outflows": [
+            [
+              "owner_drawings",
+              3389670
+            ],
+            [
+              "supplier_payments",
+              757000
+            ],
+            [
+              "expenses",
+              309630
+            ]
+          ]
+        },
+        "conservative": {
+          "assumption_keys": [
+            "collections_expected_not_guaranteed",
+            "sales_from_weekday_averages",
+            "unlinked_cash_projected_from_counts"
+          ],
+          "days": [
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 975253,
+              "collections_iqd": 0,
+              "date": "2026-09-14",
+              "expenses_iqd": 10321,
+              "opening_iqd": 870500,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 1035069,
+              "collections_iqd": 0,
+              "date": "2026-09-15",
+              "expenses_iqd": 10321,
+              "opening_iqd": 975253,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 348260,
+              "collections_iqd": 0,
+              "date": "2026-09-16",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1035069,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 757000,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 472888,
+              "collections_iqd": 0,
+              "date": "2026-09-17",
+              "expenses_iqd": 10321,
+              "opening_iqd": 348260,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 632891,
+              "collections_iqd": 0,
+              "date": "2026-09-18",
+              "expenses_iqd": 10321,
+              "opening_iqd": 472888,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 711707,
+              "collections_iqd": 0,
+              "date": "2026-09-19",
+              "expenses_iqd": 10321,
+              "opening_iqd": 632891,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 747022,
+              "collections_iqd": 0,
+              "date": "2026-09-20",
+              "expenses_iqd": 10321,
+              "opening_iqd": 711707,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 851775,
+              "collections_iqd": 0,
+              "date": "2026-09-21",
+              "expenses_iqd": 10321,
+              "opening_iqd": 747022,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 911591,
+              "collections_iqd": 0,
+              "date": "2026-09-22",
+              "expenses_iqd": 10321,
+              "opening_iqd": 851775,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 981782,
+              "collections_iqd": 0,
+              "date": "2026-09-23",
+              "expenses_iqd": 10321,
+              "opening_iqd": 911591,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 1106410,
+              "collections_iqd": 0,
+              "date": "2026-09-24",
+              "expenses_iqd": 10321,
+              "opening_iqd": 981782,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 1266413,
+              "collections_iqd": 0,
+              "date": "2026-09-25",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1106410,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 1345229,
+              "collections_iqd": 0,
+              "date": "2026-09-26",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1266413,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 1380544,
+              "collections_iqd": 0,
+              "date": "2026-09-27",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1345229,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 1485297,
+              "collections_iqd": 0,
+              "date": "2026-09-28",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1380544,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 1545113,
+              "collections_iqd": 0,
+              "date": "2026-09-29",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1485297,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 1615304,
+              "collections_iqd": 0,
+              "date": "2026-09-30",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1545113,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 1739932,
+              "collections_iqd": 0,
+              "date": "2026-10-01",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1615304,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 1899935,
+              "collections_iqd": 0,
+              "date": "2026-10-02",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1739932,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 1978751,
+              "collections_iqd": 0,
+              "date": "2026-10-03",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1899935,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 2014066,
+              "collections_iqd": 0,
+              "date": "2026-10-04",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1978751,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 2118819,
+              "collections_iqd": 0,
+              "date": "2026-10-05",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2014066,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 2178635,
+              "collections_iqd": 0,
+              "date": "2026-10-06",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2118819,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 2248826,
+              "collections_iqd": 0,
+              "date": "2026-10-07",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2178635,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 2373454,
+              "collections_iqd": 0,
+              "date": "2026-10-08",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2248826,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 2533457,
+              "collections_iqd": 0,
+              "date": "2026-10-09",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2373454,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 2612273,
+              "collections_iqd": 0,
+              "date": "2026-10-10",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2533457,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 2647588,
+              "collections_iqd": 0,
+              "date": "2026-10-11",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2612273,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 2752341,
+              "collections_iqd": 0,
+              "date": "2026-10-12",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2647588,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 2812157,
+              "collections_iqd": 0,
+              "date": "2026-10-13",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2752341,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            }
+          ],
+          "first_shortfall_date": null,
+          "lowest": {
+            "closing_iqd": 348260,
+            "date": "2026-09-16"
+          },
+          "top_inflows": [
+            [
+              "recorded_cash_sales",
+              5998194
+            ],
+            [
+              "unlinked_cash",
+              399763
+            ],
+            [
+              "expected_collections",
+              0
+            ]
+          ],
+          "top_outflows": [
+            [
+              "owner_drawings",
+              3389670
+            ],
+            [
+              "supplier_payments",
+              757000
+            ],
+            [
+              "expenses",
+              309630
+            ]
+          ]
+        },
+        "stress": {
+          "assumption_keys": [
+            "collections_expected_not_guaranteed",
+            "sales_from_weekday_averages",
+            "unlinked_cash_projected_from_counts"
+          ],
+          "days": [
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 975253,
+              "collections_iqd": 0,
+              "date": "2026-09-14",
+              "expenses_iqd": 10321,
+              "opening_iqd": 870500,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 1035069,
+              "collections_iqd": 0,
+              "date": "2026-09-15",
+              "expenses_iqd": 10321,
+              "opening_iqd": 975253,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 348260,
+              "collections_iqd": 0,
+              "date": "2026-09-16",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1035069,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 757000,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 472888,
+              "collections_iqd": 0,
+              "date": "2026-09-17",
+              "expenses_iqd": 10321,
+              "opening_iqd": 348260,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 632891,
+              "collections_iqd": 0,
+              "date": "2026-09-18",
+              "expenses_iqd": 10321,
+              "opening_iqd": 472888,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 711707,
+              "collections_iqd": 0,
+              "date": "2026-09-19",
+              "expenses_iqd": 10321,
+              "opening_iqd": 632891,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 747022,
+              "collections_iqd": 0,
+              "date": "2026-09-20",
+              "expenses_iqd": 10321,
+              "opening_iqd": 711707,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 851775,
+              "collections_iqd": 0,
+              "date": "2026-09-21",
+              "expenses_iqd": 10321,
+              "opening_iqd": 747022,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 911591,
+              "collections_iqd": 0,
+              "date": "2026-09-22",
+              "expenses_iqd": 10321,
+              "opening_iqd": 851775,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 981782,
+              "collections_iqd": 0,
+              "date": "2026-09-23",
+              "expenses_iqd": 10321,
+              "opening_iqd": 911591,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 1106410,
+              "collections_iqd": 0,
+              "date": "2026-09-24",
+              "expenses_iqd": 10321,
+              "opening_iqd": 981782,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 1266413,
+              "collections_iqd": 0,
+              "date": "2026-09-25",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1106410,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 1345229,
+              "collections_iqd": 0,
+              "date": "2026-09-26",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1266413,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 1380544,
+              "collections_iqd": 0,
+              "date": "2026-09-27",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1345229,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 1485297,
+              "collections_iqd": 0,
+              "date": "2026-09-28",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1380544,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 1545113,
+              "collections_iqd": 0,
+              "date": "2026-09-29",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1485297,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 1615304,
+              "collections_iqd": 0,
+              "date": "2026-09-30",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1545113,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 1739932,
+              "collections_iqd": 0,
+              "date": "2026-10-01",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1615304,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 1899935,
+              "collections_iqd": 0,
+              "date": "2026-10-02",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1739932,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 1978751,
+              "collections_iqd": 0,
+              "date": "2026-10-03",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1899935,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 2014066,
+              "collections_iqd": 0,
+              "date": "2026-10-04",
+              "expenses_iqd": 10321,
+              "opening_iqd": 1978751,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 2118819,
+              "collections_iqd": 0,
+              "date": "2026-10-05",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2014066,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 2178635,
+              "collections_iqd": 0,
+              "date": "2026-10-06",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2118819,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            },
+            {
+              "cash_sales_iqd": 181188,
+              "closing_iqd": 2248826,
+              "collections_iqd": 0,
+              "date": "2026-10-07",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2178635,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 12313
+            },
+            {
+              "cash_sales_iqd": 225125,
+              "closing_iqd": 2373454,
+              "collections_iqd": 0,
+              "date": "2026-10-08",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2248826,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 22813
+            },
+            {
+              "cash_sales_iqd": 275375,
+              "closing_iqd": 2533457,
+              "collections_iqd": 0,
+              "date": "2026-10-09",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2373454,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 7938
+            },
+            {
+              "cash_sales_iqd": 188938,
+              "closing_iqd": 2612273,
+              "collections_iqd": 0,
+              "date": "2026-10-10",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2533457,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 13188
+            },
+            {
+              "cash_sales_iqd": 148375,
+              "closing_iqd": 2647588,
+              "collections_iqd": 0,
+              "date": "2026-10-11",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2612273,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 10250
+            },
+            {
+              "cash_sales_iqd": 213000,
+              "closing_iqd": 2752341,
+              "collections_iqd": 0,
+              "date": "2026-10-12",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2647588,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 15063
+            },
+            {
+              "cash_sales_iqd": 171438,
+              "closing_iqd": 2812157,
+              "collections_iqd": 0,
+              "date": "2026-10-13",
+              "expenses_iqd": 10321,
+              "opening_iqd": 2752341,
+              "owner_drawings_iqd": 112989,
+              "supplier_payments_iqd": 0,
+              "unlinked_cash_iqd": 11688
+            }
+          ],
+          "first_shortfall_date": null,
+          "lowest": {
+            "closing_iqd": 348260,
+            "date": "2026-09-16"
+          },
+          "top_inflows": [
+            [
+              "recorded_cash_sales",
+              5998194
+            ],
+            [
+              "unlinked_cash",
+              399763
+            ],
+            [
+              "expected_collections",
+              0
+            ]
+          ],
+          "top_outflows": [
+            [
+              "owner_drawings",
+              3389670
+            ],
+            [
+              "supplier_payments",
+              757000
+            ],
+            [
+              "expenses",
+              309630
+            ]
+          ]
+        }
+      },
+      "score_end": "2026-09-28",
+      "scored_days": 15
+    }
+  },
+  "final_test_run": false,
+  "metrics": null,
+  "realized_outcomes_read": false,
+  "split": "development"
+}

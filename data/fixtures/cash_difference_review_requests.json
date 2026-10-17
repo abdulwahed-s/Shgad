@@ -1,0 +1,23 @@
+[
+  {
+    "amount_iqd": 25000,
+    "client_entry_id": "T34-REJECT",
+    "expected_error": "DIFFERENCE_SIGN_MISMATCH",
+    "expected_new_rows": 0,
+    "resolution": "expense_unrecorded"
+  },
+  {
+    "amount_iqd": 25000,
+    "client_entry_id": "T28-CAPITAL",
+    "expected_created_source_id": "T22-00008",
+    "expected_remaining_iqd": 0,
+    "resolution": "capital_injection"
+  },
+  {
+    "amount_iqd": 25000,
+    "client_entry_id": "T28-CAPITAL",
+    "expected_duplicate": true,
+    "expected_new_rows": 0,
+    "resolution": "capital_injection"
+  }
+]

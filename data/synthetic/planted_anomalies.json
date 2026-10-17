@@ -1,0 +1,111 @@
+{
+  "anomalies": [
+    {
+      "fixture": "duplicate_rows.csv",
+      "id": "exact-duplicate",
+      "label": "exact_duplicate",
+      "source_ids": [
+        "HAPPY-00001"
+      ]
+    },
+    {
+      "fixture": "duplicate_rows.csv",
+      "id": "suspected-duplicate",
+      "label": "suspected_duplicate",
+      "source_ids": [
+        "HAPPY-00003",
+        "HAPPY-SUSPECT"
+      ]
+    },
+    {
+      "fixture": "overlapping_exports.csv",
+      "id": "overlap",
+      "label": "overlapping_export",
+      "source_ids": [
+        "HAPPY-00001",
+        "HAPPY-00003"
+      ]
+    },
+    {
+      "fixture": "unmatched_payment.csv",
+      "id": "unmatched",
+      "label": "unmatched",
+      "source_ids": [
+        "UNMATCHED-PAYMENT"
+      ]
+    },
+    {
+      "counterparty_ids": [
+        "CUST-02",
+        "CUST-03"
+      ],
+      "fixture": "ambiguous_customers.csv",
+      "id": "ambiguous",
+      "label": "ambiguous",
+      "source_ids": [
+        "AMBIGUOUS-00001",
+        "AMBIGUOUS-00002"
+      ]
+    },
+    {
+      "fixture": "malicious_descriptions.csv",
+      "id": "malicious",
+      "label": "malicious_description",
+      "source_ids": [
+        "MALICIOUS-00001",
+        "MALICIOUS-00002",
+        "MALICIOUS-00003"
+      ]
+    },
+    {
+      "fixture": "bad_dates_and_amounts.csv",
+      "id": "bad-input",
+      "label": "bad_date_amount_currency",
+      "source_ids": [
+        "BAD-DATE",
+        "AMBIGUOUS-DATE",
+        "BAD-NEGATIVE",
+        "BAD-DECIMAL",
+        "BAD-CURRENCY"
+      ]
+    },
+    {
+      "fixture": "missing_opening_balance.csv",
+      "id": "no-opening",
+      "label": "missing_opening_balance",
+      "source_ids": []
+    },
+    {
+      "fixture": "missing_costs.csv",
+      "id": "no-costs",
+      "label": "missing_costs",
+      "source_ids": []
+    },
+    {
+      "fixture": "three_instalments_void.csv",
+      "id": "instalments",
+      "label": "void_corrected_collection",
+      "source_ids": [
+        "T27-00003"
+      ]
+    },
+    {
+      "fixture": "../synthetic/observed_90d.csv",
+      "id": "late-observed",
+      "label": "late_collection",
+      "source_ids": [
+        "DEMO-01-00149",
+        "DEMO-01-00302",
+        "DEMO-01-00453",
+        "DEMO-01-00600"
+      ]
+    },
+    {
+      "app_access": "forbidden",
+      "artifact": "cash_difference_labels.json",
+      "id": "cash-causes",
+      "label": "evaluation_only_true_causes"
+    }
+  ],
+  "scope": "evaluation_only"
+}

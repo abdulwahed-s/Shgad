@@ -1,0 +1,2 @@
+obligation_id,kind,origin_transaction_id,counterparty_id,original_amount_iqd,due_date
+T27-R,receivable,T27-00001,CUST-02,90000,2026-09-28

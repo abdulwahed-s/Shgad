@@ -1,0 +1,10 @@
+{
+  "account": "aggregate_cash",
+  "amount_iqd": 200000,
+  "business_date": "2026-07-01",
+  "import_batch_id": "seven_day_overdue-OPEN-BATCH",
+  "opening_balance_id": "seven_day_overdue-OPEN",
+  "source_id": "seven_day_overdue-OPEN",
+  "source_row": 1,
+  "source_system": "synthetic_csv"
+}

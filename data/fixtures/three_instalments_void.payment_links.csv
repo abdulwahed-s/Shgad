@@ -1,0 +1,5 @@
+payment_link_id,payment_transaction_id,obligation_id,amount_iqd,match_basis,created_at
+T27-00002-LINK,T27-00002,T27-R,30000,confirmed,2026-09-21T12:00:00+03:00
+T27-00003-LINK,T27-00003,T27-R,25000,confirmed,2026-09-24T12:00:00+03:00
+T27-00004-LINK,T27-00004,T27-R,35000,confirmed,2026-09-28T16:00:00+03:00
+T27-00005-LINK,T27-00005,T27-R,20000,confirmed,2026-09-28T20:05:00+03:00

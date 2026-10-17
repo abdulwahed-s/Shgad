@@ -1,0 +1,2 @@
+client_entry_id,reason,void_id,transaction_id,source_id,voided_at
+T27-VOID-CLIENT,تصحيح دفعة تجريبية بطلب صاحب المحل,T27-VOID,T27-00003,T27-00003,2026-09-28T20:00:00+03:00

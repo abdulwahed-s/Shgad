@@ -7,9 +7,9 @@ with figures that can be traced back to their source rows.
 Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
 > **Available now:** a tested backend health endpoint, strict ledger schemas,
-> SQLite migrations, a business clock and deterministic financial primitives.
-> Flutter remains a static localized shell. Merchant features below remain planned;
-> no benchmark results or demo dataset exist yet.
+> SQLite migrations, deterministic financial primitives and reproducible fictional
+> merchant CSVs with independent development truth. Flutter remains a static
+> localized shell. Merchant workflows remain planned; no model benchmarks have run.
 
 ## Planned features
 
@@ -112,6 +112,31 @@ with closing(connect_database("shgad.db")) as connection:
 This creates the schema only. Import, reconciliation workflows, financial HTTP
 endpoints and a populated merchant ledger are not implemented yet.
 
+Seeded fictional data and offline development truth are available. From the
+repository root (standard library only):
+
+```sh
+python scripts/generate_synthetic_data.py --seed 20260701
+python scripts/make_ground_truth.py
+```
+
+The generator writes 90 observed days and 30 separate future days for one
+fictional shop, plus three shops reserved for frozen final forecast testing.
+It constructs daily counts, recorded sales, signed unexplained differences,
+capital, credit and supplier settlements, and isolated review/void fixtures.
+The independent calculator imports no backend financial services. Its
+development expectations include sales, debts, estimated gross margin,
+seven-day positions and three forecast scenarios at historical cutoffs.
+These are offline reference values; application tools and a production
+forecast are still pending. Development score windows stop at day 90.
+
+See [data/README.md](data/README.md) for file boundaries and generation
+metadata. Same-seed regeneration was byte-identical in a fresh process,
+including the manifest. Arabic and plausibility reviews are pending.
+Held-out questions remain outside the repository; only the format and a
+human-run hash/count helper are prepared. No sealed set or model evaluation
+is claimed.
+
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
 its license. Backend requests use one Dio client configured with `API_BASE_URL`;
@@ -141,8 +166,12 @@ is implemented yet.
 Entry, difference-review and void HTTP endpoints, and the next-seven-days view,
 remain planned. The tested review/void primitives have no merchant-facing workflow.
 
-Verified locally: **236 backend tests**, Ruff lint and format checks
-(28 Python files). Revised financial rules were tested before implementation.
+Verified locally: **279 backend tests**, including 43 offline data/evaluation
+checks, plus Ruff lint and formatting for 38 Python files. Financial-rule
+regressions were observed failing before their implementation or fix.
+To include offline scripts in lint/format checks from backend/, run
+`python -m ruff check --config pyproject.toml . ../scripts` and
+`python -m ruff format --check --config pyproject.toml . ../scripts`.
 Checks include recorded sales and signed differences, capital, review validation,
 void-adjusted balances and knowledge cutoffs, v1 upgrades, replay and atomic rollback.
 Concurrent review requests cannot explain the same cash twice. No LLM is connected.
@@ -159,7 +188,7 @@ runs backend lint/format/tests and Flutter localization, formatting, analysis an
 on pushes and pull requests. Its linked run history shows the measured CI results.
 There are no financial benchmarks or model evaluations.
 
-Demo seed/import instructions and a merchant demo remain pending.
+Synthetic CSV generation is available; ledger import and a merchant demo remain pending.
 
 ## Data and scope
 
@@ -167,5 +196,9 @@ All datasets must be fictional. Real customer and transaction records are outsid
 of this project. The demo will cover one merchant; payment execution and formal tax/accounting
 services are outside the planned MVP.
 
-Application
-model/API integration and synthetic data generation remain planned.
+GPT-6.1 Sol drafted the fictional scenario templates. Deterministic seeded Python
+generated all numeric records.
+The scenario manifest records the drafting brief and the user-confirmed model
+display name; the exact provider model ID/settings remain unavailable and are
+not guessed. No model-provider API call was used for this dataset.
+Application model/API integration remains planned.

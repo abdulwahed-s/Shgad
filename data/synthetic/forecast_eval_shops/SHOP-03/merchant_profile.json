@@ -1,0 +1,54 @@
+{
+  "account_scope": "aggregate_cash",
+  "business_as_of": "2026-09-28",
+  "counterparties": [
+    {
+      "counterparty_id": "CUST-01",
+      "display_name": "أبو حيدر",
+      "kind": "customer"
+    },
+    {
+      "counterparty_id": "CUST-02",
+      "display_name": "أبو علي - دفتر أ",
+      "kind": "customer"
+    },
+    {
+      "counterparty_id": "CUST-03",
+      "display_name": "ابو علي - دفتر ب",
+      "kind": "customer"
+    },
+    {
+      "counterparty_id": "CUST-04",
+      "display_name": "أم نور التجريبية",
+      "kind": "customer"
+    },
+    {
+      "counterparty_id": "CUST-05",
+      "display_name": "أبو سجاد التجريبي",
+      "kind": "customer"
+    },
+    {
+      "counterparty_id": "CUST-06",
+      "display_name": "أم زين التجريبية",
+      "kind": "customer"
+    },
+    {
+      "counterparty_id": "SUP-01",
+      "display_name": "مجهز الرف التجريبي",
+      "kind": "supplier"
+    },
+    {
+      "counterparty_id": "SUP-02",
+      "display_name": "مجهز السلة التجريبي",
+      "kind": "supplier"
+    }
+  ],
+  "display_name": "محل الرف التجريبي SHOP-03",
+  "fictional": true,
+  "human_plausibility_review": "pending",
+  "merchant_id": "SHOP-03",
+  "real_people_or_records_used": false,
+  "timezone": "Asia/Baghdad",
+  "use": "frozen_final_forecast_evaluation_only",
+  "week_start": "saturday"
+}

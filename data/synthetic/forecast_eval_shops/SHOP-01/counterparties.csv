@@ -1,0 +1,9 @@
+counterparty_id,display_name,kind
+CUST-01,أبو حيدر,customer
+CUST-02,أبو علي - دفتر أ,customer
+CUST-03,ابو علي - دفتر ب,customer
+CUST-04,أم نور التجريبية,customer
+CUST-05,أبو سجاد التجريبي,customer
+CUST-06,أم زين التجريبية,customer
+SUP-01,مجهز الرف التجريبي,supplier
+SUP-02,مجهز السلة التجريبي,supplier

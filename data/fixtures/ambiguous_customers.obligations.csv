@@ -1,0 +1,3 @@
+obligation_id,kind,origin_transaction_id,counterparty_id,original_amount_iqd,due_date
+AMBIGUOUS-CUST-02,receivable,AMBIGUOUS-00001,CUST-02,40000,2026-09-18
+AMBIGUOUS-CUST-03,receivable,AMBIGUOUS-00002,CUST-03,40000,2026-09-18

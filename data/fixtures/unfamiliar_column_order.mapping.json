@@ -1,0 +1,22 @@
+{
+  "IQD": "amount_iqd",
+  "Notes": "description",
+  "Reference": "source_id",
+  "When": "occurred_at",
+  "business_date": "business_date",
+  "category_id": "category_id",
+  "client_entry_id": "client_entry_id",
+  "counterparty_id": "counterparty_id",
+  "due_date": "due_date",
+  "idempotency_key": "idempotency_key",
+  "import_batch_id": "import_batch_id",
+  "obligation_id": "obligation_id",
+  "quantity": "quantity",
+  "recorded_at": "recorded_at",
+  "source": "source",
+  "source_row": "source_row",
+  "source_system": "source_system",
+  "status": "status",
+  "transaction_id": "transaction_id",
+  "type": "type"
+}

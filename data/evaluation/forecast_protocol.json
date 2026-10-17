@@ -1,0 +1,66 @@
+{
+  "application_input_allowlist": [
+    "observed_90d.csv",
+    "merchant_profile.json",
+    "opening_balance.json",
+    "categories.csv",
+    "counterparties.csv",
+    "obligations.csv",
+    "payment_links.csv",
+    "entry_voids.csv"
+  ],
+  "development": [
+    {
+      "cutoff_day": 60,
+      "prediction_days": 30,
+      "score_end_day": 90,
+      "score_start_day": 61,
+      "scored_days": 30
+    },
+    {
+      "cutoff_day": 75,
+      "prediction_days": 30,
+      "score_end_day": 90,
+      "score_start_day": 76,
+      "scored_days": 15
+    }
+  ],
+  "development_forbidden_outcomes": {
+    "end_day": 120,
+    "start_day": 91
+  },
+  "final_test": {
+    "cutoff_day": 90,
+    "extra_shops": [
+      {
+        "seed": 4029097436791498883,
+        "shop_id": "SHOP-01"
+      },
+      {
+        "seed": 9767372779664702894,
+        "shop_id": "SHOP-02"
+      },
+      {
+        "seed": 4649773581756320025,
+        "shop_id": "SHOP-03"
+      }
+    ],
+    "post_test_changes_must_be_disclosed": true,
+    "prediction_days": 30,
+    "primary_shop": "DEMO-01",
+    "requires_method_freeze": true,
+    "run_status": "not_run",
+    "scored_days": 30
+  },
+  "not_application_inputs": [
+    "generation_manifest.json",
+    "future_30d_ground_truth.csv",
+    "all_120d_canonical.csv",
+    "forecast_eval_shops/",
+    "cash_difference_labels.json",
+    "planted_anomalies.json",
+    "customer_lateness_profiles.json",
+    "evaluation_only/",
+    "../evaluation/"
+  ]
+}

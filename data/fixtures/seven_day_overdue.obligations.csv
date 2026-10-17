@@ -1,0 +1,4 @@
+obligation_id,kind,origin_transaction_id,counterparty_id,original_amount_iqd,due_date
+T30-P,payable,T30-OVERDUE-00001,SUP-01,650000,2026-09-27
+T30-R,receivable,T30-OVERDUE-00002,CUST-01,150000,2026-09-30
+T30-L,receivable,T30-OVERDUE-00003,CUST-03,40000,2026-09-20

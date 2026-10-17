@@ -1,0 +1,54 @@
+{
+  "labels": [
+    {
+      "fixture": "duplicate_rows.csv",
+      "id": "exact-duplicate",
+      "label": "exact_duplicate",
+      "source_ids": [
+        "HAPPY-00001"
+      ]
+    },
+    {
+      "fixture": "duplicate_rows.csv",
+      "id": "suspected-duplicate",
+      "label": "suspected_duplicate",
+      "source_ids": [
+        "HAPPY-00003",
+        "HAPPY-SUSPECT"
+      ]
+    },
+    {
+      "fixture": "unmatched_payment.csv",
+      "id": "unmatched",
+      "label": "unmatched",
+      "source_ids": [
+        "UNMATCHED-PAYMENT"
+      ]
+    },
+    {
+      "counterparty_ids": [
+        "CUST-02",
+        "CUST-03"
+      ],
+      "fixture": "ambiguous_customers.csv",
+      "id": "ambiguous",
+      "label": "ambiguous",
+      "source_ids": [
+        "AMBIGUOUS-00001",
+        "AMBIGUOUS-00002"
+      ]
+    },
+    {
+      "fixture": "../synthetic/observed_90d.csv",
+      "id": "late-observed",
+      "label": "late_collection",
+      "source_ids": [
+        "DEMO-01-00149",
+        "DEMO-01-00302",
+        "DEMO-01-00453",
+        "DEMO-01-00600"
+      ]
+    }
+  ],
+  "split": "development_fixtures"
+}

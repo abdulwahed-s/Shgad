@@ -1,0 +1,2 @@
+transaction_id,source_id,source_system,source_row,import_batch_id,occurred_at,recorded_at,source,client_entry_id,business_date,type,amount_iqd,counterparty_id,obligation_id,due_date,category_id,quantity,description,status,idempotency_key
+UNMATCHED-PAYMENT,UNMATCHED-PAYMENT,synthetic_csv,1,UNMATCHED-BATCH,2026-08-19T12:00:00+03:00,2026-08-19T12:00:00+03:00,synthetic_csv,,2026-08-19,CREDIT_COLLECTION,17000,CUST-06,,,,,استلمت دفعة من الحساب التجريبي,flagged,synthetic_csv:UNMATCHED-PAYMENT

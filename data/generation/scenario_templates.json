@@ -1,0 +1,32 @@
+{
+  "scenario_drafting": {
+    "provider": "OpenAI",
+    "model_family": "GPT-6.1",
+    "model_name": "GPT-6.1 Sol",
+    "model_name_source": "user_confirmed_session_selection",
+    "model_id": null,
+    "model_id_status": "not_exposed_by_session",
+    "drafted_on": "2026-10-17",
+    "prompt": "Draft fictional Iraqi neighbourhood grocery scenarios and short Iraqi Arabic transaction notes for Shgad. Include cash baskets, customer credit and partial late collections, weekly supplier invoices, recorded expenses, household drawings and a counted drawer. Preserve the specified Abu Haider and Thursday invoice case. Suggest neutral notes without assigning causes to cash-count differences. Every person, merchant and record must be invented. Draft templates only: deterministic seeded Python owns all dates, quantities, IQD amounts, balances and labels. Mark Arabic and plausibility reviews pending.",
+    "settings": {"temperature": null, "top_p": null, "generation_seed": null, "settings_status": "not_exposed_by_session"},
+    "split": "The coding-session LLM drafted these notes, category/customer names and mechanics suggestions. Python constructs every numeric transaction and validates it; no provider API call or generated candidate ledger was used."
+  },
+  "human_reviews": {"arabic": "pending", "plausibility": "pending"},
+  "notes": {
+    "CASH_SALE": ["بيع نقدي من الرف التجريبي", "مبيعات سلة المحل التجريبي"],
+    "CREDIT_SALE": ["بيع بالدين مسجل بالدفتر التجريبي", "بضاعة على الحساب التجريبي"],
+    "CREDIT_COLLECTION": ["استلمت دفعة من الحساب التجريبي", "تسديد جزء من الدين التجريبي"],
+    "SUPPLIER_INVOICE": ["فاتورة تجهيز للمحل التجريبي"],
+    "SUPPLIER_PAYMENT": ["دفعة للمجهز التجريبي"],
+    "OPERATING_EXPENSE": ["مصاريف نقل وتنظيف تجريبية"],
+    "OWNER_DRAWING": ["سحب صاحب المحل للبيت - تجريبي"],
+    "CAPITAL_INJECTION": ["إضافة رأس مال مسجلة - تجريبي"],
+    "DAILY_CASH_COUNT": ["عد الصندوق بنهاية اليوم - تجريبي"]
+  },
+  "scenarios": [
+    {"id": "partial_late", "description_ar": "الزبون يدفع قسم من الحساب بموعده والباقي يتأخر.", "review": "pending"},
+    {"id": "friday", "description_ar": "يوم الجمعة حركة البيع أكثر بالمحل التجريبي.", "review": "pending"},
+    {"id": "slow_week", "description_ar": "أسبوع هادي والبيع أقل من المعتاد.", "review": "pending"},
+    {"id": "cash_close", "description_ar": "عد الصندوق يختلف عن المتوقع؛ الفرق يبقى غير مفسر.", "review": "pending"}
+  ]
+}

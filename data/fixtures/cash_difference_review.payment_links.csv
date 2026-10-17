@@ -1,0 +1,2 @@
+payment_link_id,payment_transaction_id,obligation_id,amount_iqd,match_basis,created_at
+T22-00004-LINK,T22-00004,T22-R,30000,confirmed,2026-09-28T12:00:00+03:00

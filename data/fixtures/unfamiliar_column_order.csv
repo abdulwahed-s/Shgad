@@ -1,0 +1,6 @@
+idempotency_key,status,Notes,quantity,category_id,due_date,obligation_id,counterparty_id,IQD,type,business_date,client_entry_id,source,recorded_at,When,import_batch_id,source_row,source_system,Reference,transaction_id
+synthetic_csv:HAPPY-00001,valid,بيع نقدي من الرف التجريبي,200,CAT-01,,,,100000,CASH_SALE,2026-07-01,,synthetic_csv,2026-07-01T12:00:00+03:00,2026-07-01T12:00:00+03:00,HAPPY-BATCH,1,synthetic_csv,HAPPY-00001,HAPPY-00001
+synthetic_csv:HAPPY-00002,valid,بيع بالدين مسجل بالدفتر التجريبي,14,CAT-02,2026-07-07,HAPPY-R,CUST-02,70000,CREDIT_SALE,2026-07-01,,synthetic_csv,2026-07-01T12:00:00+03:00,2026-07-01T12:00:00+03:00,HAPPY-BATCH,2,synthetic_csv,HAPPY-00002,HAPPY-00002
+synthetic_csv:HAPPY-00003,valid,استلمت دفعة من الحساب التجريبي,,,,HAPPY-R,CUST-02,30000,CREDIT_COLLECTION,2026-07-02,,synthetic_csv,2026-07-02T12:00:00+03:00,2026-07-02T12:00:00+03:00,HAPPY-BATCH,3,synthetic_csv,HAPPY-00003,HAPPY-00003
+synthetic_csv:HAPPY-00004,valid,مصاريف نقل وتنظيف تجريبية,,,,,,10000,OPERATING_EXPENSE,2026-07-02,,synthetic_csv,2026-07-02T12:00:00+03:00,2026-07-02T12:00:00+03:00,HAPPY-BATCH,4,synthetic_csv,HAPPY-00004,HAPPY-00004
+synthetic_csv:HAPPY-00005,valid,سحب صاحب المحل للبيت - تجريبي,,,,,,5000,OWNER_DRAWING,2026-07-02,,synthetic_csv,2026-07-02T12:00:00+03:00,2026-07-02T12:00:00+03:00,HAPPY-BATCH,5,synthetic_csv,HAPPY-00005,HAPPY-00005

@@ -1,0 +1,7 @@
+transaction_id,source_id,source_system,source_row,import_batch_id,occurred_at,recorded_at,source,client_entry_id,business_date,type,amount_iqd,counterparty_id,obligation_id,due_date,category_id,quantity,description,status,idempotency_key,currency
+HAPPY-00001,BAD-DATE,synthetic_csv,1,HAPPY-BATCH,2026-02-30T12:00:00+03:00,2026-07-01T12:00:00+03:00,synthetic_csv,,2026-07-01,CASH_SALE,100000,,,,CAT-01,200,بيع نقدي من الرف التجريبي,valid,synthetic_csv:HAPPY-00001,
+HAPPY-00001,AMBIGUOUS-DATE,synthetic_csv,1,HAPPY-BATCH,01/02/2026,2026-07-01T12:00:00+03:00,synthetic_csv,,2026-07-01,CASH_SALE,100000,,,,CAT-01,200,بيع نقدي من الرف التجريبي,valid,synthetic_csv:HAPPY-00001,
+HAPPY-00001,BAD-NEGATIVE,synthetic_csv,1,HAPPY-BATCH,2026-07-01T12:00:00+03:00,2026-07-01T12:00:00+03:00,synthetic_csv,,2026-07-01,CASH_SALE,-1000,,,,CAT-01,200,بيع نقدي من الرف التجريبي,valid,synthetic_csv:HAPPY-00001,
+HAPPY-00001,BAD-DECIMAL,synthetic_csv,1,HAPPY-BATCH,2026-07-01T12:00:00+03:00,2026-07-01T12:00:00+03:00,synthetic_csv,,2026-07-01,CASH_SALE,1000.50,,,,CAT-01,200,بيع نقدي من الرف التجريبي,valid,synthetic_csv:HAPPY-00001,
+HAPPY-00001,BAD-CURRENCY,synthetic_csv,1,HAPPY-BATCH,2026-07-01T12:00:00+03:00,2026-07-01T12:00:00+03:00,synthetic_csv,,2026-07-01,CASH_SALE,100000,,,,CAT-01,200,بيع نقدي من الرف التجريبي,valid,synthetic_csv:HAPPY-00001,USD
+HAPPY-00001,,synthetic_csv,1,HAPPY-BATCH,2026-07-01T12:00:00+03:00,2026-07-01T12:00:00+03:00,synthetic_csv,,2026-07-01,CASH_SALE,١٠٬٠٠٠,,,,CAT-01,200,بيع نقدي من الرف التجريبي,valid,synthetic_csv:HAPPY-00001,
