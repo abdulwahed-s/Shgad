@@ -1,15 +1,25 @@
-"""Typed environment settings; no implicit .env reads or server-date fallback."""
+"""Typed settings and explicit local runtime loading; no server-date fallback."""
 
+import os
 import re
 from datetime import date
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field, SecretStr, StrictInt, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+LOCAL_ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=None, extra="ignore")
+    # Constructing this model in a test/helper never implicitly reads a file.
+    model_config = SettingsConfigDict(
+        env_file=None,
+        env_ignore_empty=True,
+        hide_input_in_errors=True,
+        extra="ignore",
+    )
 
     llm_provider: str | None = None
     llm_model_id: str | None = None
@@ -32,6 +42,20 @@ class Settings(BaseSettings):
         return value
 
 
+def runtime_settings() -> Settings:
+    """Only runtime entry points load the fixed development file (decision D31).
+
+    Process variables take precedence. Tests/production disable file loading by
+    setting APP_ENV before launch. Never search parent folders or print settings.
+    """
+    local_file = (
+        LOCAL_ENV_FILE
+        if (os.environ.get("APP_ENV") or "development").lower() == "development"
+        else None
+    )
+    return Settings(_env_file=local_file, _env_file_encoding="utf-8")
+
+
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    return runtime_settings()

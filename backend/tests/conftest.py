@@ -9,8 +9,12 @@ from app.schemas.ledger import OpeningBalance, Transaction
 
 @pytest.fixture(autouse=True)
 def offline_provider_environment(request, monkeypatch):
-    """Default tests never inherit configured live provider credentials or IDs."""
+    """Default tests never read local credentials or inherit live provider IDs."""
+    from app.config import get_settings
+
+    get_settings.cache_clear()
     if request.node.get_closest_marker("live") is None:
+        monkeypatch.setenv("APP_ENV", "test")
         for name in (
             "LLM_PROVIDER",
             "LLM_MODEL_ID",
@@ -20,6 +24,8 @@ def offline_provider_environment(request, monkeypatch):
             "GROQ_API_KEY",
         ):
             monkeypatch.delenv(name, raising=False)
+    yield
+    get_settings.cache_clear()
 
 
 @pytest.fixture

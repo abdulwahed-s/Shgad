@@ -220,6 +220,7 @@ def test_dry_run_never_constructs_provider_transport(monkeypatch, capsys):
         pytest.fail("dry-run constructed a network client")
 
     monkeypatch.setattr(smoke.httpx, "Client", forbidden)
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden, raising=False)
     assert smoke.main([]) == 0
     output = json.loads(capsys.readouterr().out)
     assert output["mode"] == "dry_run" and output["maximum_requests"] == 40
@@ -267,3 +268,85 @@ def test_live_requires_exact_ids_and_both_local_keys_before_requests(monkeypatch
             ]
         )
     assert caught.value.code == 2
+
+
+def test_explicit_live_command_loads_fake_local_credentials_without_echoing_them(
+    monkeypatch, tmp_path, capsys
+):
+    from app import config
+
+    fake_file = tmp_path / "synthetic-provider-settings.fixture"
+    fake_file.write_text(
+        "GEMINI_API_KEY=fictional-local-gemini\n"
+        "GROQ_API_KEY=fictional-local-groq\nBUSINESS_AS_OF=\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(config, "LOCAL_ENV_FILE", fake_file, raising=False)
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setattr(smoke, "ROOT", tmp_path)
+    monkeypatch.setattr(smoke, "provenance", lambda: {"head_commit": "fixture"})
+    seen = []
+
+    def respond(request):
+        host = request.url.host
+        expected = (
+            "fictional-local-groq"
+            if host == "api.groq.com"
+            else "fictional-local-gemini"
+        )
+        assert request.headers["Authorization"] == f"Bearer {expected}"
+        seen.append(host)
+        return httpx.Response(401, json={"error": "recorded rejection"})
+
+    client_type = httpx.Client
+    monkeypatch.setattr(
+        smoke.httpx,
+        "Client",
+        lambda **kwargs: client_type(transport=httpx.MockTransport(respond), **kwargs),
+    )
+    result = smoke.main(
+        [
+            "--live",
+            "--gemini-model",
+            "recorded-model",
+            "--groq-model",
+            "recorded-model",
+            "--model-ids-checked-on",
+            "2026-10-18",
+        ]
+    )
+    assert result == 1
+    assert seen == ["generativelanguage.googleapis.com", "api.groq.com"]
+    output = capsys.readouterr()
+    assert "fictional-local" not in output.out + output.err
+    reports = list((tmp_path / "docs/model_comparison").glob("*.json"))
+    assert len(reports) == 1 and "fictional-local" not in reports[0].read_text()
+
+
+def test_invalid_local_comparison_settings_are_sanitized_before_transport(
+    monkeypatch, tmp_path, capsys
+):
+    from app import config
+
+    fake_file = tmp_path / "synthetic-invalid-settings.fixture"
+    fake_file.write_text(
+        "LLM_TIMEOUT_SECONDS=fictional-sensitive-value\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(config, "LOCAL_ENV_FILE", fake_file, raising=False)
+    monkeypatch.setenv("APP_ENV", "development")
+    with pytest.raises(SystemExit) as caught:
+        smoke.main(
+            [
+                "--live",
+                "--gemini-model",
+                "recorded-model",
+                "--groq-model",
+                "recorded-model",
+                "--model-ids-checked-on",
+                "2026-10-18",
+            ]
+        )
+    assert caught.value.code == 2
+    error = capsys.readouterr().err
+    assert "invalid local configuration" in error
+    assert "fictional-sensitive-value" not in error

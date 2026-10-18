@@ -9,7 +9,7 @@ import pytest
 from app.agents.llm_client import LLMClient
 from app.agents.system_instructions import SYSTEM_INSTRUCTIONS
 from app.agents.tool_registry import TOOLS, definitions
-from app.config import Settings
+from app.config import runtime_settings
 
 
 @pytest.mark.live
@@ -23,7 +23,7 @@ def test_opt_in_development_routing(request):
         )
 
     async def scenario():
-        async with LLMClient(Settings()) as client:
+        async with LLMClient(runtime_settings()) as client:
             if not client.available:
                 pytest.skip("Local model IDs/keys are unconfigured")
             reply = await client.complete(

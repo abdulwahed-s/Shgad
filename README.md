@@ -89,7 +89,13 @@ python -m uvicorn app.main:app --reload
 Activate the environment first (`.venv/Scripts/Activate.ps1` in PowerShell or
 `source .venv/bin/activate` on macOS/Linux). `GET http://127.0.0.1:8000/health`
 returns `{"status":"ok","version":"0.1.0"}` without configuration values.
-Settings read process environment variables; `.env.example` lists the names.
+For local development, copy `.env.example` to a repository-root `.env` if it does
+not already exist, then edit it locally. The backend loads that exact file from
+either the root or `backend/` working directory. Non-empty process environment
+variables override file values; blank optional values use defaults. Keep `.env`
+out of Git and chat. Set `APP_ENV=test` or `APP_ENV=production` in the launching
+process to use environment variables without reading the local file. Restart the
+backend after changing configuration.
 No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
 stays unset in raw settings until configured. The domain `BusinessClock.from_settings`
 uses the configured date, or **2026-09-28** (synthetic day 90) when absent; it never
@@ -220,8 +226,9 @@ python scripts/model_smoke_test.py --help
 
 The default is a dry run with no provider requests. Live use requires `--live`,
 exact console model IDs through `--gemini-model` and `--groq-model`, their
-`--model-ids-checked-on` date, and both provider keys in the local process environment.
-Never paste keys into chat; the script does not open `.env`. It compares interpretation
+`--model-ids-checked-on` date, and both provider keys in local `.env` or process
+environment variables. Only an explicit live run loads credentials; the default
+dry run leaves `.env` untouched. Never paste keys into chat. It compares interpretation
 and native tool selection against development labels, including customer and period.
 It executes no proposed tools and measures no financial-answer accuracy. The hard
 cap is 40 requests, with no retries and at least ten seconds between a provider's
@@ -286,9 +293,10 @@ names or periods produce fixed clarification messages. Provider failure after a
 verified result can return the deterministic template with a fallback notice.
 
 Configure `LLM_PROVIDER` (`gemini` or `groq`), `LLM_MODEL_ID` and that provider's
-API key in the local process environment. `.env.example` lists optional fallback
-and timeout settings. Use exact console model IDs; keep keys local and never paste
-them into chat. The backend does not open `.env`. Without configuration, chat
+API key in the root `.env` or process environment. `.env.example` lists optional
+fallback and timeout settings. `GEMINI_API_KEY` and `GROQ_API_KEY` authenticate
+provider access; model IDs select models separately. Use exact console model IDs;
+keep keys local and never paste them into chat. Without configuration, chat
 returns the typed `llm_unavailable` response without a provider request.
 
 `app.agents.renderer` fills `{{fig:key}}` and `{{date:key}}` only from verified
@@ -300,7 +308,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **600 backend tests passed, one opt-in live test skipped**,
+Verified locally: **611 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar

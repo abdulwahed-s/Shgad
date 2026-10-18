@@ -1,4 +1,4 @@
-"""Opt-in development routing screen. Fixed inputs; never opens .env.
+"""Opt-in development routing screen. Dry runs never load local credentials.
 
 This is not the application agent or the held-out evaluator. Each of ten fixed
 development cases gets an interpretation request and a native tool-call request
@@ -10,7 +10,6 @@ import argparse
 import csv
 import hashlib
 import json
-import os
 import re
 import subprocess
 import sys
@@ -20,13 +19,14 @@ from pathlib import Path
 from typing import Literal
 
 import httpx
-from pydantic import Field
+from pydantic import Field, ValidationError
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "backend") not in sys.path:
     sys.path.insert(0, str(ROOT / "backend"))
 
 from app.agents.tool_registry import TOOLS, definitions  # noqa: E402
+from app.config import runtime_settings  # noqa: E402
 from app.schemas.tools import DateArguments, Period  # noqa: E402
 from app.services.business_clock import BusinessClock  # noqa: E402
 from app.services.errors import FinancialRuleError  # noqa: E402
@@ -482,10 +482,17 @@ def main(argv=None):
         for model in models.values()
     ):
         parser.error("supply exact console model IDs and --model-ids-checked-on")
-    keys = {provider: os.environ.get(name, "") for provider, name in KEY_NAMES.items()}
+    try:
+        settings = runtime_settings()
+    except (ValidationError, OSError, UnicodeError):
+        parser.error("invalid local configuration; check setting names and value types")
+    keys = {}
+    for provider, name in KEY_NAMES.items():
+        key = getattr(settings, name.lower())
+        keys[provider] = key.get_secret_value() if key else ""
     if not all(value.strip() for value in keys.values()):
         parser.error(
-            "both provider keys must be configured in the local process; "
+            "configure both provider keys in local .env or process environment; "
             "never paste keys"
         )
     last_request = {}
