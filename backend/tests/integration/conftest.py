@@ -151,3 +151,46 @@ def create_obligation(ledger, insert_event):
         return source
 
     return create
+
+
+@pytest.fixture
+def debt_factory(ledger, insert_event):
+    """Inline fictional obligations with exact identities and observed origins."""
+
+    def create(key, amount, due, *, kind="receivable", party=None):
+        row = insert_event(
+            source_id=key,
+            type="CREDIT_SALE" if kind == "receivable" else "SUPPLIER_INVOICE",
+            amount_iqd=amount,
+            counterparty_id=party or ("CUST-01" if kind == "receivable" else "SUP-01"),
+            obligation_id=f"OB-{key}",
+            due_date=due,
+        )
+        ledger.execute(
+            "INSERT INTO obligations VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                row.obligation_id,
+                kind,
+                row.transaction_id,
+                row.counterparty_id,
+                amount,
+                due,
+            ),
+        )
+        return row
+
+    return create
+
+
+@pytest.fixture
+def j1_shop(ledger, insert_event, debt_factory):
+    insert_event(
+        source_id="CNT-090",
+        type="DAILY_CASH_COUNT",
+        amount_iqd=420000,
+        occurred_at="2026-09-28T21:00:00+03:00",
+    )
+    debt_factory("J1-R", 150000, "2026-09-30")
+    debt_factory("J1-P", 650000, "2026-10-01", kind="payable")
+    ledger.commit()
+    return ledger

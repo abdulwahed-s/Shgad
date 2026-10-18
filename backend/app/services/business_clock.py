@@ -80,6 +80,10 @@ class BusinessClock:
             days = int(match[1])
             if days <= 90:
                 return DateRange(today - timedelta(days=days - 1), today)
+        if match := re.fullmatch(r"next_n_days:([1-9][0-9]?)", period):
+            days = int(match[1])
+            if days <= 30:
+                return DateRange(today, today + timedelta(days=days - 1))
         if period.startswith("next_weekday:"):
             weekday = period.removeprefix("next_weekday:")
             if weekday in _WEEKDAYS:

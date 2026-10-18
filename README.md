@@ -8,6 +8,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
 > **Available now:** a tested backend for synthetic CSV import, merchant entries,
 > partial payments, voids/corrections, ledger evidence and daily-close review.
+> Source-linked sales/debt queries and a next-days obligations HTTP view separate
+> confirmed cash from expected collections, with missing balances kept unavailable.
 > Deterministic reconciliation, persisted mapping preview/confirmation and a
 > cutoff-safe cash-estimate service are tested. Flutter remains a static localized
 > shell; chat, merchant screens and a live mapping proposer remain planned.
@@ -228,11 +230,17 @@ flows and shows the signed unexplained difference. Missing counts remain missing
 `POST /api/daily-close/{date}/resolve` accepts a merchant-chosen explanation or
 `leave_unexplained`. Sign/amount guards and client idempotency prevent a second
 financial effect; a voided explanation stays in review history. No cause is inferred.
-The next-seven-days HTTP view remains planned.
+`GET /api/obligations/upcoming?days=7` lists supplier dues, non-overdue expected
+collections and separate overdue receivables. It returns signed confirmed-only
+and with-expected positions, daily running balances and first negative dates,
+without projected sales. The window accepts 1–30 days; missing cash retains known
+obligations with unavailable positions. `GET /api/debts` provides receivable totals,
+aging and exact-party evidence. The read-only sales/debts tool wrappers validate
+arguments and resolve symbolic periods on the server; other tools remain planned.
 
-Verified locally: **439 backend tests**, including real HTTP/SQLite financial,
+Verified locally: **457 backend tests**, including real HTTP/SQLite financial,
 mapping, reconciliation, immutable-correction and cutoff regressions, plus offline
-synthetic-data checks. Ruff lint/format pass for **71 backend/script files**;
+synthetic-data checks. Ruff lint/format pass for **81 backend/script files**;
 dependency checks pass. A running-server smoke passed 13 check groups across the
 11 implemented OpenAPI paths, using only a temporary fictional database. Financial-rule
 regressions were observed failing before their implementation or fix.
