@@ -66,26 +66,67 @@ _TABLES = {
 }
 
 
-def _records(connection: sqlite3.Connection, model):
+_VISIBLE = """WITH visible AS (SELECT * FROM transactions
+    WHERE business_date BETWEEN :start AND :day AND occurred_at <= :known
+    AND recorded_at <= :known) """
+_BOUNDED_READS = {
+    Transaction: "SELECT * FROM visible ORDER BY occurred_at, transaction_id",
+    Obligation: """SELECT o.* FROM obligations o JOIN visible t
+        ON t.transaction_id = o.origin_transaction_id ORDER BY o.rowid""",
+    PaymentLink: """SELECT l.* FROM payment_links l JOIN visible p
+        ON p.transaction_id = l.payment_transaction_id JOIN obligations o
+        ON o.obligation_id = l.obligation_id JOIN visible t
+        ON t.transaction_id = o.origin_transaction_id WHERE l.created_at <= :known
+        ORDER BY l.rowid""",
+    EntryVoid: """SELECT v.* FROM entry_voids v JOIN visible t
+        ON t.transaction_id = v.transaction_id WHERE v.voided_at <= :known
+        ORDER BY v.rowid""",
+    DifferenceReview: """SELECT * FROM difference_reviews
+        WHERE business_date BETWEEN :start AND :day AND created_at <= :known
+        ORDER BY rowid""",
+}
+
+
+def _records(connection: sqlite3.Connection, model, params=None):
     # Identifiers are a closed application allowlist; values use SQL parameters.
     return tuple(
         model.model_validate(dict(row))
-        for row in connection.execute(f"SELECT * FROM {_TABLES[model]} ORDER BY rowid")
+        for row in connection.execute(
+            _VISIBLE + _BOUNDED_READS[model]
+            if params
+            else f"SELECT * FROM {_TABLES[model]} ORDER BY rowid",
+            params or {},
+        )
     )
 
 
-def read_ledger(connection: sqlite3.Connection) -> LedgerSnapshot:
+def read_ledger(
+    connection: sqlite3.Connection,
+    *,
+    as_of: date | None = None,
+    known_at: datetime | str | None = None,
+) -> LedgerSnapshot:
     """Retain original evidence; consumers apply the same explicit cutoff filters."""
     # A savepoint gives all table reads one SQLite snapshot, also within a
     # caller's transaction. It does not acquire a write lock or commit caller work.
+    params = None
+    if as_of is not None:
+        from app.services.ledger_rules import knowledge_cutoff
+        from app.services.observed import OBSERVED_START
+
+        params = {
+            "start": OBSERVED_START.isoformat(),
+            "day": as_of.isoformat(),
+            "known": parse_timestamp(knowledge_cutoff(as_of, known_at)).isoformat(),
+        }
     connection.execute("SAVEPOINT ledger_snapshot_read")
     try:
         snapshot = LedgerSnapshot(
-            transactions=_records(connection, Transaction),
-            obligations=_records(connection, Obligation),
-            payment_links=_records(connection, PaymentLink),
-            voids=_records(connection, EntryVoid),
-            reviews=_records(connection, DifferenceReview),
+            transactions=_records(connection, Transaction, params),
+            obligations=_records(connection, Obligation, params),
+            payment_links=_records(connection, PaymentLink, params),
+            voids=_records(connection, EntryVoid, params),
+            reviews=_records(connection, DifferenceReview, params),
         )
     except BaseException:
         connection.execute("ROLLBACK TO SAVEPOINT ledger_snapshot_read")
@@ -127,7 +168,7 @@ def _atomic(connection: sqlite3.Connection) -> Iterator[None]:
 def _close(
     connection: sqlite3.Connection, day: date, audit_time: datetime
 ) -> DailyClose:
-    snapshot = read_ledger(connection)
+    snapshot = read_ledger(connection, as_of=day, known_at=audit_time)
     return daily_close(
         snapshot.transactions,
         business_date=day,
@@ -234,6 +275,13 @@ def resolve_difference(
                 review,
                 _close(connection, day, audit_time),
                 True,
+            )
+        if connection.execute(
+            "SELECT 1 FROM transactions WHERE client_entry_id = ?",
+            (request.client_entry_id,),
+        ).fetchone():
+            raise FinancialRuleError(
+                "VALIDATION_ERROR", details={"reason": "IDEMPOTENCY_CONFLICT"}
             )
         close = _close(connection, day, audit_time)
         remaining = close.unexplained_difference_iqd

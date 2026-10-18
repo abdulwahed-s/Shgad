@@ -206,11 +206,16 @@ The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; And
 and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
 Flutter merchant screens and model integration remain planned. CSV import/receipts
 and merchant entries have HTTP interfaces; forecasting has a Python service interface.
-Difference-review HTTP routes and the next-seven-days view remain planned.
+`GET /api/daily-close/{date}` compares consecutive counts against recorded cash
+flows and shows the signed unexplained difference. Missing counts remain missing.
+`POST /api/daily-close/{date}/resolve` accepts a merchant-chosen explanation or
+`leave_unexplained`. Sign/amount guards and client idempotency prevent a second
+financial effect; a voided explanation stays in review history. No cause is inferred.
+The next-seven-days HTTP view remains planned.
 
-Verified locally: **381 backend tests**, including six void/evidence, 26 merchant-entry and 63 importer/forecast runtime
+Verified locally: **396 backend tests**, including 15 daily-close, six void/evidence, 26 merchant-entry and 63 importer/forecast runtime
 regressions and 50 offline data/evaluation checks, plus Ruff lint and formatting
-for 55 backend Python files (script checks were also verified previously). Financial-rule
+for 59 backend Python files (script checks were also verified previously). Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and

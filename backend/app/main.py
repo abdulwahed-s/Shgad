@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 
+from app.api.daily_close import router as daily_close_router
 from app.api.entries import router as entries_router
 from app.api.errors import register_error_handlers
 from app.api.health import router as health_router
@@ -14,3 +15,4 @@ app.include_router(health_router)
 app.include_router(imports_router)
 app.include_router(entries_router)
 app.include_router(ledger_router)
+app.include_router(daily_close_router)

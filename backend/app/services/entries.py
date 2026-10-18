@@ -62,6 +62,13 @@ def create_entry(
                 source_id=prior["source_id"],
                 duplicate=True,
             )
+        if connection.execute(
+            "SELECT 1 FROM difference_reviews WHERE client_entry_id = ?",
+            (request.client_entry_id,),
+        ).fetchone():
+            raise FinancialRuleError(
+                "VALIDATION_ERROR", details={"reason": "IDEMPOTENCY_CONFLICT"}
+            )
         token = uuid4().hex
         source_id, batch_id = f"ENT-{token}", f"ENTRY-BATCH-{token}"
         obligation_id = request.obligation_id
