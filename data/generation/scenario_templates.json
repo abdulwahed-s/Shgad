@@ -17,7 +17,7 @@
     "split": "The coding-session LLM drafted these notes, category/customer names and mechanics suggestions. Python constructs every numeric transaction and validates it; no provider API call or generated candidate ledger was used."
   },
   "human_reviews": {
-    "arabic": "partial",
+    "arabic": "approved",
     "plausibility": "approved"
   },
   "notes": {
@@ -121,6 +121,8 @@
       "DEV-032": "c7645d67f8214e66afd543658fbae75a85658dc23691cb5edc048322e9221143"
     },
     "approved_notes": {
+      "NOTE-01": "888b527aa3da2dac08e7b580d353f8e31a1c3e4cd90e9e890158eb18c91be19b",
+      "NOTE-02": "8614efff7de7347a99c5c636e1bfc7cf456d4dfcae5b1c98073e86b0e7b19775",
       "NOTE-03": "f999aea85bebe31b24ebb0076ed9594c3ad62d14e9da5018a84c1648b205a2f5",
       "NOTE-04": "b9b87518f7f946a72ce33562625822d679812da5fd89e2a1fc2141738e53b922",
       "NOTE-05": "ba29734e20b6c0af1d9217b95926c1c6cd37e7a0eca8faf343a3d9a06e26869c",
@@ -138,6 +140,25 @@
       "SCENE-03": "929ee0e87e1ff9537d9386e24b5a89f68d8b5fc8386cae663c48ad7781b5341a",
       "SCENE-04": "ff69d80c300f46407aad87b19dfa3ea3447776ef8f3d7660ed25330131926ba5"
     },
-    "approved_mechanics": "f8b5d33e3582efaa69a3da0d8d3220f371e2c67dff4c39e4023abcadf8939a0d"
+    "approved_mechanics": "f8b5d33e3582efaa69a3da0d8d3220f371e2c67dff4c39e4023abcadf8939a0d",
+    "followups": [
+      {
+        "reviewed_on": "2026-10-18",
+        "reviewer_identity": "recorded_locally",
+        "responses_sha256": "1457832d59f51a08d8bb8133f39c1850f6d19bfd853dd4188bed330701d528c6",
+        "source_snapshot_id": "f2f1df44b62802bc0c1d08b808f7080992f31b33759cda356b39bdc760824c04",
+        "response_counts": {
+          "accepted": 2,
+          "needs_change": 0,
+          "unsure": 0
+        },
+        "approved_items": [
+          "NOTE-01",
+          "NOTE-02"
+        ],
+        "attestation_source": "explicit_user_confirmation_in_chat",
+        "original_export_attested": false
+      }
+    ]
   }
 }

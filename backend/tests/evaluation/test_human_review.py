@@ -17,17 +17,24 @@ def sources():
     )
 
 
-def test_generated_review_keeps_uncertain_notes_pending(tmp_path):
+def test_generated_review_records_confirmed_note_followup(tmp_path):
     manifest = generate(seed=20260701, output_root=tmp_path)
     assert manifest["human_reviews"] == {
-        "arabic": "partial",
+        "arabic": "approved",
         "plausibility": "approved",
     }
     review = manifest["human_review"]
-    assert review["pending_arabic_items"] == ["NOTE-01", "NOTE-02"]
+    assert review["pending_arabic_items"] == []
     assert review["reviewed_on"] == "2026-10-17"
     assert review["reviewer_identity"] == "recorded_locally"
     assert len(review["responses_sha256"]) == 64
+    followup = review["followups"][0]
+    assert followup["reviewed_on"] == "2026-10-18"
+    assert followup["approved_items"] == ["NOTE-01", "NOTE-02"]
+    assert followup["attestation_source"] == "explicit_user_confirmation_in_chat"
+    assert followup["original_export_attested"] is False
+    assert followup["reviewer_identity"] == "recorded_locally"
+    assert len(followup["responses_sha256"]) == 64
     questions = [
         json.loads(line)
         for line in (tmp_path / "evaluation/development_questions.jsonl")
@@ -36,6 +43,24 @@ def test_generated_review_keeps_uncertain_notes_pending(tmp_path):
     ]
     assert len(questions) == 32
     assert all(row["arabic_review"] == "approved" for row in questions)
+
+
+def test_missing_note_approvals_stay_pending_despite_cached_status(sources):
+    from scripts.generate_synthetic_data import human_review_status
+
+    mechanics, templates = sources
+    questions = development_questions(
+        approved_signatures=templates["human_review"]["approved_questions"]
+    )
+    templates["human_reviews"]["arabic"] = "approved"
+    for identifier in ("NOTE-01", "NOTE-02"):
+        templates["human_review"]["approved_notes"].pop(identifier, None)
+    status = human_review_status(mechanics, templates, questions)
+    assert status == {
+        "arabic": "partial",
+        "plausibility": "approved",
+        "pending_arabic_items": ["NOTE-01", "NOTE-02"],
+    }
 
 
 @pytest.mark.parametrize("changed", ["text", "customer", "period"])
@@ -72,7 +97,7 @@ def test_changed_note_or_mechanics_invalidates_only_its_review_scope(sources):
     updated = copy.deepcopy(templates)
     updated["notes"]["CREDIT_SALE"][0] += "!"
     status = human_review_status(mechanics, updated, questions)
-    assert set(status["pending_arabic_items"]) == {"NOTE-01", "NOTE-02", "NOTE-03"}
+    assert status["pending_arabic_items"] == ["NOTE-03"]
     assert status["plausibility"] == "approved"
     mechanics["credit_term_days"] += 1
     assert human_review_status(mechanics, templates, questions)["plausibility"] == (

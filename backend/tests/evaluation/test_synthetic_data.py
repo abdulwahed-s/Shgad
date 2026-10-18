@@ -58,7 +58,7 @@ def test_manifest_hashes_cover_all_generated_artifacts(dataset):
     assert manifest["scenario_drafting"]["prompt"]
     assert manifest["scenario_drafting"]["model_id_status"] == "not_exposed_by_session"
     assert manifest["human_reviews"] == {
-        "arabic": "partial",
+        "arabic": "approved",
         "plausibility": "approved",
     }
 

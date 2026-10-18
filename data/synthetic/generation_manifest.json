@@ -22,14 +22,14 @@
     }
   ],
   "file_sha256": {
-    "evaluation/QUESTION_SPEC.md": "8a2c806589c6fc78efd14f87bc0137af6a432eb2e5e9c457bea03e12fc7a3190",
+    "evaluation/QUESTION_SPEC.md": "a0a33b4f5aa9ef64887193d794818229147f487893e6b63117b95c0d2a7034ff",
     "evaluation/development_expected.json": "fe17b5459cf6691dff2959374fe2d0fe09bccfb1cbd868932110d8aa187ff233",
     "evaluation/development_questions.jsonl": "089b5e89e0c216cd2053eb170db2ef162ff24d538e44d58b31fbcfc6e0e5c3c7",
     "evaluation/dialect_intents.jsonl": "8c57e2f093e8fd8bcd4ff26bad93a17cd064d539e07c1c770073d99c0b45e134",
     "evaluation/forecast_expected.json": "8650477bee0cd2e8e959dc682ea0e419a0b99016dc08fa302bcf87f42d9b420d",
     "evaluation/forecast_protocol.json": "9115ec7251c36f6518e7414ee7fd2cbd9361ee1d72014ce4bd159f87fb594647",
     "evaluation/reconciliation_expected.json": "83fc7c8c6715d76d4d26ff78ad762be3afbdfe31463886fdbbad9e910cff9254",
-    "evaluation/sealing_input_manifest.json": "871025fb7597ad2535f69bd541dc7dd1b6bb22cb53d7ccbc94d6348476ce5cd2",
+    "evaluation/sealing_input_manifest.json": "ae174c473eb6b471236dedaf5ed53bd6e93cabd6c36562906623d696e472310d",
     "fixtures/ambiguous_customers.categories.csv": "31cc9f724cf19427489b63d9c995f96ef3b9ed9ca8245b7b20c1de83204ee4d0",
     "fixtures/ambiguous_customers.csv": "07666de3a12c10c9c984e3d69901c87bbbd305ece5cd0ce2a1f546606d441c0d",
     "fixtures/ambiguous_customers.difference_reviews.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
@@ -162,10 +162,26 @@
   },
   "future_outcomes": "generated_and_schema_validated_only_no_final_test_scoring",
   "human_review": {
-    "pending_arabic_items": [
-      "NOTE-01",
-      "NOTE-02"
+    "followups": [
+      {
+        "approved_items": [
+          "NOTE-01",
+          "NOTE-02"
+        ],
+        "attestation_source": "explicit_user_confirmation_in_chat",
+        "original_export_attested": false,
+        "response_counts": {
+          "accepted": 2,
+          "needs_change": 0,
+          "unsure": 0
+        },
+        "responses_sha256": "1457832d59f51a08d8bb8133f39c1850f6d19bfd853dd4188bed330701d528c6",
+        "reviewed_on": "2026-10-18",
+        "reviewer_identity": "recorded_locally",
+        "source_snapshot_id": "f2f1df44b62802bc0c1d08b808f7080992f31b33759cda356b39bdc760824c04"
+      }
     ],
+    "pending_arabic_items": [],
     "requested_copy_cleanup": "Iraqi Arabic merchant wording; remove synthetic labels from display names while retaining fictional provenance.",
     "response_counts": {
       "accepted": 94,
@@ -179,7 +195,7 @@
     "source_snapshot_id": "3ebec8097621f78e06119006ab5d1b9ae5ff58f7934e5813394540604c260f11"
   },
   "human_reviews": {
-    "arabic": "partial",
+    "arabic": "approved",
     "plausibility": "approved"
   },
   "implementation": "Python standard library; random.Random integer draws; UTF-8 LF",
@@ -203,9 +219,9 @@
   },
   "seed": 20260701,
   "source_sha256": {
-    "data/evaluation/QUESTION_SPEC.md": "8a2c806589c6fc78efd14f87bc0137af6a432eb2e5e9c457bea03e12fc7a3190",
+    "data/evaluation/QUESTION_SPEC.md": "a0a33b4f5aa9ef64887193d794818229147f487893e6b63117b95c0d2a7034ff",
     "data/generation/business_mechanics.json": "12fa6dab549a146dcad710ad9effb703c962a067cc651b0b0dc4c69d543d1fb4",
-    "data/generation/scenario_templates.json": "5692dd14630e635347b5dbde28226b4ce9ebed312cfd20bc2c9dd2a80abf0b51",
+    "data/generation/scenario_templates.json": "b416968dc0299a060a0efaf9a542ace0b71509c5ca11a2f6e8f28edbfffded6f",
     "scripts/data_contract.py": "d32a994c71d829a31b9b78d78d5b56725c88ce7067729c625488d10c797afda8",
     "scripts/development_questions.py": "4ddafeaa3041997770eac8b03f20790b49318be4884f7e5df0d88695725bbf69",
     "scripts/generate_synthetic_data.py": "f8d12d51e28304d7d8f42fb760ff26c87ccf51f6cd8f8fd688facd2db1adb105",

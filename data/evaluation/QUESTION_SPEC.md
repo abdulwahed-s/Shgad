@@ -3,8 +3,8 @@
 Version: shgad-question-v1. This describes development and independently sealed
 historical Q&A. It contains no held-out questions or numeric answers. Development
 examples are exclusively in development_questions.jsonl; their Iraqi Arabic was
-human-reviewed on 17 October 2026, with requested wording edits applied. Two
-cash-sale note templates remain pending in the separate generation review.
+human-reviewed on 17 October 2026, with requested wording edits applied. The
+remaining two generation note phrases were approved on 18 October 2026.
 The sealed file is authored and edited outside the repository by a
 tool and session independent of every Shgad builder.
 
