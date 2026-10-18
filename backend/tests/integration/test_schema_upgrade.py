@@ -104,7 +104,7 @@ def test_upgrade_preserves_v1_rows_evidence_relationships_and_replays(tmp_path):
         seed_v1(connection)
         before = data_snapshot(connection)
         migrations.apply_migrations(connection)
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
         after = data_snapshot(connection)
         for table, rows in before.items():
             assert (
@@ -184,3 +184,28 @@ def test_v1_migration_definition_remains_historically_identical():
         hashlib.sha256(migrations._SCHEMA_V1.encode()).hexdigest()
         == "c1be81a4acd8fc59077ed536be2b2fd4732ee2ae3dba117450e0dc08b6ea4178"
     )
+
+
+def test_mapping_upgrade_preserves_populated_v2_and_rolls_back_on_conflict(tmp_path):
+    connection = connect_database(tmp_path / "version2.sqlite")
+    seed_v1(connection)
+    connection.executescript(
+        "PRAGMA foreign_keys = OFF;\n"
+        + migrations._SCHEMA_V2
+        + "\nPRAGMA user_version = 2; PRAGMA foreign_keys = ON;"
+    )
+    before = data_snapshot(connection)
+    connection.execute("CREATE TABLE csv_mappings (legacy TEXT)")
+    with pytest.raises(sqlite3.DatabaseError):
+        migrations.apply_migrations(connection)
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
+    assert not connection.in_transaction
+    connection.execute("DROP TABLE csv_mappings")
+    migrations.apply_migrations(connection)
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+    after = data_snapshot(connection)
+    for table, rows in before.items():
+        assert after[table] == rows
+    assert after["csv_mappings"] == after["mapping_confirmations"] == []
+    assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+    connection.close()

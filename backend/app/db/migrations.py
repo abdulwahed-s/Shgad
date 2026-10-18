@@ -512,7 +512,34 @@ CREATE TRIGGER {_table}_immutable_{_operation.lower()} BEFORE {_operation} ON {_
 BEGIN SELECT RAISE(ABORT, '{_table} is immutable'); END;
 """
 
-_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2)
+_SCHEMA_V3 = f"""
+CREATE TABLE csv_mappings (
+    mapping_id TEXT PRIMARY KEY NOT NULL CHECK (length(mapping_id) > 0),
+    filename TEXT NOT NULL,
+    content BLOB NOT NULL CHECK (length(content) <= 5242880),
+    columns_json TEXT NOT NULL CHECK ({_json("columns_json", "array")}),
+    preview_json TEXT NOT NULL CHECK ({_json("preview_json", "object")}),
+    business_as_of TEXT NOT NULL CHECK ({_date("business_as_of")}),
+    created_at TEXT NOT NULL CHECK ({_timestamp("created_at")})
+) STRICT;
+CREATE TABLE mapping_confirmations (
+    mapping_id TEXT PRIMARY KEY NOT NULL REFERENCES csv_mappings(mapping_id),
+    import_batch_id TEXT NOT NULL REFERENCES import_batches(import_batch_id),
+    confirmed_at TEXT NOT NULL CHECK ({_timestamp("confirmed_at")})
+) STRICT;
+CREATE TRIGGER mapping_confirmation_chronology BEFORE INSERT ON mapping_confirmations
+WHEN NOT EXISTS (SELECT 1 FROM csv_mappings m WHERE m.mapping_id = NEW.mapping_id
+    AND m.created_at <= NEW.confirmed_at)
+BEGIN SELECT RAISE(ABORT, 'confirmation cannot precede mapping'); END;
+"""
+for _table in ("csv_mappings", "mapping_confirmations"):
+    for _operation in ("UPDATE", "DELETE"):
+        _SCHEMA_V3 += f"""
+CREATE TRIGGER {_table}_immutable_{_operation.lower()} BEFORE {_operation} ON {_table}
+BEGIN SELECT RAISE(ABORT, '{_table} is immutable'); END;
+"""
+
+_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2, _SCHEMA_V3)
 
 
 def apply_migrations(connection: sqlite3.Connection) -> None:

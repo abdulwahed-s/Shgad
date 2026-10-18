@@ -49,6 +49,8 @@ def test_migrations_create_all_strict_tables_and_are_repeatable(tmp_path):
         "tool_calls",
         "entry_voids",
         "difference_reviews",
+        "csv_mappings",
+        "mapping_confirmations",
     }
     tables = {row["name"]: row for row in connection.execute("PRAGMA table_list")}
     assert expected <= tables.keys()
@@ -61,7 +63,7 @@ def test_migrations_create_all_strict_tables_and_are_repeatable(tmp_path):
         connection.execute("SELECT sql FROM sqlite_schema ORDER BY name").fetchall()
         == schema
     )
-    assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
     connection.close()
     reopened = connect_database(path)
     assert reopened.execute("PRAGMA foreign_keys").fetchone()[0] == 1

@@ -93,7 +93,7 @@ separate from signed unexplained differences; missing consecutive counts remain
 unavailable. Capital injections add cash without sales, revenue or collections.
 Drawings remain separate from business expenses.
 
-SQLite schema version 2 has thirteen STRICT tables, with foreign keys, unique
+SQLite schema version 3 has fifteen STRICT tables, with foreign keys, unique
 idempotency keys, guarded partial-payment allocations and immutable source evidence.
 `POST /api/entries/{source_id}/void` supports merchant undo with client idempotency
 and cutoff-aware calculations. Voiding a collection restores outstanding
@@ -137,8 +137,16 @@ duplicates remain flagged for review. Exact file replay adds no transactions,
 cash, revenue, obligations or allocations; receipts distinguish accepted, rejected,
 exact-duplicate and flagged rows. `POST /api/imports/csv` accepts a multipart `file`;
 `GET /api/imports/{batch_id}` retrieves its receipt and row errors. Files must be
-fictional. No reference data is created automatically. Column mapping is pending.
+fictional. No reference data is created automatically.
 Uploads retain real audit times; late knowledge stays excluded from earlier cutoffs.
+
+Unfamiliar CSV layouts have mapping preview and confirmation endpoints at
+`POST /api/imports/csv/mapping` and `POST /api/imports/csv/mapping/{mapping_id}/confirm`.
+The proposer interface receives only the header and three sample rows. Code validates
+its mapping and previews up to five parsed rows without financial writes. Confirmation
+uses saved immutable input/mapping metadata and the normal importer; retries are safe.
+The default proposer returns `LLM_UNAVAILABLE` because no model is connected yet.
+Tests inject fake proposals; there is no live mapping suggestion feature.
 
 `app.services.forecast.forecast` reads only a cutoff-filtered SQLite snapshot and
 returns 30 integer-IQD daily estimates for base, conservative and stress scenarios.
@@ -213,9 +221,10 @@ flows and shows the signed unexplained difference. Missing counts remain missing
 financial effect; a voided explanation stays in review history. No cause is inferred.
 The next-seven-days HTTP view remains planned.
 
-Verified locally: **396 backend tests**, including 15 daily-close, six void/evidence, 26 merchant-entry and 63 importer/forecast runtime
+Verified locally: **416 backend tests**, including 19 CSV-mapping, 15 daily-close,
+six void/evidence, 26 merchant-entry and 63 importer/forecast runtime
 regressions and 50 offline data/evaluation checks, plus Ruff lint and formatting
-for 59 backend Python files (script checks were also verified previously). Financial-rule
+for 62 backend Python files (script checks were also verified previously). Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and

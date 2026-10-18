@@ -10,6 +10,7 @@ from app.config import Settings, get_settings
 from app.db.connection import connect_database
 from app.db.migrations import apply_migrations
 from app.services.business_clock import BusinessClock
+from app.services.csv_mapping import UnavailableMappingProposer
 from app.services.errors import FinancialRuleError
 from app.services.observed import observed_day
 
@@ -17,6 +18,10 @@ from app.services.observed import observed_day
 def audit_timestamp() -> datetime:
     # Wall time belongs at the HTTP boundary, never in financial domain logic.
     return datetime.now(UTC)
+
+
+def mapping_model():
+    return UnavailableMappingProposer()
 
 
 def business_clock(

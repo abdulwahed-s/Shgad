@@ -114,6 +114,14 @@ def _file_rows(path: Path) -> tuple[str, list[dict[str, str]]]:
 
 
 def _csv_rows(content: bytes) -> tuple[str, list[dict[str, str]]]:
+    header, rows = read_csv_content(content)
+    if not _REQUIRED <= set(header) <= _ALLOWED:
+        raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "CSV_COLUMNS"})
+    return hashlib.sha256(content).hexdigest(), rows
+
+
+def read_csv_content(content: bytes) -> tuple[list[str], list[dict[str, str]]]:
+    """Bounded strict CSV decoding shared by canonical import and mapping."""
     if len(content) > MAX_FILE_BYTES:
         raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "FILE_SIZE"})
     try:
@@ -121,7 +129,12 @@ def _csv_rows(content: bytes) -> tuple[str, list[dict[str, str]]]:
             io.StringIO(content.decode("utf-8-sig"), newline=""), strict=True
         )
         header = next(reader)
-        if len(header) != len(set(header)) or not _REQUIRED <= set(header) <= _ALLOWED:
+        if (
+            not header
+            or len(header) > 200
+            or not all(header)
+            or len(header) != len(set(header))
+        ):
             raise FinancialRuleError(
                 "IMPORT_REJECTED", details={"reason": "CSV_COLUMNS"}
             )
@@ -136,7 +149,7 @@ def _csv_rows(content: bytes) -> tuple[str, list[dict[str, str]]]:
                 raise FinancialRuleError(
                     "IMPORT_REJECTED", details={"reason": "ROW_LIMIT"}
                 )
-        return hashlib.sha256(content).hexdigest(), rows
+        return header, rows
     except (OSError, UnicodeError, csv.Error, StopIteration) as exc:
         raise FinancialRuleError(
             "IMPORT_REJECTED", details={"reason": "INVALID_FILE"}
@@ -362,6 +375,7 @@ def _import_rows(
     imported_at,
     source_system="synthetic_csv",
     allow_late_audit=False,
+    raw_rows=None,
 ):
     cutoff = knowledge_cutoff(observed_day(clock))
     audit_time = parse_timestamp(imported_at)
@@ -389,6 +403,7 @@ def _import_rows(
         accepted = flagged = rejected = 0
         for number, raw in enumerate(rows, 1):
             raw_id = f"{batch_id}-RAW-{number}"
+            evidence = raw_rows[number - 1] if raw_rows is not None else raw
             try:
                 row = _parse(
                     raw,
@@ -414,9 +429,10 @@ def _import_rows(
                         WHERE import_batch_id = ? AND source_row = ?""",
                         (old.import_batch_id, old.source_row),
                     ).fetchone()
+                    original_cells = json.loads(original[0])
+                    original_cells = original_cells.get("canonical", original_cells)
                     old_reference = (
-                        json.loads(original[0]).get("obligation_id", old.obligation_id)
-                        or None
+                        original_cells.get("obligation_id", old.obligation_id) or None
                     )
                     exact = all(
                         (old_reference if key == "obligation_id" else getattr(old, key))
@@ -457,7 +473,7 @@ def _import_rows(
                         raw_row_id=raw_id,
                         import_batch_id=batch_id,
                         source_row=number,
-                        row_json=json.dumps(raw, ensure_ascii=False),
+                        row_json=json.dumps(evidence, ensure_ascii=False),
                         status=status,
                     ),
                 )
@@ -518,7 +534,7 @@ def _import_rows(
                         raw_row_id=raw_id,
                         import_batch_id=batch_id,
                         source_row=number,
-                        row_json=json.dumps(raw, ensure_ascii=False),
+                        row_json=json.dumps(evidence, ensure_ascii=False),
                         errors_json=json.dumps([error.model_dump()]),
                         status="rejected",
                     ),
