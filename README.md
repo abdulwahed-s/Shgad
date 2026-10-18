@@ -10,7 +10,7 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > SQLite migrations, deterministic financial primitives and reproducible fictional
 > merchant CSVs with independent development truth, a canonical CSV importer and
 > a cutoff-safe three-scenario cash-estimate service. CSV upload and batch-receipt
-> HTTP routes are available. Flutter remains a static
+> HTTP routes and merchant entry/partial-payment endpoints are available. Flutter remains a static
 > localized shell. Merchant workflows remain planned; no model benchmarks have run.
 
 ## Planned features
@@ -114,8 +114,15 @@ with closing(connect_database("shgad.db")) as connection:
     apply_migrations(connection)
 ```
 
-This creates the schema only. Merchant-facing import/reconciliation workflows,
-financial HTTP endpoints and automatic demo-data loading remain planned.
+This creates the schema only. Preload fictional reference and opening records
+before importing or recording debts. Report/chat endpoints and automatic
+demo-data loading remain planned.
+
+`POST /api/entries` records cash/credit sales, supplier invoices, explicit partial
+collections/payments, expenses, drawings, capital and daily cash counts. Amounts
+are strict positive integer IQD; invalid references and overpayments are rejected
+atomically. Retry with the same `client_entry_id` and payload to receive the saved
+source ID without another financial effect. A changed payload under that key fails.
 
 The Python service `app.services.ingest.import_csv` imports explicitly fictional
 canonical CSV files into a migrated SQLite connection. Preload verified categories,
@@ -194,15 +201,14 @@ flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=ht
 
 The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; Android builds
 and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
-No merchant chat, import workflow, ledger HTTP queries, forecast screen or model
-integration is implemented yet. Import has HTTP and Python interfaces; forecasting
-currently has a Python service interface.
-Entry, difference-review and void HTTP endpoints, and the next-seven-days view,
-remain planned. The tested review/void primitives have no merchant-facing workflow.
+Flutter merchant screens and model integration remain planned. CSV import/receipts
+and merchant entries have HTTP interfaces; forecasting has a Python service interface.
+Difference-review, void and ledger-evidence HTTP routes, and the next-seven-days view,
+remain planned.
 
-Verified locally: **349 backend tests**, including 63 importer/forecast runtime
+Verified locally: **375 backend tests**, including 26 merchant-entry and 63 importer/forecast runtime
 regressions and 50 offline data/evaluation checks, plus Ruff lint and formatting
-for 47 backend Python files (script checks were also verified previously). Financial-rule
+for 51 backend Python files (script checks were also verified previously). Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and
