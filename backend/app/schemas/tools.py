@@ -32,6 +32,10 @@ class SalesArguments(DateArguments):
     kind: Literal["cash", "credit", "all"] = "all"
 
 
+class MarginArguments(DateArguments):
+    period: Period
+
+
 class DebtsArguments(DateArguments):
     counterparty_query: (
         Annotated[str, StringConstraints(strict=True, min_length=1, max_length=200)]

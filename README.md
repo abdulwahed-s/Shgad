@@ -236,13 +236,19 @@ and with-expected positions, daily running balances and first negative dates,
 without projected sales. The window accepts 1–30 days; missing cash retains known
 obligations with unavailable positions. `GET /api/debts` provides receivable totals,
 aging and exact-party evidence. The read-only sales/debts tool wrappers validate
-arguments and resolve symbolic periods on the server; other tools remain planned.
+arguments and resolve symbolic periods on the server. `GET /api/reports/margin`
+returns estimated gross margin, recorded-sales coverage, unpriced-sale count,
+buy-price evidence and an after-recorded-expenses figure with excluded-cost notes.
+`GET /api/reports/weekly` returns deterministic weekly totals and shows estimated
+margin only at the configured coverage threshold (80% by default;
+`MARGIN_MIN_COVERAGE_PCT`). Voided sales and expenses are excluded using the query's
+audit knowledge. Reconciliation/forecast tool wrappers and the renderer remain planned.
 
-Verified locally: **457 backend tests**, including real HTTP/SQLite financial,
+Verified locally: **471 backend tests**, including real HTTP/SQLite financial,
 mapping, reconciliation, immutable-correction and cutoff regressions, plus offline
-synthetic-data checks. Ruff lint/format pass for **81 backend/script files**;
-dependency checks pass. A running-server smoke passed 13 check groups across the
-11 implemented OpenAPI paths, using only a temporary fictional database. Financial-rule
+synthetic-data checks. Ruff lint/format pass for **87 backend/script files**;
+dependency checks pass. An earlier running-server smoke passed 13 check groups across
+the then-existing 11 OpenAPI paths, using only a temporary fictional database. Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and

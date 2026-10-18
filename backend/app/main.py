@@ -9,6 +9,7 @@ from app.api.health import router as health_router
 from app.api.imports import router as imports_router
 from app.api.ledger import router as ledger_router
 from app.api.queries import router as queries_router
+from app.api.reports import router as reports_router
 
 app = FastAPI(title="Shgad", version="0.1.0")
 register_error_handlers(app)
@@ -18,3 +19,4 @@ app.include_router(entries_router)
 app.include_router(ledger_router)
 app.include_router(daily_close_router)
 app.include_router(queries_router)
+app.include_router(reports_router)

@@ -9,17 +9,20 @@ from app.schemas.tools import (
     DebtsArguments,
     ErrorDetail,
     Figure,
+    MarginArguments,
     SalesArguments,
     ToolEnvelope,
 )
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
 from app.services.financial_queries import QuerySnapshot, sources
-from app.tools import get_debts, get_sales
+from app.services.margin import margin_metrics
+from app.tools import get_debts, get_margin, get_sales
 
 TOOLS = {
     "get_sales": (SalesArguments, get_sales.run),
     "get_debts": (DebtsArguments, get_debts.run),
+    "get_margin": (MarginArguments, get_margin.run),
 }
 
 
@@ -71,14 +74,18 @@ def invoke(name, arguments, *, connection, clock, known_at=None, user_message=""
         )
         data = result.model_dump(mode="json")
         figures, dates = _metadata(data)
+        metrics = (
+            margin_metrics(snapshot, resolved, result) if name == "get_margin" else ()
+        )
         resolved = resolved or DateRange(snapshot.day, snapshot.day)
         dates.update({"start": resolved.start, "end": resolved.end})
         return ToolEnvelope(
             ok=True,
             result=data,
             figures=tuple(figures),
+            metrics=metrics,
             dates=dates,
-            evidence_source_ids=sources(*(f.source_ids for f in figures)),
+            evidence_source_ids=sources(*(f.source_ids for f in (*figures, *metrics))),
             resolved_range=DateRangeView(start=resolved.start, end=resolved.end),
             resolved_counterparty=party,
         )

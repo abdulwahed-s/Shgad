@@ -3,7 +3,7 @@
 from datetime import date
 from functools import lru_cache
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, StrictInt
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     business_as_of: date | None = None
     database_url: str = Field(default="sqlite:///./shgad.db", repr=False, exclude=True)
     app_env: str = "development"
+    margin_min_coverage_pct: StrictInt = Field(default=80, ge=0, le=100)
 
 
 @lru_cache
