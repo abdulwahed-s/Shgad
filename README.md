@@ -14,7 +14,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > reconciliation and cutoff-safe cash-estimate HTTP routes are tested. Persisted
 > mapping preview/confirmation works with fake proposals. Flutter remains a static localized
 > shell; chat, merchant screens and a live mapping proposer remain planned.
-> No model benchmarks have run.
+> An opt-in development model comparison has an offline-tested harness; no model
+> benchmarks have run.
 
 ## Capabilities and planned interface
 
@@ -203,6 +204,25 @@ tool used during development. Memory controls were requested; isolation was not
 independently verified and the exact generator model ID was not exposed.
 No model evaluation has run.
 
+`scripts/model_smoke_test.py` prepares a provider comparison using ten fixed,
+reviewed development questions and the existing five read-only tool schemas.
+With the backend development environment installed, run from the repository root:
+
+```sh
+python scripts/model_smoke_test.py
+python scripts/model_smoke_test.py --help
+```
+
+The default is a dry run with no provider requests. Live use requires `--live`,
+exact console model IDs through `--gemini-model` and `--groq-model`, their
+`--model-ids-checked-on` date, and both provider keys in the local process environment.
+Never paste keys into chat; the script does not open `.env`. It compares interpretation
+and native tool selection against development labels, including customer and period.
+It executes no proposed tools and measures no financial-answer accuracy. The hard
+cap is 40 requests, with no retries and at least ten seconds between a provider's
+requests. Provider errors stop that candidate. Live availability and model quality
+remain unverified.
+
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
 its license. Backend requests use one Dio client configured with `API_BASE_URL`;
@@ -260,11 +280,12 @@ quotes stay quoted data. Money uses Arabic-Indic digits and exact abbreviations;
 evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic review.
 There is no chat endpoint or live agent yet.
 
-Verified locally: **534 backend tests**, including real HTTP/SQLite financial,
+Verified locally: **557 backend tests**, including real HTTP/SQLite financial,
 mapping, reconciliation, immutable-correction and cutoff regressions, plus offline
-synthetic-data checks. Ruff lint/format and Python 3.11 grammar checks pass for
-**99 backend/script files**; dependency checks pass. A running-server smoke passed
-**19 check groups across 18 OpenAPI paths**, using only a temporary fictional database.
+synthetic-data and model-comparison harness checks. Ruff lint/format and Python 3.11
+grammar checks pass for **101 backend/script files**; dependency checks pass.
+A running-server smoke passed **19 check groups across 18 OpenAPI paths**, using
+only a temporary fictional database.
 Every implemented endpoint has a response-model contract test, including daily close,
 voids and standard error responses. Financial-rule
 regressions were observed failing before their implementation or fix.
