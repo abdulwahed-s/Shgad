@@ -1,11 +1,12 @@
 """Allowlisted validated read-only dispatch, independent of any LLM (§8.1)."""
 
-import re
 import sqlite3
+from datetime import date
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from app.agents.verification import verify_tool_output
+from app.schemas.forecast import Amount
 from app.schemas.queries import DateRangeView
 from app.schemas.tools import (
     DebtsArguments,
@@ -35,20 +36,24 @@ TOOLS = {
 
 def _metadata(value, path=""):
     figures, dates = [], {}
-    if isinstance(value, dict):
-        if "amount_iqd" in value:
-            figures.append(Figure(**value, key=path))
-        else:
-            for key, item in value.items():
-                found, resolved = _metadata(item, f"{path}.{key}" if path else key)
-                figures.extend(found)
-                dates.update(resolved)
-    elif isinstance(value, list):
+    if isinstance(value, Amount):
+        figures.append(Figure(**value.model_dump(), key=path))
+    elif isinstance(value, (BaseModel, dict)):
+        entries = (
+            ((key, getattr(value, key)) for key in type(value).model_fields)
+            if isinstance(value, BaseModel)
+            else value.items()
+        )
+        for key, item in entries:
+            found, resolved = _metadata(item, f"{path}.{key}" if path else key)
+            figures.extend(found)
+            dates.update(resolved)
+    elif isinstance(value, (list, tuple)):
         for index, item in enumerate(value):
             found, resolved = _metadata(item, f"{path}.{index}")
             figures.extend(found)
             dates.update(resolved)
-    elif isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+    elif type(value) is date:
         dates[path] = value
     return figures, dates
 
@@ -82,7 +87,7 @@ def _invoke(name, arguments, *, connection, clock, known_at=None, user_message="
             snapshot, clock=clock, arguments=args, dates_from_user=explicit
         )
         data = result.model_dump(mode="json")
-        figures, dates = _metadata(data)
+        figures, dates = _metadata(result)
         metrics = (
             margin_metrics(snapshot, resolved, result) if name == "get_margin" else ()
         )

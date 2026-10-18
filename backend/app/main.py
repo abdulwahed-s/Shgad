@@ -10,8 +10,16 @@ from app.api.imports import router as imports_router
 from app.api.ledger import router as ledger_router
 from app.api.queries import router as queries_router
 from app.api.reports import router as reports_router
+from app.schemas.tools import ErrorResponse
 
-app = FastAPI(title="Shgad", version="0.1.0")
+app = FastAPI(
+    title="Shgad",
+    version="0.1.0",
+    responses={
+        status: {"model": ErrorResponse}
+        for status in (400, 404, 405, 413, 415, 422, 500, 503)
+    },
+)
 register_error_handlers(app)
 app.include_router(health_router)
 app.include_router(imports_router)

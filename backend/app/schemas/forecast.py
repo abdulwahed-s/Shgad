@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import StrictInt, model_validator
+from pydantic import Field, StrictInt, model_validator
 
 from app.schemas.ledger import BusinessDate, LedgerModel
 
@@ -46,11 +46,11 @@ class Driver(LedgerModel):
 
 
 class Forecast(LedgerModel):
-    days: tuple[ForecastDay, ...]
+    days: tuple[ForecastDay, ...] = Field(min_length=30, max_length=30)
     lowest: Lowest
     first_shortfall_date: BusinessDate | None
-    top_inflows: tuple[Driver, ...]
-    top_outflows: tuple[Driver, ...]
+    top_inflows: tuple[Driver, ...] = Field(max_length=3)
+    top_outflows: tuple[Driver, ...] = Field(max_length=3)
 
 
 class OverdueExcluded(LedgerModel):

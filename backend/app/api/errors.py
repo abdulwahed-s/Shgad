@@ -7,19 +7,18 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
+from app.schemas.tools import ErrorDetail, ErrorResponse
 from app.services.errors import FinancialRuleError
 
 
 def _error(code, status, details=None):
     return JSONResponse(
         status_code=status,
-        content={
-            "error": {
-                "code": code,
-                "message_key": f"error_{code.lower()}",
-                "details": details or {},
-            }
-        },
+        content=ErrorResponse(
+            error=ErrorDetail(
+                code=code, message_key=f"error_{code.lower()}", details=details or {}
+            )
+        ).model_dump(mode="json"),
     )
 
 

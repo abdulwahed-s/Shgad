@@ -89,3 +89,21 @@ def test_amount_unknown_and_integer_contract(value, kind):
             source_ids=(),
             formula="test",
         )
+
+
+def test_coverage_unit_cannot_be_relabelled_as_count(tool_history):
+    output = invoke(
+        "get_margin",
+        {"period": "today"},
+        connection=tool_history,
+        clock=CLOCK,
+        known_at=KNOWN,
+    )
+    wrong_unit = output.metrics[0].model_copy(update={"unit": "count"})
+    changed = output.model_copy(update={"metrics": (wrong_unit, *output.metrics[1:])})
+    with pytest.raises(FinancialRuleError):
+        verify_tool_output(
+            changed,
+            snapshot=QuerySnapshot(tool_history, clock=CLOCK, known_at=KNOWN),
+            tool_name="get_margin",
+        )

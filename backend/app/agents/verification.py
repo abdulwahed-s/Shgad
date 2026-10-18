@@ -9,7 +9,7 @@ from collections import Counter
 from datetime import timedelta
 
 from app.schemas.queries import DebtsResult, FlagsReport
-from app.schemas.tools import ToolEnvelope
+from app.schemas.tools import Figure, Metric, ToolEnvelope
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
 from app.services.financial_queries import payment_capacity, sale_totals, sources
@@ -181,10 +181,24 @@ def verify_tool_output(envelope, *, snapshot, tool_name):
             _reject()
         original = _lookup(envelope.result, figure.key)
         if isinstance(original, dict):
+            if not isinstance(figure, Figure):
+                _reject()
             if figure.model_dump(mode="json", exclude={"key"}) != original:
                 _reject()
         elif original != value or (original is not None and type(original) is not int):
             _reject()
+        elif figure.key.endswith("_iqd"):
+            if not isinstance(figure, Figure):
+                _reject()
+        else:
+            expected_unit = {
+                "coverage_pct": "percent",
+                "unpriced_sales_count": "count",
+                "days_overdue": "days",
+                "horizon_days": "days",
+            }.get(figure.key.rsplit(".", 1)[-1])
+            if not isinstance(figure, Metric) or figure.unit != expected_unit:
+                _reject()
     for key, value in _leaves(envelope.result):
         if isinstance(value, float):
             _reject()

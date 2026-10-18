@@ -10,8 +10,9 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > partial payments, voids/corrections, ledger evidence and daily-close review.
 > Source-linked sales/debt queries and a next-days obligations HTTP view separate
 > confirmed cash from expected collections, with missing balances kept unavailable.
-> Deterministic reconciliation, persisted mapping preview/confirmation and a
-> cutoff-safe cash-estimate service are tested. Flutter remains a static localized
+> Five read-only tools, margin/weekly reports, deterministic Arabic figure rendering,
+> reconciliation and cutoff-safe cash-estimate HTTP routes are tested. Persisted
+> mapping preview/confirmation works with fake proposals. Flutter remains a static localized
 > shell; chat, merchant screens and a live mapping proposer remain planned.
 > No model benchmarks have run.
 
@@ -22,9 +23,11 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 - Keep recorded cash sales separate from signed unexplained cash differences.
 - Preserve immutable evidence through merchant voids and explicit corrections.
 - Identify unmatched/candidate payments, partial balances, overdue debts and suspected duplicates.
-- Provide a secondary Python cash-estimate service with base, conservative and stress scenarios.
+- Query sales, debts, reconciliation, estimated gross margin and cash estimates through five validated tools.
+- Return deterministic weekly totals and a secondary cash estimate with base, conservative and stress scenarios.
+- Render sourced figures and dates in Arabic, with validation and deterministic template fallback.
 - Planned merchant screens will put today's cash, debts, entry and daily close first.
-- Planned Iraqi Arabic chat and reports will use verified figures and source evidence.
+- Planned Iraqi Arabic chat and merchant screens will use verified figures and source evidence.
 
 ## Merchant questions
 
@@ -52,9 +55,10 @@ flowchart LR
     Renderer --> API
 ```
 
-Financial calculations use integer IQD in Python. The planned LLM will request validated,
-read-only tools and draft explanations with symbolic slots; the backend will fill figures
-and dates from verified results. Provider calls and API keys will stay in the backend.
+Financial calculations use integer IQD in Python. The tools and renderer work without
+an LLM. The planned agent will request these tools and draft explanations with symbolic
+slots; the backend fills figures and dates from verified results. Provider calls and
+API keys will stay in the backend.
 
 ## Development status
 
@@ -122,8 +126,8 @@ with closing(connect_database("shgad.db")) as connection:
 ```
 
 This creates the schema only. Preload fictional reference and opening records
-before importing or recording debts. Report/chat endpoints and automatic
-demo-data loading remain planned.
+before importing or recording debts. Chat, demo reset and automatic demo-data
+loading remain planned.
 
 `POST /api/entries` records cash/credit sales, supplier invoices, explicit partial
 collections/payments, expenses, drawings, capital and daily cash counts. Amounts
@@ -166,8 +170,8 @@ collections use observed settlement lateness, stress collections are zero, and o
 receivables are excluded. Unknown starting cash, essential history or due dates produce
 typed clarification errors. Later entries, payment links and voids cannot change an
 earlier forecast. The service enforces the observed calendar boundary and loads no
-files or evaluation answers. Forecast HTTP/UI integration and accuracy evaluation
-remain pending.
+files or evaluation answers. `GET /api/reports/forecast` exposes the service;
+forecast UI integration and accuracy evaluation remain pending.
 
 Seeded fictional data and offline development truth are available. From the
 repository root (standard library only):
@@ -185,8 +189,8 @@ The independent calculator imports no backend financial services. Its
 development expectations include sales, debts, estimated gross margin,
 seven-day positions and three forecast scenarios at historical cutoffs.
 These are offline reference values; the separate production forecast service uses
-the financial specification and SQLite history. Application agent tools remain
-pending. Development score windows stop at day 90.
+the financial specification and SQLite history. The five read-only tools query
+that ledger without a provider. Development score windows stop at day 90.
 
 See [data/README.md](data/README.md) for file boundaries and generation
 metadata. Same-seed regeneration was byte-identical in a fresh process,
@@ -223,8 +227,8 @@ flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=ht
 
 The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; Android builds
 and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
-Flutter merchant screens and model integration remain planned. CSV import/receipts
-and merchant entries have HTTP interfaces; forecasting has a Python service interface.
+Flutter merchant screens and model integration remain planned. CSV import/receipts,
+merchant entries and deterministic reports have HTTP interfaces, documented at `/docs`.
 `GET /api/daily-close/{date}` compares consecutive counts against recorded cash
 flows and shows the signed unexplained difference. Missing counts remain missing.
 `POST /api/daily-close/{date}/resolve` accepts a merchant-chosen explanation or
@@ -246,13 +250,23 @@ audit knowledge. All five tools validate arguments and verify source references,
 integer units and arithmetic before a protected renderer handoff.
 `GET /api/flags` exposes reconciliation flags; `GET /api/reports/forecast`
 exposes the existing cutoff-safe scenarios. `/api/meta` honestly reports that no
-LLM is available. The renderer remains planned.
+LLM is available.
 
-Verified locally: **492 backend tests**, including real HTTP/SQLite financial,
+`app.agents.renderer` fills `{{fig:key}}` and `{{date:key}}` only from verified
+tool output. Raw numeric characters, unknown keys and unsourced values are rejected.
+It supports one retry callback and then deterministic templates, with server-resolved
+customer/period context, margin coverage and estimate assumptions. Exact user-typed
+quotes stay quoted data. Money uses Arabic-Indic digits and exact abbreviations;
+evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic review.
+There is no chat endpoint or live agent yet.
+
+Verified locally: **534 backend tests**, including real HTTP/SQLite financial,
 mapping, reconciliation, immutable-correction and cutoff regressions, plus offline
-synthetic-data checks. Ruff lint/format pass for **93 backend/script files**;
-dependency checks pass. An earlier running-server smoke passed 13 check groups across
-the then-existing 11 OpenAPI paths, using only a temporary fictional database. Financial-rule
+synthetic-data checks. Ruff lint/format and Python 3.11 grammar checks pass for
+**99 backend/script files**; dependency checks pass. A running-server smoke passed
+**19 check groups across 18 OpenAPI paths**, using only a temporary fictional database.
+Every implemented endpoint has a response-model contract test, including daily close,
+voids and standard error responses. Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and
@@ -273,7 +287,7 @@ runs backend lint/format/tests and Flutter localization, formatting, analysis an
 on pushes and pull requests. Its linked run history shows the measured CI results.
 There are no financial benchmarks or model evaluations.
 
-Synthetic CSV generation, ledger-import and forecast services are available;
+Synthetic CSV generation, ledger import, financial tools and deterministic reports are available;
 a merchant-facing demo remains pending. No forecast accuracy or model result is claimed.
 
 ## Data and scope

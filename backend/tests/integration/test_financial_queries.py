@@ -194,3 +194,13 @@ def test_sales_kind_selects_without_relabelling_total(
     result = call(ledger, "get_sales", {"period": "today", "kind": kind})
     assert result.result["selected_sales"]["amount_iqd"] == expected
     assert result.result["total_sales"]["amount_iqd"] == 170000
+
+
+def test_counterparty_text_is_not_a_server_date_slot(ledger, debt_factory):
+    ledger.execute(
+        "INSERT INTO counterparties VALUES ('DATE-NAME', '2026-09-28', 'customer')"
+    )
+    debt_factory("DATE-NAME-DEBT", 10000, "2026-09-30", party="DATE-NAME")
+    result = call(ledger, "get_debts", {"counterparty_query": "2026-09-28"})
+    assert result.ok
+    assert "receivables.customers.0.display_name" not in result.dates

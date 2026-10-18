@@ -14,7 +14,12 @@ from app.services.validation import parse_timestamp
 router = APIRouter(prefix="/api/entries", tags=["entries"])
 
 
-@router.post("", response_model=EntryReceipt, status_code=201)
+@router.post(
+    "",
+    response_model=EntryReceipt,
+    status_code=201,
+    responses={200: {"model": EntryReceipt, "description": "Idempotent replay"}},
+)
 async def save_entry(
     request: EntryRequest,
     response: Response,
