@@ -242,11 +242,15 @@ buy-price evidence and an after-recorded-expenses figure with excluded-cost note
 `GET /api/reports/weekly` returns deterministic weekly totals and shows estimated
 margin only at the configured coverage threshold (80% by default;
 `MARGIN_MIN_COVERAGE_PCT`). Voided sales and expenses are excluded using the query's
-audit knowledge. Reconciliation/forecast tool wrappers and the renderer remain planned.
+audit knowledge. All five tools validate arguments and verify source references,
+integer units and arithmetic before a protected renderer handoff.
+`GET /api/flags` exposes reconciliation flags; `GET /api/reports/forecast`
+exposes the existing cutoff-safe scenarios. `/api/meta` honestly reports that no
+LLM is available. The renderer remains planned.
 
-Verified locally: **471 backend tests**, including real HTTP/SQLite financial,
+Verified locally: **492 backend tests**, including real HTTP/SQLite financial,
 mapping, reconciliation, immutable-correction and cutoff regressions, plus offline
-synthetic-data checks. Ruff lint/format pass for **87 backend/script files**;
+synthetic-data checks. Ruff lint/format pass for **93 backend/script files**;
 dependency checks pass. An earlier running-server smoke passed 13 check groups across
 the then-existing 11 OpenAPI paths, using only a temporary fictional database. Financial-rule
 regressions were observed failing before their implementation or fix.

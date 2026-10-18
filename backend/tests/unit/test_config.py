@@ -46,3 +46,10 @@ def test_private_settings_are_redacted(monkeypatch):
     ):
         assert value not in repr(settings)
         assert value not in settings.model_dump_json()
+
+
+def test_coverage_threshold_can_be_configured_in_process_environment(monkeypatch):
+    from app.config import Settings
+
+    monkeypatch.setenv("MARGIN_MIN_COVERAGE_PCT", "75")
+    assert Settings().margin_min_coverage_pct == 75

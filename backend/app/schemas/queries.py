@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import StrictBool, StrictInt
 
-from app.schemas.evidence import CounterpartyView
+from app.schemas.evidence import CounterpartyView, FlagView
 from app.schemas.forecast import Amount
 from app.schemas.ledger import BusinessDate, LedgerModel, Timestamp
 
@@ -110,3 +110,29 @@ class DebtsResult(LedgerModel):
     receivables: DebtReport | None
     payables: DebtReport | None
     upcoming: UpcomingObligations | None
+
+
+class FlagsReport(LedgerModel):
+    items: tuple[FlagView, ...]
+
+
+class PaymentCapacity(LedgerModel):
+    due_date: BusinessDate
+    cash_on_hand: Amount
+    supplier_due: Amount
+    expected_collection: Amount
+    shortfall_with_collection: Amount
+    shortfall_without_collection: Amount
+
+
+class MerchantMeta(LedgerModel):
+    id: Literal["DEMO-01"] = "DEMO-01"
+    display_name_key: Literal["demo_shop_name"] = "demo_shop_name"
+
+
+class MetaReport(LedgerModel):
+    business_as_of: BusinessDate
+    week_start: Literal["saturday"] = "saturday"
+    data_version: Literal["synthetic-ledger-v1"] = "synthetic-ledger-v1"
+    llm_available: Literal[False] = False
+    merchant: MerchantMeta = MerchantMeta()

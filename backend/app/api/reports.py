@@ -6,14 +6,25 @@ from fastapi import APIRouter, Depends, Query
 
 from app.api.dependencies import AuditTime, Clock, Database
 from app.config import Settings, get_settings
+from app.schemas.forecast import ForecastReport
 from app.schemas.ledger import BusinessDate
 from app.schemas.reports import MarginReport, WeeklyReport
 from app.schemas.tools import Period
 from app.services.financial_queries import QuerySnapshot, historical_range
+from app.services.forecast import forecast as forecast_report
 from app.services.margin import margin_report
 from app.services.summary import weekly_report
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
+
+
+@router.get("/forecast", response_model=ForecastReport)
+async def forecast(
+    db: Database,
+    clock: Clock,
+    scenario: Annotated[str, Query(pattern="^(base|conservative|stress|all)$")] = "all",
+):
+    return forecast_report(db, clock=clock, scenario=scenario)
 
 
 @router.get("/margin", response_model=MarginReport)

@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import StrictInt
+from pydantic import StrictInt, model_validator
 
 from app.schemas.ledger import BusinessDate, LedgerModel
 
@@ -15,6 +15,12 @@ class Amount(LedgerModel):
     label_key: str
     source_ids: tuple[str, ...]
     formula: str
+
+    @model_validator(mode="after")
+    def missing_is_unavailable(self):
+        if (self.kind == "missing") != (self.amount_iqd is None):
+            raise ValueError("Only missing amounts are null")
+        return self
 
 
 class ForecastDay(LedgerModel):

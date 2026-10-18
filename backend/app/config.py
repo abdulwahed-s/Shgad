@@ -1,9 +1,10 @@
 """Typed environment settings; no implicit .env reads or server-date fallback."""
 
+import re
 from datetime import date
 from functools import lru_cache
 
-from pydantic import Field, SecretStr, StrictInt
+from pydantic import Field, SecretStr, StrictInt, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +20,13 @@ class Settings(BaseSettings):
     database_url: str = Field(default="sqlite:///./shgad.db", repr=False, exclude=True)
     app_env: str = "development"
     margin_min_coverage_pct: StrictInt = Field(default=80, ge=0, le=100)
+
+    @field_validator("margin_min_coverage_pct", mode="before")
+    @classmethod
+    def parse_percentage_setting(cls, value):
+        if isinstance(value, str) and re.fullmatch(r"[0-9]{1,3}", value):
+            return int(value)
+        return value
 
 
 @lru_cache

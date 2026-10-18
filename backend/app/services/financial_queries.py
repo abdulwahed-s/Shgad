@@ -19,6 +19,7 @@ from app.schemas.queries import (
     DebtReport,
     DueItem,
     OverdueItem,
+    PaymentCapacity,
     PositionDay,
     ReportRange,
     SalesReport,
@@ -64,6 +65,7 @@ class Balance:
 
 class QuerySnapshot:
     def __init__(self, connection, *, clock: BusinessClock, known_at=None):
+        self.connection = connection
         self.day = observed_day(clock)
         self.known = knowledge_cutoff(self.day, known_at)
         connection.execute("SAVEPOINT financial_query")
@@ -475,5 +477,57 @@ def upcoming_obligations(snapshot, *, days=7, party_id=None):
                 and r.running_with_expected_iqd < 0
             ),
             None,
+        ),
+    )
+
+
+def payment_capacity(snapshot, due_date):
+    """FINANCIAL_RULES §7: primary J1 figures contain no projected drivers."""
+    if not snapshot.day <= due_date <= snapshot.day + timedelta(days=30):
+        raise FinancialRuleError("VALIDATION_ERROR")
+    if any(b.obligation.due_date is None for b in snapshot.balances):
+        raise FinancialRuleError("MISSING_DUE_DATE")
+    cash, _ = snapshot.cash()
+    dues = [
+        b
+        for b in snapshot.balances
+        if b.obligation.kind == "payable" and b.obligation.due_date == due_date
+    ]
+    expected = [
+        b
+        for b in snapshot.balances
+        if b.obligation.kind == "receivable"
+        and snapshot.day <= b.obligation.due_date <= due_date
+    ]
+
+    def total(balances, label, kind):
+        return amount(
+            sum(b.amount_iqd for b in balances),
+            label,
+            sources(*(b.source_ids for b in balances)),
+            "sum eligible outstanding at cutoff",
+            kind=kind,
+        )
+
+    due, incoming = (
+        total(dues, "supplier_due", "verified"),
+        total(expected, "expected_collection", "expected"),
+    )
+    return PaymentCapacity(
+        due_date=due_date,
+        cash_on_hand=cash,
+        supplier_due=due,
+        expected_collection=incoming,
+        shortfall_with_collection=amount(
+            max(0, due.amount_iqd - cash.amount_iqd - incoming.amount_iqd),
+            "shortfall_with_collection",
+            sources(cash.source_ids, due.source_ids, incoming.source_ids),
+            "max(0, supplier_due - cash_on_hand - eligible expected collections)",
+        ),
+        shortfall_without_collection=amount(
+            max(0, due.amount_iqd - cash.amount_iqd),
+            "shortfall_without_collection",
+            sources(cash.source_ids, due.source_ids),
+            "max(0, supplier_due - cash_on_hand)",
         ),
     )

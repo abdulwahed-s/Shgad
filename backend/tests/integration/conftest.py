@@ -194,3 +194,56 @@ def j1_shop(ledger, insert_event, debt_factory):
     debt_factory("J1-P", 650000, "2026-10-01", kind="payable")
     ledger.commit()
     return ledger
+
+
+@pytest.fixture
+def tool_history(ledger, insert_event, debt_factory):
+    from datetime import date, timedelta
+
+    # Eight observed weekdays of gap history; no future realized outcomes.
+    for offset in range(9):
+        day = date(2026, 9, 20) + timedelta(days=offset)
+        insert_event(
+            source_id=f"SALE-{offset}",
+            amount_iqd=10000,
+            category_id="CAT-01",
+            quantity=2,
+            occurred_at=f"{day}T12:00:00+03:00",
+        )
+        insert_event(
+            source_id=f"CNT-{offset}",
+            type="DAILY_CASH_COUNT",
+            amount_iqd=340000 + offset * 10000,
+            occurred_at=f"{day}T21:00:00+03:00",
+        )
+    debt_factory("J1-R", 150000, "2026-09-30")
+    debt_factory("J1-P", 650000, "2026-10-01", kind="payable")
+    settled = debt_factory("SETTLED", 30000, "2026-09-25")
+    payment = insert_event(
+        source_id="SETTLEMENT",
+        type="CREDIT_COLLECTION",
+        amount_iqd=30000,
+        counterparty_id="CUST-01",
+        obligation_id=settled.obligation_id,
+        occurred_at="2026-09-28T12:00:00+03:00",
+    )
+    ledger.execute(
+        "INSERT INTO payment_links VALUES (?, ?, ?, ?, ?, ?)",
+        (
+            "TOOL-LINK",
+            payment.transaction_id,
+            settled.obligation_id,
+            30000,
+            "definite",
+            "2026-09-28T09:00:00+00:00",
+        ),
+    )
+    insert_event(
+        source_id="UNALLOCATED",
+        type="CREDIT_COLLECTION",
+        amount_iqd=10000,
+        counterparty_id="CUST-02",
+        status="flagged",
+    )
+    ledger.commit()
+    return ledger

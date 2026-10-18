@@ -2,7 +2,14 @@
 
 from typing import Annotated, Any, Literal
 
-from pydantic import Field, StrictBool, StrictInt, StringConstraints, model_validator
+from pydantic import (
+    Field,
+    PrivateAttr,
+    StrictBool,
+    StrictInt,
+    StringConstraints,
+    model_validator,
+)
 
 from app.schemas.evidence import CounterpartyView
 from app.schemas.forecast import Amount
@@ -36,6 +43,28 @@ class MarginArguments(DateArguments):
     period: Period
 
 
+class ReconcileArguments(DateArguments):
+    period: Period
+    types: (
+        tuple[
+            Literal[
+                "unmatched",
+                "suspected_duplicate",
+                "partially_paid",
+                "overdue",
+                "ambiguous",
+            ],
+            ...,
+        ]
+        | None
+    ) = None
+
+
+class ForecastArguments(DateArguments):
+    scenario: Literal["base", "conservative", "stress", "all"] = "all"
+    until: Period | None = None
+
+
 class DebtsArguments(DateArguments):
     counterparty_query: (
         Annotated[str, StringConstraints(strict=True, min_length=1, max_length=200)]
@@ -59,6 +88,12 @@ class Metric(LedgerModel):
     source_ids: tuple[str, ...]
     formula: str
 
+    @model_validator(mode="after")
+    def missing_is_unavailable(self):
+        if (self.kind == "missing") != (self.value is None):
+            raise ValueError("Only missing metrics are null")
+        return self
+
 
 class ErrorDetail(LedgerModel):
     code: str
@@ -71,6 +106,7 @@ class ErrorResponse(LedgerModel):
 
 
 class ToolEnvelope(LedgerModel):
+    _verified_fingerprint: str | None = PrivateAttr(default=None)
     ok: StrictBool
     data_version: Literal["synthetic-ledger-v1"] = "synthetic-ledger-v1"
     currency: Literal["IQD"] = "IQD"
