@@ -225,6 +225,9 @@ def test_dry_run_never_constructs_provider_transport(monkeypatch, capsys):
     output = json.loads(capsys.readouterr().out)
     assert output["mode"] == "dry_run" and output["maximum_requests"] == 40
     assert output["case_count"] == 10
+    assert output["selected_providers"] == ["gemini", "groq"]
+    assert output["settings"]["max_tokens"] == 768
+    assert output["settings"]["timeout_seconds"] == 20
 
 
 def test_input_reads_stay_on_the_explicit_development_metadata_allowlist(
@@ -350,3 +353,148 @@ def test_invalid_local_comparison_settings_are_sanitized_before_transport(
     error = capsys.readouterr().err
     assert "invalid local configuration" in error
     assert "fictional-sensitive-value" not in error
+
+
+def test_single_candidate_keeps_budget_and_records_safe_response_diagnostics(cases):
+    sent = []
+
+    def sender(provider, payload):
+        sent.append((provider, payload))
+        response = (
+            interpretation()
+            if len(sent) == 1
+            else completion(calls=[call(period="this_week", kind="cash")])
+        )
+        response["choices"][0]["finish_reason"] = (
+            "stop" if len(sent) == 1 else "tool_calls"
+        )
+        response["usage"] = {
+            "prompt_tokens": 1200,
+            "completion_tokens": 3000,
+            "total_tokens": 4200,
+            "completion_tokens_details": {"reasoning_tokens": 2900},
+            "untrusted_field": "do-not-persist",
+        }
+        return response
+
+    report = smoke.compare(
+        {"gemini": "recorded-model"},
+        sender=sender,
+        max_requests=2,
+        max_tokens=32768,
+        cases=[cases["DEV-001"]],
+    )
+    assert len(sent) == report["request_attempts"] == 2
+    assert all(provider == "gemini" for provider, _ in sent)
+    assert all(payload["max_tokens"] == 32768 for _, payload in sent)
+    summary = report["providers"]["gemini"]
+    assert summary["joint_correct"] == 1
+    assert [r["stage"] for r in summary["requests"]] == [
+        "interpretation",
+        "tool_selection",
+    ]
+    assert summary["requests"][0]["usage"] == {
+        "prompt_tokens": 1200,
+        "completion_tokens": 3000,
+        "total_tokens": 4200,
+        "reasoning_tokens": 2900,
+    }
+    assert all(type(r["elapsed_ms"]) is int for r in summary["requests"])
+    assert "do-not-persist" not in json.dumps(report)
+
+
+def test_truncation_diagnostics_do_not_retain_model_text_or_untrusted_metadata(cases):
+    response = completion(content="do-not-persist")
+    response["choices"][0]["finish_reason"] = "length"
+    response["usage"] = {
+        "prompt_tokens": "do-not-persist",
+        "completion_tokens": -1,
+        "total_tokens": True,
+        "completion_tokens_details": {"reasoning_tokens": 32768},
+    }
+    report = smoke.compare(
+        {"gemini": "recorded-model"},
+        sender=lambda provider, payload: response,
+        max_requests=2,
+        cases=[cases["DEV-001"]],
+    )
+    requests = report["providers"]["gemini"]["requests"]
+    assert all(r["finish_reason"] == "length" for r in requests)
+    assert requests[0]["usage"] == {"reasoning_tokens": 32768}
+    assert "do-not-persist" not in json.dumps(report)
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["--max-tokens", "0"],
+        ["--max-tokens", "32769"],
+        ["--timeout-seconds", "0"],
+        ["--timeout-seconds", "301"],
+    ],
+)
+def test_invalid_resource_limits_fail_before_loading_credentials(
+    monkeypatch, arguments
+):
+    def forbidden():
+        pytest.fail("invalid profile loaded local credentials")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    with pytest.raises(SystemExit) as caught:
+        smoke.main(["--live", *arguments])
+    assert caught.value.code == 2
+
+
+def test_single_provider_live_cli_uses_only_its_key_and_honors_resource_profile(
+    monkeypatch, tmp_path, capsys
+):
+    from app.config import Settings
+
+    monkeypatch.setattr(smoke, "ROOT", tmp_path)
+    monkeypatch.setattr(smoke, "provenance", lambda: {"head_commit": "fixture"})
+    monkeypatch.setattr(
+        smoke, "runtime_settings", lambda: Settings(gemini_api_key="fictional-gemini")
+    )
+    monkeypatch.setattr(smoke.time, "sleep", lambda delay: None)
+    seen = []
+
+    def respond(request):
+        assert request.url.host == "generativelanguage.googleapis.com"
+        assert request.headers["Authorization"] == "Bearer fictional-gemini"
+        assert json.loads(request.content)["max_tokens"] == 32768
+        assert request.extensions["timeout"]["read"] == 180
+        seen.append(request.url.host)
+        return httpx.Response(200, json=interpretation())
+
+    client_type = httpx.Client
+    monkeypatch.setattr(
+        smoke.httpx,
+        "Client",
+        lambda **kwargs: client_type(transport=httpx.MockTransport(respond), **kwargs),
+    )
+    result = smoke.main(
+        [
+            "--live",
+            "--provider",
+            "gemini",
+            "--gemini-model",
+            "recorded-model",
+            "--model-ids-checked-on",
+            "2026-10-18",
+            "--max-requests",
+            "20",
+            "--max-tokens",
+            "32768",
+            "--timeout-seconds",
+            "180",
+        ]
+    )
+    assert result == 0 and len(seen) == 20
+    output = capsys.readouterr()
+    assert "fictional-gemini" not in output.out + output.err
+    report_path = next((tmp_path / "docs/model_comparison").glob("*.json"))
+    report = json.loads(report_path.read_text())
+    assert report["live_provider_requests"] == report["maximum_requests"] == 20
+    assert set(report["providers"]) == {"gemini"}
+    assert report["settings"]["max_tokens"] == 32768
+    assert report["settings"]["timeout_seconds"] == 180

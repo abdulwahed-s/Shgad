@@ -204,7 +204,7 @@ def resolve_queries(queries, *, direction="both"):
     return sorted(ids)
 
 
-def payloads(question, model):
+def payloads(question, model, *, max_tokens=768):
     context = {
         "question": question["question_ar"],
         "business_as_of": question["business_as_of"],
@@ -213,7 +213,7 @@ def payloads(question, model):
             {"name": p["display_name"], "kind": p["kind"]} for p in reference_parties()
         ],
     }
-    base = {"model": model, "temperature": 0, "max_tokens": 768}
+    base = {"model": model, "temperature": 0, "max_tokens": max_tokens}
     user = {"role": "user", "content": encoded(context).decode()}
     return (
         base
@@ -387,11 +387,52 @@ def send_request(client, provider, payload, key):
         raise ProviderFailure("INVALID_RESPONSE") from None
 
 
-def compare(models, *, sender, max_requests=MAX_REQUESTS, cases=None, mode="recorded"):
+def response_diagnostics(response):
+    """Persist bounded counters and known finish codes, never provider text."""
+    result = {"finish_reason": None, "usage": {}}
+    if not isinstance(response, dict):
+        return result
+    choices = response.get("choices")
+    if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+        reason = choices[0].get("finish_reason")
+        if isinstance(reason, str):
+            result["finish_reason"] = (
+                reason
+                if reason in {"stop", "length", "tool_calls", "content_filter"}
+                else "other"
+            )
+    usage = response.get("usage")
+    if isinstance(usage, dict):
+        for name in ("prompt_tokens", "completion_tokens", "total_tokens"):
+            value = usage.get(name)
+            if type(value) is int and 0 <= value <= 2**31 - 1:
+                result["usage"][name] = value
+        details = usage.get("completion_tokens_details")
+        value = details.get("reasoning_tokens") if isinstance(details, dict) else None
+        if type(value) is int and 0 <= value <= 2**31 - 1:
+            result["usage"]["reasoning_tokens"] = value
+    return result
+
+
+def compare(
+    models,
+    *,
+    sender,
+    max_requests=MAX_REQUESTS,
+    max_tokens=768,
+    cases=None,
+    mode="recorded",
+):
     if type(max_requests) is not int or not 1 <= max_requests <= MAX_REQUESTS:
         raise ValueError("INVALID_REQUEST_BUDGET")
-    if set(models) != set(ENDPOINTS) or mode not in {"recorded", "live"}:
+    if (
+        not models
+        or not set(models).issubset(ENDPOINTS)
+        or mode not in {"recorded", "live"}
+    ):
         raise ValueError("INVALID_COMPARISON")
+    if type(max_tokens) is not int or not 1 <= max_tokens <= 32768:
+        raise ValueError("INVALID_TOKEN_BUDGET")
     questions = development_cases() if cases is None else cases
     report = {
         "mode": mode,
@@ -410,19 +451,27 @@ def compare(models, *, sender, max_requests=MAX_REQUESTS, cases=None, mode="reco
             "valid_tool_selections": 0,
             "stopped_reason": None,
             "cases": [],
+            "requests": [],
         }
         report["providers"][provider] = summary
         for question in questions:
             responses = []
-            for payload in payloads(question, model):
+            for stage, payload in zip(
+                ("interpretation", "tool_selection"),
+                payloads(question, model, max_tokens=max_tokens),
+                strict=True,
+            ):
                 if report["request_attempts"] >= max_requests:
                     summary["stopped_reason"] = "REQUEST_BUDGET"
                     break
                 report["request_attempts"] += 1
                 if mode == "live":
                     report["live_provider_requests"] += 1
+                started = time.monotonic()
+                diagnostic = {"case_id": question["id"], "stage": stage}
                 try:
                     response = sender(provider, payload)
+                    diagnostic |= response_diagnostics(response)
                     responses.append(response)
                     reported = (
                         response.get("model") if isinstance(response, dict) else None
@@ -435,7 +484,13 @@ def compare(models, *, sender, max_requests=MAX_REQUESTS, cases=None, mode="reco
                         summary["model_ids_reported"].append(reported)
                 except ProviderFailure as failure:
                     summary["stopped_reason"] = str(failure)
+                    diagnostic["error"] = str(failure)
                     break
+                finally:
+                    diagnostic["elapsed_ms"] = max(
+                        0, round((time.monotonic() - started) * 1000)
+                    )
+                    summary["requests"].append(diagnostic)
             if len(responses) != 2:
                 break
             result = score(question, *responses)
@@ -453,11 +508,27 @@ def main(argv=None):
     )
     parser.add_argument("--gemini-model")
     parser.add_argument("--groq-model")
+    parser.add_argument("--provider", choices=("both", *ENDPOINTS), default="both")
     parser.add_argument("--model-ids-checked-on", type=date.fromisoformat)
     parser.add_argument("--max-requests", type=int, default=MAX_REQUESTS)
+    parser.add_argument("--max-tokens", type=int, default=768)
+    parser.add_argument("--timeout-seconds", type=int, default=20)
     args = parser.parse_args(argv)
     if not 1 <= args.max_requests <= MAX_REQUESTS:
         parser.error("max-requests must be between 1 and 40")
+    if not 1 <= args.max_tokens <= 32768:
+        parser.error("max-tokens must be between 1 and 32768")
+    if not 1 <= args.timeout_seconds <= 300:
+        parser.error("timeout-seconds must be between 1 and 300")
+    providers = tuple(ENDPOINTS) if args.provider == "both" else (args.provider,)
+    request_settings = {
+        "temperature": 0,
+        "max_tokens": args.max_tokens,
+        "timeout_seconds": args.timeout_seconds,
+        "minimum_request_interval_seconds": 10,
+        "request_elapsed_includes_pacing": True,
+        "retries": 0,
+    }
     metadata = provenance()
     if not args.live:
         print(
@@ -468,6 +539,8 @@ def main(argv=None):
                     "case_count": len(development_cases()),
                     "case_ids": CASE_IDS,
                     "maximum_requests": args.max_requests,
+                    "selected_providers": providers,
+                    "settings": request_settings,
                     "provider_calls": 0,
                     "model_ids_and_keys_required_for_live": True,
                 },
@@ -476,27 +549,28 @@ def main(argv=None):
             )
         )
         return 0
-    models = {"gemini": args.gemini_model, "groq": args.groq_model}
+    models = {provider: getattr(args, f"{provider}_model") for provider in providers}
     if not args.model_ids_checked_on or any(
         not model or not re.fullmatch(r"[A-Za-z0-9/._:-]{1,120}", model)
         for model in models.values()
     ):
-        parser.error("supply exact console model IDs and --model-ids-checked-on")
+        parser.error("supply verified model IDs and --model-ids-checked-on")
     try:
         settings = runtime_settings()
     except (ValidationError, OSError, UnicodeError):
         parser.error("invalid local configuration; check setting names and value types")
     keys = {}
-    for provider, name in KEY_NAMES.items():
+    for provider in providers:
+        name = KEY_NAMES[provider]
         key = getattr(settings, name.lower())
         keys[provider] = key.get_secret_value() if key else ""
     if not all(value.strip() for value in keys.values()):
         parser.error(
-            "configure both provider keys in local .env or process environment; "
+            "configure selected provider keys in local .env or process environment; "
             "never paste keys"
         )
     last_request = {}
-    with httpx.Client(timeout=20, trust_env=False) as client:
+    with httpx.Client(timeout=args.timeout_seconds, trust_env=False) as client:
 
         def sender(provider, payload):
             delay = max(0, 10 - (time.monotonic() - last_request.get(provider, -100)))
@@ -506,18 +580,16 @@ def main(argv=None):
             return send_request(client, provider, payload, keys[provider])
 
         report = compare(
-            models, sender=sender, max_requests=args.max_requests, mode="live"
+            models,
+            sender=sender,
+            max_requests=args.max_requests,
+            max_tokens=args.max_tokens,
+            mode="live",
         )
     report |= metadata | {
         "model_ids_checked_on": str(args.model_ids_checked_on),
         "created_at": datetime.now(UTC).isoformat(),
-        "settings": {
-            "temperature": 0,
-            "max_tokens": 768,
-            "timeout_seconds": 20,
-            "minimum_request_interval_seconds": 10,
-            "retries": 0,
-        },
+        "settings": request_settings,
         "scope": (
             "development routing screen; "
             "no financial answer or end-to-end accuracy measured"

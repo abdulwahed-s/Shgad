@@ -225,14 +225,21 @@ python scripts/model_smoke_test.py --help
 
 The default is a dry run with no provider requests. Live use requires `--live`,
 exact provider model IDs through `--gemini-model` and `--groq-model`, their
-`--model-ids-checked-on` date, and both provider keys in local `.env` or process
-environment variables. Only an explicit live run loads credentials; the default
+`--model-ids-checked-on` date, and the selected provider keys in local `.env` or
+process environment variables. `--provider gemini` or `--provider groq` runs one
+candidate and requires only its key; the default compares both providers.
+Only an explicit live run loads credentials; the default
 dry run leaves `.env` untouched. Never paste keys into chat. It compares interpretation
 and native tool selection against development labels, including customer and period.
 It executes no proposed tools and measures no financial-answer accuracy. The hard
 cap is 40 requests, with no retries and at least ten seconds between a provider's
-requests. Provider errors stop that candidate. Full application quality remains
-unverified.
+requests. Provider errors stop that candidate. The default HTTP timeout is 20s
+and output limit is 768 tokens; explicit `--timeout-seconds` (1–300) and
+`--max-tokens` (1–32,768) support slower reasoning models. Reports record these
+limits, known finish reasons and available token-usage counters, without retaining
+model prose or tool arguments. Per-request elapsed times include pacing waits.
+Scores from different limit settings are not controlled model comparisons.
+Full application quality remains unverified.
 
 Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
 completed the ten-question development screen using 40 requests total, with no
@@ -322,7 +329,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **611 backend tests passed, one opt-in live test skipped**,
+Verified locally: **618 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
