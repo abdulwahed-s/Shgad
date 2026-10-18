@@ -15,9 +15,9 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > mapping use a configurable provider client with bounded retries and failover;
 > their integration is verified with recorded provider responses. Flutter remains a
 > static localized shell; merchant screens and frontend chat integration are planned.
-> Gemini and Groq completed a bounded development routing comparison. The current
-> routing configuration needs improvement; full live chat validation and human
-> review of new Arabic copy remain pending.
+> Gemini and Groq completed bounded development routing screens. An additional
+> Gemini 3.8 Flash check scored 9/10 with larger time/token limits. Full live chat
+> validation and human review of new Arabic copy remain pending.
 
 ## Capabilities and planned interface
 
@@ -251,10 +251,21 @@ choice, customer and period to agree with the development labels.
 | `gemini-3.1-flash-lite` | 6/10 | 9/10 |
 | `openai/gpt-oss-120b` on Groq | 4/10 | 5/10 |
 
-Settings were temperature 0 and a 768-token output limit, with the timeout and
-pacing described above. This small development screen uses a separate routing
+This first comparison requested temperature 0, a 768-token output limit and a
+20s HTTP timeout. This small development screen uses a separate routing
 prompt; it does not measure application answers, financial accuracy or held-out
 performance. Development tuning and human acceptance remain pending.
+
+An additional check on 18 October at clean source `54a7382` used the same ten
+questions, prompts, gold labels and tool schemas with `gemini-3.8-flash`:
+**9/10 jointly correct and 9/10 correct tool sets**, with intent, behavior,
+customer and period each correct on all ten. All 20 requests completed with no
+provider errors, retries or reported truncation. This run allowed 180s per HTTP
+request and 32,768 output tokens, with at least ten seconds between requests.
+The API reported 34,829 total tokens across the run. Its larger time/token limits
+differ from the first comparison, so the score difference cannot be attributed
+solely to model choice. Application model selection and live answer quality
+remain pending.
 
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
