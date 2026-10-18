@@ -3,7 +3,7 @@
 import json
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 
@@ -240,3 +240,30 @@ def test_concurrent_manual_collections_cannot_overallocate(api, ledger):
         ledger.execute("SELECT SUM(amount_iqd) FROM payment_links").fetchone()[0]
         == 40000
     )
+
+
+def test_current_entry_after_historical_count_increases_counted_cash(
+    api, ledger, insert_event
+):
+    from app.api.dependencies import audit_timestamp
+    from app.main import app
+    from app.services.ledger_rules import cash_on_hand
+
+    insert_event(
+        source_id="COUNT",
+        type="DAILY_CASH_COUNT",
+        amount_iqd=420000,
+        occurred_at="2026-09-28T21:00:00+03:00",
+    )
+    ledger.commit()
+    now = datetime.fromisoformat("2026-10-18T10:00:00+04:00")
+    app.dependency_overrides[audit_timestamp] = lambda: now
+    response = save(api, "after-count", amount=5000)
+    assert response.status_code == 201, response.text
+    snapshot = read_ledger(ledger)
+    cash = cash_on_hand(snapshot.transactions, as_of=date(2026, 9, 28), known_at=now)
+    assert cash.amount_iqd == 425000
+    assert cash.source_ids == ("COUNT", response.json()["source_id"])
+    row = snapshot.transactions[-1]
+    assert row.occurred_at > snapshot.transactions[0].occurred_at
+    assert row.recorded_at == now and row.business_date == date(2026, 9, 28)

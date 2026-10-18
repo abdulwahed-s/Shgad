@@ -32,6 +32,7 @@ from app.services.business_clock import BusinessClock
 from app.services.errors import FinancialRuleError
 from app.services.ledger_rules import knowledge_cutoff
 from app.services.observed import OBSERVED_START, observed_day
+from app.services.reconcile import match_payment
 from app.services.validation import parse_iqd, parse_timestamp
 
 MAX_FILE_BYTES = 5 * 1024 * 1024
@@ -247,47 +248,10 @@ def _check_references(connection, row):
         raise _RowProblem("INVALID_REFERENCE")
 
 
-def _payment_match(connection, row, audit_time):
+def _payment_match(connection, row, audit_time, *, clock):
     if row.type not in _PAYMENTS:
-        return None, None
-    origin = connection.execute(
-        """SELECT o.*, t.occurred_at, t.recorded_at FROM obligations o
-        JOIN transactions t ON t.transaction_id = o.origin_transaction_id
-        WHERE o.obligation_id = ? AND o.counterparty_id = ? AND o.kind = ?
-        AND NOT EXISTS (SELECT 1 FROM entry_voids v
-            WHERE v.transaction_id = t.transaction_id
-            AND v.voided_at <= ?)""",
-        (
-            row.obligation_id,
-            row.counterparty_id,
-            "receivable" if row.type == EventType.CREDIT_COLLECTION else "payable",
-            audit_time.isoformat(),
-        ),
-    ).fetchone()
-    if origin is None:
-        return "unmatched_payment", None
-    if (
-        parse_timestamp(origin["occurred_at"]) > row.occurred_at
-        or parse_timestamp(origin["recorded_at"]) > audit_time
-    ):
-        return "unmatched_payment", None
-    paid = connection.execute(
-        """SELECT COALESCE(SUM(l.amount_iqd), 0) FROM payment_links l
-        JOIN transactions p ON p.transaction_id = l.payment_transaction_id
-        WHERE l.obligation_id = ? AND l.created_at <= ? AND p.recorded_at <= ?
-        AND p.occurred_at <= ? AND NOT EXISTS (SELECT 1 FROM entry_voids v
-            WHERE v.transaction_id = p.transaction_id AND v.voided_at <= ?)""",
-        (
-            row.obligation_id,
-            audit_time.isoformat(),
-            audit_time.isoformat(),
-            audit_time.isoformat(),
-            audit_time.isoformat(),
-        ),
-    ).fetchone()[0]
-    if row.amount_iqd > origin["original_amount_iqd"] - paid:
-        return "payment_exceeds_outstanding", row.obligation_id
-    return None, row.obligation_id
+        return None
+    return match_payment(connection, row, clock=clock, known_at=audit_time)
 
 
 def get_import_receipt(connection, batch_id, *, replay=False) -> ImportReceipt:
@@ -439,25 +403,37 @@ def _import_rows(
                         == getattr(row, key)
                         for key in _IDENTITY
                     )
+                    exact = exact and (
+                        not raw.get("recorded_at") or old.recorded_at == row.recorded_at
+                    )
                     raise _RowProblem(
                         "EXACT_DUPLICATE" if exact else "IDEMPOTENCY_CONFLICT"
                     )
                 _check_references(connection, row)
-                reason, reference = _payment_match(connection, row, audit_time)
-                if row.type in _PAYMENTS and reference is None:
+                match = _payment_match(connection, row, audit_time, clock=clock)
+                reason = match.reason_key if match else None
+                if match is not None:
                     row = row.model_copy(
-                        update={"obligation_id": None, "status": "flagged"}
+                        update={
+                            "obligation_id": match.obligation_id,
+                            "status": "flagged" if reason else "valid",
+                        }
                     )
                 near = connection.execute(
-                    """SELECT 1 FROM transactions WHERE source_system = ?
-                    AND type = ? AND amount_iqd = ? AND counterparty_id IS ?
-                    AND business_date = ? LIMIT 1""",
+                    """SELECT 1 FROM transactions t WHERE type = ?
+                    AND amount_iqd = ? AND counterparty_id IS ?
+                    AND business_date = ? AND recorded_at <= ? AND occurred_at <= ?
+                    AND NOT EXISTS (SELECT 1 FROM entry_voids v
+                        WHERE v.transaction_id = t.transaction_id AND v.voided_at <= ?)
+                    LIMIT 1""",
                     (
-                        source_system,
                         row.type,
                         row.amount_iqd,
                         row.counterparty_id,
                         row.business_date.isoformat(),
+                        audit_time.isoformat(),
+                        audit_time.isoformat(),
+                        audit_time.isoformat(),
                     ),
                 ).fetchone()
                 reasons = ([reason] if reason else []) + (
@@ -500,7 +476,7 @@ def _import_rows(
                             payment_transaction_id=row.transaction_id,
                             obligation_id=row.obligation_id,
                             amount_iqd=row.amount_iqd,
-                            match_basis="definite",
+                            match_basis=match.level,
                             created_at=audit_time,
                         ),
                     )
@@ -511,6 +487,8 @@ def _import_rows(
                             flag_id=f"FLAG-{uuid4().hex}",
                             type="suspected_duplicate"
                             if reason_key == "suspected_duplicate"
+                            else "ambiguous"
+                            if match and match.level == "candidate"
                             else "unmatched",
                             reason_key=reason_key,
                             amount_iqd=row.amount_iqd,

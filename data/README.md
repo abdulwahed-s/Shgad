@@ -1,8 +1,8 @@
 # Fictional merchant data
 
 All names, merchants and records are invented. Human review of the shared
-business mechanics and development questions was recorded on 17 October 2026;
-two cash-sale note templates still await approval. Display names use natural
+business mechanics and development questions was recorded on 17–18 October 2026;
+all twelve note phrases and four scenarios were reviewed. Display names use natural
 Iraqi wording; metadata retains fictional provenance. This is not merchant validation.
 
 From the repository root, using Python 3.11+ (standard library only):
@@ -50,7 +50,7 @@ The obligation/link files contain only records known by the observed cutoff.
 The canonical importer now accepts the primary observed CSV, allowlisted canonical
 fixtures and explicitly synthetic external uploads. Other packaged files are refused
 before opening. Categories/counterparties/opening records must be separately verified
-and preloaded; the importer derives obligations and definite payment allocations from
+and preloaded; the importer derives obligations and definite/unique-strong allocations from
 transaction rows. It does not autodiscover or import support/link/void files.
 The production forecast reads cutoff-filtered SQLite only, without file access.
 Real runtime tests verify file replay, observed boundaries and later entry/link/void

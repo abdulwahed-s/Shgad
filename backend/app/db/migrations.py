@@ -539,7 +539,42 @@ CREATE TRIGGER {_table}_immutable_{_operation.lower()} BEFORE {_operation} ON {_
 BEGIN SELECT RAISE(ABORT, '{_table} is immutable'); END;
 """
 
-_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2, _SCHEMA_V3)
+_SCHEMA_V4 = f"""
+CREATE TABLE entry_corrections (
+    original_transaction_id TEXT PRIMARY KEY NOT NULL
+        REFERENCES transactions(transaction_id),
+    replacement_transaction_id TEXT NOT NULL UNIQUE
+        REFERENCES transactions(transaction_id),
+    created_at TEXT NOT NULL CHECK ({_timestamp("created_at")}),
+    CHECK (original_transaction_id != replacement_transaction_id)
+) STRICT;
+CREATE TRIGGER correction_identity BEFORE INSERT ON entry_corrections
+WHEN NOT EXISTS (
+    SELECT 1 FROM transactions original JOIN entry_voids v
+    ON v.transaction_id = original.transaction_id JOIN transactions replacement
+    ON replacement.transaction_id = NEW.replacement_transaction_id
+    JOIN raw_import_rows raw ON raw.import_batch_id = replacement.import_batch_id
+    AND raw.source_row = replacement.source_row
+    WHERE original.transaction_id = NEW.original_transaction_id
+    AND v.voided_at <= NEW.created_at AND replacement.recorded_at = NEW.created_at
+    AND replacement.occurred_at = original.occurred_at
+    AND replacement.business_date = original.business_date
+    AND replacement.source = 'manual_entry'
+    AND replacement.source_system = 'synthetic_entry'
+    AND json_extract(raw.row_json, '$.correction_of_source_id') = original.source_id
+)
+BEGIN
+    SELECT RAISE(ABORT, 'correction requires void and preserved event time');
+END;
+"""
+for _operation in ("UPDATE", "DELETE"):
+    _SCHEMA_V4 += f"""
+CREATE TRIGGER entry_corrections_immutable_{_operation.lower()}
+BEFORE {_operation} ON entry_corrections
+BEGIN SELECT RAISE(ABORT, 'entry_corrections is immutable'); END;
+"""
+
+_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2, _SCHEMA_V3, _SCHEMA_V4)
 
 
 def apply_migrations(connection: sqlite3.Connection) -> None:

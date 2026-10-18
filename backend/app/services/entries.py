@@ -3,7 +3,7 @@
 import hashlib
 import json
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from pydantic import ValidationError
@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from app.db.records import atomic_import, insert_record
 from app.schemas.entries import EntryReceipt, EntryRequest
 from app.schemas.ledger import (
+    EntryCorrection,
     EventType,
     ImportBatch,
     Obligation,
@@ -20,6 +21,7 @@ from app.schemas.ledger import (
 )
 from app.services.business_clock import BusinessClock
 from app.services.errors import FinancialRuleError
+from app.services.evidence import find_source
 from app.services.ingest import _check_references, _payment_match, _RowProblem
 from app.services.observed import OBSERVED_START, observed_day
 from app.services.validation import BAGHDAD, parse_timestamp
@@ -53,7 +55,10 @@ def create_entry(
             (request.client_entry_id,),
         ).fetchone()
         if prior:
-            if prior["source"] != "manual_entry" or prior["row_json"] != raw:
+            if (
+                prior["source"] != "manual_entry"
+                or EntryRequest.model_validate_json(prior["row_json"]) != request
+            ):
                 raise FinancialRuleError(
                     "VALIDATION_ERROR", details={"reason": "IDEMPOTENCY_CONFLICT"}
                 )
@@ -79,6 +84,45 @@ def create_entry(
         occurred = datetime.combine(
             request.business_date, audit.astimezone(BAGHDAD).timetz()
         )
+        latest = connection.execute(
+            """SELECT MAX(occurred_at) FROM transactions WHERE business_date = ?
+            AND occurred_at <= ? AND recorded_at <= ?""",
+            (request.business_date.isoformat(), audit.isoformat(), audit.isoformat()),
+        ).fetchone()[0]
+        if (
+            request.correction_of_source_id is None
+            and latest is not None
+            and parse_timestamp(latest) >= occurred
+        ):
+            occurred = min(parse_timestamp(latest) + timedelta(microseconds=1), audit)
+            if occurred.astimezone(BAGHDAD).date() != request.business_date:
+                raise FinancialRuleError(
+                    "VALIDATION_ERROR", details={"reason": "BUSINESS_DAY_FULL"}
+                )
+        original = None
+        if request.correction_of_source_id is not None:
+            original = find_source(
+                connection, request.correction_of_source_id, clock=clock, known_at=audit
+            )
+            if not connection.execute(
+                "SELECT 1 FROM entry_voids WHERE transaction_id = ? AND voided_at <= ?",
+                (original.transaction_id, audit.isoformat()),
+            ).fetchone():
+                raise FinancialRuleError(
+                    "VALIDATION_ERROR", details={"reason": "CORRECTION_REQUIRES_VOID"}
+                )
+            if request.business_date != original.business_date:
+                raise FinancialRuleError(
+                    "VALIDATION_ERROR", details={"reason": "CORRECTION_DATE_MISMATCH"}
+                )
+            if connection.execute(
+                "SELECT 1 FROM entry_corrections WHERE original_transaction_id = ?",
+                (original.transaction_id,),
+            ).fetchone():
+                raise FinancialRuleError(
+                    "VALIDATION_ERROR", details={"reason": "ALREADY_CORRECTED"}
+                )
+            occurred = original.occurred_at
         try:
             row = Transaction(
                 transaction_id=source_id,
@@ -125,13 +169,13 @@ def create_entry(
                 "VALIDATION_ERROR", details={"reason": "EXISTING_CASH_COUNT"}
             )
         if row.type in PAYMENTS:
-            reason, reference = _payment_match(connection, row, audit)
-            if reason is not None or reference is None:
+            match = _payment_match(connection, row, audit, clock=clock)
+            if match.reason_key is not None or match.obligation_id is None:
                 raise FinancialRuleError(
                     "VALIDATION_ERROR",
                     details={
                         "reason": "OVERPAYMENT"
-                        if reason == "payment_exceeds_outstanding"
+                        if match.reason_key == "payment_exceeds_outstanding"
                         else "INVALID_REFERENCE"
                     },
                 )
@@ -181,6 +225,15 @@ def create_entry(
                     obligation_id=obligation_id,
                     amount_iqd=row.amount_iqd,
                     match_basis="definite",
+                    created_at=audit,
+                ),
+            )
+        if original is not None:
+            insert_record(
+                connection,
+                EntryCorrection(
+                    original_transaction_id=original.transaction_id,
+                    replacement_transaction_id=row.transaction_id,
                     created_at=audit,
                 ),
             )

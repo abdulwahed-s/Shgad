@@ -32,6 +32,7 @@ class EntryRequest(LedgerModel):
     obligation_id: Identifier | None = None
     due_date: BusinessDate | None = None
     note: str | None = None
+    correction_of_source_id: Identifier | None = None
 
 
 class EntryReceipt(LedgerModel):

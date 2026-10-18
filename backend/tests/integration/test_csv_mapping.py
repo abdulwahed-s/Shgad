@@ -268,6 +268,22 @@ def test_default_proposer_is_unavailable_without_fake_or_provider_calls(api, led
     assert confirm(api, "unknown").status_code == 404
 
 
+def test_unexpected_mapping_failure_uses_sanitized_contract_envelope(api, mapper):
+    def fail(**kwargs):
+        raise RuntimeError("private synthetic adapter failure")
+
+    mapper.propose = fail
+    response = preview(api)
+    assert response.status_code == 500
+    assert response.json() == {
+        "error": {
+            "code": "INTERNAL",
+            "message_key": "error_internal",
+            "details": {},
+        }
+    }
+
+
 @pytest.mark.parametrize("content", [b"\xff", b"Ref,Ref\nx,y\n"])
 def test_invalid_mapping_file_is_rejected_before_model_call(api, mapper, content):
     response = preview(api, content)

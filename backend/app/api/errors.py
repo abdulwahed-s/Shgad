@@ -43,3 +43,7 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(sqlite3.Error)
     async def database_error(request: Request, exc: sqlite3.Error):
         return _error("INTERNAL", 500)
+
+    @app.exception_handler(Exception)
+    async def unexpected_error(request: Request, exc: Exception):
+        return _error("INTERNAL", 500)

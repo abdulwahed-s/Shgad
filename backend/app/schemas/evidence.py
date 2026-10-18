@@ -52,6 +52,7 @@ class LedgerItem(LedgerModel):
     source: Literal["synthetic_csv", "manual_entry", "daily_close_review"]
     description: str
     void: VoidEvidence | None
+    correction_of_source_id: Identifier | None = None
 
 
 class LedgerDetail(LedgerItem):

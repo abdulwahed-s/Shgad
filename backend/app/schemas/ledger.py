@@ -215,6 +215,12 @@ class EntryVoid(VoidRequest):
     voided_at: Timestamp
 
 
+class EntryCorrection(LedgerModel):
+    original_transaction_id: Identifier
+    replacement_transaction_id: Identifier
+    created_at: Timestamp
+
+
 class Counterparty(LedgerModel):
     counterparty_id: Identifier
     display_name: NonemptyText

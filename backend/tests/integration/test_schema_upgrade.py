@@ -104,7 +104,7 @@ def test_upgrade_preserves_v1_rows_evidence_relationships_and_replays(tmp_path):
         seed_v1(connection)
         before = data_snapshot(connection)
         migrations.apply_migrations(connection)
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
         after = data_snapshot(connection)
         for table, rows in before.items():
             assert (
@@ -202,10 +202,48 @@ def test_mapping_upgrade_preserves_populated_v2_and_rolls_back_on_conflict(tmp_p
     assert not connection.in_transaction
     connection.execute("DROP TABLE csv_mappings")
     migrations.apply_migrations(connection)
-    assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
     after = data_snapshot(connection)
     for table, rows in before.items():
         assert after[table] == rows
     assert after["csv_mappings"] == after["mapping_confirmations"] == []
+    assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+    connection.close()
+
+
+def test_correction_upgrade_preserves_v3_mappings_and_rolls_back_on_conflict(tmp_path):
+    connection = connect_database(tmp_path / "version3.sqlite")
+    seed_v1(connection)
+    connection.executescript(
+        "PRAGMA foreign_keys = OFF;\n"
+        + migrations._SCHEMA_V2
+        + migrations._SCHEMA_V3
+        + "\nPRAGMA user_version = 3; PRAGMA foreign_keys = ON;"
+    )
+    with connection:
+        connection.execute(
+            "INSERT INTO csv_mappings VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                "LEGACY-MAP",
+                "fictional.csv",
+                b"Ref\nfictional\n",
+                "[]",
+                "{}",
+                "2026-09-28",
+                "2026-09-28T12:00:00+00:00",
+            ),
+        )
+    before = data_snapshot(connection)
+    connection.execute("CREATE TABLE entry_corrections (legacy TEXT)")
+    with pytest.raises(sqlite3.DatabaseError):
+        migrations.apply_migrations(connection)
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+    connection.execute("DROP TABLE entry_corrections")
+    migrations.apply_migrations(connection)
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+    after = data_snapshot(connection)
+    for table, rows in before.items():
+        assert after[table] == rows
+    assert after["entry_corrections"] == []
     assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
     connection.close()

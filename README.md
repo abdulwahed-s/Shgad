@@ -6,24 +6,23 @@ with figures that can be traced back to their source rows.
 
 Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 
-> **Available now:** a tested backend health endpoint, strict ledger schemas,
-> SQLite migrations, deterministic financial primitives and reproducible fictional
-> merchant CSVs with independent development truth, a canonical CSV importer and
-> a cutoff-safe three-scenario cash-estimate service. CSV upload and batch-receipt
-> HTTP routes and merchant entry/partial-payment endpoints are available. Flutter remains a static
-> localized shell. Merchant workflows remain planned; no model benchmarks have run.
+> **Available now:** a tested backend for synthetic CSV import, merchant entries,
+> partial payments, voids/corrections, ledger evidence and daily-close review.
+> Deterministic reconciliation, persisted mapping preview/confirmation and a
+> cutoff-safe cash-estimate service are tested. Flutter remains a static localized
+> shell; chat, merchant screens and a live mapping proposer remain planned.
+> No model benchmarks have run.
 
-## Planned features
+## Capabilities and planned interface
 
-- Import synthetic CSV records into a validated SQLite ledger.
-- Answer everyday financial questions in Iraqi Arabic, with source evidence for every figure.
-- Record debts, partial payments, expenses, owner drawings and cash counts through a simple entry form or CSV.
-- Keep recorded cash sales separate from unexplained cash differences; never infer the gap's cause.
-- Show today's counted cash and debts first, including next-seven-days obligations with confirmed cash versus expected collections.
-- Flag unmatched payments and suspected duplicates for review.
-- Summarise the week, including estimated gross margin when cost data is sufficient.
-- Offer a secondary 30-day cash estimate with base, conservative and stress scenarios and explicit assumptions.
-- Preserve saved entries and source evidence through user-initiated undo/void and correction.
+- Import fictional CSVs into a validated SQLite ledger with replay-safe batch receipts.
+- Record debts, partial payments, expenses, drawings, capital and cash counts through HTTP endpoints.
+- Keep recorded cash sales separate from signed unexplained cash differences.
+- Preserve immutable evidence through merchant voids and explicit corrections.
+- Identify unmatched/candidate payments, partial balances, overdue debts and suspected duplicates.
+- Provide a secondary Python cash-estimate service with base, conservative and stress scenarios.
+- Planned merchant screens will put today's cash, debts, entry and daily close first.
+- Planned Iraqi Arabic chat and reports will use verified figures and source evidence.
 
 ## Merchant questions
 
@@ -51,7 +50,7 @@ flowchart LR
     Renderer --> API
 ```
 
-Financial calculations will use integer IQD in Python. The LLM will request validated,
+Financial calculations use integer IQD in Python. The planned LLM will request validated,
 read-only tools and draft explanations with symbolic slots; the backend will fill figures
 and dates from verified results. Provider calls and API keys will stay in the backend.
 
@@ -93,15 +92,18 @@ separate from signed unexplained differences; missing consecutive counts remain
 unavailable. Capital injections add cash without sales, revenue or collections.
 Drawings remain separate from business expenses.
 
-SQLite schema version 3 has fifteen STRICT tables, with foreign keys, unique
+SQLite schema version 4 has sixteen STRICT tables, with foreign keys, unique
 idempotency keys, guarded partial-payment allocations and immutable source evidence.
 `POST /api/entries/{source_id}/void` supports merchant undo with client idempotency
 and cutoff-aware calculations. Voiding a collection restores outstanding
 debt while retaining original transactions, raw rows and linked reason/timestamp audits.
-Correction is a void followed by a new entry. `GET /api/ledger/transactions` supports
+For a correction, void the original and send its ID as `correction_of_source_id`
+on the replacement entry. It retains the original event time and an immutable link,
+so correcting a pre-count payment does not add cash again. New entries follow the
+last known event on their supplied business date. `GET /api/ledger/transactions` supports
 date/type/customer/source-ID filters and cursor pagination; its source-ID detail
 route returns raw cells, flags and the original amount with any linked void audit.
-Versioned migrations preserve v1 data and roll back atomically. Unknown opening cash
+Versioned migrations preserve earlier ledger/mapping records and roll back atomically. Unknown opening cash
 raises a typed error.
 
 Migrations use the standard-library SQLite driver and require SQLite **3.37+**
@@ -132,7 +134,9 @@ canonical CSV files into a migrated SQLite connection. Preload verified categori
 counterparties and opening records separately. It validates UTF-8/BOM files up to
 5 MiB / 10,000 rows, normalizes Arabic-Indic amounts, preserves raw cells and errors,
 and commits validated rows and quarantine evidence atomically. Explicit compatible
-obligation references create payment allocations. Unmatched payments and suspected
+obligation references and unique strong matches create payment allocations. Strong
+matches require the exact party, a sufficient outstanding balance and a due date
+within 30 days. Candidate/unmatched payments and suspected
 duplicates remain flagged for review. Exact file replay adds no transactions,
 cash, revenue, obligations or allocations; receipts distinguish accepted, rejected,
 exact-duplicate and flagged rows. `POST /api/imports/csv` accepts a multipart `file`;
@@ -147,6 +151,11 @@ its mapping and previews up to five parsed rows without financial writes. Confir
 uses saved immutable input/mapping metadata and the normal importer; retries are safe.
 The default proposer returns `LLM_UNAVAILABLE` because no model is connected yet.
 Tests inject fake proposals; there is no live mapping suggestion feature.
+
+`app.services.reconcile.reconciliation_report` reads cutoff-bounded SQLite and
+returns definite/strong/candidate/unmatched status, reasons, source IDs and current
+partial/overdue flags. It creates no links. Similar names and ambiguous obligations
+remain candidates for merchant review. Ledger detail includes these flags.
 
 `app.services.forecast.forecast` reads only a cutoff-filtered SQLite snapshot and
 returns 30 integer-IQD daily estimates for base, conservative and stress scenarios.
@@ -221,10 +230,11 @@ flows and shows the signed unexplained difference. Missing counts remain missing
 financial effect; a voided explanation stays in review history. No cause is inferred.
 The next-seven-days HTTP view remains planned.
 
-Verified locally: **416 backend tests**, including 19 CSV-mapping, 15 daily-close,
-six void/evidence, 26 merchant-entry and 63 importer/forecast runtime
-regressions and 50 offline data/evaluation checks, plus Ruff lint and formatting
-for 62 backend Python files (script checks were also verified previously). Financial-rule
+Verified locally: **439 backend tests**, including real HTTP/SQLite financial,
+mapping, reconciliation, immutable-correction and cutoff regressions, plus offline
+synthetic-data checks. Ruff lint/format pass for **71 backend/script files**;
+dependency checks pass. A running-server smoke passed 13 check groups across the
+11 implemented OpenAPI paths, using only a temporary fictional database. Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and

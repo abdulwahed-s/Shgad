@@ -18,6 +18,7 @@ from app.schemas.ledger import Transaction
 from app.services.business_clock import BusinessClock
 from app.services.errors import FinancialRuleError
 from app.services.observed import OBSERVED_START, observed_day
+from app.services.reconcile import reconciliation_report
 from app.services.validation import SQLITE_MAX_INTEGER, parse_timestamp
 
 
@@ -53,6 +54,12 @@ def project_item(connection, row: Transaction, *, known_at: datetime) -> LedgerI
         "SELECT * FROM entry_voids WHERE transaction_id = ? AND voided_at <= ?",
         (row.transaction_id, known_at.isoformat()),
     ).fetchone()
+    correction = connection.execute(
+        """SELECT original.source_id FROM entry_corrections c JOIN transactions original
+        ON original.transaction_id = c.original_transaction_id
+        WHERE c.replacement_transaction_id = ? AND c.created_at <= ?""",
+        (row.transaction_id, known_at.isoformat()),
+    ).fetchone()
     return LedgerItem(
         source_id=row.source_id,
         occurred_at=row.occurred_at,
@@ -74,6 +81,7 @@ def project_item(connection, row: Transaction, *, known_at: datetime) -> LedgerI
         void=VoidEvidence(**{k: void[k] for k in ("void_id", "reason", "voided_at")})
         if void
         else None,
+        correction_of_source_id=correction[0] if correction else None,
     )
 
 
@@ -109,6 +117,19 @@ def transaction_detail(connection, source_id, *, clock, known_at) -> LedgerDetai
                 WHERE transaction_id = ? ORDER BY flag_id""",
                 (row.transaction_id,),
             )
+        )
+        current_flags = tuple(
+            flag
+            for flag in reconciliation_report(
+                connection,
+                clock=clock,
+                known_at=known,
+            ).flags
+            if row.source_id in flag.source_ids
+        )
+        current_reasons = {flag.reason_key for flag in current_flags}
+        flags = current_flags + tuple(
+            flag for flag in flags if flag.reason_key not in current_reasons
         )
         return LedgerDetail(
             **item.model_dump(), raw_row=json.loads(raw[0]), flags=flags

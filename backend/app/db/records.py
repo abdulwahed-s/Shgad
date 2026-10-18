@@ -5,6 +5,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 from app.schemas.ledger import (
+    EntryCorrection,
     ImportBatch,
     LedgerModel,
     Obligation,
@@ -15,6 +16,7 @@ from app.schemas.ledger import (
 )
 
 _TABLES = {
+    EntryCorrection: "entry_corrections",
     ImportBatch: "import_batches",
     RawImportRow: "raw_import_rows",
     Transaction: "transactions",
