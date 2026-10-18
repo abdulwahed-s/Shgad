@@ -15,10 +15,9 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > mapping use a configurable provider client with bounded retries and failover;
 > their integration is verified with recorded provider responses. Flutter remains a
 > static localized shell; merchant screens and frontend chat integration are planned.
-> Exact model IDs, live provider validation and human review of new Arabic copy
-> remain pending.
-> An opt-in development model comparison has an offline-tested harness; no model
-> benchmarks have run.
+> Gemini and Groq completed a bounded development routing comparison. The current
+> routing configuration needs improvement; full live chat validation and human
+> review of new Arabic copy remain pending.
 
 ## Capabilities and planned interface
 
@@ -213,7 +212,7 @@ The historical test set has 60 human-reviewed questions and a
 remain outside the repository. Generation used a separate session of the same
 tool used during development. Memory controls were requested; isolation was not
 independently verified and the exact generator model ID was not exposed.
-No model evaluation has run.
+No held-out model evaluation has run.
 
 `scripts/model_smoke_test.py` prepares a provider comparison using ten fixed,
 reviewed development questions and the existing five read-only tool schemas.
@@ -225,15 +224,30 @@ python scripts/model_smoke_test.py --help
 ```
 
 The default is a dry run with no provider requests. Live use requires `--live`,
-exact console model IDs through `--gemini-model` and `--groq-model`, their
+exact provider model IDs through `--gemini-model` and `--groq-model`, their
 `--model-ids-checked-on` date, and both provider keys in local `.env` or process
 environment variables. Only an explicit live run loads credentials; the default
 dry run leaves `.env` untouched. Never paste keys into chat. It compares interpretation
 and native tool selection against development labels, including customer and period.
 It executes no proposed tools and measures no financial-answer accuracy. The hard
 cap is 40 requests, with no retries and at least ten seconds between a provider's
-requests. Provider errors stop that candidate. Live availability and model quality
-remain unverified.
+requests. Provider errors stop that candidate. Full application quality remains
+unverified.
+
+Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
+completed the ten-question development screen using 40 requests total, with no
+provider errors or retries. Joint correctness requires intent, behavior, tool
+choice, customer and period to agree with the development labels.
+
+| Candidate | Jointly correct | Correct tool set |
+|---|---|---|
+| `gemini-3.1-flash-lite` | 6/10 | 9/10 |
+| `openai/gpt-oss-120b` on Groq | 4/10 | 5/10 |
+
+Settings were temperature 0 and a 768-token output limit, with the timeout and
+pacing described above. This small development screen uses a separate routing
+prompt; it does not measure application answers, financial accuracy or held-out
+performance. Development tuning and human acceptance remain pending.
 
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
@@ -323,8 +337,8 @@ To include offline scripts in lint/format checks from backend/, run
 `python -m ruff format --check --config pyproject.toml . ../scripts`.
 Checks include recorded sales and signed differences, capital, review validation,
 void-adjusted balances and knowledge cutoffs, v1 upgrades, replay and atomic rollback.
-Concurrent review requests cannot explain the same cash twice. No live provider
-validation has run.
+Concurrent review requests cannot explain the same cash twice. The live routing
+screen above does not validate complete chat/mapping answers or failover behavior.
 
 The default suite makes no live provider requests. A single development routing
 probe requires both `SHGAD_RUN_LIVE=1` and `python -m pytest -m live`; it has a
@@ -341,10 +355,11 @@ running health endpoint using `--dart-define`.
 [GitHub Actions](https://github.com/abdulwahed-s/Shgad/actions/workflows/test.yml)
 runs backend lint/format/tests and Flutter localization, formatting, analysis and tests
 on pushes and pull requests. Its linked run history shows the measured CI results.
-There are no financial benchmarks or model evaluations.
+No financial benchmark or held-out model evaluation has run.
 
 Synthetic CSV generation, ledger import, financial tools and deterministic reports are available;
-a merchant-facing demo remains pending. No forecast accuracy or model result is claimed.
+a merchant-facing demo remains pending. No forecast accuracy is claimed; the
+small development routing results above are the only measured model results.
 
 ## Data and scope
 
@@ -357,5 +372,6 @@ generated all numeric records.
 The scenario manifest records the drafting brief and the user-confirmed model
 display name; the exact provider model ID/settings remain unavailable and are
 not guessed. No model-provider API call was used for this dataset.
-Application provider integration is tested with recorded responses. Exact model
-selection, live checks and human approval of the new Arabic messages remain pending.
+Application integration is tested with recorded responses. Live development
+screening used the candidates above; production selection, complete application
+checks and human approval of the new Arabic messages remain pending.
