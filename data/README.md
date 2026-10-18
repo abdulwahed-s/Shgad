@@ -79,12 +79,13 @@ each, with 30/15 scoreable days ending at day 90. No realized forecast outcomes
 are read or scored by this command. These files are expected values, not model
 evaluation results or a production forecast.
 
-evaluation/development_questions.jsonl has 32 draft development cases;
+evaluation/development_questions.jsonl has 32 reviewed development cases;
 dialect_intents.jsonl carries the joint intent/tool/customer/period labels.
 QUESTION_SPEC.md defines the portable question format without numeric answers.
 All 32 development questions and the shared generation mechanics have recorded
 human review, including requested Iraqi wording and removal of synthetic labels
-from display names. Two cash-sale note drafts remain pending. Approval signatures
+from display names. All twelve note phrases and four scenarios are reviewed;
+the two cash-sale phrases were confirmed on 18 October 2026. Approval signatures
 cover the exact question text, customer/date/tool labels, note/scenario content
 and mechanics; later edits invalidate the affected approval. Reviewer identity
 is recorded locally, while generation metadata carries the evidence hash/date.
@@ -92,9 +93,14 @@ is recorded locally, while generation metadata carries the evidence hash/date.
 evaluation/sealing_input_manifest.json lists and hashes only observed inputs,
 fixtures, the format and development questions for external independent staging.
 It excludes future outcomes, unseen shops, cause labels and development answers.
-No held-out questions or heldout_60_manifest.json are generated here.
-An independent tool/session and Iraqi Arabic human review are required before
-sealing. A human runs scripts/hash_heldout.py in their own terminal with an
+The generator never creates held-out questions or their seal. The externally
+generated historical test set has 60 human-reviewed records: 40 answerable,
+11 clarification and 9 refusal cases. Its human-run seal is recorded in
+evaluation/heldout_60_manifest.json; questions remain outside the repository.
+Generation used a separate session of the same tool used during development;
+memory controls were requested, isolation was not independently verified and
+the exact generator model ID was not exposed. These counts describe set
+composition, not model performance. A human runs scripts/hash_heldout.py with an
 external HELDOUT_PATH; it validates 60 reviewed records (40 answerable, 20
 clarify/refuse) and emits only SHA-256 and aggregate counts. Builders must never
 run it against actual held-out content.

@@ -158,10 +158,13 @@ pending. Development score windows stop at day 90.
 See [data/README.md](data/README.md) for file boundaries and generation
 metadata. Same-seed regeneration was byte-identical in a fresh process,
 including the manifest. The development questions and generation mechanics have
-recorded human review; two cash-sale note templates still await approval.
-Held-out questions remain outside the repository; only the format and a
-human-run hash/count helper are prepared. No sealed set or model evaluation
-is claimed.
+recorded human review, including all twelve note phrases and four scenarios.
+The historical test set has 60 human-reviewed questions and a
+[hash/count manifest](data/evaluation/heldout_60_manifest.json); the questions
+remain outside the repository. Generation used a separate session of the same
+tool used during development. Memory controls were requested; isolation was not
+independently verified and the exact generator model ID was not exposed.
+No model evaluation has run.
 
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
@@ -192,8 +195,8 @@ integration is implemented yet. Import and forecast currently have Python servic
 Entry, difference-review and void HTTP endpoints, and the next-seven-days view,
 remain planned. The tested review/void primitives have no merchant-facing workflow.
 
-Verified locally: **339 backend tests**, including 54 importer/forecast runtime
-regressions and 49 offline data/evaluation checks, plus Ruff lint and formatting
+Verified locally: **340 backend tests**, including 54 importer/forecast runtime
+regressions and 50 offline data/evaluation checks, plus Ruff lint and formatting
 for 49 Python files. Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
