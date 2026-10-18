@@ -95,9 +95,12 @@ Drawings remain separate from business expenses.
 
 SQLite schema version 2 has thirteen STRICT tables, with foreign keys, unique
 idempotency keys, guarded partial-payment allocations and immutable source evidence.
-Difference review and void/correction work at the domain/database level, with client
-idempotency and cutoff-aware calculations. Voiding a collection restores outstanding
+`POST /api/entries/{source_id}/void` supports merchant undo with client idempotency
+and cutoff-aware calculations. Voiding a collection restores outstanding
 debt while retaining original transactions, raw rows and linked reason/timestamp audits.
+Correction is a void followed by a new entry. `GET /api/ledger/transactions` supports
+date/type/customer/source-ID filters and cursor pagination; its source-ID detail
+route returns raw cells, flags and the original amount with any linked void audit.
 Versioned migrations preserve v1 data and roll back atomically. Unknown opening cash
 raises a typed error.
 
@@ -203,12 +206,11 @@ The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; And
 and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
 Flutter merchant screens and model integration remain planned. CSV import/receipts
 and merchant entries have HTTP interfaces; forecasting has a Python service interface.
-Difference-review, void and ledger-evidence HTTP routes, and the next-seven-days view,
-remain planned.
+Difference-review HTTP routes and the next-seven-days view remain planned.
 
-Verified locally: **375 backend tests**, including 26 merchant-entry and 63 importer/forecast runtime
+Verified locally: **381 backend tests**, including six void/evidence, 26 merchant-entry and 63 importer/forecast runtime
 regressions and 50 offline data/evaluation checks, plus Ruff lint and formatting
-for 51 backend Python files (script checks were also verified previously). Financial-rule
+for 55 backend Python files (script checks were also verified previously). Financial-rule
 regressions were observed failing before their implementation or fix.
 To include offline scripts in lint/format checks from backend/, run
 `python -m ruff check --config pyproject.toml . ../scripts` and

@@ -38,3 +38,11 @@ class EntryReceipt(LedgerModel):
     transaction_id: Identifier
     source_id: Identifier
     duplicate: StrictBool = False
+
+
+class VoidReceipt(LedgerModel):
+    source_id: Identifier
+    status: Literal["voided"] = "voided"
+    void_id: Identifier
+    reason: str
+    duplicate: StrictBool = False
