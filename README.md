@@ -11,11 +11,12 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > Source-linked sales/debt queries and a next-days obligations HTTP view separate
 > confirmed cash from expected collections, with missing balances kept unavailable.
 > Five read-only tools, margin/weekly reports, deterministic Arabic figure rendering,
-> reconciliation and cutoff-safe cash-estimate HTTP routes are tested. Persisted
-> mapping preview/confirmation works with fake proposals. Flutter remains a static localized
-> shell; chat, merchant screens and a live mapping proposer remain planned.
-> Configurable provider transport, bounded retries and failover are tested with
-> recorded responses. Exact model IDs and live provider validation remain pending.
+> reconciliation and cutoff-safe cash-estimate HTTP routes are tested. Chat and CSV
+> mapping use a configurable provider client with bounded retries and failover;
+> their integration is verified with recorded provider responses. Flutter remains a
+> static localized shell; merchant screens and frontend chat integration are planned.
+> Exact model IDs, live provider validation and human review of new Arabic copy
+> remain pending.
 > An opt-in development model comparison has an offline-tested harness; no model
 > benchmarks have run.
 
@@ -30,7 +31,7 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 - Return deterministic weekly totals and a secondary cash estimate with base, conservative and stress scenarios.
 - Render sourced figures and dates in Arabic, with validation and deterministic template fallback.
 - Planned merchant screens will put today's cash, debts, entry and daily close first.
-- Planned Iraqi Arabic chat and merchant screens will use verified figures and source evidence.
+- Answer chat requests through a bounded, read-only agent with verified figures and source evidence.
 
 ## Merchant questions
 
@@ -59,9 +60,10 @@ flowchart LR
 ```
 
 Financial calculations use integer IQD in Python. The tools and renderer work without
-an LLM. The planned agent will request these tools and draft explanations with symbolic
-slots; the backend fills figures and dates from verified results. Provider calls and
-API keys will stay in the backend.
+an LLM. The agent requests these tools and drafts explanations with symbolic slots;
+the backend fills figures and dates from verified results. Provider calls and API
+keys stay in the backend. Integration tests use recorded provider responses;
+live model selection and quality checks remain pending.
 
 ## Development status
 
@@ -129,8 +131,8 @@ with closing(connect_database("shgad.db")) as connection:
 ```
 
 This creates the schema only. Preload fictional reference and opening records
-before importing or recording debts. Chat, demo reset and automatic demo-data
-loading remain planned.
+before importing or recording debts. Demo reset and automatic demo-data loading
+remain planned.
 
 `POST /api/entries` records cash/credit sales, supplier invoices, explicit partial
 collections/payments, expenses, drawings, capital and daily cash counts. Amounts
@@ -158,8 +160,9 @@ Unfamiliar CSV layouts have mapping preview and confirmation endpoints at
 The proposer interface receives only the header and three sample rows. Code validates
 its mapping and previews up to five parsed rows without financial writes. Confirmation
 uses saved immutable input/mapping metadata and the normal importer; retries are safe.
-The default proposer returns `LLM_UNAVAILABLE` because no model is connected yet.
-Tests inject fake proposals; there is no live mapping suggestion feature.
+The proposer uses the same configurable client as chat. An unconfigured client
+returns `LLM_UNAVAILABLE`. Recorded-response integration tests cover the HTTP
+proposal, preview and explicit confirmation flow; live mapping quality is unverified.
 
 `app.services.reconcile.reconciliation_report` reads cutoff-bounded SQLite and
 returns definite/strong/candidate/unmatched status, reasons, source IDs and current
@@ -271,8 +274,22 @@ margin only at the configured coverage threshold (80% by default;
 audit knowledge. All five tools validate arguments and verify source references,
 integer units and arithmetic before a protected renderer handoff.
 `GET /api/flags` exposes reconciliation flags; `GET /api/reports/forecast`
-exposes the existing cutoff-safe scenarios. `/api/meta` honestly reports that no
-LLM is available.
+exposes the existing cutoff-safe scenarios. `/api/meta` reports whether a provider,
+model ID and local key are configured; this does not probe network availability.
+
+`POST /api/chat` accepts `message` and a correlation `conversation_id`. Each request
+starts a fresh tool context. The agent can use only the existing five read-only
+tools, with validated arguments, at most four completion turns and eight tool
+calls. Responses include the resolved customer and period, sourced figures and
+dates, verification evidence and renderer status. Missing balances and ambiguous
+names or periods produce fixed clarification messages. Provider failure after a
+verified result can return the deterministic template with a fallback notice.
+
+Configure `LLM_PROVIDER` (`gemini` or `groq`), `LLM_MODEL_ID` and that provider's
+API key in the local process environment. `.env.example` lists optional fallback
+and timeout settings. Use exact console model IDs; keep keys local and never paste
+them into chat. The backend does not open `.env`. Without configuration, chat
+returns the typed `llm_unavailable` response without a provider request.
 
 `app.agents.renderer` fills `{{fig:key}}` and `{{date:key}}` only from verified
 tool output. Raw numeric characters, unknown keys and unsourced values are rejected.
@@ -280,13 +297,15 @@ It supports one retry callback and then deterministic templates, with server-res
 customer/period context, margin coverage and estimate assumptions. Exact user-typed
 quotes stay quoted data. Money uses Arabic-Indic digits and exact abbreviations;
 evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic review.
-There is no chat endpoint or live agent yet.
+The agent retries an invalid draft once before using these templates. Imported
+text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **570 backend tests**, including real HTTP/SQLite financial,
-mapping, reconciliation, immutable-correction and cutoff regressions, plus offline
-synthetic-data and model-comparison harness checks. Ruff lint/format and Python 3.11
-grammar checks pass for **103 backend/script files**; dependency checks pass.
-A running-server smoke passed **19 check groups across 18 OpenAPI paths**, using
+Verified locally: **600 backend tests passed, one opt-in live test skipped**,
+including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
+and cutoff regressions, recorded provider integration, and offline synthetic-data
+and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
+checks pass for **110 backend/script files**; dependency checks pass.
+A running-server smoke passed **20 check groups across 19 OpenAPI paths**, using
 only a temporary fictional database.
 Every implemented endpoint has a response-model contract test, including daily close,
 voids and standard error responses. Financial-rule
@@ -296,7 +315,13 @@ To include offline scripts in lint/format checks from backend/, run
 `python -m ruff format --check --config pyproject.toml . ../scripts`.
 Checks include recorded sales and signed differences, capital, review validation,
 void-adjusted balances and knowledge cutoffs, v1 upgrades, replay and atomic rollback.
-Concurrent review requests cannot explain the same cash twice. No LLM is connected.
+Concurrent review requests cannot explain the same cash twice. No live provider
+validation has run.
+
+The default suite makes no live provider requests. A single development routing
+probe requires both `SHGAD_RUN_LIVE=1` and `python -m pytest -m live`; it has a
+four-request transport cap. The separate development comparison above retains
+its forty-request cap. Neither check accesses held-out questions.
 
 Flutter verification: 4 widget tests
 (360×800, Arabic/English, text scales 1.0/1.3), Dart formatting and Flutter analysis.
@@ -324,4 +349,5 @@ generated all numeric records.
 The scenario manifest records the drafting brief and the user-confirmed model
 display name; the exact provider model ID/settings remain unavailable and are
 not guessed. No model-provider API call was used for this dataset.
-Application model/API integration remains planned.
+Application provider integration is tested with recorded responses. Exact model
+selection, live checks and human approval of the new Arabic messages remain pending.

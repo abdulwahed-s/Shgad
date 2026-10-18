@@ -134,5 +134,5 @@ class MetaReport(LedgerModel):
     business_as_of: BusinessDate
     week_start: Literal["saturday"] = "saturday"
     data_version: Literal["synthetic-ledger-v1"] = "synthetic-ledger-v1"
-    llm_available: Literal[False] = False
+    llm_available: StrictBool = False
     merchant: MerchantMeta = MerchantMeta()

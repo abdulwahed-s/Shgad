@@ -2,9 +2,11 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
+from app.agents.llm_client import provider_configs
 from app.api.dependencies import AuditTime, Clock, Database
+from app.config import Settings, get_settings
 from app.schemas.queries import DebtReport, FlagsReport, MetaReport, UpcomingObligations
 from app.services.financial_queries import (
     QuerySnapshot,
@@ -39,5 +41,7 @@ async def flags(db: Database, clock: Clock, now: AuditTime):
 
 
 @router.get("/api/meta", response_model=MetaReport)
-async def meta(clock: Clock):
-    return MetaReport(business_as_of=clock.today)
+async def meta(clock: Clock, settings: Annotated[Settings, Depends(get_settings)]):
+    return MetaReport(
+        business_as_of=clock.today, llm_available=bool(provider_configs(settings))
+    )

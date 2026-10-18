@@ -1,6 +1,7 @@
 """One compatible HTTP client, fixed provider hosts and bounded failover (§3.2a)."""
 
 import asyncio
+import copy
 import json
 import re
 from dataclasses import dataclass
@@ -51,7 +52,9 @@ def provider_configs(settings):
             and re.fullmatch(r"[A-Za-z0-9/._:-]{1,120}", model)
         ):
             config = (provider, model)
-            if config not in result:
+            if not any(
+                existing_provider == provider for existing_provider, _ in result
+            ):
                 result.append(config)
     return tuple(result)
 
@@ -135,6 +138,7 @@ class LLMClient:
         self.transport = transport
         self.sleep = sleep
         self._client = None
+        self._preferred = None
 
     @property
     def available(self):
@@ -152,8 +156,30 @@ class LLMClient:
     async def __aexit__(self, *args):
         await self._client.aclose()
 
+    async def _request(self, provider, payload, key):
+        # A read timeout alone resets on each byte; enforce a total deadline too.
+        async with asyncio.timeout(self.settings.llm_timeout_seconds):
+            async with self._client.stream(
+                "POST",
+                ENDPOINTS[provider],
+                json=payload,
+                headers={"Authorization": f"Bearer {key}"},
+            ) as response:
+                status = response.status_code
+                retry_after = response.headers.get("retry-after", "")
+                if status != 200:
+                    return status, retry_after, None
+                data = bytearray()
+                async for chunk in response.aiter_bytes():
+                    data.extend(chunk)
+                    if len(data) > MAX_BYTES:
+                        raise ValueError("RESPONSE_TOO_LARGE")
+                return status, retry_after, strict_json(bytes(data))
+
     async def complete(self, messages, *, tools=(), json_mode=False):
-        configs = provider_configs(self.settings)
+        configs = sorted(
+            provider_configs(self.settings), key=lambda pair: pair != self._preferred
+        )
         if not configs or self._client is None:
             raise LLMUnavailable("not_configured")
         secrets = [
@@ -164,9 +190,14 @@ class LLMClient:
         reason = "busy"
         for provider, model in configs:
             key = getattr(self.settings, f"{provider}_api_key").get_secret_value()
+            provider_messages = copy.deepcopy(messages)
+            if provider != "gemini":
+                for message in provider_messages:
+                    for call in message.get("tool_calls", []):
+                        call.pop("extra_content", None)
             payload = {
                 "model": model,
-                "messages": messages,
+                "messages": provider_messages,
                 "temperature": 0,
                 "max_tokens": 2048,
             }
@@ -174,36 +205,27 @@ class LLMClient:
                 payload |= {"tools": list(tools), "tool_choice": "auto"}
             if json_mode:
                 payload["response_format"] = {"type": "json_object"}
+            if len(json.dumps(payload, ensure_ascii=False).encode()) > 128_000:
+                raise LLMUnavailable("context_limit")
             for attempt in range(2):
                 delay = min(2, 2**attempt)
                 try:
-                    async with self._client.stream(
-                        "POST",
-                        ENDPOINTS[provider],
-                        json=payload,
-                        headers={"Authorization": f"Bearer {key}"},
-                    ) as response:
-                        if response.status_code != 200:
-                            retry = response.status_code in RETRIABLE
-                            header = response.headers.get("retry-after", "")
-                            if re.fullmatch(r"[0-9]{1,9}", header):
-                                delay = min(2, max(delay, int(header)))
-                            if not retry or attempt == 1:
-                                break
-                        else:
-                            data = bytearray()
-                            async for chunk in response.aiter_bytes():
-                                data.extend(chunk)
-                                if len(data) > MAX_BYTES:
-                                    raise ValueError("RESPONSE_TOO_LARGE")
-                            body = strict_json(bytes(data))
-                            if any(
-                                secret in json.dumps(body, ensure_ascii=False)
-                                for secret in secrets
-                            ):
-                                raise ValueError("SECRET_ECHO")
-                            return parse_reply(body, provider=provider, model=model)
-                except (httpx.TimeoutException, httpx.TransportError):
+                    status, header, body = await self._request(provider, payload, key)
+                    if status != 200:
+                        if status not in RETRIABLE or attempt == 1:
+                            break
+                        if re.fullmatch(r"[0-9]{1,9}", header):
+                            delay = min(2, max(delay, int(header)))
+                    else:
+                        if any(
+                            secret in json.dumps(body, ensure_ascii=False)
+                            for secret in secrets
+                        ):
+                            raise ValueError("SECRET_ECHO")
+                        reply = parse_reply(body, provider=provider, model=model)
+                        self._preferred = (provider, model)
+                        return reply
+                except (TimeoutError, httpx.TimeoutException, httpx.TransportError):
                     reason = "needs_internet"
                     if attempt == 1:
                         break

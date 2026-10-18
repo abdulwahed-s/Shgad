@@ -1,5 +1,6 @@
 """Thin synthetic CSV upload and batch-receipt routes (roadmap §7.1/B.2)."""
 
+from inspect import isawaitable
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, UploadFile
@@ -7,7 +8,14 @@ from fastapi import APIRouter, Depends, File, UploadFile
 from app.api.dependencies import AuditTime, Clock, Database, mapping_model
 from app.schemas.csv_mapping import MappingPreview
 from app.schemas.imports import ImportReceipt
-from app.services.csv_mapping import MappingProposer, confirm_mapping, propose_mapping
+from app.services.csv_mapping import (
+    MappingProposer,
+    SuppliedMappingProposer,
+    confirm_mapping,
+    mapping_input,
+    propose_mapping,
+)
+from app.services.errors import FinancialRuleError
 from app.services.ingest import MAX_FILE_BYTES, get_import_receipt, import_csv_bytes
 
 router = APIRouter(prefix="/api/imports", tags=["imports"])
@@ -47,11 +55,21 @@ async def map_csv(
     proposer: Annotated[MappingProposer, Depends(mapping_model)],
 ):
     try:
+        content = await file.read(MAX_FILE_BYTES + 1)
+        headers, rows = mapping_input(content, file.filename or "")
+        try:
+            proposal = proposer.propose(
+                headers=tuple(headers), sample_rows=tuple(rows[:3])
+            )
+            if isawaitable(proposal):
+                proposal = await proposal
+        except (TimeoutError, ConnectionError):
+            raise FinancialRuleError("LLM_UNAVAILABLE") from None
         return propose_mapping(
             db,
-            await file.read(MAX_FILE_BYTES + 1),
+            content,
             filename=file.filename or "",
-            proposer=proposer,
+            proposer=SuppliedMappingProposer(proposal),
             clock=clock,
             created_at=now,
         )

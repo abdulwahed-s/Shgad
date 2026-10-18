@@ -7,6 +7,21 @@ import pytest
 from app.schemas.ledger import OpeningBalance, Transaction
 
 
+@pytest.fixture(autouse=True)
+def offline_provider_environment(request, monkeypatch):
+    """Default tests never inherit configured live provider credentials or IDs."""
+    if request.node.get_closest_marker("live") is None:
+        for name in (
+            "LLM_PROVIDER",
+            "LLM_MODEL_ID",
+            "LLM_FALLBACK_PROVIDER",
+            "LLM_FALLBACK_MODEL_ID",
+            "GEMINI_API_KEY",
+            "GROQ_API_KEY",
+        ):
+            monkeypatch.delenv(name, raising=False)
+
+
 @pytest.fixture
 def transaction_factory():
     def make(source_id="TX-001", **overrides):

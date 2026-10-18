@@ -6,11 +6,11 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from app.agents.llm_client import LLMClient
 from app.config import Settings, get_settings
 from app.db.connection import connect_database
 from app.db.migrations import apply_migrations
 from app.services.business_clock import BusinessClock
-from app.services.csv_mapping import UnavailableMappingProposer
 from app.services.errors import FinancialRuleError
 from app.services.observed import observed_day
 
@@ -20,8 +20,15 @@ def audit_timestamp() -> datetime:
     return datetime.now(UTC)
 
 
-def mapping_model():
-    return UnavailableMappingProposer()
+async def llm_client(settings: Annotated[Settings, Depends(get_settings)]):
+    async with LLMClient(settings) as client:
+        yield client
+
+
+def mapping_model(client: Annotated[LLMClient, Depends(llm_client)]):
+    from app.agents.csv_mapper import LLMMappingProposer
+
+    return LLMMappingProposer(client)
 
 
 def business_clock(

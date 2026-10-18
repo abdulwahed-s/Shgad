@@ -6,6 +6,7 @@ import pytest
 from pydantic import TypeAdapter, ValidationError
 
 from app.api.health import HealthResponse
+from app.schemas.chat import ChatResponse
 from app.schemas.csv_mapping import MappingPreview
 from app.schemas.daily_close import DailyCloseView, ResolutionReceipt
 from app.schemas.entries import EntryReceipt, VoidReceipt
@@ -17,6 +18,7 @@ from app.schemas.reports import MarginReport, WeeklyReport
 from app.schemas.tools import ErrorResponse
 
 CONTRACTS = {
+    ("post", "/api/chat"): ChatResponse,
     ("get", "/health"): HealthResponse,
     ("get", "/api/meta"): MetaReport,
     ("post", "/api/entries"): EntryReceipt,
@@ -63,6 +65,12 @@ def test_every_implemented_success_response_validates(api, tool_history):
         ("/api/daily-close/{business_date}", "/api/daily-close/2026-09-28"),
     ]:
         check(("get", path), api.get(url))
+    check(
+        ("post", "/api/chat"),
+        api.post(
+            "/api/chat", json={"message": "شكد بعت؟", "conversation_id": "contract"}
+        ),
+    )
     entry_body = {
         "client_entry_id": "contract",
         "type": "CASH_SALE",

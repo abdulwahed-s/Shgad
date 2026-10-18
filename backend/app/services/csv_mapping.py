@@ -1,6 +1,6 @@
 """Untrusted column proposals; deterministic preview and explicit confirmation.
 
-Only header/three sample rows cross the proposer interface. No provider is wired.
+Only header/three sample rows cross the proposer interface.
 Preview financial writes always roll back; confirmation uses the normal importer.
 """
 
@@ -41,6 +41,22 @@ class MappingProposer(Protocol):
 class UnavailableMappingProposer:
     def propose(self, *, headers, sample_rows):
         raise FinancialRuleError("LLM_UNAVAILABLE")
+
+
+class SuppliedMappingProposer:
+    """Bridge an already-awaited proposal into the existing sync preview pipeline."""
+
+    def __init__(self, value):
+        self.value = value
+
+    def propose(self, *, headers, sample_rows):
+        return self.value
+
+
+def mapping_input(content, filename):
+    if Path(filename).suffix.lower() != ".csv":
+        raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "FILE_TYPE"})
+    return read_csv_content(content)
 
 
 def _validate_proposal(value, headers):
@@ -161,9 +177,7 @@ def _preview_rows(connection, content, proposal, *, clock, audit, missing):
 def propose_mapping(
     connection, content, *, filename, proposer: MappingProposer, clock, created_at
 ) -> MappingPreview:
-    if Path(filename).suffix.lower() != ".csv":
-        raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "FILE_TYPE"})
-    headers, rows = read_csv_content(content)
+    headers, rows = mapping_input(content, filename)
     audit = parse_timestamp(created_at)
     try:
         output = proposer.propose(

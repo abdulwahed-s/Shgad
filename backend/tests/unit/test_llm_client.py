@@ -183,3 +183,51 @@ def test_tool_arguments_reject_duplicate_json_keys():
     }
     with pytest.raises(LLMUnavailable):
         run(lambda request: httpx.Response(200, json=response))
+
+
+def test_total_timeout_bounds_a_provider_that_never_finishes_its_stream():
+    attempts = []
+
+    class SlowStream(httpx.AsyncByteStream):
+        async def __aiter__(self):
+            await asyncio.sleep(2)
+            yield b"{}"
+
+    def respond(request):
+        attempts.append(request)
+        return httpx.Response(200, stream=SlowStream())
+
+    with pytest.raises(LLMUnavailable):
+        run(respond, settings(llm_timeout_seconds=1))
+    assert len(attempts) == 2
+
+
+def test_fallback_stays_selected_for_the_rest_of_the_request():
+    hosts = []
+
+    def respond(request):
+        hosts.append(request.url.host)
+        return (
+            httpx.Response(503)
+            if request.url.host.startswith("generativelanguage")
+            else httpx.Response(200, json=answer())
+        )
+
+    async def scenario():
+        async def sleep(delay):
+            pass
+
+        async with LLMClient(
+            settings(
+                llm_fallback_provider="groq",
+                llm_fallback_model_id="recorded-fallback",
+                groq_api_key="synthetic-fallback-secret",
+            ),
+            transport=httpx.MockTransport(respond),
+            sleep=sleep,
+        ) as client:
+            for _ in range(2):
+                await client.complete([{"role": "user", "content": "fictional"}])
+
+    asyncio.run(scenario())
+    assert hosts == ["generativelanguage.googleapis.com"] * 2 + ["api.groq.com"] * 2
