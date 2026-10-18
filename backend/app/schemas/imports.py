@@ -1,4 +1,4 @@
-"""Roadmap Appendix B.2 canonical importer receipt (no HTTP route yet)."""
+"""Roadmap Appendix B.2 canonical importer receipt."""
 
 from app.schemas.ledger import (
     Identifier,

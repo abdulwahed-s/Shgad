@@ -1,9 +1,57 @@
 """Synthetic SQLite fixtures shared by constraint and audit tests."""
 
+import asyncio
+from datetime import datetime
+
 import pytest
+from httpx import ASGITransport, AsyncClient
 
 from app.db.connection import connect_database
 from app.db.migrations import apply_migrations
+
+
+@pytest.fixture
+def api(ledger):
+    """Real HTTP/service/SQLite stack with only settings and audit time injected."""
+    from app.api.dependencies import audit_timestamp, database
+    from app.config import Settings, get_settings
+    from app.main import app
+
+    path = ledger.execute("PRAGMA database_list").fetchone()[2]
+
+    async def connection():
+        db = connect_database(path)
+        try:
+            yield db
+        finally:
+            db.close()
+
+    class Client:
+        def request(self, method, url, **kwargs):
+            async def send():
+                async with AsyncClient(
+                    transport=ASGITransport(app=app, raise_app_exceptions=False),
+                    base_url="http://test",
+                ) as client:
+                    return await client.request(method, url, **kwargs)
+
+            return asyncio.run(send())
+
+        def post(self, url, **kwargs):
+            return self.request("POST", url, **kwargs)
+
+        def get(self, url, **kwargs):
+            return self.request("GET", url, **kwargs)
+
+    app.dependency_overrides[database] = connection
+    app.dependency_overrides[get_settings] = lambda: Settings()
+    app.dependency_overrides[audit_timestamp] = lambda: datetime.fromisoformat(
+        "2026-09-28T23:59:59+03:00"
+    )
+    try:
+        yield Client()
+    finally:
+        app.dependency_overrides.clear()
 
 
 @pytest.fixture

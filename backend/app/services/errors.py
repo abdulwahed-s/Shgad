@@ -3,6 +3,9 @@
 from typing import Literal
 
 ErrorCode = Literal[
+    "INTERNAL",
+    "MAPPING_UNRESOLVED",
+    "LLM_UNAVAILABLE",
     "MISSING_OPENING_BALANCE",
     "MISSING_COSTS",
     "AMBIGUOUS_DATE",

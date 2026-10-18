@@ -106,8 +106,17 @@ def _file_rows(path: Path) -> tuple[str, list[dict[str, str]]]:
     try:
         with path.open("rb") as stream:
             content = stream.read(MAX_FILE_BYTES + 1)
-        if len(content) > MAX_FILE_BYTES:
-            raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "FILE_SIZE"})
+        return _csv_rows(content)
+    except OSError as exc:
+        raise FinancialRuleError(
+            "IMPORT_REJECTED", details={"reason": "INVALID_FILE"}
+        ) from exc
+
+
+def _csv_rows(content: bytes) -> tuple[str, list[dict[str, str]]]:
+    if len(content) > MAX_FILE_BYTES:
+        raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "FILE_SIZE"})
+    try:
         reader = csv.reader(
             io.StringIO(content.decode("utf-8-sig"), newline=""), strict=True
         )
@@ -134,7 +143,16 @@ def _file_rows(path: Path) -> tuple[str, list[dict[str, str]]]:
         ) from exc
 
 
-def _parse(raw, *, batch_id, row_number, source_system, audit_time, cutoff):
+def _parse(
+    raw,
+    *,
+    batch_id,
+    row_number,
+    source_system,
+    audit_time,
+    cutoff,
+    allow_late_audit=False,
+):
     try:
         occurred_at = parse_timestamp(raw["occurred_at"])
         recorded_at = parse_timestamp(raw.get("recorded_at") or audit_time)
@@ -175,7 +193,10 @@ def _parse(raw, *, batch_id, row_number, source_system, audit_time, cutoff):
         )
     except ValidationError as exc:
         raise _RowProblem("VALIDATION_ERROR") from exc
-    if not OBSERVED_START <= row.business_date <= cutoff.date() or recorded_at > cutoff:
+    late_upload_audit = allow_late_audit and not raw.get("recorded_at")
+    if not OBSERVED_START <= row.business_date <= cutoff.date() or (
+        recorded_at > cutoff and not late_upload_audit
+    ):
         raise _RowProblem("OUTSIDE_OBSERVED_DATA")
     if recorded_at < occurred_at or recorded_at > audit_time:
         raise _RowProblem("INVALID_DATE")
@@ -256,7 +277,13 @@ def _payment_match(connection, row, audit_time):
     return None, row.obligation_id
 
 
-def _receipt(connection, batch_id, *, replay=False):
+def get_import_receipt(connection, batch_id, *, replay=False) -> ImportReceipt:
+    if not connection.execute(
+        """SELECT 1 FROM import_batches WHERE import_batch_id = ?
+        AND status = 'completed'""",
+        (batch_id,),
+    ).fetchone():
+        raise FinancialRuleError("NOT_FOUND")
     counts = {"accepted": 0, "flagged": 0, "rejected": 0, "duplicate": 0}
     errors = []
     for row in connection.execute(
@@ -293,11 +320,53 @@ def import_csv(
     Imported knowledge time is preserved when supplied by the synthetic export;
     otherwise the explicit import audit time is used. Neither extends observed history.
     """
+    file_hash, rows = _file_rows(Path(path))
+    return _import_rows(
+        connection,
+        file_hash,
+        rows,
+        clock=clock,
+        imported_at=imported_at,
+        source_system=source_system,
+    )
+
+
+def import_csv_bytes(
+    connection: sqlite3.Connection,
+    content: bytes,
+    *,
+    filename: str,
+    clock: BusinessClock,
+    imported_at: datetime | str,
+) -> ImportReceipt:
+    """Synthetic HTTP uploads use the same parser/atomic importer without disk files."""
+    if Path(filename).suffix.lower() != ".csv":
+        raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "FILE_TYPE"})
+    file_hash, rows = _csv_rows(content)
+    return _import_rows(
+        connection,
+        file_hash,
+        rows,
+        clock=clock,
+        imported_at=imported_at,
+        allow_late_audit=True,
+    )
+
+
+def _import_rows(
+    connection,
+    file_hash,
+    rows,
+    *,
+    clock,
+    imported_at,
+    source_system="synthetic_csv",
+    allow_late_audit=False,
+):
     cutoff = knowledge_cutoff(observed_day(clock))
     audit_time = parse_timestamp(imported_at)
     if source_system not in {"synthetic_csv", "synthetic_wallet"}:
         raise FinancialRuleError("IMPORT_REJECTED")
-    file_hash, rows = _file_rows(Path(path))
     with atomic_import(connection):
         existing = connection.execute(
             """SELECT import_batch_id FROM import_batches WHERE file_sha256 = ?
@@ -305,7 +374,7 @@ def import_csv(
             (file_hash, source_system),
         ).fetchone()
         if existing:
-            return _receipt(connection, existing[0], replay=True)
+            return get_import_receipt(connection, existing[0], replay=True)
         batch_id = f"CSV-{uuid4().hex}"
         insert_record(
             connection,
@@ -328,6 +397,7 @@ def import_csv(
                     source_system=source_system,
                     audit_time=audit_time,
                     cutoff=cutoff,
+                    allow_late_audit=allow_late_audit,
                 )
                 prior = connection.execute(
                     """SELECT * FROM transactions
@@ -458,4 +528,4 @@ def import_csv(
             rejected_count = ?, status = 'completed' WHERE import_batch_id = ?""",
             (accepted, flagged, rejected, batch_id),
         )
-        return _receipt(connection, batch_id)
+        return get_import_receipt(connection, batch_id)
