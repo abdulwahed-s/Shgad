@@ -15,6 +15,7 @@ def local_config(tmp_path, monkeypatch):
     for name in (
         "GEMINI_API_KEY",
         "GROQ_API_KEY",
+        "OPENAI_API_KEY",
         "LLM_PROVIDER",
         "LLM_MODEL_ID",
         "LLM_FALLBACK_PROVIDER",
@@ -67,12 +68,14 @@ def test_private_settings_are_redacted(monkeypatch):
     monkeypatch.delenv("BUSINESS_AS_OF", raising=False)
     monkeypatch.setenv("GEMINI_API_KEY", "synthetic-gemini-sentinel")
     monkeypatch.setenv("GROQ_API_KEY", "synthetic-groq-sentinel")
+    monkeypatch.setenv("OPENAI_API_KEY", "synthetic-openai-sentinel")
     monkeypatch.setenv("DATABASE_URL", "sqlite:///synthetic-private.db")
     settings = Settings()
 
     for value in (
         "synthetic-gemini-sentinel",
         "synthetic-groq-sentinel",
+        "synthetic-openai-sentinel",
         "synthetic-private.db",
     ):
         assert value not in repr(settings)
@@ -161,3 +164,23 @@ def test_bad_local_configuration_never_echoes_its_value(local_config):
     with pytest.raises(ValidationError) as caught:
         config.get_settings()
     assert "fictional-sensitive-value" not in str(caught.value)
+
+
+def test_openai_comparison_key_uses_runtime_loading_and_stays_secret(
+    local_config, monkeypatch
+):
+    config, path = local_config
+    path.write_text("OPENAI_API_KEY=fictional-openai-local\n", encoding="utf-8")
+    assert config.Settings().openai_api_key is None
+    settings = config.runtime_settings()
+    assert settings.openai_api_key.get_secret_value() == "fictional-openai-local"
+    assert "fictional-openai" not in repr(settings)
+    assert "fictional-openai" not in settings.model_dump_json()
+    monkeypatch.setenv("OPENAI_API_KEY", "fictional-openai-process")
+    assert (
+        config.runtime_settings().openai_api_key.get_secret_value()
+        == "fictional-openai-process"
+    )
+    monkeypatch.delenv("OPENAI_API_KEY")
+    monkeypatch.setenv("APP_ENV", "production")
+    assert config.runtime_settings().openai_api_key is None

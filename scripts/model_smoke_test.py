@@ -48,8 +48,13 @@ CASE_IDS = (
 ENDPOINTS = {
     "gemini": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     "groq": "https://api.groq.com/openai/v1/chat/completions",
+    "openai": "https://api.openai.com/v1/responses",
 }
-KEY_NAMES = {"gemini": "GEMINI_API_KEY", "groq": "GROQ_API_KEY"}
+KEY_NAMES = {
+    "gemini": "GEMINI_API_KEY",
+    "groq": "GROQ_API_KEY",
+    "openai": "OPENAI_API_KEY",
+}
 DEVELOPMENT = ROOT / "data/evaluation/development_questions.jsonl"
 PARTIES = ROOT / "data/synthetic/counterparties.csv"
 SEAL = "data/evaluation/heldout_60_manifest.json"
@@ -360,11 +365,117 @@ def score(question, interpretation_response, selection_response):
     return result
 
 
+def openai_payload(payload):
+    """Encode the unchanged logical screen for Luna's reasoning/function API."""
+    result = {
+        "model": payload["model"],
+        "input": payload["messages"],
+        "max_output_tokens": payload["max_tokens"],
+        "reasoning": {"effort": "medium"},
+        "store": False,
+    }
+    if "response_format" in payload:
+        result["text"] = {"format": payload["response_format"]}
+    if "tools" in payload:
+        # Responses can normalize omitted strictness; preserve legacy optional args.
+        # These remain the real five closed schemas, validated again by the scorer.
+        result["tools"] = [
+            {"type": "function", **tool["function"], "strict": False}
+            for tool in payload["tools"]
+        ]
+        result["tool_choice"] = payload["tool_choice"]
+    return result
+
+
+def openai_completion(body):
+    """Normalize native calls/usage for the existing scorer, rejecting bad output."""
+    usage = body.get("usage")
+    usage = usage if isinstance(usage, dict) else {}
+    normalized_usage = {
+        "prompt_tokens": usage.get("input_tokens"),
+        "completion_tokens": usage.get("output_tokens"),
+        "total_tokens": usage.get("total_tokens"),
+        "completion_tokens_details": usage.get("output_tokens_details"),
+    }
+    status = body.get("status")
+    if status == "incomplete":
+        details = body.get("incomplete_details")
+        reason = details.get("reason") if isinstance(details, dict) else None
+        finish = (
+            "length"
+            if reason == "max_output_tokens"
+            else "content_filter"
+            if reason == "content_filter"
+            else "other"
+        )
+        # A partial/empty call must never pass as a valid no-tool refusal.
+        message = None
+    elif status == "completed":
+        output = body.get("output")
+        if not isinstance(output, list) or not output or len(output) > 32:
+            raise ProviderFailure("INVALID_RESPONSE")
+        texts, calls = [], []
+        assistant_message = False
+        for item in output:
+            if not isinstance(item, dict):
+                raise ProviderFailure("INVALID_RESPONSE")
+            kind = item.get("type")
+            if kind == "reasoning":
+                continue
+            if item.get("status", "completed") != "completed":
+                raise ProviderFailure("INVALID_RESPONSE")
+            if kind == "function_call":
+                if not all(
+                    isinstance(item.get(field), str)
+                    for field in ("call_id", "name", "arguments")
+                ):
+                    raise ProviderFailure("INVALID_RESPONSE")
+                calls.append(
+                    {
+                        "type": "function",
+                        "id": item["call_id"],
+                        "function": {
+                            "name": item["name"],
+                            "arguments": item["arguments"],
+                        },
+                    }
+                )
+            elif kind == "message":
+                content = item.get("content")
+                if item.get("role") != "assistant" or not isinstance(content, list):
+                    raise ProviderFailure("INVALID_RESPONSE")
+                for part in content:
+                    if not isinstance(part, dict):
+                        raise ProviderFailure("INVALID_RESPONSE")
+                    if part.get("type") == "output_text" and isinstance(
+                        part.get("text"), str
+                    ):
+                        texts.append(part["text"])
+                    elif part.get("type") != "refusal" or not isinstance(
+                        part.get("refusal"), str
+                    ):
+                        raise ProviderFailure("INVALID_RESPONSE")
+                    assistant_message = True
+            else:
+                raise ProviderFailure("INVALID_RESPONSE")
+        if not assistant_message and not calls:
+            raise ProviderFailure("INVALID_RESPONSE")
+        message = {"content": "".join(texts) or None, "tool_calls": calls}
+        finish = "tool_calls" if calls else "stop"
+    else:
+        raise ProviderFailure("INVALID_RESPONSE")
+    return {
+        "model": body.get("model"),
+        "choices": [{"message": message, "finish_reason": finish}],
+        "usage": normalized_usage,
+    }
+
+
 def send_request(client, provider, payload, key):
     try:
         response = client.post(
             ENDPOINTS[provider],
-            json=payload,
+            json=openai_payload(payload) if provider == "openai" else payload,
             headers={"Authorization": f"Bearer {key}"},
             follow_redirects=False,
         )
@@ -382,7 +493,7 @@ def send_request(client, provider, payload, key):
             raise ValueError
         if isinstance(body.get("model"), str) and key in body["model"]:
             body["model"] = None
-        return body
+        return openai_completion(body) if provider == "openai" else body
     except ValueError:
         raise ProviderFailure("INVALID_RESPONSE") from None
 
@@ -508,6 +619,7 @@ def main(argv=None):
     )
     parser.add_argument("--gemini-model")
     parser.add_argument("--groq-model")
+    parser.add_argument("--openai-model")
     parser.add_argument("--provider", choices=("both", *ENDPOINTS), default="both")
     parser.add_argument("--model-ids-checked-on", type=date.fromisoformat)
     parser.add_argument("--max-requests", type=int, default=MAX_REQUESTS)
@@ -520,7 +632,7 @@ def main(argv=None):
         parser.error("max-tokens must be between 1 and 32768")
     if not 1 <= args.timeout_seconds <= 300:
         parser.error("timeout-seconds must be between 1 and 300")
-    providers = tuple(ENDPOINTS) if args.provider == "both" else (args.provider,)
+    providers = ("gemini", "groq") if args.provider == "both" else (args.provider,)
     request_settings = {
         "temperature": 0,
         "max_tokens": args.max_tokens,
@@ -529,6 +641,14 @@ def main(argv=None):
         "request_elapsed_includes_pacing": True,
         "retries": 0,
     }
+    if providers == ("openai",):
+        request_settings |= {
+            "api_protocol": "responses",
+            "temperature": None,
+            "reasoning_effort": "medium",
+            "store": False,
+            "function_schema_strict": False,
+        }
     metadata = provenance()
     if not args.live:
         print(

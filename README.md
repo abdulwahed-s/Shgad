@@ -227,7 +227,13 @@ The default is a dry run with no provider requests. Live use requires `--live`,
 exact provider model IDs through `--gemini-model` and `--groq-model`, their
 `--model-ids-checked-on` date, and the selected provider keys in local `.env` or
 process environment variables. `--provider gemini` or `--provider groq` runs one
-candidate and requires only its key; the default compares both providers.
+candidate and requires only its key; the default compares Gemini and Groq.
+An explicit `--provider openai --openai-model gpt-6-luna` comparison uses a local
+`OPENAI_API_KEY`. This comparison-only path uses Responses with medium reasoning,
+no temperature override and optional response storage disabled. It preserves the
+same logical prompts, tool parameter schemas and scoring. API/reasoning differences
+limit comparisons with the compatible-chat providers. OpenAI is not an application
+provider in this implementation.
 Only an explicit live run loads credentials; the default
 dry run leaves `.env` untouched. Never paste keys into chat. It compares interpretation
 and native tool selection against development labels, including customer and period.
@@ -340,7 +346,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **618 backend tests passed, one opt-in live test skipped**,
+Verified locally: **626 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar

@@ -498,3 +498,142 @@ def test_single_provider_live_cli_uses_only_its_key_and_honors_resource_profile(
     assert set(report["providers"]) == {"gemini"}
     assert report["settings"]["max_tokens"] == 32768
     assert report["settings"]["timeout_seconds"] == 180
+
+
+def responses_body(*, text=None, calls=(), status="completed"):
+    output = [{"type": "reasoning", "summary": []}]
+    if text is not None:
+        output.append(
+            {
+                "type": "message",
+                "role": "assistant",
+                "status": "completed",
+                "content": [{"type": "output_text", "text": text}],
+            }
+        )
+    for native in calls:
+        output.append(
+            {
+                "type": "function_call",
+                "status": "completed",
+                "call_id": native["id"],
+                **native["function"],
+            }
+        )
+    return {
+        "model": "gpt-6-luna",
+        "status": status,
+        "output": output,
+        "usage": {
+            "input_tokens": 1200,
+            "output_tokens": 500,
+            "total_tokens": 1700,
+            "output_tokens_details": {"reasoning_tokens": 450},
+        },
+    }
+
+
+def test_luna_responses_adapter_preserves_questions_schemas_and_native_scoring(cases):
+    sent = []
+    parsed = interpretation()["choices"][0]["message"]["content"]
+
+    def respond(request):
+        assert request.url == "https://api.openai.com/v1/responses"
+        assert request.headers["Authorization"] == "Bearer fictional-openai"
+        body = json.loads(request.content)
+        assert body["store"] is False
+        assert body["reasoning"] == {"effort": "medium"}
+        assert body["max_output_tokens"] == 32768
+        assert "temperature" not in body and "max_tokens" not in body
+        original = smoke.payloads(cases["DEV-001"], "gpt-6-luna", max_tokens=32768)
+        assert body["input"] == original[len(sent)]["messages"]
+        sent.append(body)
+        if len(sent) == 1:
+            assert body["text"]["format"] == {"type": "json_object"}
+            assert "tools" not in body
+            response = responses_body(text=parsed)
+        else:
+            assert body["tools"] == [
+                {"type": "function", **tool["function"], "strict": False}
+                for tool in smoke.definitions()
+            ]
+            assert body["tool_choice"] == "auto"
+            response = responses_body(calls=[call(period="this_week", kind="cash")])
+        return httpx.Response(200, json=response)
+
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        report = smoke.compare(
+            {"openai": "gpt-6-luna"},
+            sender=lambda provider, payload: smoke.send_request(
+                client, provider, payload, "fictional-openai"
+            ),
+            max_requests=2,
+            max_tokens=32768,
+            cases=[cases["DEV-001"]],
+        )
+    assert len(sent) == report["request_attempts"] == 2
+    summary = report["providers"]["openai"]
+    assert summary["joint_correct"] == 1
+    assert summary["requests"][0]["usage"]["reasoning_tokens"] == 450
+    assert summary["requests"][1]["finish_reason"] == "tool_calls"
+    assert "fictional-openai" not in json.dumps(report)
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        responses_body(),
+        {"status": "completed", "output": []},
+        {"status": "completed", "output": [{"type": "web_search_call"}]},
+        {"status": "completed", "output": [None]},
+    ],
+)
+def test_bad_responses_outputs_cannot_pass_as_valid_no_tool_answers(body):
+    with httpx.Client(
+        transport=httpx.MockTransport(lambda request: httpx.Response(200, json=body))
+    ) as client:
+        with pytest.raises(smoke.ProviderFailure, match="INVALID_RESPONSE"):
+            smoke.send_request(
+                client,
+                "openai",
+                smoke.payloads(smoke.development_cases()[0], "gpt-6-luna")[1],
+                "fictional-openai",
+            )
+
+
+def test_incomplete_responses_preserve_usage_without_passing_refusal_scoring(cases):
+    body = responses_body(text="partial", status="incomplete")
+    body["incomplete_details"] = {"reason": "max_output_tokens"}
+    with httpx.Client(
+        transport=httpx.MockTransport(lambda request: httpx.Response(200, json=body))
+    ) as client:
+        result = smoke.send_request(
+            client,
+            "openai",
+            smoke.payloads(cases["DEV-028"], "gpt-6-luna")[1],
+            "fictional-openai",
+        )
+    assert smoke.response_diagnostics(result)["finish_reason"] == "length"
+    assert smoke.response_diagnostics(result)["usage"]["reasoning_tokens"] == 450
+    score = smoke.score(
+        cases["DEV-028"],
+        interpretation(intent="unsupported_write", behavior="refuse", period=None),
+        result,
+    )
+    assert not score["tool_arguments_valid"] and not score["joint_correct"]
+
+
+def test_openai_candidate_dry_run_is_explicit_and_never_loads_credentials(
+    monkeypatch, capsys
+):
+    def forbidden(*args, **kwargs):
+        pytest.fail("dry run accessed credentials or network")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    monkeypatch.setattr(smoke.httpx, "Client", forbidden)
+    assert smoke.main(["--provider", "openai", "--openai-model", "gpt-6-luna"]) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert report["selected_providers"] == ["openai"]
+    assert report["settings"]["temperature"] is None
+    assert report["settings"]["api_protocol"] == "responses"
+    assert report["settings"]["reasoning_effort"] == "medium"

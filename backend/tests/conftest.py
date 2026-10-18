@@ -22,6 +22,7 @@ def offline_provider_environment(request, monkeypatch):
             "LLM_FALLBACK_MODEL_ID",
             "GEMINI_API_KEY",
             "GROQ_API_KEY",
+            "OPENAI_API_KEY",
         ):
             monkeypatch.delenv(name, raising=False)
     yield
