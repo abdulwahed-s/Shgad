@@ -13,6 +13,9 @@ class Settings(BaseSettings):
 
     llm_provider: str | None = None
     llm_model_id: str | None = None
+    llm_fallback_provider: str | None = None
+    llm_fallback_model_id: str | None = None
+    llm_timeout_seconds: int = Field(default=10, ge=1, le=30)
     gemini_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
     groq_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
     # Preserve raw configuration; BusinessClock applies the specified day-90 default.

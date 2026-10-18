@@ -14,6 +14,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > reconciliation and cutoff-safe cash-estimate HTTP routes are tested. Persisted
 > mapping preview/confirmation works with fake proposals. Flutter remains a static localized
 > shell; chat, merchant screens and a live mapping proposer remain planned.
+> Configurable provider transport, bounded retries and failover are tested with
+> recorded responses. Exact model IDs and live provider validation remain pending.
 > An opt-in development model comparison has an offline-tested harness; no model
 > benchmarks have run.
 
@@ -280,10 +282,10 @@ quotes stay quoted data. Money uses Arabic-Indic digits and exact abbreviations;
 evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic review.
 There is no chat endpoint or live agent yet.
 
-Verified locally: **557 backend tests**, including real HTTP/SQLite financial,
+Verified locally: **570 backend tests**, including real HTTP/SQLite financial,
 mapping, reconciliation, immutable-correction and cutoff regressions, plus offline
 synthetic-data and model-comparison harness checks. Ruff lint/format and Python 3.11
-grammar checks pass for **101 backend/script files**; dependency checks pass.
+grammar checks pass for **103 backend/script files**; dependency checks pass.
 A running-server smoke passed **19 check groups across 18 OpenAPI paths**, using
 only a temporary fictional database.
 Every implemented endpoint has a response-model contract test, including daily close,
