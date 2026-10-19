@@ -637,3 +637,123 @@ def test_openai_candidate_dry_run_is_explicit_and_never_loads_credentials(
     assert report["settings"]["temperature"] is None
     assert report["settings"]["api_protocol"] == "responses"
     assert report["settings"]["reasoning_effort"] == "medium"
+
+
+@pytest.mark.parametrize("interval", ["0", "9", "61"])
+def test_invalid_comparison_pacing_fails_before_credentials(monkeypatch, interval):
+    def forbidden():
+        pytest.fail("invalid pacing loaded credentials")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    with pytest.raises(SystemExit) as caught:
+        smoke.main(["--live", "--minimum-interval-seconds", interval])
+    assert caught.value.code == 2
+
+
+def test_qwen_output_cap_is_checked_before_credentials_or_requests(monkeypatch):
+    def forbidden(*args, **kwargs):
+        pytest.fail("unsupported Qwen output cap accessed credentials or transport")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    with pytest.raises(SystemExit) as caught:
+        smoke.main(
+            [
+                "--live",
+                "--provider",
+                "groq",
+                "--groq-model",
+                "qwen/qwen3.8-27b",
+                "--max-tokens",
+                "16385",
+            ]
+        )
+    assert caught.value.code == 2
+    with pytest.raises(ValueError, match="INVALID_MODEL_TOKEN_BUDGET"):
+        smoke.compare({"groq": "qwen/qwen3.8-27b"}, sender=forbidden, max_tokens=16385)
+
+
+def test_qwen_cli_preserves_tools_and_records_profile_pacing_and_safe_progress(
+    monkeypatch, tmp_path, capsys
+):
+    from app.config import Settings
+
+    monkeypatch.setattr(smoke, "ROOT", tmp_path)
+    monkeypatch.setattr(smoke, "provenance", lambda: {"head_commit": "fixture"})
+    monkeypatch.setattr(
+        smoke, "runtime_settings", lambda: Settings(groq_api_key="fictional-qwen")
+    )
+    elapsed = [0]
+    delays, sent = [], []
+
+    def sleep(seconds):
+        delays.append(seconds)
+        elapsed[0] += seconds
+
+    monkeypatch.setattr(smoke.time, "monotonic", lambda: elapsed[0])
+    monkeypatch.setattr(smoke.time, "sleep", sleep)
+
+    def respond(request):
+        assert request.url.host == "api.groq.com"
+        assert request.headers["Authorization"] == "Bearer fictional-qwen"
+        body = json.loads(request.content)
+        assert body["model"] == "qwen/qwen3.8-27b"
+        assert body["max_tokens"] == 16384
+        assert body["temperature"] == 1
+        assert body["top_p"] == 0.95
+        assert body["reasoning_effort"] == "medium"
+        assert body["reasoning_format"] == "hidden"
+        assert request.extensions["timeout"]["read"] == 180
+        if "tools" in body:
+            assert body["tools"] == list(smoke.definitions())
+        sent.append(body)
+        result = (
+            interpretation()
+            if "tools" not in body
+            else completion(calls=[call(period="this_week", kind="cash")])
+        )
+        return httpx.Response(200, json=result)
+
+    client_type = httpx.Client
+    monkeypatch.setattr(
+        smoke.httpx,
+        "Client",
+        lambda **kwargs: client_type(transport=httpx.MockTransport(respond), **kwargs),
+    )
+    result = smoke.main(
+        [
+            "--live",
+            "--provider",
+            "groq",
+            "--groq-model",
+            "qwen/qwen3.8-27b",
+            "--model-ids-checked-on",
+            "2026-10-18",
+            "--max-requests",
+            "20",
+            "--max-tokens",
+            "16384",
+            "--timeout-seconds",
+            "180",
+            "--minimum-interval-seconds",
+            "30",
+            "--progress",
+        ]
+    )
+    assert result == 0 and len(sent) == 20 and delays == [30] * 19
+    report = json.loads(
+        next((tmp_path / "docs/model_comparison").glob("*.json")).read_text()
+    )
+    assert report["settings"]["temperature"] == 1
+    assert report["settings"]["reasoning_effort"] == "medium"
+    assert report["settings"]["minimum_request_interval_seconds"] == 30
+    assert report["request_attempts"] == report["maximum_requests"] == 20
+    output = capsys.readouterr()
+    assert "fictional-qwen" not in output.out + output.err
+    progress = [json.loads(line) for line in output.err.splitlines()]
+    assert [item["completed"] for item in progress] == list(range(1, 11))
+    assert progress[-1] == {
+        "provider": "groq",
+        "completed": 10,
+        "case_count": 10,
+        "request_attempts": 20,
+    }

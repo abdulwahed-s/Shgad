@@ -247,6 +247,14 @@ model prose or tool arguments. Per-request elapsed times include pacing waits.
 Scores from different limit settings are not controlled model comparisons.
 Full application quality remains unverified.
 
+`--minimum-interval-seconds` selects 10-60 seconds between a provider's requests
+(default 10); `--progress` prints aggregate case/request counts to stderr.
+For `qwen/qwen3.8-27b` on Groq, the comparator uses medium reasoning with hidden
+reasoning format, temperature 1 and top_p 0.95, preserving the same prompts and
+tool parameter schemas. Its documented output cap of 16,384 tokens is checked
+before loading credentials or sending requests. Model-specific overrides and
+actual pacing are recorded in the report; this profile does not change the app.
+
 Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
 completed the ten-question development screen using 40 requests total, with no
 provider errors or retries. Joint correctness requires intent, behavior, tool
@@ -358,7 +366,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **626 backend tests passed, one opt-in live test skipped**,
+Verified locally: **631 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
