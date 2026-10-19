@@ -1,7 +1,7 @@
 """Mandatory slot renderer and bounded retry/template fallback (§8.2a).
 
 No provider dependency. This module never derives a financial value or date.
-Arabic copy is centralized and PENDING_REVIEW in messages_ar.py (D3).
+Arabic copy and its human review status are centralized in messages_ar.py.
 """
 
 import re

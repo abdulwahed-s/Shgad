@@ -17,7 +17,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > static localized shell; merchant screens and frontend chat integration are planned.
 > Gemini, Groq and OpenAI completed bounded development routing screens. With
 > larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
-> Full live chat validation and human review of new Arabic copy remain pending.
+> Full live chat validation remains pending. The 50 fixed backend Arabic messages
+> have human approval; frontend wording and future additions still need review.
 
 ## Capabilities and planned interface
 
@@ -63,7 +64,7 @@ an LLM. The agent requests these tools and drafts explanations with symbolic slo
 the backend fills figures and dates from verified results. Provider calls and API
 keys stay in the backend. Integration tests use recorded provider responses.
 The selected primary is `gemini-3.8-flash`, with Groq `openai/gpt-oss-120b` as
-the fallback. Full application quality checks and Arabic review remain pending.
+the fallback. Full application quality checks remain pending.
 
 ## Development status
 
@@ -449,7 +450,9 @@ tool output. Raw numeric characters, unknown keys and unsourced values are rejec
 It supports one retry callback and then deterministic templates, with server-resolved
 customer/period context, margin coverage and estimate assumptions. Exact user-typed
 quotes stay quoted data. Money uses Arabic-Indic digits and exact abbreviations;
-evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic review.
+evidence retains full integers. The 50 current fixed backend Arabic messages were
+approved by the user on 19 October 2026. Approval binds their exact text; new or
+edited messages remain pending Iraqi Arabic review.
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
@@ -505,4 +508,5 @@ display name; the exact provider model ID/settings remain unavailable and are
 not guessed. No model-provider API call was used for this dataset.
 Application integration is tested with recorded responses. Live development
 screening used the candidates above; Gemini 3.8 Flash is the selected primary.
-Complete application checks and human approval of the new Arabic messages remain pending.
+Complete live application checks remain pending; the 50 fixed backend Arabic
+messages have user approval. Frontend Arabic wording still needs review.

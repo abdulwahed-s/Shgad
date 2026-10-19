@@ -1,4 +1,4 @@
-"""Fixed merchant copy. Every entry is PENDING_REVIEW under decision D3.
+"""Fixed merchant copy with human approval bound to each exact reviewed text.
 
 Imported notes are never used as templates or executable instructions.
 """
@@ -6,15 +6,17 @@ Imported notes are never used as templates or executable instructions.
 from dataclasses import dataclass
 from typing import Literal
 
+from app.agents.arabic_review import review_status
+
 
 @dataclass(frozen=True)
 class DraftMessage:
     text: str
-    status: Literal["PENDING_REVIEW"] = "PENDING_REVIEW"
+    status: Literal["PENDING_REVIEW", "APPROVED"] = "PENDING_REVIEW"
 
 
 MESSAGES = {
-    key: DraftMessage(value)
+    key: DraftMessage(value, status=review_status(key, value))
     for key, value in {
         "period": "للفترة من {start} إلى {end}.",
         "customer": "الحساب: {name}.",
