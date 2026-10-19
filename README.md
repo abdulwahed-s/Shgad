@@ -269,8 +269,8 @@ Max reasoning; Step keeps native reasoning enabled. Reports record their samplin
 and chat-template options. Optional `--nvidia-stream` assembles native SSE content
 and function-call fragments, discards separate reasoning, and rejects incomplete
 or truncated responses. NVIDIA comparisons allow up to 900s HTTP timeouts;
-other providers retain the 300s ceiling. Streams have bounded wire and retained
-output sizes, with no automatic retries. The default comparison remains Gemini/Groq and the
+other providers retain the 300s ceiling. Streams bound decoded bytes and retained
+output, including unterminated lines, with no automatic retries. The default comparison remains Gemini/Groq and the
 application's provider selection is unchanged. NVIDIA model access and quality
 must be measured separately; a catalog listing alone is not an inference result.
 
@@ -296,7 +296,9 @@ quality scores. Their reasoning and resource profiles differ from earlier runs.
 marks its free endpoint deprecated. All ten cases remain unscored.
 `z-ai/glm-5.3` (Max) has no completed case yet: two nonstreaming attempts
 at 300s and two at 900s produced two unpaired interpretations, one timeout and
-one HTTP 504. A streaming transport probe remains pending; no score is assigned.
+one HTTP 504. A separate unscored streaming probe then returned one well-formed
+native tool call after 405s, using 4,387 reported tokens. The full streaming
+development screen remains pending; no score is assigned yet.
 
 Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
 completed the ten-question development screen using 40 requests total, with no
@@ -426,7 +428,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **652 backend tests passed, one opt-in live test skipped**,
+Verified locally: **654 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar

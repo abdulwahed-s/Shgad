@@ -1237,3 +1237,61 @@ def test_nvidia_stream_option_rejected_for_other_providers_before_credentials(
     with pytest.raises(SystemExit) as caught:
         smoke.main(["--live", "--nvidia-stream"])
     assert caught.value.code == 2
+
+
+def test_nvidia_stream_limits_an_unterminated_line_before_reading_more():
+    class OversizedLine(httpx.SyncByteStream):
+        def __iter__(self):
+            yield b"data: " + b"x" * 256_001
+            pytest.fail("unterminated oversized event was buffered without a bound")
+
+    with httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                headers={"content-type": "text/event-stream"},
+                stream=OversizedLine(),
+            )
+        )
+    ) as client:
+        with pytest.raises(smoke.ProviderFailure, match="RESPONSE_TOO_LARGE"):
+            smoke.send_request(
+                client,
+                "nvidia",
+                {"model": "z-ai/glm-5.3"},
+                "fictional-key",
+                nvidia_stream=True,
+            )
+
+
+def test_nvidia_stream_accepts_split_utf8_and_crlf():
+    text = "\u0634"
+    event = {"choices": [{"delta": {"content": text}, "finish_reason": "stop"}]}
+    data = (
+        "data: "
+        + json.dumps(event, ensure_ascii=False)
+        + "\r\n\r\ndata: [DONE]\r\n\r\n"
+    ).encode()
+
+    class SplitUTF8(httpx.SyncByteStream):
+        def __iter__(self):
+            for value in data:
+                yield bytes([value])
+
+    with httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                headers={"content-type": "text/event-stream"},
+                stream=SplitUTF8(),
+            )
+        )
+    ) as client:
+        response = smoke.send_request(
+            client,
+            "nvidia",
+            {"model": "z-ai/glm-5.3"},
+            "fictional-key",
+            nvidia_stream=True,
+        )
+    assert response["choices"][0]["message"]["content"] == text

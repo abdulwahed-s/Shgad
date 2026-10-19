@@ -570,6 +570,30 @@ def rate_limit_diagnostics(response):
     return limits, code
 
 
+def bounded_nvidia_lines(response, deadline):
+    """Enforce decoded-byte bounds before buffering a complete SSE line."""
+    pending, received = b"", 0
+    for chunk in response.iter_bytes():
+        if time.monotonic() > deadline:
+            raise ProviderFailure("TIMEOUT")
+        received += len(chunk)
+        if received > 16_777_216:
+            raise ProviderFailure("RESPONSE_TOO_LARGE")
+        pending += chunk
+        while delimiter := re.search(rb"\r\n|\r|\n", pending):
+            # Keep a trailing CR until the next chunk to recognize split CRLF.
+            if delimiter.group() == b"\r" and delimiter.end() == len(pending):
+                break
+            line, pending = pending[: delimiter.start()], pending[delimiter.end() :]
+            if len(line) > 256_000:
+                raise ProviderFailure("RESPONSE_TOO_LARGE")
+            yield line.decode("utf-8")
+        if len(pending.removesuffix(b"\r")) > 256_000:
+            raise ProviderFailure("RESPONSE_TOO_LARGE")
+    if pending:
+        yield pending.removesuffix(b"\r").decode("utf-8")
+
+
 def nvidia_stream_completion(client, payload, key):
     """Bound and normalize native SSE content/calls; never retain reasoning."""
     content, calls, usage = [], {}, {}
@@ -664,17 +688,10 @@ def nvidia_stream_completion(client, payload, key):
                 if isinstance(result.get("model"), str) and key in result["model"]:
                     result["model"] = None
                 return result
-            event_lines, wire_bytes, line_count = [], 0, 0
-            for line in response.iter_lines():
-                if time.monotonic() > deadline:
-                    raise ProviderFailure("TIMEOUT")
-                wire_bytes += len(line.encode("utf-8")) + 1
+            event_lines, line_count = [], 0
+            for line in bounded_nvidia_lines(response, deadline):
                 line_count += 1
-                if (
-                    len(line) > 256_000
-                    or wire_bytes > 16_777_216
-                    or line_count > 131_072
-                ):
+                if line_count > 131_072:
                     raise ProviderFailure("RESPONSE_TOO_LARGE")
                 if not line:
                     if event_lines:
@@ -988,8 +1005,8 @@ def main(argv=None):
         if args.nvidia_model == "stepfun-ai/step-5-preview":
             request_settings["reasoning_mode"] = "provider_native_always_enabled"
         if args.nvidia_stream:
-            request_settings["transport_adapter_version"] = "nvidia-sse-v1"
-            request_settings["maximum_stream_wire_bytes"] = 16_777_216
+            request_settings["transport_adapter_version"] = "nvidia-sse-v2"
+            request_settings["maximum_decoded_stream_bytes"] = 16_777_216
             request_settings["maximum_retained_output_bytes"] = 256_000
     metadata = provenance()
     if not args.live:
