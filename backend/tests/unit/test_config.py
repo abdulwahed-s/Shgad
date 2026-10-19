@@ -148,14 +148,26 @@ def test_bare_settings_never_implicitly_reads_a_local_file(local_config):
     assert Settings().gemini_api_key is None
 
 
-def test_empty_template_and_missing_local_file_are_valid(local_config):
+def test_selected_template_has_no_credentials_and_missing_file_is_valid(local_config):
     from pathlib import Path
+
+    from app.agents.llm_client import provider_configs
 
     config, path = local_config
     template = Path(__file__).resolve().parents[3] / ".env.example"
     path.write_bytes(template.read_bytes())
-    assert config.get_settings().business_as_of is None
-    assert config.get_settings().llm_model_id is None
+    selected = config.get_settings()
+    assert selected.business_as_of is None
+    assert (selected.llm_provider, selected.llm_model_id) == (
+        "gemini",
+        "gemini-3.8-flash",
+    )
+    assert (selected.llm_fallback_provider, selected.llm_fallback_model_id) == (
+        "openai",
+        "gpt-6-luna",
+    )
+    assert selected.gemini_api_key is selected.openai_api_key is None
+    assert provider_configs(selected) == ()  # Example IDs cannot enable network calls.
     path.unlink()
     config.get_settings.cache_clear()
     assert config.get_settings().gemini_api_key is None

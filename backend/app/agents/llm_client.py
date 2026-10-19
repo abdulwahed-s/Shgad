@@ -5,15 +5,40 @@ import copy
 import json
 import re
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 
 import httpx
+
+from app.agents.openai_protocol import REPLAY_ITEMS, normalize_response, request_payload
 
 ENDPOINTS = {
     "gemini": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     "groq": "https://api.groq.com/openai/v1/chat/completions",
+    "openai": "https://api.openai.com/v1/responses",
 }
 RETRIABLE = {408, 429, 500, 502, 503, 504}
 MAX_BYTES = 256_000
+
+
+def retry_delay(header):
+    """Respect server backoff; defer this provider if its wait exceeds our bound."""
+    header = header.strip()
+    if not header:
+        return 1
+    if re.fullmatch(r"[0-9]+", header):
+        if len(header) > 9 or int(header) > 2:
+            return None
+        return max(1, int(header))
+    try:
+        # This is an HTTP transport deadline, never a business/calendar date.
+        until = parsedate_to_datetime(header)
+        if until.tzinfo is None:
+            return None
+        seconds = (until - datetime.now(UTC)).total_seconds()
+        return None if seconds > 2 else max(1, seconds)
+    except (ValueError, TypeError, OverflowError):
+        return 1
 
 
 class LLMUnavailable(Exception):
@@ -184,27 +209,39 @@ class LLMClient:
             raise LLMUnavailable("not_configured")
         secrets = [
             key.get_secret_value()
-            for key in (self.settings.gemini_api_key, self.settings.groq_api_key)
+            for key in (
+                self.settings.gemini_api_key,
+                self.settings.groq_api_key,
+                self.settings.openai_api_key,
+            )
             if key
         ]
         reason = "busy"
         for provider, model in configs:
             key = getattr(self.settings, f"{provider}_api_key").get_secret_value()
             provider_messages = copy.deepcopy(messages)
+            for message in provider_messages:
+                if provider != "openai":
+                    message.pop(REPLAY_ITEMS, None)
             if provider != "gemini":
                 for message in provider_messages:
                     for call in message.get("tool_calls", []):
                         call.pop("extra_content", None)
-            payload = {
-                "model": model,
-                "messages": provider_messages,
-                "temperature": 0,
-                "max_tokens": 2048,
-            }
-            if tools:
-                payload |= {"tools": list(tools), "tool_choice": "auto"}
-            if json_mode:
-                payload["response_format"] = {"type": "json_object"}
+            if provider == "openai":
+                payload = request_payload(
+                    model, provider_messages, tools=tools, json_mode=json_mode
+                )
+            else:
+                payload = {
+                    "model": model,
+                    "messages": provider_messages,
+                    "temperature": 0,
+                    "max_tokens": 2048,
+                }
+                if tools:
+                    payload |= {"tools": list(tools), "tool_choice": "auto"}
+                if json_mode:
+                    payload["response_format"] = {"type": "json_object"}
             if len(json.dumps(payload, ensure_ascii=False).encode()) > 128_000:
                 raise LLMUnavailable("context_limit")
             for attempt in range(2):
@@ -214,15 +251,21 @@ class LLMClient:
                     if status != 200:
                         if status not in RETRIABLE or attempt == 1:
                             break
-                        if re.fullmatch(r"[0-9]{1,9}", header):
-                            delay = min(2, max(delay, int(header)))
+                        delay = retry_delay(header)
+                        if delay is None:
+                            break
                     else:
                         if any(
                             secret in json.dumps(body, ensure_ascii=False)
                             for secret in secrets
                         ):
                             raise ValueError("SECRET_ECHO")
+                        replay = None
+                        if provider == "openai":
+                            body, replay = normalize_response(body)
                         reply = parse_reply(body, provider=provider, model=model)
+                        if replay is not None:
+                            reply.message[REPLAY_ITEMS] = replay
                         self._preferred = (provider, model)
                         return reply
                 except (TimeoutError, httpx.TimeoutException, httpx.TransportError):

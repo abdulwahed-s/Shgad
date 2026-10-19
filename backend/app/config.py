@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     llm_timeout_seconds: int = Field(default=10, ge=1, le=30)
     gemini_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
     groq_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
-    # Optional development comparator credentials; application providers unchanged.
+    # Application fallback and optional development comparison credentials.
     openai_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
     build_nvidia_api_key: SecretStr | None = Field(
         default=None, repr=False, exclude=True

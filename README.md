@@ -63,8 +63,8 @@ Financial calculations use integer IQD in Python. The tools and renderer work wi
 an LLM. The agent requests these tools and drafts explanations with symbolic slots;
 the backend fills figures and dates from verified results. Provider calls and API
 keys stay in the backend. Integration tests use recorded provider responses.
-The selected primary is `gemini-3.8-flash`, with Groq `openai/gpt-oss-120b` as
-the fallback. Full application quality checks remain pending.
+The selected primary is `gemini-3.8-flash`, with OpenAI `gpt-6-luna` as the
+fallback, using paid provider accounts. Full live application checks remain pending.
 
 ## Development status
 
@@ -98,18 +98,20 @@ out of Git and chat. Set `APP_ENV=test` or `APP_ENV=production` in the launching
 process to use environment variables without reading the local file. Restart the
 backend after changing configuration.
 
-The setup template selects Gemini 3.8 Flash and the Groq fallback. For an existing
+The setup template selects Gemini 3.8 Flash and the OpenAI fallback. For an existing
 local configuration, set these non-secret fields while keeping keys local:
 
 ```dotenv
 LLM_PROVIDER=gemini
 LLM_MODEL_ID=gemini-3.8-flash
-LLM_FALLBACK_PROVIDER=groq
-LLM_FALLBACK_MODEL_ID=openai/gpt-oss-120b
+LLM_FALLBACK_PROVIDER=openai
+LLM_FALLBACK_MODEL_ID=gpt-6-luna
 ```
 
 Selecting the model does not change an existing `.env` file or verify live chat
 and CSV mapping. The earlier 9/10 result measures development routing only.
+Keep `GEMINI_API_KEY` and `OPENAI_API_KEY` local. Paid access still has rate limits;
+the client retains bounded retries and provider failover.
 
 No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
 stays unset in raw settings until configured. The domain `BusinessClock.from_settings`
@@ -438,12 +440,18 @@ dates, verification evidence and renderer status. Missing balances and ambiguous
 names or periods produce fixed clarification messages. Provider failure after a
 verified result can return the deterministic template with a fallback notice.
 
-Configure `LLM_PROVIDER` (`gemini` or `groq`), `LLM_MODEL_ID` and that provider's
+Configure `LLM_PROVIDER` (`gemini`, `groq` or `openai`), `LLM_MODEL_ID` and that provider's
 API key in the root `.env` or process environment. `.env.example` lists optional
-fallback and timeout settings. `GEMINI_API_KEY` and `GROQ_API_KEY` authenticate
+fallback and timeout settings. `GEMINI_API_KEY`, `GROQ_API_KEY` and `OPENAI_API_KEY` authenticate
 provider access; model IDs select models separately. Use exact console model IDs;
 keep keys local and never paste them into chat. Without configuration, chat
 returns the typed `llm_unavailable` response without a provider request.
+The same client uses compatible Chat Completions for Gemini/Groq and Responses
+for OpenAI. Luna requests use medium reasoning, an 8,192-token output bound,
+no temperature override and `store: false`. Encrypted continuation state stays
+in request memory. The five tool parameter schemas and server validation are
+shared. Each provider gets at most two attempts per completion; long
+`Retry-After` waits defer to fallback instead of retrying early.
 
 `app.agents.renderer` fills `{{fig:key}}` and `{{date:key}}` only from verified
 tool output. Raw numeric characters, unknown keys and unsourced values are rejected.
@@ -456,11 +464,11 @@ edited messages remain pending Iraqi Arabic review.
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **654 backend tests passed, one opt-in live test skipped**,
+Verified locally: **683 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
-checks pass for **110 backend/script files**; dependency checks pass.
+checks pass for **115 backend/script files**; dependency checks pass.
 A running-server smoke passed **20 check groups across 19 OpenAPI paths**, using
 only a temporary fictional database.
 Every implemented endpoint has a response-model contract test, including daily close,

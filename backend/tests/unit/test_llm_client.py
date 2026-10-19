@@ -49,13 +49,38 @@ def test_429_backoff_then_success_with_identical_schemas():
         sent.append(json.loads(request.content))
         if len(sent) == 1:
             return httpx.Response(
-                429, headers={"Retry-After": "999999"}, json={"private": "ignored"}
+                429, headers={"Retry-After": "2"}, json={"private": "ignored"}
             )
         return httpx.Response(200, json=answer())
 
     reply, delays = run(respond, tools=definitions())
     assert reply.provider == "gemini" and len(sent) == 2
     assert delays == [2] and sent[0]["tools"] == sent[1]["tools"] == list(definitions())
+
+
+@pytest.mark.parametrize(
+    "retry_after",
+    ["999999", "99999999999999999999", " 60 ", "Fri, 31 Dec 9999 23:59:59 GMT"],
+)
+def test_long_retry_after_defers_provider_instead_of_retrying_early(retry_after):
+    hosts = []
+
+    def respond(request):
+        hosts.append(request.url.host)
+        if request.url.host == "generativelanguage.googleapis.com":
+            return httpx.Response(429, headers={"Retry-After": retry_after})
+        return httpx.Response(200, json=answer())
+
+    reply, delays = run(
+        respond,
+        settings(
+            llm_fallback_provider="groq",
+            llm_fallback_model_id="recorded-fallback",
+            groq_api_key="synthetic-fallback-secret",
+        ),
+    )
+    assert reply.provider == "groq" and delays == []
+    assert hosts == ["generativelanguage.googleapis.com", "api.groq.com"]
 
 
 def test_bounded_retries_then_other_provider_without_changing_schemas():
