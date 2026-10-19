@@ -259,6 +259,27 @@ def test_rate_limit_diagnostics_allow_only_numeric_headers_and_known_error_codes
     assert sentinel not in json.dumps(report)
 
 
+def test_distinct_provider_quota_counters_do_not_overwrite_header_limits():
+    response = httpx.Response(
+        429,
+        headers={"x-ratelimit-limit-tokens": "8000"},
+        json={
+            "error": {
+                "code": "rate_limit_exceeded",
+                "type": "tokens",
+                "message": "Limit 1000, Requested 1212",
+            }
+        },
+    )
+    limits, code = smoke.rate_limit_diagnostics(response)
+    assert code == "rate_limit_exceeded"
+    assert limits == {
+        "limit_tokens": 8000,
+        "provider_reported_limit_tokens": 1000,
+        "requested_tokens": 1212,
+    }
+
+
 def test_dry_run_never_constructs_provider_transport(monkeypatch, capsys):
     def forbidden(*args, **kwargs):
         pytest.fail("dry-run constructed a network client")

@@ -525,7 +525,13 @@ def rate_limit_diagnostics(response):
                 ):
                     match = re.search(rf"\b{label} ([0-9]{{1,9}})\b", message)
                     if match:
-                        limits[field] = int(match[1])
+                        value = int(match[1])
+                        # Account headers and message counters can describe
+                        # different buckets; preserve both without inferring units.
+                        if field in limits and limits[field] != value:
+                            limits[f"provider_reported_{field}"] = value
+                        else:
+                            limits[field] = value
     except (ValueError, TypeError):
         pass
     return limits, code
