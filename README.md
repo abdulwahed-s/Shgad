@@ -249,15 +249,17 @@ Full application quality remains unverified.
 
 `--minimum-interval-seconds` selects 10-60 seconds between a provider's requests
 (default 10); `--progress` prints aggregate case/request counts to stderr.
-For `qwen/qwen3.8-27b` on Groq, the comparator uses medium reasoning with hidden
-reasoning format, temperature 1 and top_p 0.95, preserving the same prompts and
-tool parameter schemas. Its documented output cap of 16,384 tokens is checked
+For `qwen/qwen3.8-27b` on Groq, the comparator defaults to medium reasoning;
+`--qwen-reasoning-effort none|low|medium|high` selects an explicit profile.
+Hidden reasoning format, temperature 1 and top_p 0.95 preserve the same prompts
+and tool parameter schemas. Its documented output cap of 16,384 tokens is checked
 before loading credentials or sending requests. Model-specific overrides and
 actual pacing are recorded in the report; this profile does not change the app.
 Quota failures retain only recognized error codes and bounded numeric limit,
 remaining-token, requested-token and retry/reset counters. Provider messages,
 organization names and secret values are not retained.
-Distinct quota counters from headers and provider messages are preserved separately.
+Distinct quota counters from headers and provider messages are preserved separately,
+along with an allowlisted metric label when the provider identifies one unambiguously.
 
 Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
 completed the ten-question development screen using 40 requests total, with no
@@ -297,14 +299,22 @@ for conflicting records, and one unsupported-write interpretation. These are
 single development screens with different API/reasoning profiles, not controlled
 model rankings or live application/financial-answer accuracy.
 
-The `qwen/qwen3.8-27b` screen on Groq remains partial: at clean source `2abc508`,
-**one of ten questions completed and passed; nine remain unscored** because Groq
-returned HTTP 429 on the next tool-selection request even with 60s spacing.
-Across three operational profiles, seven generation attempts produced four
-successful responses and three quota rejections. The profiles allowed 180s HTTP
-timeouts and tried 16,384 or 4,096 output tokens with 30s or 60s spacing, preserving
-the same logical prompts, schemas and scoring. No full Qwen accuracy is claimed;
-the account's quota settings need confirmation before continuing.
+The `qwen/qwen3.8-27b` screen on Groq completed on 19 October at clean source
+`7da09ec` with a recorded local operational adapter: **2/10 jointly correct,
+8/10 correct tool sets and 9/10 valid tool selections**. All 20 requests completed
+without provider errors, retries or reported truncation, using 29,937 reported
+tokens. The profile used **reasoning none**, hidden format, temperature 1/top_p
+0.95, 768 output tokens, 180s HTTP timeouts and at least 65s actual spacing
+(60s CLI setting). No separate reasoning-token counters were reported.
+
+Sanitized provider metadata identified a separate 1,000 output-token-per-minute
+limit alongside the 8,000 combined-token limit. Earlier setup/diagnostics are
+retained separately: 12 attempts, six successful responses, five HTTP 429
+rejections and one HTTP 400; interrupted answers are not extra scored questions.
+The complete Qwen check therefore used 32 generation attempts within its 40-attempt
+recovery cap. Logical prompts, development questions, schemas and scoring stayed
+unchanged. Different reasoning/resource profiles prevent a controlled model
+ranking; application model choice and live answer quality remain pending.
 
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
@@ -379,7 +389,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **633 backend tests passed, one opt-in live test skipped**,
+Verified locally: **638 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar

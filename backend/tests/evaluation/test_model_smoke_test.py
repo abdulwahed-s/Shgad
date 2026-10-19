@@ -737,8 +737,9 @@ def test_qwen_output_cap_is_checked_before_credentials_or_requests(monkeypatch):
         smoke.compare({"groq": "qwen/qwen3.8-27b"}, sender=forbidden, max_tokens=16385)
 
 
+@pytest.mark.parametrize("effort", ["medium", "none"])
 def test_qwen_cli_preserves_tools_and_records_profile_pacing_and_safe_progress(
-    monkeypatch, tmp_path, capsys
+    monkeypatch, tmp_path, capsys, effort
 ):
     from app.config import Settings
 
@@ -765,7 +766,7 @@ def test_qwen_cli_preserves_tools_and_records_profile_pacing_and_safe_progress(
         assert body["max_tokens"] == 16384
         assert body["temperature"] == 1
         assert body["top_p"] == 0.95
-        assert body["reasoning_effort"] == "medium"
+        assert body["reasoning_effort"] == effort
         assert body["reasoning_format"] == "hidden"
         assert request.extensions["timeout"]["read"] == 180
         if "tools" in body:
@@ -803,13 +804,14 @@ def test_qwen_cli_preserves_tools_and_records_profile_pacing_and_safe_progress(
             "30",
             "--progress",
         ]
+        + (["--qwen-reasoning-effort", effort] if effort != "medium" else [])
     )
     assert result == 0 and len(sent) == 20 and delays == [30] * 19
     report = json.loads(
         next((tmp_path / "docs/model_comparison").glob("*.json")).read_text()
     )
     assert report["settings"]["temperature"] == 1
-    assert report["settings"]["reasoning_effort"] == "medium"
+    assert report["settings"]["reasoning_effort"] == effort
     assert report["settings"]["minimum_request_interval_seconds"] == 30
     assert report["request_attempts"] == report["maximum_requests"] == 20
     output = capsys.readouterr()
@@ -822,3 +824,45 @@ def test_qwen_cli_preserves_tools_and_records_profile_pacing_and_safe_progress(
         "case_count": 10,
         "request_attempts": 20,
     }
+
+
+@pytest.mark.parametrize("effort", ["unsupported", "none"])
+def test_invalid_or_inapplicable_qwen_profile_fails_before_credentials(
+    monkeypatch, effort
+):
+    def forbidden(*args, **kwargs):
+        pytest.fail("invalid candidate profile accessed credentials or transport")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    monkeypatch.setattr(smoke.httpx, "Client", forbidden)
+    with pytest.raises(SystemExit) as caught:
+        smoke.main(["--live", "--qwen-reasoning-effort", effort])
+    assert caught.value.code == 2
+
+
+@pytest.mark.parametrize("metric", ["OTPM", "PRIVATE_SENTINEL"])
+def test_quota_diagnostic_preserves_allowlisted_bucket_metric_without_raw_text(metric):
+    sentinel = "fictional-sensitive-provider-text"
+    response = httpx.Response(
+        429,
+        headers={"x-ratelimit-limit-tokens": "8000"},
+        json={
+            "error": {
+                "code": "rate_limit_exceeded",
+                "type": "tokens",
+                "message": (
+                    f"Output tokens per minute ({metric}): "
+                    f"Limit 1000, Requested 1246. {sentinel}"
+                ),
+            }
+        },
+    )
+    limits, code = smoke.rate_limit_diagnostics(response)
+    assert code == "rate_limit_exceeded"
+    assert limits == {
+        "limit_tokens": 8000,
+        "provider_reported_limit_tokens": 1000,
+        "requested_tokens": 1246,
+    } | ({"provider_reported_metric": metric} if metric == "OTPM" else {})
+    assert sentinel not in json.dumps(limits)
+    assert "PRIVATE_SENTINEL" not in json.dumps(limits)
