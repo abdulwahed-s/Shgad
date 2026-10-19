@@ -15,9 +15,9 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > mapping use a configurable provider client with bounded retries and failover;
 > their integration is verified with recorded provider responses. Flutter remains a
 > static localized shell; merchant screens and frontend chat integration are planned.
-> Gemini and Groq completed bounded development routing screens. An additional
-> Gemini 3.8 Flash check scored 9/10 with larger time/token limits. Full live chat
-> validation and human review of new Arabic copy remain pending.
+> Gemini, Groq and OpenAI completed bounded development routing screens. With
+> larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
+> Full live chat validation and human review of new Arabic copy remain pending.
 
 ## Capabilities and planned interface
 
@@ -272,6 +272,18 @@ The API reported 34,829 total tokens across the run. Its larger time/token limit
 differ from the first comparison, so the score difference cannot be attributed
 solely to model choice. Application model selection and live answer quality
 remain pending.
+
+A further check on 18 October at clean source `937d180` used `gpt-6-luna`:
+**7/10 jointly correct and 9/10 correct tool sets**, with all 20 requests
+completed and no provider errors, retries or truncation. This screen used the
+same ten questions, logical prompts, tool parameter schemas and scorer, with
+180s HTTP timeouts and 32,768 output tokens. Luna used Responses with medium
+reasoning, no temperature override and optional response storage disabled.
+The API reported **23,919 total tokens**, including **2,095 reasoning tokens**.
+The failed checks concerned one interpreted period, the reconciliation tool set
+for conflicting records, and one unsupported-write interpretation. These are
+single development screens with different API/reasoning profiles, not controlled
+model rankings or live application/financial-answer accuracy.
 
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
