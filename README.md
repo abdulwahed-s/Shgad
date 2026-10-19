@@ -274,16 +274,19 @@ output, including unterminated lines, with no automatic retries. The default com
 application's provider selection is unchanged. NVIDIA model access and quality
 must be measured separately; a catalog listing alone is not an inference result.
 
-On 19 October, clean source `b72908f` completed two NVIDIA screens using the
-same ten development questions, logical prompts, five schemas and scorer:
+On 19 October, NVIDIA screens used the same ten development questions,
+logical prompts, five schemas and scorer. Complete Flash/Step runs used clean
+source `b72908f`; the later partial GLM streaming run used clean `019de2b`:
 
 | Candidate | Jointly correct | Correct native tool set |
 |---|---|---|
 | `z-ai/glm-5.3-flash` (Max) | 6/10 | 10/10 |
 | `stepfun-ai/step-5-preview` | 0/10 | 10/10 |
+| `z-ai/glm-5.3` (Max) | Partial: 1 passed, 9 unscored | 1/1 completed |
+| `moonshotai/kimi-k3` (Max) | Unscored: HTTP 410 | Unscored |
 
-Both completed 20 requests without provider errors, retries or reported
-truncation, using 32,768 output tokens, 300s HTTP timeouts and 30s pacing.
+Flash and Step each completed 20 requests without provider errors, retries or
+reported truncation, with 32,768-token output limits, 300s HTTP timeouts and 30s pacing.
 Flash reported 37,479 total tokens; Step reported 41,622. Step failed every
 separate interpretation check while passing every native tool/context check.
 One additional unscored format probe returned separate reasoning without final
@@ -294,11 +297,18 @@ quality scores. Their reasoning and resource profiles differ from earlier runs.
 `moonshotai/kimi-k3` returned HTTP 410 on its first attempt; NVIDIA's
 [deployment page](https://build.nvidia.com/moonshotai/kimi-k3?section=deploy)
 marks its free endpoint deprecated. All ten cases remain unscored.
-`z-ai/glm-5.3` (Max) has no completed case yet: two nonstreaming attempts
-at 300s and two at 900s produced two unpaired interpretations, one timeout and
-one HTTP 504. A separate unscored streaming probe then returned one well-formed
-native tool call after 405s, using 4,387 reported tokens. The full streaming
-development screen remains pending; no score is assigned yet.
+GLM's initial nonstreaming runs produced two unpaired interpretations, one
+300s timeout and one HTTP 504 despite a 900s client timeout. A separate unscored
+streaming probe returned a well-formed native call after 405s. The fresh fixed
+streaming screen then completed and passed one question before another upstream
+HTTP 504 stopped the second question: four attempts, three responses and nine
+unscored questions. Its successful responses reported 4,930 total tokens.
+There is insufficient data for a ten-question GLM score; no further retry ran.
+
+Across these NVIDIA checks, **51 generation attempts** used the original
+80-attempt budget: 47 decoded responses and four failures, plus one catalog GET.
+Known reported usage totals **91,287 tokens**; failed-request usage is unknown.
+Failures and unpaired answers are retained without adding scored questions.
 
 Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
 completed the ten-question development screen using 40 requests total, with no
