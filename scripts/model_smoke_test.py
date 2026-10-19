@@ -116,6 +116,11 @@ class Interpretation(DateArguments):
 class ProviderFailure(Exception):
     """A bounded, sanitized error code; never a provider body or exception text."""
 
+    def __init__(self, code, *, rate_limits=None, provider_error_code=None):
+        super().__init__(code)
+        self.rate_limits = rate_limits or {}
+        self.provider_error_code = provider_error_code
+
 
 def encoded(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True).encode("utf-8")
@@ -478,6 +483,54 @@ def openai_completion(body):
     }
 
 
+def rate_limit_diagnostics(response):
+    """Extract only numeric quota metadata and known codes, never raw text."""
+    limits = {}
+    for header, field in (
+        ("x-ratelimit-limit-tokens", "limit_tokens"),
+        ("x-ratelimit-remaining-tokens", "remaining_tokens"),
+        ("x-ratelimit-limit-requests", "limit_requests"),
+        ("x-ratelimit-remaining-requests", "remaining_requests"),
+    ):
+        value = response.headers.get(header, "")
+        if re.fullmatch(r"[0-9]{1,9}", value):
+            limits[field] = int(value)
+    value = response.headers.get("retry-after", "")
+    if re.fullmatch(r"[0-9]{1,5}(?:\.[0-9]{1,6})?", value):
+        whole, _, fraction = value.partition(".")
+        limits["retry_after_seconds"] = int(whole) + bool(int(fraction or "0"))
+    value = response.headers.get("x-ratelimit-reset-tokens", "")
+    duration = re.fullmatch(r"(?:(\d{1,3})m)?(\d{1,3})(?:\.(\d{1,6}))?s", value)
+    if duration:
+        minutes, seconds, fraction = duration.groups()
+        limits["token_reset_seconds"] = (
+            int(minutes or "0") * 60 + int(seconds) + bool(int(fraction or "0"))
+        )
+    code = None
+    try:
+        body = response.json()
+        error = body.get("error") if isinstance(body, dict) else None
+        if isinstance(error, dict) and error.get("code") in {
+            "rate_limit_exceeded",
+            "insufficient_quota",
+            "request_too_large",
+        }:
+            code = error["code"]
+            kind, message = error.get("type"), error.get("message")
+            if kind in {"tokens", "requests"} and isinstance(message, str):
+                for label, field in (
+                    ("Limit", f"limit_{kind}"),
+                    ("Requested", f"requested_{kind}"),
+                    ("Used", f"used_{kind}"),
+                ):
+                    match = re.search(rf"\b{label} ([0-9]{{1,9}})\b", message)
+                    if match:
+                        limits[field] = int(match[1])
+    except (ValueError, TypeError):
+        pass
+    return limits, code
+
+
 def send_request(client, provider, payload, key):
     wire_payload = payload
     if provider == "openai":
@@ -495,10 +548,19 @@ def send_request(client, provider, payload, key):
         raise ProviderFailure("TIMEOUT") from None
     except httpx.TransportError:
         raise ProviderFailure("NETWORK") from None
-    if response.status_code != 200:
-        raise ProviderFailure(f"HTTP_{response.status_code}")
     if len(response.content) > 256_000:
         raise ProviderFailure("RESPONSE_TOO_LARGE")
+    if response.status_code != 200:
+        limits, code = (
+            rate_limit_diagnostics(response)
+            if response.status_code == 429
+            else ({}, None)
+        )
+        raise ProviderFailure(
+            f"HTTP_{response.status_code}",
+            rate_limits=limits,
+            provider_error_code=code,
+        )
     try:
         body = response.json()
         if not isinstance(body, dict):
@@ -611,6 +673,10 @@ def compare(
                 except ProviderFailure as failure:
                     summary["stopped_reason"] = str(failure)
                     diagnostic["error"] = str(failure)
+                    if failure.rate_limits:
+                        diagnostic["rate_limits"] = failure.rate_limits
+                    if failure.provider_error_code:
+                        diagnostic["provider_error_code"] = failure.provider_error_code
                     break
                 finally:
                     diagnostic["elapsed_ms"] = max(

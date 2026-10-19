@@ -215,6 +215,50 @@ def test_transport_never_logs_keys_or_provider_error_body(status):
     assert sentinel not in str(caught.value) and str(status) in str(caught.value)
 
 
+def test_rate_limit_diagnostics_allow_only_numeric_headers_and_known_error_codes(cases):
+    sentinel = "fictional-secret-do-not-print"
+
+    def respond(request):
+        return httpx.Response(
+            429,
+            json={
+                "error": {
+                    "message": f"Limit 8000, Requested 12000. {sentinel}",
+                    "code": "rate_limit_exceeded",
+                    "type": "tokens",
+                }
+            },
+            headers={
+                "x-ratelimit-limit-tokens": "8000",
+                "x-ratelimit-remaining-tokens": "3000",
+                "x-ratelimit-limit-requests": sentinel,
+                "retry-after": "29.2",
+                "x-ratelimit-reset-tokens": "1m2.1s",
+                "x-unknown": sentinel,
+            },
+        )
+
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        report = smoke.compare(
+            {"groq": "recorded-model"},
+            sender=lambda provider, payload: smoke.send_request(
+                client, provider, payload, sentinel
+            ),
+            cases=[cases["DEV-001"]],
+            max_requests=1,
+        )
+    detail = report["providers"]["groq"]["requests"][0]
+    assert detail["provider_error_code"] == "rate_limit_exceeded"
+    assert detail["rate_limits"] == {
+        "limit_tokens": 8000,
+        "remaining_tokens": 3000,
+        "retry_after_seconds": 30,
+        "token_reset_seconds": 63,
+        "requested_tokens": 12000,
+    }
+    assert sentinel not in json.dumps(report)
+
+
 def test_dry_run_never_constructs_provider_transport(monkeypatch, capsys):
     def forbidden(*args, **kwargs):
         pytest.fail("dry-run constructed a network client")

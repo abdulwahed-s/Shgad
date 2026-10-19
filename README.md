@@ -254,6 +254,9 @@ reasoning format, temperature 1 and top_p 0.95, preserving the same prompts and
 tool parameter schemas. Its documented output cap of 16,384 tokens is checked
 before loading credentials or sending requests. Model-specific overrides and
 actual pacing are recorded in the report; this profile does not change the app.
+Quota failures retain only recognized error codes and bounded numeric limit,
+remaining-token, requested-token and retry/reset counters. Provider messages,
+organization names and secret values are not retained.
 
 Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
 completed the ten-question development screen using 40 requests total, with no
@@ -366,7 +369,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **631 backend tests passed, one opt-in live test skipped**,
+Verified locally: **632 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
