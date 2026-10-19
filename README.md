@@ -61,8 +61,9 @@ flowchart LR
 Financial calculations use integer IQD in Python. The tools and renderer work without
 an LLM. The agent requests these tools and drafts explanations with symbolic slots;
 the backend fills figures and dates from verified results. Provider calls and API
-keys stay in the backend. Integration tests use recorded provider responses;
-live model selection and quality checks remain pending.
+keys stay in the backend. Integration tests use recorded provider responses.
+The selected primary is `gemini-3.8-flash`, with Groq `openai/gpt-oss-120b` as
+the fallback. Full application quality checks and Arabic review remain pending.
 
 ## Development status
 
@@ -95,6 +96,20 @@ variables override file values; blank optional values use defaults. Keep `.env`
 out of Git and chat. Set `APP_ENV=test` or `APP_ENV=production` in the launching
 process to use environment variables without reading the local file. Restart the
 backend after changing configuration.
+
+The setup template selects Gemini 3.8 Flash and the Groq fallback. For an existing
+local configuration, set these non-secret fields while keeping keys local:
+
+```dotenv
+LLM_PROVIDER=gemini
+LLM_MODEL_ID=gemini-3.8-flash
+LLM_FALLBACK_PROVIDER=groq
+LLM_FALLBACK_MODEL_ID=openai/gpt-oss-120b
+```
+
+Selecting the model does not change an existing `.env` file or verify live chat
+and CSV mapping. The earlier 9/10 result measures development routing only.
+
 No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
 stays unset in raw settings until configured. The domain `BusinessClock.from_settings`
 uses the configured date, or **2026-09-28** (synthetic day 90) when absent; it never
@@ -333,8 +348,8 @@ provider errors, retries or reported truncation. This run allowed 180s per HTTP
 request and 32,768 output tokens, with at least ten seconds between requests.
 The API reported 34,829 total tokens across the run. Its larger time/token limits
 differ from the first comparison, so the score difference cannot be attributed
-solely to model choice. Application model selection and live answer quality
-remain pending.
+solely to model choice. Gemini 3.8 Flash was subsequently selected as primary;
+live application answer quality remains pending.
 
 A further check on 18 October at clean source `937d180` used `gpt-6-luna`:
 **7/10 jointly correct and 9/10 correct tool sets**, with all 20 requests
@@ -363,7 +378,7 @@ rejections and one HTTP 400; interrupted answers are not extra scored questions.
 The complete Qwen check therefore used 32 generation attempts within its 40-attempt
 recovery cap. Logical prompts, development questions, schemas and scoring stayed
 unchanged. Different reasoning/resource profiles prevent a controlled model
-ranking; application model choice and live answer quality remain pending.
+ranking; Gemini 3.8 Flash is the selected primary and live answer quality remains pending.
 
 The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
 chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
@@ -489,5 +504,5 @@ The scenario manifest records the drafting brief and the user-confirmed model
 display name; the exact provider model ID/settings remain unavailable and are
 not guessed. No model-provider API call was used for this dataset.
 Application integration is tested with recorded responses. Live development
-screening used the candidates above; production selection, complete application
-checks and human approval of the new Arabic messages remain pending.
+screening used the candidates above; Gemini 3.8 Flash is the selected primary.
+Complete application checks and human approval of the new Arabic messages remain pending.
