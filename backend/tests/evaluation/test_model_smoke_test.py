@@ -866,3 +866,156 @@ def test_quota_diagnostic_preserves_allowlisted_bucket_metric_without_raw_text(m
     } | ({"provider_reported_metric": metric} if metric == "OTPM" else {})
     assert sentinel not in json.dumps(limits)
     assert "PRIVATE_SENTINEL" not in json.dumps(limits)
+
+
+@pytest.mark.parametrize(
+    ("model", "options"),
+    [
+        (
+            "z-ai/glm-5.3",
+            {
+                "temperature": 0.5,
+                "reasoning_effort": "max",
+                "chat_template_kwargs": {"clear_thinking": True},
+            },
+        ),
+        ("moonshotai/kimi-k3", {"temperature": 1, "reasoning_effort": "max"}),
+        (
+            "stepfun-ai/step-5-preview",
+            {
+                "temperature": 0.5,
+                "chat_template_kwargs": {
+                    "enable_thinking": True,
+                    "preserve_thinking": True,
+                },
+            },
+        ),
+        (
+            "z-ai/glm-5.3-flash",
+            {
+                "temperature": 0.5,
+                "reasoning_effort": "max",
+                "chat_template_kwargs": {"clear_thinking": True},
+            },
+        ),
+    ],
+)
+def test_nvidia_cli_uses_native_profiles_same_tools_and_sanitized_reports(
+    monkeypatch, tmp_path, capsys, model, options
+):
+    from app.config import Settings
+
+    monkeypatch.setattr(smoke, "ROOT", tmp_path)
+    monkeypatch.setattr(smoke, "provenance", lambda: {"head_commit": "fixture"})
+    monkeypatch.setattr(
+        smoke,
+        "runtime_settings",
+        lambda: Settings(build_nvidia_api_key="fictional-nvidia-key"),
+    )
+    elapsed, sent, delays = [0], [], []
+
+    def sleep(seconds):
+        delays.append(seconds)
+        elapsed[0] += seconds
+
+    monkeypatch.setattr(smoke.time, "monotonic", lambda: elapsed[0])
+    monkeypatch.setattr(smoke.time, "sleep", sleep)
+
+    def respond(request):
+        assert request.url == "https://integrate.api.nvidia.com/v1/chat/completions"
+        assert request.headers["Authorization"] == "Bearer fictional-nvidia-key"
+        body = json.loads(request.content)
+        assert body["model"] == model
+        assert body["stream"] is False
+        assert body["max_tokens"] == 32768
+        assert request.extensions["timeout"]["read"] == 300
+        for key, value in options.items():
+            assert body[key] == value
+        if "reasoning_effort" not in options:
+            assert "reasoning_effort" not in body
+        assert "top_p" not in body
+        if "tools" in body:
+            assert body["tools"] == list(smoke.definitions())
+        else:
+            assert body["response_format"] == {"type": "json_object"}
+        sent.append(body)
+        result = (
+            interpretation()
+            if "tools" not in body
+            else completion(calls=[call(period="this_week", kind="cash")])
+        )
+        result["choices"][0]["message"]["reasoning_content"] = (
+            "fictional-private-reasoning"
+        )
+        return httpx.Response(200, json=result)
+
+    client_type = httpx.Client
+    monkeypatch.setattr(
+        smoke.httpx,
+        "Client",
+        lambda **kwargs: client_type(transport=httpx.MockTransport(respond), **kwargs),
+    )
+    assert (
+        smoke.main(
+            [
+                "--live",
+                "--provider",
+                "nvidia",
+                "--nvidia-model",
+                model,
+                "--model-ids-checked-on",
+                "2026-10-19",
+                "--max-requests",
+                "20",
+                "--max-tokens",
+                "32768",
+                "--timeout-seconds",
+                "300",
+                "--minimum-interval-seconds",
+                "30",
+                "--progress",
+            ]
+        )
+        == 0
+    )
+    assert len(sent) == 20 and delays == [30] * 19
+    saved = next((tmp_path / "docs/model_comparison").glob("*.json")).read_text()
+    report = json.loads(saved)
+    assert report["request_attempts"] == report["maximum_requests"] == 20
+    assert report["settings"]["api_protocol"] == "chat_completions"
+    assert report["settings"]["provider_overrides"]["nvidia"] == options | {
+        "stream": False
+    }
+    assert set(report["providers"]) == {"nvidia"}
+    output = capsys.readouterr()
+    for private in ("fictional-nvidia-key", "fictional-private-reasoning"):
+        assert private not in saved + output.out + output.err
+    assert len(output.err.splitlines()) == 10
+
+
+def test_nvidia_dry_run_never_loads_credentials_or_constructs_transport(
+    monkeypatch, capsys
+):
+    def forbidden(*args, **kwargs):
+        pytest.fail("dry run accessed credentials or transport")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    monkeypatch.setattr(smoke.httpx, "Client", forbidden)
+    assert smoke.main(["--provider", "nvidia", "--nvidia-model", "z-ai/glm-5.3"]) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert report["selected_providers"] == ["nvidia"]
+    assert report["provider_calls"] == 0
+    assert report["settings"]["reasoning_effort"] == "max"
+
+
+def test_unverified_nvidia_model_fails_before_credentials(monkeypatch):
+    def forbidden(*args, **kwargs):
+        pytest.fail("unverified model accessed credentials or transport")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    monkeypatch.setattr(smoke.httpx, "Client", forbidden)
+    with pytest.raises(SystemExit) as caught:
+        smoke.main(
+            ["--live", "--provider", "nvidia", "--nvidia-model", "unverified-model"]
+        )
+    assert caught.value.code == 2

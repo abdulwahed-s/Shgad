@@ -261,6 +261,15 @@ organization names and secret values are not retained.
 Distinct quota counters from headers and provider messages are preserved separately,
 along with an allowlisted metric label when the provider identifies one unambiguously.
 
+NVIDIA-hosted candidates are available explicitly through `--provider nvidia
+--nvidia-model ...`, using the optional local `BUILD_NVIDIA_API_KEY`. Supported
+comparison IDs are `z-ai/glm-5.3`, `moonshotai/kimi-k3`,
+`stepfun-ai/step-5-preview` and `z-ai/glm-5.3-flash`. GLM and Kimi profiles request
+Max reasoning; Step keeps native reasoning enabled. Reports record their sampling
+and chat-template options. The default comparison remains Gemini/Groq and the
+application's provider selection is unchanged. NVIDIA model access and quality
+must be measured separately; a catalog listing alone is not an inference result.
+
 Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
 completed the ten-question development screen using 40 requests total, with no
 provider errors or retries. Joint correctness requires intent, behavior, tool
@@ -389,7 +398,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **638 backend tests passed, one opt-in live test skipped**,
+Verified locally: **645 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar

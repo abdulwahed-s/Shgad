@@ -28,8 +28,11 @@ class Settings(BaseSettings):
     llm_timeout_seconds: int = Field(default=10, ge=1, le=30)
     gemini_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
     groq_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
-    # Optional development comparator credential; application providers unchanged.
+    # Optional development comparator credentials; application providers unchanged.
     openai_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
+    build_nvidia_api_key: SecretStr | None = Field(
+        default=None, repr=False, exclude=True
+    )
     # Preserve raw configuration; BusinessClock applies the specified day-90 default.
     business_as_of: date | None = None
     database_url: str = Field(default="sqlite:///./shgad.db", repr=False, exclude=True)

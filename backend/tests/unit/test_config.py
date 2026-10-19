@@ -16,6 +16,7 @@ def local_config(tmp_path, monkeypatch):
         "GEMINI_API_KEY",
         "GROQ_API_KEY",
         "OPENAI_API_KEY",
+        "BUILD_NVIDIA_API_KEY",
         "LLM_PROVIDER",
         "LLM_MODEL_ID",
         "LLM_FALLBACK_PROVIDER",
@@ -69,6 +70,7 @@ def test_private_settings_are_redacted(monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "synthetic-gemini-sentinel")
     monkeypatch.setenv("GROQ_API_KEY", "synthetic-groq-sentinel")
     monkeypatch.setenv("OPENAI_API_KEY", "synthetic-openai-sentinel")
+    monkeypatch.setenv("BUILD_NVIDIA_API_KEY", "synthetic-nvidia-sentinel")
     monkeypatch.setenv("DATABASE_URL", "sqlite:///synthetic-private.db")
     settings = Settings()
 
@@ -76,6 +78,7 @@ def test_private_settings_are_redacted(monkeypatch):
         "synthetic-gemini-sentinel",
         "synthetic-groq-sentinel",
         "synthetic-openai-sentinel",
+        "synthetic-nvidia-sentinel",
         "synthetic-private.db",
     ):
         assert value not in repr(settings)
@@ -166,21 +169,28 @@ def test_bad_local_configuration_never_echoes_its_value(local_config):
     assert "fictional-sensitive-value" not in str(caught.value)
 
 
-def test_openai_comparison_key_uses_runtime_loading_and_stays_secret(
-    local_config, monkeypatch
+@pytest.mark.parametrize(
+    ("variable", "field"),
+    [
+        ("OPENAI_API_KEY", "openai_api_key"),
+        ("BUILD_NVIDIA_API_KEY", "build_nvidia_api_key"),
+    ],
+)
+def test_comparison_keys_use_runtime_loading_and_stay_secret(
+    local_config, monkeypatch, variable, field
 ):
     config, path = local_config
-    path.write_text("OPENAI_API_KEY=fictional-openai-local\n", encoding="utf-8")
-    assert config.Settings().openai_api_key is None
+    path.write_text(f"{variable}=fictional-comparison-local\n", encoding="utf-8")
+    assert getattr(config.Settings(), field) is None
     settings = config.runtime_settings()
-    assert settings.openai_api_key.get_secret_value() == "fictional-openai-local"
-    assert "fictional-openai" not in repr(settings)
-    assert "fictional-openai" not in settings.model_dump_json()
-    monkeypatch.setenv("OPENAI_API_KEY", "fictional-openai-process")
+    assert getattr(settings, field).get_secret_value() == "fictional-comparison-local"
+    assert "fictional-comparison" not in repr(settings)
+    assert "fictional-comparison" not in settings.model_dump_json()
+    monkeypatch.setenv(variable, "fictional-comparison-process")
     assert (
-        config.runtime_settings().openai_api_key.get_secret_value()
-        == "fictional-openai-process"
+        getattr(config.runtime_settings(), field).get_secret_value()
+        == "fictional-comparison-process"
     )
-    monkeypatch.delenv("OPENAI_API_KEY")
+    monkeypatch.delenv(variable)
     monkeypatch.setenv("APP_ENV", "production")
-    assert config.runtime_settings().openai_api_key is None
+    assert getattr(config.runtime_settings(), field) is None
