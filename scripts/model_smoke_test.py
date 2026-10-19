@@ -570,7 +570,158 @@ def rate_limit_diagnostics(response):
     return limits, code
 
 
-def send_request(client, provider, payload, key, *, qwen_reasoning_effort=None):
+def nvidia_stream_completion(client, payload, key):
+    """Bound and normalize native SSE content/calls; never retain reasoning."""
+    content, calls, usage = [], {}, {}
+    model, finish, retained = None, None, 0
+    done = False
+    deadline = time.monotonic() + min(client.timeout.read or 900, 900)
+
+    def fragment(value):
+        nonlocal retained
+        if not isinstance(value, str):
+            raise ProviderFailure("INVALID_RESPONSE")
+        retained += len(value.encode("utf-8"))
+        if retained > 256_000:
+            raise ProviderFailure("RESPONSE_TOO_LARGE")
+        return value
+
+    def consume(data):
+        nonlocal model, finish, usage, done
+        if data == "[DONE]":
+            done = True
+            return
+        event = json.loads(data)
+        if not isinstance(event, dict) or "error" in event:
+            raise ProviderFailure("INVALID_RESPONSE")
+        reported = event.get("model")
+        if isinstance(reported, str) and key not in reported:
+            if model is not None and reported != model:
+                raise ProviderFailure("INVALID_RESPONSE")
+            model = reported
+        if isinstance(event.get("usage"), dict):
+            usage = event["usage"]
+        choices = event.get("choices", [])
+        if not isinstance(choices, list) or len(choices) > 1:
+            raise ProviderFailure("INVALID_RESPONSE")
+        if not choices:
+            return
+        choice = choices[0]
+        if not isinstance(choice, dict) or choice.get("index", 0) != 0:
+            raise ProviderFailure("INVALID_RESPONSE")
+        delta = choice.get("delta", {})
+        if not isinstance(delta, dict) or delta.get("role", "assistant") != "assistant":
+            raise ProviderFailure("INVALID_RESPONSE")
+        if delta.get("content") is not None:
+            content.append(fragment(delta["content"]))
+        # reasoning/reasoning_content are deliberately discarded, never promoted.
+        pieces = delta.get("tool_calls")
+        if pieces is not None:
+            if not isinstance(pieces, list) or len(pieces) > 32:
+                raise ProviderFailure("INVALID_RESPONSE")
+            for piece in pieces:
+                if not isinstance(piece, dict):
+                    raise ProviderFailure("INVALID_RESPONSE")
+                index = piece.get("index")
+                if type(index) is not int or not 0 <= index < 32:
+                    raise ProviderFailure("INVALID_RESPONSE")
+                call = calls.setdefault(
+                    index, {"id": "", "type": "function", "name": "", "arguments": ""}
+                )
+                if "id" in piece:
+                    call["id"] += fragment(piece["id"])
+                if piece.get("type", "function") != "function":
+                    raise ProviderFailure("INVALID_RESPONSE")
+                function = piece.get("function", {})
+                if not isinstance(function, dict):
+                    raise ProviderFailure("INVALID_RESPONSE")
+                for field in ("name", "arguments"):
+                    if field in function:
+                        call[field] += fragment(function[field])
+        if choice.get("finish_reason") is not None:
+            reason = choice["finish_reason"]
+            if not isinstance(reason, str):
+                raise ProviderFailure("INVALID_RESPONSE")
+            finish = reason
+
+    try:
+        with client.stream(
+            "POST",
+            ENDPOINTS["nvidia"],
+            json=payload,
+            headers={"Authorization": f"Bearer {key}"},
+            follow_redirects=False,
+        ) as response:
+            if response.status_code != 200:
+                raise ProviderFailure(f"HTTP_{response.status_code}")
+            if "text/event-stream" not in response.headers.get("content-type", ""):
+                body = response.read()
+                if len(body) > 256_000:
+                    raise ProviderFailure("RESPONSE_TOO_LARGE")
+                result = response.json()
+                if not isinstance(result, dict):
+                    raise ProviderFailure("INVALID_RESPONSE")
+                if isinstance(result.get("model"), str) and key in result["model"]:
+                    result["model"] = None
+                return result
+            event_lines, wire_bytes, line_count = [], 0, 0
+            for line in response.iter_lines():
+                if time.monotonic() > deadline:
+                    raise ProviderFailure("TIMEOUT")
+                wire_bytes += len(line.encode("utf-8")) + 1
+                line_count += 1
+                if (
+                    len(line) > 256_000
+                    or wire_bytes > 16_777_216
+                    or line_count > 131_072
+                ):
+                    raise ProviderFailure("RESPONSE_TOO_LARGE")
+                if not line:
+                    if event_lines:
+                        consume("\n".join(event_lines))
+                        event_lines.clear()
+                    if done:
+                        break
+                elif line.startswith("data:"):
+                    event_lines.append(line[5:].lstrip(" "))
+                elif not line.startswith((":", "event:", "id:", "retry:")):
+                    raise ProviderFailure("INVALID_RESPONSE")
+            if event_lines and not done:
+                consume("\n".join(event_lines))
+    except httpx.TimeoutException:
+        raise ProviderFailure("TIMEOUT") from None
+    except httpx.TransportError:
+        raise ProviderFailure("NETWORK") from None
+    except (ValueError, TypeError, KeyError):
+        raise ProviderFailure("INVALID_RESPONSE") from None
+    if not done or finish is None:
+        raise ProviderFailure("INVALID_RESPONSE")
+    normalized = []
+    for index in sorted(calls):
+        call = calls[index]
+        if not call["id"] or not call["name"]:
+            raise ProviderFailure("INVALID_RESPONSE")
+        normalized.append(
+            {
+                "id": call["id"],
+                "type": "function",
+                "function": {"name": call["name"], "arguments": call["arguments"]},
+            }
+        )
+    text = "".join(content)
+    message = {"content": text or None, "tool_calls": normalized}
+    if finish not in {"stop", "tool_calls"} or (not text and not normalized):
+        message = None
+    return {
+        "model": model,
+        "choices": [{"message": message, "finish_reason": finish}],
+        "usage": usage,
+    }
+
+
+def send_request(
+    client, provider, payload, key, *, qwen_reasoning_effort=None, nvidia_stream=False
+):
     wire_payload = payload
     if provider == "openai":
         wire_payload = openai_payload(payload)
@@ -579,6 +730,9 @@ def send_request(client, provider, payload, key, *, qwen_reasoning_effort=None):
         if options is None:
             raise ProviderFailure("UNVERIFIED_MODEL")
         wire_payload = payload | options
+        if nvidia_stream:
+            wire_payload |= {"stream": True, "stream_options": {"include_usage": True}}
+            return nvidia_stream_completion(client, wire_payload, key)
     elif provider == "groq" and payload["model"] == QWEN_ID:
         profile = QWEN_OPTIONS
         if qwen_reasoning_effort is not None:
@@ -760,6 +914,7 @@ def main(argv=None):
     parser.add_argument("--groq-model")
     parser.add_argument("--openai-model")
     parser.add_argument("--nvidia-model", choices=tuple(NVIDIA_MODEL_OPTIONS))
+    parser.add_argument("--nvidia-stream", action="store_true")
     parser.add_argument("--provider", choices=("both", *ENDPOINTS), default="both")
     parser.add_argument("--model-ids-checked-on", type=date.fromisoformat)
     parser.add_argument("--max-requests", type=int, default=MAX_REQUESTS)
@@ -780,13 +935,16 @@ def main(argv=None):
         parser.error("max-requests must be between 1 and 40")
     if not 1 <= args.max_tokens <= 32768:
         parser.error("max-tokens must be between 1 and 32768")
-    if not 1 <= args.timeout_seconds <= 300:
-        parser.error("timeout-seconds must be between 1 and 300")
+    timeout_limit = 900 if args.provider == "nvidia" else 300
+    if not 1 <= args.timeout_seconds <= timeout_limit:
+        parser.error(f"timeout-seconds must be between 1 and {timeout_limit}")
     if not 10 <= args.minimum_interval_seconds <= 60:
         parser.error("minimum-interval-seconds must be between 10 and 60")
     providers = ("gemini", "groq") if args.provider == "both" else (args.provider,)
     if providers == ("nvidia",) and args.nvidia_model is None:
         parser.error("supply a documented --nvidia-model")
+    if args.nvidia_stream and providers != ("nvidia",):
+        parser.error("nvidia-stream requires the NVIDIA provider")
     qwen_selected = "groq" in providers and args.groq_model == QWEN_ID
     if not qwen_selected and args.qwen_reasoning_effort != "medium":
         parser.error("qwen-reasoning-effort requires the Qwen Groq model")
@@ -818,12 +976,21 @@ def main(argv=None):
             request_settings["temperature"] = None
     if providers == ("nvidia",):
         options = NVIDIA_MODEL_OPTIONS[args.nvidia_model]
+        if args.nvidia_stream:
+            options = options | {
+                "stream": True,
+                "stream_options": {"include_usage": True},
+            }
         request_settings |= options | {
             "api_protocol": "chat_completions",
             "provider_overrides": {"nvidia": options},
         }
         if args.nvidia_model == "stepfun-ai/step-5-preview":
             request_settings["reasoning_mode"] = "provider_native_always_enabled"
+        if args.nvidia_stream:
+            request_settings["transport_adapter_version"] = "nvidia-sse-v1"
+            request_settings["maximum_stream_wire_bytes"] = 16_777_216
+            request_settings["maximum_retained_output_bytes"] = 256_000
     metadata = provenance()
     if not args.live:
         print(
@@ -882,6 +1049,7 @@ def main(argv=None):
                 payload,
                 keys[provider],
                 qwen_reasoning_effort=args.qwen_reasoning_effort,
+                nvidia_stream=args.nvidia_stream,
             )
 
         report = compare(

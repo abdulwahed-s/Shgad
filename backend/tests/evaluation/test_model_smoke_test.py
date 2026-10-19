@@ -1019,3 +1019,221 @@ def test_unverified_nvidia_model_fails_before_credentials(monkeypatch):
             ["--live", "--provider", "nvidia", "--nvidia-model", "unverified-model"]
         )
     assert caught.value.code == 2
+
+
+def nvidia_events(chunks, *, done=True):
+    result = ": keepalive\n\n" + "".join(
+        "data: " + json.dumps(chunk) + "\n\n" for chunk in chunks
+    )
+    return (result + ("data: [DONE]\n\n" if done else "")).encode()
+
+
+def test_nvidia_stream_joins_native_function_fragments_and_discards_reasoning(cases):
+    sentinel = "fictional-stream-private-reasoning"
+
+    def respond(request):
+        body = json.loads(request.content)
+        assert body["stream"] is True
+        assert body["stream_options"] == {"include_usage": True}
+        assert body["reasoning_effort"] == "max"
+        assert request.extensions["timeout"]["read"] == 900
+        chunks = [
+            {
+                "model": body["model"],
+                "choices": [
+                    {"delta": {"role": "assistant", "reasoning_content": sentinel}}
+                ],
+            }
+        ]
+        if "tools" in body:
+            assert body["tools"] == list(smoke.definitions())
+            args = json.dumps({"period": "this_week", "kind": "cash"})
+            chunks.extend(
+                [
+                    {
+                        "choices": [
+                            {
+                                "delta": {
+                                    "tool_calls": [
+                                        {
+                                            "index": 0,
+                                            "id": "stream-call",
+                                            "type": "function",
+                                            "function": {
+                                                "name": "get_",
+                                                "arguments": args[:12],
+                                            },
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "choices": [
+                            {
+                                "delta": {
+                                    "tool_calls": [
+                                        {
+                                            "index": 0,
+                                            "function": {
+                                                "name": "sales",
+                                                "arguments": args[12:],
+                                            },
+                                        }
+                                    ]
+                                },
+                                "finish_reason": "tool_calls",
+                            }
+                        ]
+                    },
+                ]
+            )
+        else:
+            content = interpretation()["choices"][0]["message"]["content"]
+            chunks.extend(
+                [
+                    {"choices": [{"delta": {"content": content[:20]}}]},
+                    {
+                        "choices": [
+                            {
+                                "delta": {"content": content[20:]},
+                                "finish_reason": "stop",
+                            }
+                        ]
+                    },
+                ]
+            )
+        chunks.append(
+            {
+                "choices": [],
+                "usage": {
+                    "prompt_tokens": 20,
+                    "completion_tokens": 12,
+                    "total_tokens": 32,
+                },
+            }
+        )
+        return httpx.Response(
+            200,
+            headers={"content-type": "text/event-stream"},
+            content=nvidia_events(chunks),
+        )
+
+    with httpx.Client(timeout=900, transport=httpx.MockTransport(respond)) as client:
+        report = smoke.compare(
+            {"nvidia": "z-ai/glm-5.3"},
+            sender=lambda provider, payload: smoke.send_request(
+                client, provider, payload, "fictional-key", nvidia_stream=True
+            ),
+            cases=[cases["DEV-001"]],
+            max_requests=2,
+        )
+    assert report["providers"]["nvidia"]["joint_correct"] == 1
+    assert report["providers"]["nvidia"]["requests"][0]["usage"]["total_tokens"] == 32
+    assert sentinel not in json.dumps(report)
+
+
+@pytest.mark.parametrize("fault", ["missing_done", "bad_index", "bad_arguments"])
+def test_nvidia_stream_rejects_incomplete_or_malformed_native_events(fault):
+    tool = {
+        "index": False if fault == "bad_index" else 0,
+        "id": "call",
+        "type": "function",
+        "function": {
+            "name": "get_sales",
+            "arguments": False if fault == "bad_arguments" else "{}",
+        },
+    }
+    events = nvidia_events(
+        [
+            {
+                "choices": [
+                    {"delta": {"tool_calls": [tool]}, "finish_reason": "tool_calls"}
+                ]
+            }
+        ],
+        done=fault != "missing_done",
+    )
+    with httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200, headers={"content-type": "text/event-stream"}, content=events
+            )
+        )
+    ) as client:
+        with pytest.raises(smoke.ProviderFailure, match="INVALID_RESPONSE"):
+            smoke.send_request(
+                client,
+                "nvidia",
+                {"model": "z-ai/glm-5.3"},
+                "fictional-key",
+                nvidia_stream=True,
+            )
+
+
+def test_nvidia_stream_length_does_not_pass_as_valid_interpretation(cases):
+    content = interpretation()["choices"][0]["message"]["content"]
+    events = nvidia_events(
+        [{"choices": [{"delta": {"content": content}, "finish_reason": "length"}]}]
+    )
+    with httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200, headers={"content-type": "text/event-stream"}, content=events
+            )
+        )
+    ) as client:
+        response = smoke.send_request(
+            client,
+            "nvidia",
+            {"model": "z-ai/glm-5.3"},
+            "fictional-key",
+            nvidia_stream=True,
+        )
+    assert smoke.response_diagnostics(response)["finish_reason"] == "length"
+    assert not smoke.score(
+        cases["DEV-001"],
+        response,
+        completion(calls=[call(period="this_week", kind="cash")]),
+    )["joint_correct"]
+
+
+def test_nvidia_stream_dry_run_supports_extended_timeout_without_credentials(
+    monkeypatch, capsys
+):
+    def forbidden(*args, **kwargs):
+        pytest.fail("stream dry run accessed credentials or transport")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    monkeypatch.setattr(smoke.httpx, "Client", forbidden)
+    assert (
+        smoke.main(
+            [
+                "--provider",
+                "nvidia",
+                "--nvidia-model",
+                "z-ai/glm-5.3",
+                "--nvidia-stream",
+                "--timeout-seconds",
+                "900",
+            ]
+        )
+        == 0
+    )
+    report = json.loads(capsys.readouterr().out)
+    assert report["provider_calls"] == 0
+    assert report["settings"]["stream"] is True
+    assert report["settings"]["timeout_seconds"] == 900
+
+
+def test_nvidia_stream_option_rejected_for_other_providers_before_credentials(
+    monkeypatch,
+):
+    def forbidden(*args, **kwargs):
+        pytest.fail("inapplicable stream option accessed credentials")
+
+    monkeypatch.setattr(smoke, "runtime_settings", forbidden)
+    with pytest.raises(SystemExit) as caught:
+        smoke.main(["--live", "--nvidia-stream"])
+    assert caught.value.code == 2

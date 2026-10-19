@@ -266,9 +266,37 @@ NVIDIA-hosted candidates are available explicitly through `--provider nvidia
 comparison IDs are `z-ai/glm-5.3`, `moonshotai/kimi-k3`,
 `stepfun-ai/step-5-preview` and `z-ai/glm-5.3-flash`. GLM and Kimi profiles request
 Max reasoning; Step keeps native reasoning enabled. Reports record their sampling
-and chat-template options. The default comparison remains Gemini/Groq and the
+and chat-template options. Optional `--nvidia-stream` assembles native SSE content
+and function-call fragments, discards separate reasoning, and rejects incomplete
+or truncated responses. NVIDIA comparisons allow up to 900s HTTP timeouts;
+other providers retain the 300s ceiling. Streams have bounded wire and retained
+output sizes, with no automatic retries. The default comparison remains Gemini/Groq and the
 application's provider selection is unchanged. NVIDIA model access and quality
 must be measured separately; a catalog listing alone is not an inference result.
+
+On 19 October, clean source `b72908f` completed two NVIDIA screens using the
+same ten development questions, logical prompts, five schemas and scorer:
+
+| Candidate | Jointly correct | Correct native tool set |
+|---|---|---|
+| `z-ai/glm-5.3-flash` (Max) | 6/10 | 10/10 |
+| `stepfun-ai/step-5-preview` | 0/10 | 10/10 |
+
+Both completed 20 requests without provider errors, retries or reported
+truncation, using 32,768 output tokens, 300s HTTP timeouts and 30s pacing.
+Flash reported 37,479 total tokens; Step reported 41,622. Step failed every
+separate interpretation check while passing every native tool/context check.
+One additional unscored format probe returned separate reasoning without final
+text; it does not establish the cause of every original failure or change scores.
+These are strict routing/format screens, not application or Arabic-language
+quality scores. Their reasoning and resource profiles differ from earlier runs.
+
+`moonshotai/kimi-k3` returned HTTP 410 on its first attempt; NVIDIA's
+[deployment page](https://build.nvidia.com/moonshotai/kimi-k3?section=deploy)
+marks its free endpoint deprecated. All ten cases remain unscored.
+`z-ai/glm-5.3` (Max) has no completed case yet: two nonstreaming attempts
+at 300s and two at 900s produced two unpaired interpretations, one timeout and
+one HTTP 504. A streaming transport probe remains pending; no score is assigned.
 
 Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
 completed the ten-question development screen using 40 requests total, with no
@@ -398,7 +426,7 @@ evidence retains full integers. New fixed Arabic copy is pending Iraqi Arabic re
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
-Verified locally: **645 backend tests passed, one opt-in live test skipped**,
+Verified locally: **652 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
