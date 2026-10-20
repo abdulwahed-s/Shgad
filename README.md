@@ -17,8 +17,10 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > static localized shell; merchant screens and frontend chat integration are planned.
 > Gemini, Groq and OpenAI completed bounded development routing screens. With
 > larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
-> Full live chat validation remains pending. The 50 fixed backend Arabic messages
-> have human approval; frontend wording and future additions still need review.
+> Live OpenAI fallback chat and CSV preview have been checked. Gemini returned
+> HTTP 503 during application validation, so primary-model acceptance remains pending.
+> The 50 fixed backend Arabic messages have human approval; frontend wording and
+> future additions still need review.
 
 ## Capabilities and planned interface
 
@@ -64,7 +66,8 @@ an LLM. The agent requests these tools and drafts explanations with symbolic slo
 the backend fills figures and dates from verified results. Provider calls and API
 keys stay in the backend. Integration tests use recorded provider responses.
 The selected primary is `gemini-3.8-flash`, with OpenAI `gpt-6-luna` as the
-fallback, using paid provider accounts. Full live application checks remain pending.
+fallback. Paid API access is user-reported. Primary-model acceptance remains pending
+after HTTP 503 responses; fallback chat and mapping have live checks below.
 
 ## Development status
 
@@ -106,11 +109,13 @@ LLM_PROVIDER=gemini
 LLM_MODEL_ID=gemini-3.8-flash
 LLM_FALLBACK_PROVIDER=openai
 LLM_FALLBACK_MODEL_ID=gpt-6-luna
+LLM_TIMEOUT_SECONDS=30
 ```
 
 Selecting the model does not change an existing `.env` file or verify live chat
 and CSV mapping. The earlier 9/10 result measures development routing only.
-Keep `GEMINI_API_KEY` and `OPENAI_API_KEY` local. Paid access still has rate limits;
+Keep `GEMINI_API_KEY` and `OPENAI_API_KEY` local. The selected setup uses a
+30-second request deadline. Paid access still has [rate limits](https://developers.openai.com/api/docs/guides/rate-limits);
 the client retains bounded retries and provider failover.
 
 No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
@@ -185,7 +190,9 @@ its mapping and previews up to five parsed rows without financial writes. Confir
 uses saved immutable input/mapping metadata and the normal importer; retries are safe.
 The proposer uses the same configurable client as chat. An unconfigured client
 returns `LLM_UNAVAILABLE`. Recorded-response integration tests cover the HTTP
-proposal, preview and explicit confirmation flow; live mapping quality is unverified.
+proposal, preview and explicit confirmation flow. One live OpenAI fallback preview
+produced five parsed rows without errors or ledger writes; Gemini mapping remains
+unverified while its API is unavailable.
 
 `app.services.reconcile.reconciliation_report` reads cutoff-bounded SQLite and
 returns definite/strong/candidate/unmatched status, reasons, source IDs and current
@@ -288,8 +295,8 @@ and chat-template options. Optional `--nvidia-stream` assembles native SSE conte
 and function-call fragments, discards separate reasoning, and rejects incomplete
 or truncated responses. NVIDIA comparisons allow up to 900s HTTP timeouts;
 other providers retain the 300s ceiling. Streams bound decoded bytes and retained
-output, including unterminated lines, with no automatic retries. The default comparison remains Gemini/Groq and the
-application's provider selection is unchanged. NVIDIA model access and quality
+output, including unterminated lines, with no automatic retries. The default comparison remains Gemini/Groq;
+the application uses the separately configured Gemini/OpenAI roles above. NVIDIA model access and quality
 must be measured separately; a catalog listing alone is not an inference result.
 
 On 19 October, NVIDIA screens used the same ten development questions,
@@ -464,6 +471,21 @@ edited messages remain pending Iraqi Arabic review.
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
+On 19 October, an opt-in application check at source `a3dd418` used five reviewed
+development questions and a temporary observed synthetic ledger. Gemini returned
+HTTP 503 on all ten attempts; its five cases remain unscored. Automatic failover
+to `gpt-6-luna` produced four grounded answers and one clarification. Three of
+five cases matched the expected tools, customer and period. The weekly summary
+selected two of four expected tools, and the duplicate-record question clarified
+without calling `reconcile`. These are limits of this development check, not
+held-out accuracy or a replacement for the earlier routing-screen scores.
+
+A separate OpenAI fallback CSV check passed with one request, five preview rows,
+no parsing errors and no financial writes. Across both checks there were
+21 actual requests: ten Gemini failures and eleven OpenAI responses, within
+the documented 22-attempt combined ceiling. No prompt tuning or held-out run
+followed these results. Primary-model validation remains pending.
+
 Verified locally: **683 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
@@ -516,5 +538,6 @@ display name; the exact provider model ID/settings remain unavailable and are
 not guessed. No model-provider API call was used for this dataset.
 Application integration is tested with recorded responses. Live development
 screening used the candidates above; Gemini 3.8 Flash is the selected primary.
-Complete live application checks remain pending; the 50 fixed backend Arabic
-messages have user approval. Frontend Arabic wording still needs review.
+OpenAI fallback chat and CSV preview have live checks; Gemini's HTTP 503 responses
+leave primary-model acceptance pending. The 50 fixed backend Arabic messages
+have user approval. Frontend Arabic wording still needs review.
