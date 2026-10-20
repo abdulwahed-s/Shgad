@@ -17,8 +17,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > static localized shell; merchant screens and frontend chat integration are planned.
 > Gemini, Groq and OpenAI completed bounded development routing screens. With
 > larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
-> Live OpenAI fallback chat and CSV preview have been checked. Gemini returned
-> HTTP 503 during application validation, so primary-model acceptance remains pending.
+> Both selected provider APIs now respond successfully. Live CSV previews and
+> controlled fallback checks pass; primary-model routing acceptance remains pending.
 > The 50 fixed backend Arabic messages have human approval; frontend wording and
 > future additions still need review.
 
@@ -66,8 +66,8 @@ an LLM. The agent requests these tools and drafts explanations with symbolic slo
 the backend fills figures and dates from verified results. Provider calls and API
 keys stay in the backend. Integration tests use recorded provider responses.
 The selected primary is `gemini-3.8-flash`, with OpenAI `gpt-6-luna` as the
-fallback. Paid API access is user-reported. Primary-model acceptance remains pending
-after HTTP 503 responses; fallback chat and mapping have live checks below.
+fallback. Paid API access is user-reported. Both APIs have successful live checks;
+primary-model routing acceptance remains pending.
 
 ## Development status
 
@@ -191,8 +191,8 @@ uses saved immutable input/mapping metadata and the normal importer; retries are
 The proposer uses the same configurable client as chat. An unconfigured client
 returns `LLM_UNAVAILABLE`. Recorded-response integration tests cover the HTTP
 proposal, preview and explicit confirmation flow. One live OpenAI fallback preview
-produced five parsed rows without errors or ledger writes; Gemini mapping remains
-unverified while its API is unavailable.
+produced five parsed rows without errors or ledger writes. After the paid-access
+update, both Gemini and OpenAI passed this same bounded preview check.
 
 `app.services.reconcile.reconciliation_report` reads cutoff-bounded SQLite and
 returns definite/strong/candidate/unmatched status, reasons, source IDs and current
@@ -483,8 +483,20 @@ held-out accuracy or a replacement for the earlier routing-screen scores.
 A separate OpenAI fallback CSV check passed with one request, five preview rows,
 no parsing errors and no financial writes. Across both checks there were
 21 actual requests: ten Gemini failures and eleven OpenAI responses, within
-the documented 22-attempt combined ceiling. No prompt tuning or held-out run
-followed these results. Primary-model validation remains pending.
+the documented 22-attempt combined ceiling. Those original reports remain
+unchanged; later development work is recorded below. No held-out run took place.
+
+After the user reported paid access was active, a fresh check at `abaed05` used
+15 of its 20 allowed requests: twelve Gemini and three OpenAI responses, all HTTP
+200. Both CSV previews and controlled OpenAI fallback passed. Gemini matched
+three of five expected tool/customer/period cases; the weekly-summary and
+duplicate-record tool-set misses remained. Two answers used deterministic
+templates. These are development application results, with no held-out run.
+
+The versioned agent policy now clarifies that possible duplicate-payment
+comparisons inspect read-only reconciliation flags before asking for record
+identities. It still cannot combine entries or resolve flags. Development and
+selected-provider validation of that policy clarification are pending.
 
 Verified locally: **683 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
@@ -538,6 +550,6 @@ display name; the exact provider model ID/settings remain unavailable and are
 not guessed. No model-provider API call was used for this dataset.
 Application integration is tested with recorded responses. Live development
 screening used the candidates above; Gemini 3.8 Flash is the selected primary.
-OpenAI fallback chat and CSV preview have live checks; Gemini's HTTP 503 responses
-leave primary-model acceptance pending. The 50 fixed backend Arabic messages
+Both selected APIs now respond and both CSV previews pass. Primary-model routing
+acceptance remains pending. The 50 fixed backend Arabic messages
 have user approval. Frontend Arabic wording still needs review.
