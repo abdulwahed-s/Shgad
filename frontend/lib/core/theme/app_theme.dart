@@ -19,9 +19,20 @@ abstract final class AppTheme {
       outline: AppColors.line,
       error: AppColors.clay,
       onError: AppColors.onGreen,
+      tertiary: AppColors.greenSoft,
+      onTertiary: AppColors.green,
+      tertiaryContainer: AppColors.brassSoft,
+      onTertiaryContainer: AppColors.brass,
+      errorContainer: AppColors.claySoft,
+      onErrorContainer: AppColors.clay,
+      secondaryContainer: AppColors.merchantBubble,
     ),
     textTheme: const TextTheme(
       titleLarge: AppTextStyles.title,
+      headlineLarge: AppTextStyles.display,
+      titleMedium: AppTextStyles.heading,
+      titleSmall: AppTextStyles.amount,
+      bodyMedium: AppTextStyles.body,
       bodyLarge: AppTextStyles.body,
       labelLarge: AppTextStyles.label,
       bodySmall: AppTextStyles.caption,
@@ -35,5 +46,27 @@ abstract final class AppTheme {
       scrolledUnderElevation: 0,
     ),
     dividerTheme: const DividerThemeData(color: AppColors.line, thickness: 1),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.surfaceSunk,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: const BorderSide(color: AppColors.line),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size.fromHeight(52),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        textStyle: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+      ),
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: AppColors.surface,
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+      ),
+    ),
   );
 }

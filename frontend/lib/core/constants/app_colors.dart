@@ -9,6 +9,7 @@ abstract final class AppColors {
   static const inkFaint = Color(0xFF8C8D81);
   static const green = Color(0xFF1F5246);
   static const greenSoft = Color(0xFFE4EDE6);
+  static const merchantBubble = Color(0xFFDFE8DD);
   static const brass = Color(0xFFA98642);
   static const brassSoft = Color(0xFFF4ECDC);
   static const line = Color(0xFFD4C39E);

@@ -6,5 +6,11 @@ import 'app/di/injection.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
-  runApp(const ShgadApp());
+  final options = Uri.base.queryParameters;
+  runApp(
+    ShgadApp(
+      locale: Locale(options['lang'] == 'en' ? 'en' : 'ar'),
+      textScale: double.tryParse(options['scale'] ?? ''),
+    ),
+  );
 }

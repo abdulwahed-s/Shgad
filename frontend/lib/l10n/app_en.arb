@@ -1,9 +1,100 @@
 {
   "@@locale": "en",
   "appTitle": "Shgad",
-  "@appTitle": {"description": "App display name."},
+  "@appTitle": {
+    "description": "App display name."
+  },
   "chatTitle": "Shop chat",
-  "@chatTitle": {"description": "Section label for the Phase 0 chat shell."},
+  "@chatTitle": {
+    "description": "Section label for the Phase 0 chat shell."
+  },
   "chatSetupNotice": "Chat is not available in this version yet.",
-  "@chatSetupNotice": {"description": "Honest notice for the static chat shell."}
+  "@chatSetupNotice": {
+    "description": "Honest notice for the static chat shell."
+  },
+  "verified": "Verified",
+  "@verified": {
+    "description": "Merchant interface: verified"
+  },
+  "expected": "Expected",
+  "@expected": {
+    "description": "Merchant interface: expected"
+  },
+  "calculated": "Calculated from records",
+  "@calculated": {
+    "description": "Merchant interface: calculated"
+  },
+  "missing": "Missing",
+  "@missing": {
+    "description": "Merchant interface: missing"
+  },
+  "flagged": "Needs review",
+  "@flagged": {
+    "description": "Merchant interface: flagged"
+  },
+  "thousand": "thousand IQD",
+  "@thousand": {
+    "description": "Merchant interface: thousand"
+  },
+  "iqd": "IQD",
+  "@iqd": {
+    "description": "Merchant interface: iqd"
+  },
+  "galleryTitle": "Components gallery",
+  "@galleryTitle": {
+    "description": "Merchant interface: galleryTitle"
+  },
+  "gallerySpecimens": "Component specimens · fictional values",
+  "@gallerySpecimens": {
+    "description": "Merchant interface: gallerySpecimens"
+  },
+  "galleryTimestamp": "28 September · 21:00",
+  "@galleryTimestamp": {
+    "description": "Merchant interface: galleryTimestamp"
+  },
+  "cashOnHand": "Cash on hand",
+  "@cashOnHand": {
+    "description": "Merchant interface: cashOnHand"
+  },
+  "positionConfirmed": "After dues · confirmed cash",
+  "@positionConfirmed": {
+    "description": "Merchant interface: positionConfirmed"
+  },
+  "expectedNotice": "Expected collections are not guaranteed.",
+  "@expectedNotice": {
+    "description": "Merchant interface: expectedNotice"
+  },
+  "galleryQuestion": "Can I pay the supplier on Thursday?",
+  "@galleryQuestion": {
+    "description": "Merchant interface: galleryQuestion"
+  },
+  "galleryAnswer": "Check confirmed cash and expected collections separately.",
+  "@galleryAnswer": {
+    "description": "Merchant interface: galleryAnswer"
+  },
+  "confirm": "Confirm and save",
+  "@confirm": {
+    "description": "Merchant interface: confirm"
+  },
+  "evidence": "Source evidence",
+  "@evidence": {
+    "description": "Merchant interface: evidence"
+  },
+  "offlineUpdated": "Offline · last updated {time}",
+  "@offlineUpdated": {
+    "description": "Merchant interface: offlineUpdated",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "noRecords": "No records for this view.",
+  "@noRecords": {
+    "description": "Merchant interface: noRecords"
+  },
+  "retry": "Try again",
+  "@retry": {
+    "description": "Merchant interface: retry"
+  }
 }

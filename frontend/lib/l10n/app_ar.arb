@@ -14,5 +14,110 @@
   "@chatSetupNotice": {
     "description": "Honest notice: this skeleton cannot send or answer questions yet.",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "verified": "مؤكد",
+  "@verified": {
+    "description": "Merchant interface: verified",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "expected": "متوقع",
+  "@expected": {
+    "description": "Merchant interface: expected",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "calculated": "محسوب من السجلات",
+  "@calculated": {
+    "description": "Merchant interface: calculated",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "missing": "ناقص",
+  "@missing": {
+    "description": "Merchant interface: missing",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagged": "يحتاج مراجعة",
+  "@flagged": {
+    "description": "Merchant interface: flagged",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "thousand": "ألف",
+  "@thousand": {
+    "description": "Merchant interface: thousand",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "iqd": "دينار",
+  "@iqd": {
+    "description": "Merchant interface: iqd",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryTitle": "معرض المكونات",
+  "@galleryTitle": {
+    "description": "Merchant interface: galleryTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "gallerySpecimens": "نماذج المكونات · أرقام تجريبية",
+  "@gallerySpecimens": {
+    "description": "Merchant interface: gallerySpecimens",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryTimestamp": "٢٨ أيلول · ٢١:٠٠",
+  "@galleryTimestamp": {
+    "description": "Merchant interface: galleryTimestamp",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "cashOnHand": "النقد المتوفر",
+  "@cashOnHand": {
+    "description": "Merchant interface: cashOnHand",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "positionConfirmed": "الرصيد بعد المستحقات بالنقد المؤكد",
+  "@positionConfirmed": {
+    "description": "Merchant interface: positionConfirmed",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "expectedNotice": "التحصيل المتوقع مو مضمون.",
+  "@expectedNotice": {
+    "description": "Merchant interface: expectedNotice",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryQuestion": "أكدر أدفع للمجهز الخميس؟",
+  "@galleryQuestion": {
+    "description": "Merchant interface: galleryQuestion",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryAnswer": "راجع النقد المؤكد والتحصيل المتوقع كل واحد بروحه.",
+  "@galleryAnswer": {
+    "description": "Merchant interface: galleryAnswer",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "confirm": "أكد واحفظ",
+  "@confirm": {
+    "description": "Merchant interface: confirm",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "evidence": "مصدر الرقم",
+  "@evidence": {
+    "description": "Merchant interface: evidence",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "offlineUpdated": "بدون اتصال · آخر تحديث {time}",
+  "@offlineUpdated": {
+    "description": "Merchant interface: offlineUpdated",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "noRecords": "ماكو سجلات لهالعرض.",
+  "@noRecords": {
+    "description": "Merchant interface: noRecords",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "retry": "جرّب مرة ثانية",
+  "@retry": {
+    "description": "Merchant interface: retry",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

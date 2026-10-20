@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../constants/app_dimens.dart';
 
 class ChatBubble extends StatelessWidget {
-  const ChatBubble({required this.text, super.key});
+  const ChatBubble({required this.text, this.merchant = false, super.key});
 
   final String text;
+  final bool merchant;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,9 @@ class ChatBubble extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimens.lg),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: merchant
+            ? theme.colorScheme.secondaryContainer
+            : theme.colorScheme.surface,
         border: Border.all(
           color: theme.colorScheme.outline,
           width: AppDimens.borderWidth,

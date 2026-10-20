@@ -3,6 +3,21 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
 abstract final class AppTextStyles {
+  static const display = TextStyle(
+    fontFamily: 'Cairo',
+    fontSize: 32,
+    fontWeight: FontWeight.w700,
+    height: 1.25,
+    fontFeatures: [FontFeature.tabularFigures()],
+    color: AppColors.ink,
+  );
+  static const heading = TextStyle(
+    fontFamily: 'Cairo',
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    height: 1.4,
+    color: AppColors.ink,
+  );
   static const title = TextStyle(
     fontFamily: 'Cairo',
     fontSize: 22,
