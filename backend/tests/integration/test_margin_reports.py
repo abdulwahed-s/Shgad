@@ -286,6 +286,17 @@ def test_t11_duplicate_only_week_never_suggests_no_action(api, ledger):
     assert weekly["cash_sales"]["amount_iqd"] == 1000
 
 
+def test_t11_overdue_supplier_alone_still_suggests_review(api, ledger, debt_factory):
+    debt_factory("OVERDUE-SUPPLIER", 5000, "2026-09-25", kind="payable")
+    ledger.commit()
+    weekly = api.get("/api/reports/weekly").json()
+    assert weekly["outstanding_receivables"]["amount_iqd"] == 0
+    assert weekly["flags_count"] == 1
+    assert weekly["flags"][0]["type"] == "overdue"
+    assert weekly["flags"][0]["amount"]["amount_iqd"] == 5000
+    assert weekly["suggestion_key"] == "review_debts"
+
+
 def test_t11_complete_weekly_lines_debt_aging_and_difference_evidence(
     api, ledger, priced_shop, insert_event, debt_factory
 ):

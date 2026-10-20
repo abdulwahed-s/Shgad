@@ -125,7 +125,7 @@ def weekly_report(
             else "review_duplicate_payment"
             if any(f.type == "suspected_duplicate" for f in flags)
             else "review_debts"
-            if debts.customers
+            if debts.customers or flags
             else "no_action_needed",
         )
     finally:

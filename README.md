@@ -474,8 +474,8 @@ integer units and arithmetic before a protected renderer handoff.
 exposes the existing cutoff-safe scenarios. `/api/meta` reports whether a provider,
 model ID and local key are configured; this does not probe network availability.
 The weekly report includes the actual warning items with amounts, source IDs,
-reasons, matching logic and safe review steps. Duplicate-only warnings now suggest
-review. Recorded cash sales, signed unexplained differences, credit sales,
+reasons, matching logic and safe review steps. Duplicate-only and overdue-supplier
+warnings suggest review. Recorded cash sales, signed unexplained differences, credit sales,
 collections, expenses, drawings and capital stay separate. Debt aging is oldest
 first; insufficient price coverage hides the estimated margin and retains coverage.
 
@@ -564,7 +564,7 @@ The first paid retry also recorded two Gemini drafts ending at the old output
 cap. The output budget is now configurable; the selected setup uses 8,192 while
 retaining its request deadline and response-size bounds.
 
-Verified locally: **715 backend tests passed, one opt-in live test skipped**,
+Verified locally: **716 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
