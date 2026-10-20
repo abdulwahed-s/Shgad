@@ -5,7 +5,9 @@ import copy
 REPLAY_ITEMS = "_openai_response_items"
 
 
-def request_payload(model, messages, *, tools=(), json_mode=False):
+def request_payload(
+    model, messages, *, tools=(), json_mode=False, max_output_tokens=8192
+):
     inputs = []
     for message in messages:
         role = message["role"]
@@ -39,7 +41,7 @@ def request_payload(model, messages, *, tools=(), json_mode=False):
         "store": False,
         "reasoning": {"effort": "medium"},
         "include": ["reasoning.encrypted_content"],
-        "max_output_tokens": 8192,
+        "max_output_tokens": max_output_tokens,
     }
     if tools:
         payload |= {

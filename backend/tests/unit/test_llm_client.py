@@ -109,6 +109,50 @@ def test_bounded_retries_then_other_provider_without_changing_schemas():
     assert all(body["tools"] == list(definitions()) for body in bodies)
 
 
+def test_configured_output_bound_is_sent_to_both_provider_protocols():
+    sent = []
+
+    def respond(request):
+        body = json.loads(request.content)
+        sent.append((request.url.host, body))
+        if request.url.host == "generativelanguage.googleapis.com":
+            return httpx.Response(503)
+        return httpx.Response(
+            200,
+            json={
+                "status": "completed",
+                "output": [
+                    {
+                        "type": "message",
+                        "role": "assistant",
+                        "content": [{"type": "output_text", "text": "{}"}],
+                    }
+                ],
+            },
+        )
+
+    result, _ = run(
+        respond,
+        settings(
+            llm_max_output_tokens=4096,
+            llm_fallback_provider="openai",
+            llm_fallback_model_id="gpt-6-luna",
+            openai_api_key="synthetic-openai-secret",
+        ),
+    )
+    assert result.provider == "openai"
+    assert sent[0][1]["max_tokens"] == sent[1][1]["max_tokens"] == 4096
+    assert sent[2][1]["max_output_tokens"] == 4096
+
+
+@pytest.mark.parametrize("finish", ["length", "content_filter"])
+def test_incomplete_provider_endings_are_never_accepted(finish):
+    body = answer()
+    body["choices"][0]["finish_reason"] = finish
+    with pytest.raises(LLMUnavailable):
+        run(lambda request: httpx.Response(200, json=body))
+
+
 def test_timeouts_are_bounded_and_sanitized():
     attempts = []
 

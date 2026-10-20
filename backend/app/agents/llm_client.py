@@ -107,7 +107,14 @@ def parse_reply(body, *, provider, model):
         or len(body["choices"]) != 1
     ):
         raise ValueError("INVALID_RESPONSE")
-    message = body["choices"][0]["message"]
+    choice = body["choices"][0]
+    if not isinstance(choice, dict) or choice.get("finish_reason") not in (
+        None,
+        "stop",
+        "tool_calls",
+    ):
+        raise ValueError("INCOMPLETE_RESPONSE")
+    message = choice["message"]
     if not isinstance(message, dict) or message.get("role", "assistant") != "assistant":
         raise ValueError("INVALID_RESPONSE")
     content = message.get("content")
@@ -229,14 +236,18 @@ class LLMClient:
                         call.pop("extra_content", None)
             if provider == "openai":
                 payload = request_payload(
-                    model, provider_messages, tools=tools, json_mode=json_mode
+                    model,
+                    provider_messages,
+                    tools=tools,
+                    json_mode=json_mode,
+                    max_output_tokens=self.settings.llm_max_output_tokens or 8192,
                 )
             else:
                 payload = {
                     "model": model,
                     "messages": provider_messages,
                     "temperature": 0,
-                    "max_tokens": 2048,
+                    "max_tokens": self.settings.llm_max_output_tokens or 2048,
                 }
                 if tools:
                     payload |= {"tools": list(tools), "tool_choice": "auto"}

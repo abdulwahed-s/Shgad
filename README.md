@@ -110,6 +110,7 @@ LLM_MODEL_ID=gemini-3.8-flash
 LLM_FALLBACK_PROVIDER=openai
 LLM_FALLBACK_MODEL_ID=gpt-6-luna
 LLM_TIMEOUT_SECONDS=30
+LLM_MAX_OUTPUT_TOKENS=8192
 ```
 
 Selecting the model does not change an existing `.env` file or verify live chat
@@ -117,6 +118,10 @@ and CSV mapping. The earlier 9/10 result measures development routing only.
 Keep `GEMINI_API_KEY` and `OPENAI_API_KEY` local. The selected setup uses a
 30-second request deadline. Paid access still has [rate limits](https://developers.openai.com/api/docs/guides/rate-limits);
 the client retains bounded retries and provider failover.
+`LLM_MAX_OUTPUT_TOKENS` optionally sets the output bound (256–32,768 tokens).
+The selected setup uses 8,192; when unset, compatible requests retain 2,048 and
+OpenAI Responses retains 8,192. Explicit truncated or filtered completions are
+rejected before use, with the existing failover/template handling.
 
 No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
 stays unset in raw settings until configured. The domain `BusinessClock.from_settings`
@@ -497,8 +502,11 @@ The versioned agent policy now clarifies that possible duplicate-payment
 comparisons inspect read-only reconciliation flags before asking for record
 identities. It still cannot combine entries or resolve flags. Development and
 selected-provider validation of that policy clarification are pending.
+The first paid retry also recorded two Gemini drafts ending at the old output
+cap. The output budget is now configurable; the selected setup uses 8,192 while
+retaining its request deadline and response-size bounds.
 
-Verified locally: **683 backend tests passed, one opt-in live test skipped**,
+Verified locally: **686 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar

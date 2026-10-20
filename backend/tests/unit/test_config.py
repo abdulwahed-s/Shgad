@@ -167,6 +167,7 @@ def test_selected_template_has_no_credentials_and_missing_file_is_valid(local_co
         "gpt-6-luna",
     )
     assert selected.gemini_api_key is selected.openai_api_key is None
+    assert selected.llm_max_output_tokens == 8192
     assert provider_configs(selected) == ()  # Example IDs cannot enable network calls.
     path.unlink()
     config.get_settings.cache_clear()
