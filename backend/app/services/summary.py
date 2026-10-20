@@ -118,9 +118,12 @@ def weekly_report(
                 if shown
                 else "margin_insufficient_priced_sales",
             ),
+            flags=flags,
             flags_count=len(flags),
             suggestion_key="review_unmatched_payment"
             if any(f.type in {"unmatched", "ambiguous"} for f in flags)
+            else "review_duplicate_payment"
+            if any(f.type == "suspected_duplicate" for f in flags)
             else "review_debts"
             if debts.customers
             else "no_action_needed",

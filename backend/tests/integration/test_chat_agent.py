@@ -120,6 +120,62 @@ def test_j1_multi_tool_answer_has_both_shortfalls(api, scripted, tool_history):
     assert len(json.dumps(sent[-1], ensure_ascii=False).encode()) < 32_000
 
 
+@pytest.mark.parametrize(
+    "question,name,args,slots,values",
+    [
+        (
+            "شكد بعت اليوم نقد وآجل؟",
+            "get_sales",
+            {"period": "today", "kind": "all"},
+            ("cash_sales", "credit_sales", "total_sales"),
+            (10000, 180000, 190000),
+        ),
+        (
+            "شكد بذمة الزبائن وشكد للمجهزين؟",
+            "get_debts",
+            {"direction": "both"},
+            ("receivables.total_outstanding", "payables.total_outstanding"),
+            (150000, 650000),
+        ),
+        (
+            "شكد ربحت اليوم؟",
+            "get_margin",
+            {"period": "today"},
+            ("gross_margin",),
+            (8000,),
+        ),
+    ],
+)
+def test_financial_questions_keep_sales_debt_and_estimated_margin_separate(
+    api, scripted, tool_history, question, name, args, slots, values
+):
+    before = tuple(tool_history.iterdump())
+    scripted(calls((name, args)), draft("؛ ".join("{{fig:" + s + "}}" for s in slots)))
+    result = chat(api, question)
+    assert result.status == "answered" and result.used_tools == (name,)
+    assert tuple(f.amount_iqd for f in result.figures) == values
+    assert all(f.source_ids and f.formula for f in result.figures)
+    if name == "get_margin":
+        assert result.figures[0].label_key == "estimated_gross_margin"
+        assert result.metrics[0].value == 5
+        assert "غير المسجلة" in result.reply_ar
+    assert tuple(tool_history.iterdump()) == before
+
+
+def test_profit_question_without_buy_prices_clarifies_instead_of_guessing(
+    api, scripted, ledger, insert_event
+):
+    insert_event(source_id="UNPRICED-ONLY", amount_iqd=10000)
+    ledger.commit()
+    sent = scripted(calls(("get_margin", {"period": "today"})))
+    result = chat(api, "شكد ربحت اليوم؟")
+    assert result.status == "clarification" and not result.figures
+    from app.agents.messages_ar import text
+
+    assert result.reply_ar == text("clarify_costs")
+    assert result.used_tools == ("get_margin",) and len(sent) == 1
+
+
 def test_seven_day_obligations_use_debts_and_separate_expected_cash(
     api, scripted, tool_history
 ):

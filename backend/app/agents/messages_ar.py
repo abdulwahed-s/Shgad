@@ -54,6 +54,13 @@ MESSAGES = {
         "after_recorded_expenses": "بعد المصاريف المسجلة",
         "unpriced_sales_count": "عدد المبيعات بدون كلفة مسجلة",
         "reconciliation_amount": "مبلغ يحتاج مراجعة",
+        "review_unmatched_payment": "راجع الدفعة اللي ما تطابقت وكمل تفاصيلها.",
+        "review_duplicate_payment": "راجع القيود المتشابهة قبل أي تعديل.",
+        "review_debts": "راجع الديون الباقية وتواريخ استحقاقها.",
+        "no_action_needed": "ماكو تنبيه يحتاج مراجعة بهالسجلات.",
+        "margin_insufficient_priced_sales": (
+            "المبيعات اللي إلها كلفة مسجلة ما تكفي لعرض الهامش التقديري."
+        ),
         "forecast_lowest": "أقل نقد متوقع",
         "thousand": "ألف",
         "iqd": "دينار",

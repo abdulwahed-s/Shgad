@@ -237,3 +237,99 @@ def test_previous_week_and_date_selector_agree_with_sql(api, ledger, insert_even
     ).fetchone()[0]
     assert previous["cash_sales"]["amount_iqd"] == expected == 123456
     assert previous["cash_sales"]["source_ids"] == ["OLD"]
+
+
+def test_t11_weekly_warnings_include_the_actual_evidenced_flags(api, tool_history):
+    before = tuple(tool_history.iterdump())
+    weekly = api.get("/api/reports/weekly").json()
+    flags = api.get("/api/flags").json()["items"]
+    assert weekly["flags"] == flags
+    assert weekly["flags_count"] == len(flags) > 0
+    assert weekly["suggestion_key"] == "review_unmatched_payment"
+    for flag in weekly["flags"]:
+        assert flag["reason_key"] and flag["confidence_basis"]
+        assert flag["next_step_key"] in {"review", "provide_details"}
+        assert flag["amount"]["source_ids"] == flag["source_ids"]
+        assert flag["amount"]["formula"]
+        for source in flag["source_ids"]:
+            assert api.get(f"/api/ledger/transactions/{source}").status_code == 200
+    assert tuple(tool_history.iterdump()) == before
+
+
+def test_t11_duplicate_only_week_never_suggests_no_action(api, ledger):
+    content = (
+        "source_id,occurred_at,type,amount_iqd,counterparty_id,obligation_id,"
+        "due_date,category_id,quantity,description\n"
+        "DUP-A,2026-09-28T10:00:00+03:00,CASH_SALE,1000,,,,,,fictional\n"
+        "DUP-B,2026-09-28T11:00:00+03:00,CASH_SALE,1000,,,,,,fictional\n"
+    )
+    assert (
+        api.post(
+            "/api/imports/csv", files={"file": ("fictional.csv", content, "text/csv")}
+        ).status_code
+        == 200
+    )
+    weekly = api.get("/api/reports/weekly").json()
+    assert weekly["suggestion_key"] == "review_duplicate_payment"
+    assert weekly["cash_sales"]["amount_iqd"] == 2000
+    assert weekly["flags"][0]["type"] == "suspected_duplicate"
+    assert set(weekly["flags"][0]["source_ids"]) == {"DUP-A", "DUP-B"}
+    assert (
+        api.post(
+            "/api/entries/DUP-B/void",
+            json={"client_entry_id": "weekly-void", "reason": "fictional review"},
+        ).status_code
+        == 200
+    )
+    weekly = api.get("/api/reports/weekly").json()
+    assert weekly["flags"] == [] and weekly["flags_count"] == 0
+    assert weekly["cash_sales"]["amount_iqd"] == 1000
+
+
+def test_t11_complete_weekly_lines_debt_aging_and_difference_evidence(
+    api, ledger, priced_shop, insert_event, debt_factory
+):
+    for day in (25, 26):
+        insert_event(
+            source_id=f"COUNT-{day}",
+            type="DAILY_CASH_COUNT",
+            amount_iqd=300000,
+            occurred_at=f"2026-09-{day}T21:00:00+03:00",
+        )
+    # Oldest debt takes precedence over a larger, newer debt; suppliers stay separate.
+    debt_factory("OLDER", 1000, "2026-07-01", party="CUST-02")
+    debt_factory("PAYABLE", 999999, "2026-07-01", kind="payable")
+    ledger.commit()
+    weekly = api.get("/api/reports/weekly").json()
+    assert weekly["unexplained_cash_difference"]["amount_iqd"] == 25000
+    assert weekly["unexplained_cash_difference"]["kind"] == "flagged"
+    assert {"COUNT-25", "COUNT-26", "PREVIOUS", "CLOSING", "CAPITAL", "DRAWING"} <= set(
+        weekly["unexplained_cash_difference"]["source_ids"]
+    )
+    assert weekly["outstanding_receivables"]["amount_iqd"] == 11000
+    assert weekly["overdue_receivables"]["amount_iqd"] == 1000
+    assert [p["counterparty_id"] for p in weekly["debt_aging_top"]] == [
+        "CUST-02",
+        "CUST-01",
+    ]
+    assert weekly["debt_aging_top"][0]["days_overdue"] == 89
+    assert weekly["gross_margin"]["shown"] is False
+    assert weekly["gross_margin"]["coverage_pct"] == 79
+    assert weekly["gross_margin"]["note_key"] == "margin_insufficient_priced_sales"
+    # Recorded money is independently derivable from active SQL rows.
+    for key, kind in (
+        ("cash_sales", "CASH_SALE"),
+        ("credit_sales", "CREDIT_SALE"),
+        ("collections", "CREDIT_COLLECTION"),
+        ("supplier_payments", "SUPPLIER_PAYMENT"),
+        ("operating_expenses", "OPERATING_EXPENSE"),
+        ("owner_drawings", "OWNER_DRAWING"),
+        ("capital_injections", "CAPITAL_INJECTION"),
+    ):
+        rows = ledger.execute(
+            "SELECT source_id, amount_iqd FROM transactions WHERE type=? "
+            "AND business_date BETWEEN '2026-09-26' AND '2026-09-28'",
+            (kind,),
+        ).fetchall()
+        assert weekly[key]["amount_iqd"] == sum(r["amount_iqd"] for r in rows)
+        assert set(weekly[key]["source_ids"]) == {r["source_id"] for r in rows}

@@ -450,6 +450,11 @@ integer units and arithmetic before a protected renderer handoff.
 `GET /api/flags` exposes reconciliation flags; `GET /api/reports/forecast`
 exposes the existing cutoff-safe scenarios. `/api/meta` reports whether a provider,
 model ID and local key are configured; this does not probe network availability.
+The weekly report includes the actual warning items with amounts, source IDs,
+reasons, matching logic and safe review steps. Duplicate-only warnings now suggest
+review. Recorded cash sales, signed unexplained differences, credit sales,
+collections, expenses, drawings and capital stay separate. Debt aging is oldest
+first; insufficient price coverage hides the estimated margin and retains coverage.
 
 `POST /api/chat` accepts `message` and a correlation `conversation_id`. Each request
 starts a fresh tool context. The agent can use only the existing five read-only
@@ -478,8 +483,9 @@ It supports one retry callback and then deterministic templates, with server-res
 customer/period context, margin coverage and estimate assumptions. Exact user-typed
 quotes stay quoted data. Money uses Arabic-Indic digits and exact abbreviations;
 evidence retains full integers. The 50 current fixed backend Arabic messages were
-approved by the user on 19 October 2026. Approval binds their exact text; new or
-edited messages remain pending Iraqi Arabic review.
+approved by the user on 19 October 2026. Approval binds their exact text. Five new
+weekly suggestion/insufficient-margin messages remain pending Iraqi Arabic review,
+as does any other new or edited copy.
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
@@ -535,7 +541,7 @@ The first paid retry also recorded two Gemini drafts ending at the old output
 cap. The output budget is now configurable; the selected setup uses 8,192 while
 retaining its request deadline and response-size bounds.
 
-Verified locally: **690 backend tests passed, one opt-in live test skipped**,
+Verified locally: **698 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar

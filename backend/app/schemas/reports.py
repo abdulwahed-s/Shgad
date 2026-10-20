@@ -6,7 +6,7 @@ from pydantic import StrictBool, StrictInt
 
 from app.schemas.forecast import Amount
 from app.schemas.ledger import LedgerModel
-from app.schemas.queries import ReportRange
+from app.schemas.queries import FlagView, ReportRange
 
 
 class PriceBasis(LedgerModel):
@@ -58,5 +58,6 @@ class WeeklyReport(LedgerModel):
     overdue_receivables: Amount
     debt_aging_top: tuple[DebtTop, ...]
     gross_margin: WeeklyMargin
+    flags: tuple[FlagView, ...]
     flags_count: StrictInt
     suggestion_key: str

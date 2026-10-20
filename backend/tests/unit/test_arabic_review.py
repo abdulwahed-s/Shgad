@@ -4,8 +4,23 @@ from app.agents.messages_ar import MESSAGES, DraftMessage
 
 
 def test_confirmed_backend_copy_has_recorded_approval():
-    assert len(MESSAGES) == 50
-    assert {item.status for item in MESSAGES.values()} == {"APPROVED"}
+    from app.agents.arabic_review import APPROVED_MESSAGES
+
+    assert len(APPROVED_MESSAGES) == 50
+    assert {key for key, item in MESSAGES.items() if item.status == "APPROVED"} == set(
+        APPROVED_MESSAGES
+    )
+
+
+def test_weekly_suggestion_and_insufficient_margin_copy_needs_human_review():
+    for key in (
+        "review_unmatched_payment",
+        "review_duplicate_payment",
+        "review_debts",
+        "no_action_needed",
+        "margin_insufficient_priced_sales",
+    ):
+        assert MESSAGES[key].status == "PENDING_REVIEW"
 
 
 def test_changed_text_loses_approval():
