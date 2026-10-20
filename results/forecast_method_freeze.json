@@ -1,0 +1,72 @@
+{
+  "code_commit": "1dc2179ab1fe80ba799b11c518f1838fb10a523d",
+  "final_test_has_run_at_freeze": false,
+  "frozen_at": "2026-10-20T05:34:06.913402+00:00",
+  "later_method_changes_after_final_testing_require_post_test_disclosure": true,
+  "method_settings": {
+    "baseline": "cash_at_cutoff_plus_day_times_rounded_count_delta_over_seven",
+    "cash_sales_and_difference_lookback_days": 56,
+    "customer_lateness_fallback": "shop_median",
+    "customer_lateness_minimum_settlements": 2,
+    "development_cutoffs_and_scored_days": [
+      [
+        60,
+        30
+      ],
+      [
+        75,
+        15
+      ]
+    ],
+    "expense_and_drawing_lookback_days": 28,
+    "false_ok": "FINANCIAL_RULES_7b_per_invoice_own_payment_only",
+    "final_cutoff_and_scored_days": [
+      90,
+      30
+    ],
+    "lateness_day_rounding": "half_up_once_after_exact_median",
+    "mae_display_rounding": "half_up_integer_iqd_with_exact_error_sum",
+    "method_id": "recorded-weekday-cash-v1",
+    "money_rounding": "half_up_once_per_series_integer_iqd",
+    "overdue_receivables": "excluded_all_scenarios",
+    "prediction_days": 30,
+    "shortfall": "closing_negative_or_below_next_day_known_scheduled_dues",
+    "shortfall_timing_tolerance_days": 2,
+    "stress_collections": "zero"
+  },
+  "model_id": "deterministic-no-llm",
+  "primary_development_measurement_has_run_at_freeze": false,
+  "primary_input_hashes": {
+    "categories.csv": "31cc9f724cf19427489b63d9c995f96ef3b9ed9ca8245b7b20c1de83204ee4d0",
+    "counterparties.csv": "d3348dcf9615ffc376e0a9e5933661749042088ef43dca9fb14a40b6eff0fde0",
+    "entry_voids.csv": "5ff31826c79ae5fda1730a9fa2e56c6a1a55ed427a90d9a388f403c895e095a0",
+    "observed_90d.csv": "fa9742513683ec5dcfde07acb94e26e0c088123db919e4187a6831292a8ed5cc",
+    "opening_balance.json": "e0ff347e584c22cf658e627b586b58275f1ef324ca2504d3dd8d90f4e0acb3e8",
+    "payment_links.csv": "acd2b15f39d9c501615d1d57f0fff0e1b7c3ef3415ff0f00de725f0826ab5fdd"
+  },
+  "prompt_hash": null,
+  "source_hashes": {
+    "backend/app/db/connection.py": "97a0b89539429b6622eb9bb4dd38f895915c1f6c7a11ebe977eacf1462a93e57",
+    "backend/app/db/forecast_repository.py": "d3d9a953bbd0a4d386f2e8b90a9ff64f9f3c9556eb7ab732729c4b6ddb076a79",
+    "backend/app/db/migrations.py": "24ad72c752b704bb6d07a6f9b3d1092e41e55427e269b304c3a05506a28d1634",
+    "backend/app/db/records.py": "9b95030479fc02b4691c907e407be0982077a2f12de675fb90af9f61d4dcc361",
+    "backend/app/schemas/evidence.py": "2189f6bba56fe9a95ebe2e7518f65e3a607d6103cc7cf6f94e1fea5bc3e5f2f1",
+    "backend/app/schemas/forecast.py": "6717eb384e26ab528378d9c3d2af54c8b2c2ccc5d5e04fd5c5bd3b815f7aa37a",
+    "backend/app/schemas/ledger.py": "bdbb463ed4ca78819104b2246a927298f1f5212bab4553777735ccc5d8bb7cae",
+    "backend/app/schemas/queries.py": "76c4d66ca8549e13b085ccaced983dcc9b8883b31d4fb79b86e2db3da241a036",
+    "backend/app/services/business_clock.py": "627c5597149958f13a936c6af0186416f9f1709dc89712b2c80dbe8e4ec9daca",
+    "backend/app/services/errors.py": "5c8c8d41230cebb58958766813d013ad8d92899a6618116b7bd0bd71d43e6cd8",
+    "backend/app/services/financial_queries.py": "76d95cdaab0109ccd46b03723c2fbcfb0b5cc354c5d6d1891afba87edca66c6f",
+    "backend/app/services/forecast.py": "653184349a444a7d908bc41f9d139499701b2fffd4716f7172af722c2dd55df9",
+    "backend/app/services/ledger_audit.py": "44cc48ede29bcd741768037f59ca8c5ed323ffcec0553380a59437c2459e24fd",
+    "backend/app/services/ledger_rules.py": "ed4708c576ca300d425781a3bc220e641b733f2211e7e741d22909bbb90114ba",
+    "backend/app/services/observed.py": "f5d32ef27f4efa2d6bebe660deff86b5ba614b383caaf2f2974c1776d0fb0646",
+    "backend/app/services/reconcile.py": "0b170871ab365f6be309e40144342e8758394304a47ceb6b4bfc30e8d4adfbcb",
+    "backend/app/services/validation.py": "568addba95792b30f804c437e63529bee152e70c16aef7718082c777c058c5f7",
+    "scripts/data_contract.py": "d32a994c71d829a31b9b78d78d5b56725c88ce7067729c625488d10c797afda8",
+    "scripts/forecast_inputs.py": "29c145911cced42cc2d3aed7601ae30e46cca927dde28bc6c41fd7a254fd57fe",
+    "scripts/forecast_metrics.py": "827e059f3b29cec206a2b8853f384e2a2d2de1d9604abe51f0228b75b0bec4a2",
+    "scripts/make_ground_truth.py": "bfd18e83b305695c5994bb823fab3ccf5d62e3976788bba78ff6837cb10d5122",
+    "scripts/run_forecast_eval.py": "5da155a6969e78723666798c9b41bb25cf56806c01cc85f4b845d77da2f07c02"
+  }
+}

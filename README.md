@@ -21,6 +21,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > controlled fallback checks pass. A five-case application check matched four
 > expected tool sets and three full responses; weekly-summary and response-format
 > limitations remain.
+> The development forecast benchmark performs worse than the seven-day baseline;
+> final testing has not run.
 > The 55 fixed backend Arabic messages have human approval; frontend wording and
 > future additions still need review.
 
@@ -219,7 +221,8 @@ receivables are excluded. Unknown starting cash, essential history or due dates 
 typed clarification errors. Later entries, payment links and voids cannot change an
 earlier forecast. The service enforces the observed calendar boundary and loads no
 files or evaluation answers. `GET /api/reports/forecast` exposes the service;
-forecast UI integration and accuracy evaluation remain pending.
+forecast UI integration and final accuracy testing remain pending. Observed-data
+development errors are reported below.
 
 Seeded fictional data and offline development truth are available. From the
 repository root (standard library only):
@@ -262,6 +265,51 @@ The final-test path requires a separate explicit run flag and a matching frozen
 method/settings/source-commit receipt before opening final outcomes or extra shops.
 No final test has run. Conservative collection dates round the exact median
 lateness half up once to whole days before adding it to the due date.
+**Forecast development results — 20 October 2026.** The actual offline run at
+source `1dc2179ab1fe80ba799b11c518f1838fb10a523d` used method
+`recorded-weekday-cash-v1` and model ID `deterministic-no-llm`.
+All amounts in this table are integer IQD.
+
+| Cutoff day | Scored forecast-days | Baseline MAE | Base MAE | Conservative MAE | Stress MAE |
+|---|---:|---:|---:|---:|---:|
+| 60 | 30 | 246,560 | 688,086 | 699,245 | 604,901 |
+| 75 | 15 | 200,923 | 330,233 | 330,233 | 330,233 |
+| Combined | 45 | 231,348 | 568,802 | 576,241 | 513,345 |
+
+Both cutoffs generated all 30 predictions; grading used days 61–90 and 76–90.
+The combined MAE weights 45 forecast-day observations across the two cutoffs;
+their calendar dates overlap. **All three scenarios performed worse than the
+baseline at both cutoffs.** Aggregate worst-day errors were
+2,096,402 IQD for base/conservative
+and 1,894,402 IQD for stress.
+
+There were no realized shortfalls in the scored windows. For each scenario,
+shortfall-timing hits were 0/0 (null/N/A), with two forecasts evaluated and no
+predicted shortfall date inside either scored window. The baseline predicted
+1 September at cutoff 60 and no shortfall at cutoff 75; neither window had a
+realized shortfall to match.
+
+| View | False-OK count | Realized-short invoice denominator | Rate | Eligible invoice-cutoff observations |
+|---|---:|---:|---|---:|
+| base | 0 | 0 | null / N/A | 2 |
+| conservative | 0 | 0 | null / N/A | 2 |
+| stress | 0 | 0 | null / N/A | 2 |
+| Seven-day with expected | 0 | 0 | null / N/A | 2 |
+| J1 with expected | 0 | 0 | null / N/A | 0 |
+
+Each cutoff contributed one eligible invoice to each scenario and the seven-day
+view, with no realized-short invoice; J1 had no eligible invoices at either cutoff.
+These null rates provide no measured evidence about behavior during actual
+shortfalls. The T32 synthetic regression separately checks a positive false-OK case.
+
+The [complete development report](results/forecast_dev_2026-10-20.json) records
+per-cutoff errors, dates, counts, source/input hashes and all 30 prediction rows.
+The [method freeze](results/forecast_method_freeze.json) predates this run and
+pins the same code/settings and observed inputs. Independent calculations match
+all six complete prediction series; separate error-sum checks agree.
+Only the primary fictional shop's observed data was used. Final outcomes,
+the three reserved shops and held-out questions remain unaccessed. No final or
+real-world accuracy is established, and no method was tuned after this run.
 
 See [data/README.md](data/README.md) for file boundaries and generation
 metadata. Same-seed regeneration was byte-identical in a fresh process,
@@ -597,11 +645,14 @@ running health endpoint using `--dart-define`.
 [GitHub Actions](https://github.com/abdulwahed-s/Shgad/actions/workflows/test.yml)
 runs backend lint/format/tests and Flutter localization, formatting, analysis and tests
 on pushes and pull requests. Its linked run history shows the measured CI results.
-No financial benchmark or held-out model evaluation has run.
+The development forecast benchmark above has run. No final forecast test or
+held-out model evaluation has run.
 
 Synthetic CSV generation, ledger import, financial tools and deterministic reports are available;
-a merchant-facing demo remains pending. No forecast accuracy is claimed; the
-small development routing results above are the only measured model results.
+a merchant-facing demo remains pending. The forecast results above cover one
+fictional development shop and do not meet the baseline comparison target.
+The separate model-routing/application checks retain their reported limitations;
+no held-out or general financial-answer accuracy is established.
 
 ## Data and scope
 
