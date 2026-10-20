@@ -18,7 +18,9 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > Gemini, Groq and OpenAI completed bounded development routing screens. With
 > larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
 > Both selected provider APIs now respond successfully. Live CSV previews and
-> controlled fallback checks pass; primary-model routing acceptance remains pending.
+> controlled fallback checks pass. A five-case application check matched four
+> expected tool sets and three full responses; weekly-summary and response-format
+> limitations remain.
 > The 50 fixed backend Arabic messages have human approval; frontend wording and
 > future additions still need review.
 
@@ -67,7 +69,8 @@ the backend fills figures and dates from verified results. Provider calls and AP
 keys stay in the backend. Integration tests use recorded provider responses.
 The selected primary is `gemini-3.8-flash`, with OpenAI `gpt-6-luna` as the
 fallback. Paid API access is user-reported. Both APIs have successful live checks;
-primary-model routing acceptance remains pending.
+primary/fallback CSV previews and controlled OpenAI fallback chat passed. The
+development results and their limitations are recorded below.
 
 ## Development status
 
@@ -504,8 +507,30 @@ templates. These are development application results, with no held-out run.
 
 The versioned agent policy now clarifies that possible duplicate-payment
 comparisons inspect read-only reconciliation flags before asking for record
-identities. It still cannot combine entries or resolve flags. Development and
-selected-provider validation of that policy clarification are pending.
+identities. It still cannot combine entries or resolve flags. A frozen application
+check at `d67667d` matched four of five expected native tool sets: sales, debt,
+margin and reconciliation. Three cases also matched behavior, customer and period.
+The weekly summary omitted debts/reconciliation. The duplicate-payment case read
+reconciliation flags but fell back to an empty answer instead of clarification.
+This pass used all 16 allowed requests: thirteen Gemini responses, two Gemini
+timeouts and one OpenAI response. The primary CSV preview passed.
+
+A separate duplicate-case diagnostic at `f84f2ee` used three Gemini responses;
+both final drafts failed the strict response schema. A local check-script fixture
+lookup then failed before its fallback checks. These failures remain recorded.
+General fixes now preserve valid clarification/refusal actions on draft retry
+and make empty templates ask for clarification. Four regression cases first
+failed, then passed. The primary application score was not rerun after these fixes.
+The remaining controlled fallback chat and CSV check at `b33618e` passed with
+three actual OpenAI responses: correct tool/customer/period/source evidence,
+five CSV preview rows, zero errors and no financial writes. That diagnostic and
+continuation used six of their combined eight allowed requests.
+
+The paid retry and subsequent development/integration work used 41 of 48
+documented generation attempts: 38 decoded successful responses and three failed
+requests, with 119,722 known reported tokens. Failed-request usage is unknown.
+These small development checks do not establish held-out or general financial
+answer accuracy. Original reports and earlier routing-screen scores are preserved.
 The first paid retry also recorded two Gemini drafts ending at the old output
 cap. The output budget is now configurable; the selected setup uses 8,192 while
 retaining its request deadline and response-size bounds.
