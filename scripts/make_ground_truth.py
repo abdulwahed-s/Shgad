@@ -549,14 +549,19 @@ class TruthLedger:
         }
 
     def baseline(self, as_of):
-        counts = {
-            r["business_date"]: r
-            for r in self.visible(as_of)
-            if r["type"] == "DAILY_CASH_COUNT"
-        }
-        left, right = counts.get(str(as_of - timedelta(days=7))), counts.get(str(as_of))
-        if left is None or right is None:
-            raise TruthError("MISSING_COUNT")
+        counts = [r for r in self.visible(as_of) if r["type"] == "DAILY_CASH_COUNT"]
+
+        def closing_count(day):
+            candidates = [r for r in counts if r["business_date"] == str(day)]
+            if not candidates:
+                raise TruthError("MISSING_COUNT")
+            if len(candidates) > 1 and stamp(candidates[-2]["occurred_at"]) == stamp(
+                candidates[-1]["occurred_at"]
+            ):
+                raise TruthError("AMBIGUOUS_CASH_COUNT")
+            return candidates[-1]
+
+        left, right = closing_count(as_of - timedelta(days=7)), closing_count(as_of)
         change = round_half_up(right["amount_iqd"] - left["amount_iqd"], 7)
         starting = self.cash(as_of)
         return {

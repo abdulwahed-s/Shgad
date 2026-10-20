@@ -240,6 +240,29 @@ These are offline reference values; the separate production forecast service use
 the financial specification and SQLite history. The five read-only tools query
 that ledger without a provider. Development score windows stop at day 90.
 
+With the backend environment installed, the offline benchmark is available from
+the repository root:
+
+```sh
+python scripts/run_forecast_eval.py --split dev --output results/forecast_dev.json
+```
+
+Commit verified source first; the benchmark records its Git commit, source and
+input hashes, settings and exact scored-day counts. Both development cutoffs
+generate 30 predictions: cutoff 60 grades days 61–90 and cutoff 75 grades only
+76–90. It reports integer-IQD MAE against the seven-day baseline, worst-day error,
+shortfall timing and false-OK numerator/realized-shortfall denominator/rate per
+scenario and for the J1/seven-day with-expected views. A zero denominator has a
+null rate. Aggregates weight MAE by scored days and count invoice-cutoff observations.
+The baseline rounds `(cutoff count − count seven days earlier) / 7` half up to
+whole IQD once, then adds each day's multiple of that change to cutoff cash.
+Missing or ambiguous anchor counts give typed errors. Existing result files
+are never overwritten.
+The final-test path requires a separate explicit run flag and a matching frozen
+method/settings/source-commit receipt before opening final outcomes or extra shops.
+No final test has run. A fractional median-lateness daily-bucketing decision is
+pending before development results and the final method freeze are published.
+
 See [data/README.md](data/README.md) for file boundaries and generation
 metadata. Same-seed regeneration was byte-identical in a fresh process,
 including the manifest. The development questions and generation mechanics have
@@ -541,11 +564,11 @@ The first paid retry also recorded two Gemini drafts ending at the old output
 cap. The output budget is now configurable; the selected setup uses 8,192 while
 retaining its request deadline and response-size bounds.
 
-Verified locally: **698 backend tests passed, one opt-in live test skipped**,
+Verified locally: **715 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
-checks pass for **115 backend/script files**; dependency checks pass.
+checks pass for **120 backend/script files**; dependency checks pass.
 A running-server smoke passed **20 check groups across 19 OpenAPI paths**, using
 only a temporary fictional database.
 Every implemented endpoint has a response-model contract test, including daily close,
