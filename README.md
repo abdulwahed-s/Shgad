@@ -124,6 +124,8 @@ OpenAI Responses retains 8,192. Explicit truncated or filtered completions are
 rejected before use, with the existing failover/template handling.
 If the single draft retry returns a valid clarification or refusal, chat uses
 that fixed response instead of replacing it with a financial template.
+An empty fallback template asks for clarification rather than claiming to have
+answered the ledger question.
 
 No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
 stays unset in raw settings until configured. The domain `BusinessClock.from_settings`
@@ -508,7 +510,7 @@ The first paid retry also recorded two Gemini drafts ending at the old output
 cap. The output budget is now configurable; the selected setup uses 8,192 while
 retaining its request deadline and response-size bounds.
 
-Verified locally: **688 backend tests passed, one opt-in live test skipped**,
+Verified locally: **690 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar

@@ -176,6 +176,27 @@ def test_draft_retry_preserves_valid_clarification_or_refusal(
     assert tuple(tool_history.iterdump()) == before
 
 
+@pytest.mark.parametrize("failure", ["invalid_drafts", "provider_unavailable"])
+def test_empty_verified_template_requires_clarification(api, scripted, ledger, failure):
+    """API_CONTRACT /api/chat: an empty fallback cannot answer a ledger question."""
+    from app.agents.messages_ar import text
+
+    before = tuple(ledger.iterdump())
+    replies = (
+        [draft("{{fig:unknown}}"), draft("999999")]
+        if failure == "invalid_drafts"
+        else [{"content": None, "tool_calls": 0}]
+    )
+    sent = scripted(calls(("reconcile", {"period": "today"})), *replies)
+    result = chat(api)
+    assert result.status == "clarification" and result.clarification
+    assert result.reply_ar == text("clarify_request")
+    assert result.used_tools == ("reconcile",) and len(sent) == 1 + len(replies)
+    assert not result.figures and not result.metrics and not result.dates
+    assert result.resolved_range is None and result.resolved_counterparty is None
+    assert tuple(ledger.iterdump()) == before
+
+
 def test_t31_customer_and_period_come_from_tool_context(
     api, scripted, ledger, debt_factory
 ):

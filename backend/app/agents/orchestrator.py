@@ -227,6 +227,12 @@ def checked_draft(draft, outputs, user_message):
 
 
 def response(rendered, outputs, used):
+    if (
+        rendered.renderer.fell_back_to_template
+        and not rendered.figures
+        and not rendered.metrics
+    ):
+        return fixed("clarification", "clarify_request", used=used)
     fields = rendered.model_dump()
     if rendered.resolved_range is None:
         for output in reversed(outputs):
