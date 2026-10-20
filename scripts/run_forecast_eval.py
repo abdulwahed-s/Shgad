@@ -46,6 +46,7 @@ METHOD_SETTINGS = {
     "money_rounding": "half_up_once_per_series_integer_iqd",
     "customer_lateness_minimum_settlements": 2,
     "customer_lateness_fallback": "shop_median",
+    "lateness_day_rounding": "half_up_once_after_exact_median",
     "overdue_receivables": "excluded_all_scenarios",
     "stress_collections": "zero",
     "baseline": "cash_at_cutoff_plus_day_times_rounded_count_delta_over_seven",

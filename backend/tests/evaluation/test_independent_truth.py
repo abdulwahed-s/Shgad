@@ -264,10 +264,11 @@ def test_t29_forecast_stress_all_drivers_and_thirty_rows():
         ) == (10, 2, 3, 1)
 
 
-def test_t26_median_is_settled_obligations_not_profile_or_partial_payment():
+@pytest.mark.parametrize("delays", [(2, 4), (2, 3)])
+def test_t26_median_is_settled_obligations_not_profile_or_partial_payment(delays):
     ledger = forecast_ledger()
-    # Two settled debts: +2, +4 late; customer median 3 days.
-    for i, delay in enumerate((2, 4)):
+    # D43: exact median 3 or 2.5 maps to 3 days, half up once for scheduling.
+    for i, delay in enumerate(delays):
         day = date(2026, 9, 10) + timedelta(days=delay)
         ledger.rows += [
             row(

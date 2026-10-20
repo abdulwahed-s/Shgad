@@ -480,17 +480,17 @@ class TruthLedger:
                 payments[str(due)] += debt["outstanding_iqd"]
             elif due >= as_of and scenario != "stress":
                 values = customer[debt["counterparty_id"]]
-                delay = (
+                delay = Fraction(
                     median_days(values if len(values) >= 2 else all_lateness)
                     if scenario == "conservative"
                     else 0
                 )
-                # Median lateness may be half a day. Keep it exact and assign
-                # the receipt to the Baghdad date containing that instant.
-                arrival = datetime.combine(due, time.min, BAGHDAD) + timedelta(
-                    seconds=int(delay * 86400)
+                # D43 / FINANCIAL_RULES §5: keep the median exact until the
+                # single half-up whole-day conversion for the daily schedule.
+                arrival = due + timedelta(
+                    days=round_half_up(delay.numerator, delay.denominator)
                 )
-                receipts[str(arrival.date())] += debt["outstanding_iqd"]
+                receipts[str(arrival)] += debt["outstanding_iqd"]
         opening = self.cash(as_of)["amount_iqd"]
         daily = []
         for i in range(1, 31):

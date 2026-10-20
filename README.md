@@ -21,7 +21,7 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > controlled fallback checks pass. A five-case application check matched four
 > expected tool sets and three full responses; weekly-summary and response-format
 > limitations remain.
-> The 50 fixed backend Arabic messages have human approval; frontend wording and
+> The 55 fixed backend Arabic messages have human approval; frontend wording and
 > future additions still need review.
 
 ## Capabilities and planned interface
@@ -260,8 +260,8 @@ Missing or ambiguous anchor counts give typed errors. Existing result files
 are never overwritten.
 The final-test path requires a separate explicit run flag and a matching frozen
 method/settings/source-commit receipt before opening final outcomes or extra shops.
-No final test has run. A fractional median-lateness daily-bucketing decision is
-pending before development results and the final method freeze are published.
+No final test has run. Conservative collection dates round the exact median
+lateness half up once to whole days before adding it to the due date.
 
 See [data/README.md](data/README.md) for file boundaries and generation
 metadata. Same-seed regeneration was byte-identical in a fresh process,
@@ -505,10 +505,10 @@ tool output. Raw numeric characters, unknown keys and unsourced values are rejec
 It supports one retry callback and then deterministic templates, with server-resolved
 customer/period context, margin coverage and estimate assumptions. Exact user-typed
 quotes stay quoted data. Money uses Arabic-Indic digits and exact abbreviations;
-evidence retains full integers. The 50 current fixed backend Arabic messages were
-approved by the user on 19 October 2026. Approval binds their exact text. Five new
-weekly suggestion/insufficient-margin messages remain pending Iraqi Arabic review,
-as does any other new or edited copy.
+evidence retains full integers. The original 50 fixed backend Arabic messages were
+approved by the user on 19 October 2026; five weekly suggestion/insufficient-margin
+messages were approved on 20 October. Separate per-key hashes bind the exact texts
+and their approval dates. Any new or edited copy still needs Iraqi Arabic review.
 The agent retries an invalid draft once before using these templates. Imported
 text remains quoted data and gives the agent no ledger-write capability.
 
@@ -564,7 +564,7 @@ The first paid retry also recorded two Gemini drafts ending at the old output
 cap. The output budget is now configurable; the selected setup uses 8,192 while
 retaining its request deadline and response-size bounds.
 
-Verified locally: **716 backend tests passed, one opt-in live test skipped**,
+Verified locally: **718 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
@@ -617,5 +617,5 @@ not guessed. No model-provider API call was used for this dataset.
 Application integration is tested with recorded responses. Live development
 screening used the candidates above; Gemini 3.8 Flash is the selected primary.
 Both selected APIs now respond and both CSV previews pass. Primary-model routing
-acceptance remains pending. The 50 fixed backend Arabic messages
+acceptance remains pending. The 55 fixed backend Arabic messages
 have user approval. Frontend Arabic wording still needs review.

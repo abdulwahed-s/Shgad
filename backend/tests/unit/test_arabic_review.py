@@ -4,15 +4,17 @@ from app.agents.messages_ar import MESSAGES, DraftMessage
 
 
 def test_confirmed_backend_copy_has_recorded_approval():
-    from app.agents.arabic_review import APPROVED_MESSAGES
+    from app.agents.arabic_review import APPROVED_MESSAGES, WEEKLY_APPROVED_MESSAGES
 
     assert len(APPROVED_MESSAGES) == 50
     assert {key for key, item in MESSAGES.items() if item.status == "APPROVED"} == set(
         APPROVED_MESSAGES
-    )
+    ) | set(WEEKLY_APPROVED_MESSAGES)
 
 
-def test_weekly_suggestion_and_insufficient_margin_copy_needs_human_review():
+def test_weekly_copy_approval_binds_the_five_exact_reviewed_texts():
+    from app.agents.arabic_review import review_status
+
     for key in (
         "review_unmatched_payment",
         "review_duplicate_payment",
@@ -20,7 +22,33 @@ def test_weekly_suggestion_and_insufficient_margin_copy_needs_human_review():
         "no_action_needed",
         "margin_insufficient_priced_sales",
     ):
-        assert MESSAGES[key].status == "PENDING_REVIEW"
+        assert MESSAGES[key].status == "APPROVED"
+        assert review_status(key, MESSAGES[key].text + " changed") == "PENDING_REVIEW"
+
+
+def test_weekly_copy_has_a_separate_canonical_approval_snapshot():
+    import hashlib
+    import json
+
+    from app.agents.arabic_review import (
+        APPROVED_TEXT_SHA256,
+        REVIEWED_ON,
+        WEEKLY_APPROVED_MESSAGES,
+        WEEKLY_APPROVED_TEXT_SHA256,
+        WEEKLY_REVIEWED_ON,
+    )
+
+    assert REVIEWED_ON == "2026-10-19" and WEEKLY_REVIEWED_ON == "2026-10-20"
+    assert APPROVED_TEXT_SHA256 == (
+        "98e65cbc75df68410294ca4527e193706508fedef2e66555bded88f2806bb28a"
+    )
+    canonical = json.dumps(
+        {key: MESSAGES[key].text for key in WEEKLY_APPROVED_MESSAGES},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    assert hashlib.sha256(canonical).hexdigest() == WEEKLY_APPROVED_TEXT_SHA256
 
 
 def test_changed_text_loses_approval():

@@ -121,7 +121,29 @@ APPROVED_MESSAGES = {
     "chat_error": "1ce9ce88d5bd93f552187750819a03f03c6887d68c57381fe13ac620e1d4ed95",
 }
 
+# D44 is a separate approval, preserving D38's exact original snapshot and date.
+WEEKLY_REVIEWED_ON = "2026-10-20"
+WEEKLY_APPROVED_TEXT_SHA256 = (
+    "8855675ef45aabb270112b75ff2f88c52e20bf3a03e53b19c56eb22495f111b7"
+)
+WEEKLY_APPROVED_MESSAGES = {
+    "review_unmatched_payment": (
+        "aa6e304d7bd9319df39edbc9d2f9d2ad0c1077400a5632b415ab6052139f2afb"
+    ),
+    "review_duplicate_payment": (
+        "8e36347191f8442446fafc6857b4546fb7f40dfb83d64163c1312ca4deaf26c6"
+    ),
+    "review_debts": "0fb7eb70bcab85fbacabc6087a4e6d81fccaced76240c41cc713a11aa0c054f0",
+    "no_action_needed": (
+        "749dd4350b02566138c895ef97b982c8c46ef574175ff446325d5ba74d726763"
+    ),
+    "margin_insufficient_priced_sales": (
+        "227ba763b426310ff12b04d559cd2d9891d86dd3bc73f6a4df942492070ed238"
+    ),
+}
+
 
 def review_status(key, text):
     fingerprint = hashlib.sha256(text.encode("utf-8")).hexdigest()
-    return "APPROVED" if APPROVED_MESSAGES.get(key) == fingerprint else "PENDING_REVIEW"
+    expected = APPROVED_MESSAGES.get(key, WEEKLY_APPROVED_MESSAGES.get(key))
+    return "APPROVED" if expected == fingerprint else "PENDING_REVIEW"
