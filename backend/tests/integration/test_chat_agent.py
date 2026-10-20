@@ -151,6 +151,31 @@ def test_t24_raw_digits_and_unknown_slots_retry_once_then_template(
     assert len(sent) == 3 and result.figures
 
 
+@pytest.mark.parametrize(
+    "status,key",
+    [("clarification", "clarify_request"), ("refused", "unsupported_write")],
+)
+def test_draft_retry_preserves_valid_clarification_or_refusal(
+    api, scripted, tool_history, status, key
+):
+    """API_CONTRACT /api/chat: safe fixed actions also terminate a draft retry."""
+    from app.agents.messages_ar import text
+
+    before = tuple(tool_history.iterdump())
+    sent = scripted(
+        calls(("reconcile", {"period": "today"})),
+        draft("{{fig:unknown}}"),
+        {"content": json.dumps({"status": status, "message_key": key})},
+    )
+    result = chat(api)
+    assert result.status == status and result.reply_ar == text(key)
+    assert result.used_tools == ("reconcile",) and len(sent) == 3
+    assert not result.figures and not result.metrics and not result.dates
+    assert result.resolved_range is None and result.resolved_counterparty is None
+    assert (result.clarification is not None) == (status == "clarification")
+    assert tuple(tool_history.iterdump()) == before
+
+
 def test_t31_customer_and_period_come_from_tool_context(
     api, scripted, ledger, debt_factory
 ):

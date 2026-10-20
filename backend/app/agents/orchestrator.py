@@ -356,6 +356,11 @@ async def converse(request, *, client, connection, clock, known_at):
                 try:
                     retry = await client.complete(messages, tools=())
                     candidate = action(retry)
+                    if not retry.tool_calls and candidate.status in {
+                        "clarification",
+                        "refused",
+                    }:
+                        return fixed(candidate.status, candidate.message_key, used=used)
                     if not retry.tool_calls and candidate.status == "answered":
                         revised = (
                             ""
