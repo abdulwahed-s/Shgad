@@ -96,5 +96,82 @@
   "retry": "Try again",
   "@retry": {
     "description": "Merchant interface: retry"
+  },
+  "updatedAt": "Last updated {time}",
+  "@updatedAt": {
+    "description": "Merchant interface: updatedAt",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "needsConnection": "A connection is needed. Your typed values stay here.",
+  "@needsConnection": {
+    "description": "Merchant interface: needsConnection"
+  },
+  "errorSign": "This choice does not match the difference sign.",
+  "@errorSign": {
+    "description": "Merchant interface: errorSign"
+  },
+  "errorExceeded": "The amount exceeds the remaining difference.",
+  "@errorExceeded": {
+    "description": "Merchant interface: errorExceeded"
+  },
+  "errorCount": "Record both consecutive cash counts first.",
+  "@errorCount": {
+    "description": "Merchant interface: errorCount"
+  },
+  "errorBalance": "Opening cash is missing. Record it first.",
+  "@errorBalance": {
+    "description": "Merchant interface: errorBalance"
+  },
+  "errorCosts": "Recorded costs are missing.",
+  "@errorCosts": {
+    "description": "Merchant interface: errorCosts"
+  },
+  "errorHistory": "There is not enough history for an estimate.",
+  "@errorHistory": {
+    "description": "Merchant interface: errorHistory"
+  },
+  "errorDueDate": "Complete the missing due date.",
+  "@errorDueDate": {
+    "description": "Merchant interface: errorDueDate"
+  },
+  "errorParty": "Choose the exact customer or supplier ID.",
+  "@errorParty": {
+    "description": "Merchant interface: errorParty"
+  },
+  "errorDate": "Clarify the business date.",
+  "@errorDate": {
+    "description": "Merchant interface: errorDate"
+  },
+  "errorMapping": "Some required columns could not be mapped.",
+  "@errorMapping": {
+    "description": "Merchant interface: errorMapping"
+  },
+  "errorImport": "Check the CSV file and its row errors.",
+  "@errorImport": {
+    "description": "Merchant interface: errorImport"
+  },
+  "errorValidation": "Check the values and references, then try again.",
+  "@errorValidation": {
+    "description": "Merchant interface: errorValidation"
+  },
+  "errorMissing": "Required records are missing.",
+  "@errorMissing": {
+    "description": "Merchant interface: errorMissing"
+  },
+  "errorNotFound": "This record was not found.",
+  "@errorNotFound": {
+    "description": "Merchant interface: errorNotFound"
+  },
+  "errorUnavailable": "The service is unavailable. Try again shortly.",
+  "@errorUnavailable": {
+    "description": "Merchant interface: errorUnavailable"
+  },
+  "errorInternal": "Could not verify this view. Try again.",
+  "@errorInternal": {
+    "description": "Merchant interface: errorInternal"
   }
 }

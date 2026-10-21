@@ -119,5 +119,100 @@
   "@retry": {
     "description": "Merchant interface: retry",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "updatedAt": "آخر تحديث {time}",
+  "@updatedAt": {
+    "description": "Merchant interface: updatedAt",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "needsConnection": "تحتاج اتصال. القيم اللي كتبتها تبقى هنا.",
+  "@needsConnection": {
+    "description": "Merchant interface: needsConnection",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorSign": "هالاختيار ما يطابق إشارة الفرق.",
+  "@errorSign": {
+    "description": "Merchant interface: errorSign",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorExceeded": "المبلغ أكبر من الفرق الباقي.",
+  "@errorExceeded": {
+    "description": "Merchant interface: errorExceeded",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorCount": "سجل عدّ النقد لليومين المتتاليين أول.",
+  "@errorCount": {
+    "description": "Merchant interface: errorCount",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorBalance": "رصيد البداية ناقص. سجله أول.",
+  "@errorBalance": {
+    "description": "Merchant interface: errorBalance",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorCosts": "كلف الشراء المسجلة ناقصة.",
+  "@errorCosts": {
+    "description": "Merchant interface: errorCosts",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorHistory": "السجلات ما تكفي للتقدير.",
+  "@errorHistory": {
+    "description": "Merchant interface: errorHistory",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorDueDate": "كمل تاريخ الاستحقاق الناقص.",
+  "@errorDueDate": {
+    "description": "Merchant interface: errorDueDate",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorParty": "اختار رقم الزبون أو المجهز بالضبط.",
+  "@errorParty": {
+    "description": "Merchant interface: errorParty",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorDate": "وضح تاريخ الشغل.",
+  "@errorDate": {
+    "description": "Merchant interface: errorDate",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorMapping": "بعض الأعمدة المطلوبة ما تطابقت.",
+  "@errorMapping": {
+    "description": "Merchant interface: errorMapping",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorImport": "راجع ملف السجلات وأخطاء صفوفه.",
+  "@errorImport": {
+    "description": "Merchant interface: errorImport",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorValidation": "راجع القيم وأرقام السجلات وجرب مرة ثانية.",
+  "@errorValidation": {
+    "description": "Merchant interface: errorValidation",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorMissing": "السجلات المطلوبة ناقصة.",
+  "@errorMissing": {
+    "description": "Merchant interface: errorMissing",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorNotFound": "هالسجل مو موجود.",
+  "@errorNotFound": {
+    "description": "Merchant interface: errorNotFound",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorUnavailable": "الخدمة مو متاحة. جرب بعد شوية.",
+  "@errorUnavailable": {
+    "description": "Merchant interface: errorUnavailable",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorInternal": "ما كدرنا نتحقق من هالعرض. جرب مرة ثانية.",
+  "@errorInternal": {
+    "description": "Merchant interface: errorInternal",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

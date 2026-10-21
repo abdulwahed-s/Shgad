@@ -15,7 +15,7 @@ Dio createDioClient() {
     BaseOptions(
       baseUrl: apiBaseUrl,
       connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 150),
       sendTimeout: const Duration(seconds: 15),
     ),
   );

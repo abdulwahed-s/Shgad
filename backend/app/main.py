@@ -1,6 +1,7 @@
 """Application entry point for deterministic synthetic merchant workflows."""
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.chat import router as chat_router
 from app.api.daily_close import router as daily_close_router
@@ -20,6 +21,12 @@ app = FastAPI(
         status: {"model": ErrorResponse}
         for status in (400, 404, 405, 413, 415, 422, 500, 503)
     },
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"https?://(?:localhost|127\.0\.0\.1)(?::[0-9]+)?",
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
 )
 register_error_handlers(app)
 app.include_router(health_router)
