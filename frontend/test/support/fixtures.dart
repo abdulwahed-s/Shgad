@@ -167,3 +167,38 @@ Map<String, dynamic> sourcesJson() => {
     },
   ],
 };
+Map<String, dynamic> weeklyJson() => {
+  'range': {'start': '2026-09-26', 'end': '2026-09-28', 'partial': true},
+  'cash_sales': amount(120000, 'recorded_cash_sales'),
+  'unexplained_cash_difference': amount(
+    25000,
+    'unexplained_cash_difference',
+    kind: 'flagged',
+  ),
+  'credit_sales': amount(70000, 'credit_sales'),
+  'collections': amount(30000, 'collections'),
+  'supplier_payments': amount(10000, 'supplier_payments'),
+  'operating_expenses': amount(20000, 'operating_expenses'),
+  'owner_drawings': amount(10000, 'owner_drawings'),
+  'capital_injections': amount(25000, 'capital_injections'),
+  'outstanding_receivables': amount(150000, 'receivables'),
+  'overdue_receivables': amount(30000, 'overdue_receivables'),
+  'debt_aging_top': [
+    {
+      'counterparty_id': 'CUST-01',
+      'display_name': 'أبو حيدر صاحب المحل القريب من السوق القديم',
+      'outstanding': amount(150000, 'outstanding'),
+      'days_overdue': 40,
+    },
+  ],
+  'gross_margin': {
+    'shown': true,
+    'margin': amount(90000, 'estimated_gross_margin', kind: 'calculated'),
+    'coverage_pct': 92,
+    'note_key': 'margin_excludes_unrecorded_costs',
+    'unexplained_difference_excluded': true,
+  },
+  'flags_count': 0,
+  'flags': <Object>[],
+  'suggestion_key': 'review_debts',
+};

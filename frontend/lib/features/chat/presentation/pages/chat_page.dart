@@ -9,6 +9,7 @@ import '../../../../core/widgets/chat_bubble.dart';
 import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
+import '../../../../core/widgets/merchant_menu.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/chat_reply.dart';
@@ -30,7 +31,10 @@ class _ChatView extends StatelessWidget {
       final bloc = context.read<ChatBloc>();
       final v = state.view;
       return Scaffold(
-        appBar: AppBar(title: Text(l.chatTitle)),
+        appBar: AppBar(
+          title: Text(l.chatTitle),
+          actions: const [MerchantMenu()],
+        ),
         bottomNavigationBar: const MerchantNavigation(),
         body: SafeArea(
           child: Align(

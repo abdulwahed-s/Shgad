@@ -859,5 +859,160 @@
   "@originalRow": {
     "description": "Merchant interface: originalRow",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "weeklyTitle": "ملخص الأسبوع",
+  "@weeklyTitle": {
+    "description": "Merchant interface: weeklyTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "recordedCashSales": "المبيعات النقدية المسجلة",
+  "@recordedCashSales": {
+    "description": "Merchant interface: recordedCashSales",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "overdueReceivables": "ديون الزبائن المتأخرة",
+  "@overdueReceivables": {
+    "description": "Merchant interface: overdueReceivables",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "totalRecordedSales": "مجموع المبيعات المسجلة",
+  "@totalRecordedSales": {
+    "description": "Merchant interface: totalRecordedSales",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "agingOldest": "الديون الأقدم أول",
+  "@agingOldest": {
+    "description": "Merchant interface: agingOldest",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "daysOverdue": "متأخر {days} يوم",
+  "@daysOverdue": {
+    "description": "Merchant interface: daysOverdue",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "showAllDebts": "شوف كل الديون",
+  "@showAllDebts": {
+    "description": "Merchant interface: showAllDebts",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "coverageValue": "تغطية كلفة المبيعات المسجلة: {value}٪",
+  "@coverageValue": {
+    "description": "Merchant interface: coverageValue",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "coverageMissing": "تغطية كلفة المبيعات المسجلة مو متوفرة.",
+  "@coverageMissing": {
+    "description": "Merchant interface: coverageMissing",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "insufficientMargin": "المبيعات المسجلة اللي إلها كلفة ما تكفي لعرض الهامش الإجمالي التقديري.",
+  "@insufficientMargin": {
+    "description": "Merchant interface: insufficientMargin",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "marginExclusions": "الهامش الإجمالي التقديري يشمل المبيعات المسجلة المسعّرة. المصاريف غير المسجلة مو مشمولة، والفرق غير المفسّر خارج تغطية الكلفة.",
+  "@marginExclusions": {
+    "description": "Merchant interface: marginExclusions",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewUnmatched": "راجع الدفعات اللي ما تطابقت وكمل تفاصيلها.",
+  "@reviewUnmatched": {
+    "description": "Merchant interface: reviewUnmatched",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewDuplicate": "راجع القيود المتشابهة قبل أي تعديل.",
+  "@reviewDuplicate": {
+    "description": "Merchant interface: reviewDuplicate",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewDebts": "راجع الديون الباقية وتواريخ استحقاقها.",
+  "@reviewDebts": {
+    "description": "Merchant interface: reviewDebts",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "noActionNeeded": "ماكو سجل يحتاج مراجعة هنا.",
+  "@noActionNeeded": {
+    "description": "Merchant interface: noActionNeeded",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagUnmatched": "دفعة مو متطابقة",
+  "@flagUnmatched": {
+    "description": "Merchant interface: flagUnmatched",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagDuplicate": "اشتباه تكرار",
+  "@flagDuplicate": {
+    "description": "Merchant interface: flagDuplicate",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagPartial": "مدفوع جزئياً",
+  "@flagPartial": {
+    "description": "Merchant interface: flagPartial",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagOverdue": "متأخر",
+  "@flagOverdue": {
+    "description": "Merchant interface: flagOverdue",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagAmbiguous": "تطابق مو واضح",
+  "@flagAmbiguous": {
+    "description": "Merchant interface: flagAmbiguous",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagOriginVoided": "قيد الدين الأصلي ملغي.",
+  "@flagOriginVoided": {
+    "description": "Merchant interface: flagOriginVoided",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagUnallocated": "جزء من هالدفعة ما إله ربط موثق.",
+  "@flagUnallocated": {
+    "description": "Merchant interface: flagUnallocated",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagReview": "راجع المصادر قبل أي تعديل.",
+  "@flagReview": {
+    "description": "Merchant interface: flagReview",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "basisSameDay": "نفس المبلغ والحساب بنفس يوم الشغل، وأرقام المصدر مختلفة.",
+  "@basisSameDay": {
+    "description": "Merchant interface: basisSameDay",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "basisPartial": "توزيعات جزئية موثقة.",
+  "@basisPartial": {
+    "description": "Merchant interface: basisPartial",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "basisOverdue": "تاريخ الاستحقاق قبل تاريخ الشغل.",
+  "@basisOverdue": {
+    "description": "Merchant interface: basisOverdue",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "basisCandidate": "تطابق محتمل يحتاج مراجعتك.",
+  "@basisCandidate": {
+    "description": "Merchant interface: basisCandidate",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "basisUnmatched": "ماكو تطابق موثق ويا دين.",
+  "@basisUnmatched": {
+    "description": "Merchant interface: basisUnmatched",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "more": "بعد",
+  "@more": {
+    "description": "Merchant interface: more",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

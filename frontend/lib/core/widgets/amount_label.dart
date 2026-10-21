@@ -2,7 +2,7 @@ import '../../l10n/generated/app_localizations.dart';
 
 String amountLabel(AppLocalizations l, String key) => switch (key) {
   'cash_on_hand' => l.cashOnHand,
-  'recorded_cash_sales' || 'cash_sales' => l.cashSale,
+  'recorded_cash_sales' || 'cash_sales' => l.recordedCashSales,
   'unexplained_cash_difference' => l.unexplainedDifference,
   'credit_sales' => l.creditSale,
   'collections' => l.collection,
@@ -17,6 +17,8 @@ String amountLabel(AppLocalizations l, String key) => switch (key) {
   'receivables' || 'outstanding_receivables' => l.receivables,
   'payables' => l.payables,
   'estimated_gross_margin' => l.estimatedMargin,
+  'overdue_receivables' => l.overdueReceivables,
+  'total_recorded_sales' => l.totalRecordedSales,
   'coverage' => l.coverageLabel,
   'shortfall_with_collection' => l.conditionalShortfall,
   'shortfall_without_collection' => l.confirmedShortfall,

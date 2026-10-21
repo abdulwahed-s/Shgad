@@ -715,5 +715,131 @@
   "originalRow": "Show original row",
   "@originalRow": {
     "description": "Merchant interface: originalRow"
+  },
+  "weeklyTitle": "Weekly summary",
+  "@weeklyTitle": {
+    "description": "Merchant interface: weeklyTitle"
+  },
+  "recordedCashSales": "Recorded cash sales",
+  "@recordedCashSales": {
+    "description": "Merchant interface: recordedCashSales"
+  },
+  "overdueReceivables": "Overdue customer debts",
+  "@overdueReceivables": {
+    "description": "Merchant interface: overdueReceivables"
+  },
+  "totalRecordedSales": "Total recorded sales",
+  "@totalRecordedSales": {
+    "description": "Merchant interface: totalRecordedSales"
+  },
+  "agingOldest": "Oldest debts first",
+  "@agingOldest": {
+    "description": "Merchant interface: agingOldest"
+  },
+  "daysOverdue": "{days} days overdue",
+  "@daysOverdue": {
+    "description": "Merchant interface: daysOverdue",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "showAllDebts": "Show all debts",
+  "@showAllDebts": {
+    "description": "Merchant interface: showAllDebts"
+  },
+  "coverageValue": "Recorded-sales price coverage: {value}٪",
+  "@coverageValue": {
+    "description": "Merchant interface: coverageValue",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "coverageMissing": "Recorded-sales price coverage is unavailable.",
+  "@coverageMissing": {
+    "description": "Merchant interface: coverageMissing"
+  },
+  "insufficientMargin": "Not enough priced recorded sales to show an estimated gross margin.",
+  "@insufficientMargin": {
+    "description": "Merchant interface: insufficientMargin"
+  },
+  "marginExclusions": "Estimated gross margin covers priced recorded sales. Unrecorded expenses are excluded; unexplained cash differences are outside price coverage.",
+  "@marginExclusions": {
+    "description": "Merchant interface: marginExclusions"
+  },
+  "reviewUnmatched": "Review unmatched payments and complete their details.",
+  "@reviewUnmatched": {
+    "description": "Merchant interface: reviewUnmatched"
+  },
+  "reviewDuplicate": "Review similar records before making a change.",
+  "@reviewDuplicate": {
+    "description": "Merchant interface: reviewDuplicate"
+  },
+  "reviewDebts": "Review outstanding debts and due dates.",
+  "@reviewDebts": {
+    "description": "Merchant interface: reviewDebts"
+  },
+  "noActionNeeded": "No record needs review here.",
+  "@noActionNeeded": {
+    "description": "Merchant interface: noActionNeeded"
+  },
+  "flagUnmatched": "Unmatched payment",
+  "@flagUnmatched": {
+    "description": "Merchant interface: flagUnmatched"
+  },
+  "flagDuplicate": "Suspected duplicate",
+  "@flagDuplicate": {
+    "description": "Merchant interface: flagDuplicate"
+  },
+  "flagPartial": "Partially settled",
+  "@flagPartial": {
+    "description": "Merchant interface: flagPartial"
+  },
+  "flagOverdue": "Overdue",
+  "@flagOverdue": {
+    "description": "Merchant interface: flagOverdue"
+  },
+  "flagAmbiguous": "Ambiguous match",
+  "@flagAmbiguous": {
+    "description": "Merchant interface: flagAmbiguous"
+  },
+  "flagOriginVoided": "The originating debt was voided.",
+  "@flagOriginVoided": {
+    "description": "Merchant interface: flagOriginVoided"
+  },
+  "flagUnallocated": "Part of this payment has no verified allocation.",
+  "@flagUnallocated": {
+    "description": "Merchant interface: flagUnallocated"
+  },
+  "flagReview": "Review the sources before any change.",
+  "@flagReview": {
+    "description": "Merchant interface: flagReview"
+  },
+  "basisSameDay": "Same amount and account on the same business day; distinct source IDs.",
+  "@basisSameDay": {
+    "description": "Merchant interface: basisSameDay"
+  },
+  "basisPartial": "Verified partial allocations.",
+  "@basisPartial": {
+    "description": "Merchant interface: basisPartial"
+  },
+  "basisOverdue": "Due date is before the business date.",
+  "@basisOverdue": {
+    "description": "Merchant interface: basisOverdue"
+  },
+  "basisCandidate": "A possible match needs merchant review.",
+  "@basisCandidate": {
+    "description": "Merchant interface: basisCandidate"
+  },
+  "basisUnmatched": "No verified obligation match.",
+  "@basisUnmatched": {
+    "description": "Merchant interface: basisUnmatched"
+  },
+  "more": "More",
+  "@more": {
+    "description": "Merchant interface: more"
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../constants/app_dimens.dart';
+import 'merchant_menu.dart';
 
 class MerchantPage extends StatelessWidget {
   const MerchantPage({
@@ -15,7 +16,7 @@ class MerchantPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: actions),
+      appBar: AppBar(title: Text(title), actions: const [MerchantMenu()]),
       body: SafeArea(
         child: Align(
           alignment: AlignmentDirectional.topCenter,
@@ -25,7 +26,14 @@ class MerchantPage extends StatelessWidget {
             ),
             child: ListView(
               padding: const EdgeInsets.all(AppDimens.lg),
-              children: children,
+              children: [
+                if (actions.isNotEmpty)
+                  Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: Wrap(children: actions),
+                  ),
+                ...children,
+              ],
             ),
           ),
         ),

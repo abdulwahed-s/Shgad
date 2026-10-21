@@ -1,3 +1,8 @@
+import '../../features/weekly_summary/data/datasources/weekly_summary_remote.dart';
+import '../../features/weekly_summary/data/repositories/weekly_summary_repository_impl.dart';
+import '../../features/weekly_summary/domain/repositories/weekly_summary_repository.dart';
+import '../../features/weekly_summary/domain/usecases/load_weekly_summary.dart';
+import '../../features/weekly_summary/presentation/bloc/weekly_summary_bloc.dart';
 import '../../features/evidence/data/datasources/evidence_remote.dart';
 import '../../features/evidence/data/repositories/evidence_repository_impl.dart';
 import '../../features/evidence/domain/repositories/evidence_repository.dart';
@@ -126,4 +131,14 @@ void configureDependencies() {
   getIt.registerFactory<EvidenceBloc>(
     () => EvidenceBloc(getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
   );
+  getIt.registerLazySingleton<WeeklySummaryRemote>(
+    () => WeeklySummaryRemote(getIt()),
+  );
+  getIt.registerLazySingleton<WeeklySummaryRepository>(
+    () => WeeklySummaryRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<LoadWeeklySummary>(
+    () => LoadWeeklySummary(getIt()),
+  );
+  getIt.registerFactory<WeeklySummaryBloc>(() => WeeklySummaryBloc(getIt()));
 }
