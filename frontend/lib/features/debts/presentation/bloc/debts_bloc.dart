@@ -3,5 +3,5 @@ import '../../domain/entities/debts.dart';
 import '../../domain/usecases/load_debts.dart';
 
 class DebtsBloc extends ReportBloc<Debts> {
-  DebtsBloc(LoadDebts super.load);
+  DebtsBloc(LoadDebts super.load, [super.resets]);
 }

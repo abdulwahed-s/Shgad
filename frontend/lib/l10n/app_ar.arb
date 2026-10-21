@@ -1119,5 +1119,55 @@
   "@assumptionSupplier": {
     "description": "Merchant interface: assumptionSupplier",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "sampleTitle": "المحل التجريبي",
+  "@sampleTitle": {
+    "description": "Merchant interface: sampleTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "demoShopName": "محل شكد التجريبي",
+  "@demoShopName": {
+    "description": "Merchant interface: demoShopName",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "fictionalShop": "هذا المحل وكل سجلاته خيالية. استخدم ملفات تجريبية بس.",
+  "@fictionalShop": {
+    "description": "Merchant interface: fictionalShop",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chatNotConfigured": "المحادثة مو مهيأة بهالخادم. صفحات الدفتر تبقى تشتغل.",
+  "@chatNotConfigured": {
+    "description": "Merchant interface: chatNotConfigured",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "resetWarning": "تبدل دفتر المحل التجريبي؟ هذا يمسح القيود والإلغاءات والتصحيحات اللي ضفتها للتجربة.",
+  "@resetWarning": {
+    "description": "Merchant interface: resetWarning",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "useSample": "استخدم أو رجّع المحل التجريبي",
+  "@useSample": {
+    "description": "Merchant interface: useSample",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "confirmReset": "أكد إعادة المحل التجريبي",
+  "@confirmReset": {
+    "description": "Merchant interface: confirmReset",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "sampleReady": "المحل التجريبي جاهز. انمسحت النسخ المحفوظة وأجوبة المحادثة القديمة.",
+  "@sampleReady": {
+    "description": "Merchant interface: sampleReady",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "openToday": "افتح صفحة اليوم",
+  "@openToday": {
+    "description": "Merchant interface: openToday",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "cancel": "إلغاء",
+  "@cancel": {
+    "description": "Merchant interface: cancel",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

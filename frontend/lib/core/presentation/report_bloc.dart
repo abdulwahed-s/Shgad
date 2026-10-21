@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:async';
+import '../domain/session_events.dart';
 import '../domain/snapshot.dart';
 import '../error/app_failure.dart';
 import '../usecase/load_report.dart';
@@ -33,19 +35,30 @@ final class ReportFailure<T> extends ReportState<T> {
 }
 
 class RefreshReport {
-  const RefreshReport();
+  const RefreshReport({this.clear = false});
+  final bool clear;
 }
 
 class ReportBloc<T> extends Bloc<RefreshReport, ReportState<T>> {
-  ReportBloc(this.load) : super(ReportInitial<T>()) {
+  ReportBloc(this.load, [WatchSessionReset? resets])
+    : super(ReportInitial<T>()) {
+    _resets = resets?.call().listen((_) {
+      _generation++;
+      add(const RefreshReport(clear: true));
+    });
     on<RefreshReport>((event, emit) async {
-      final previous = switch (state) {
-        ReportLoaded<T>(:final snapshot) ||
-        ReportOffline<T>(:final snapshot) => snapshot,
-        _ => null,
-      };
+      final request = ++_generation;
+      final previous = event.clear
+          ? null
+          : switch (state) {
+              ReportLoaded<T>(:final snapshot) ||
+              ReportOffline<T>(:final snapshot) => snapshot,
+              _ => null,
+            };
       emit(ReportLoading(previous));
-      switch (await load()) {
+      final result = await load();
+      if (request != _generation) return;
+      switch (result) {
         case Success<Snapshot<T>>(:final value):
           emit(value.offline ? ReportOffline(value) : ReportLoaded(value));
         case Failed<Snapshot<T>>(:final failure):
@@ -54,4 +67,11 @@ class ReportBloc<T> extends Bloc<RefreshReport, ReportState<T>> {
     });
   }
   final LoadReport<T> load;
+  int _generation = 0;
+  StreamSubscription<void>? _resets;
+  @override
+  Future<void> close() async {
+    await _resets?.cancel();
+    return super.close();
+  }
 }

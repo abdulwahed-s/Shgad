@@ -1,3 +1,5 @@
+import 'dart:async';
+import '../../../../core/domain/session_events.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/domain/amount.dart';
 import '../../../../core/domain/snapshot.dart';
@@ -109,7 +111,8 @@ sealed class ForecastEvent {
 }
 
 class RefreshForecast extends ForecastEvent {
-  const RefreshForecast();
+  const RefreshForecast({this.clear = false});
+  final bool clear;
 }
 
 class ChooseScenario extends ForecastEvent {
@@ -123,11 +126,19 @@ class ChooseForecastDay extends ForecastEvent {
 }
 
 class ForecastBloc extends Bloc<ForecastEvent, ForecastState> {
-  ForecastBloc(this.load) : super(const ForecastInitial(ForecastView())) {
+  ForecastBloc(this.load, [WatchSessionReset? resets])
+    : super(const ForecastInitial(ForecastView())) {
+    _resets = resets?.call().listen((_) {
+      _generation++;
+      add(const RefreshForecast(clear: true));
+    });
     on<RefreshForecast>((event, emit) async {
-      final old = state.view;
+      final request = ++_generation;
+      final old = event.clear ? const ForecastView() : state.view;
       emit(ForecastLoading(old));
-      switch (await load()) {
+      final result = await load();
+      if (request != _generation) return;
+      switch (result) {
         case Success<Snapshot<ForecastBundle>>(:final value):
           final view = ForecastView(
             snapshot: value,
@@ -154,6 +165,14 @@ class ForecastBloc extends Bloc<ForecastEvent, ForecastState> {
     });
   }
   final LoadForecast load;
+  int _generation = 0;
+  StreamSubscription<void>? _resets;
+  @override
+  Future<void> close() async {
+    await _resets?.cancel();
+    return super.close();
+  }
+
   void _show(Emitter<ForecastState> emit, ForecastView view) => emit(
     view.snapshot!.offline ? ForecastOffline(view) : ForecastLoaded(view),
   );

@@ -1,3 +1,9 @@
+import '../../core/domain/session_events.dart';
+import '../../features/sample_shop/data/datasources/sample_remote.dart';
+import '../../features/sample_shop/data/repositories/sample_repository_impl.dart';
+import '../../features/sample_shop/domain/repositories/sample_repository.dart';
+import '../../features/sample_shop/domain/usecases/sample_usecases.dart';
+import '../../features/sample_shop/presentation/bloc/sample_bloc.dart';
 import '../../features/forecast/data/datasources/forecast_remote.dart';
 import '../../features/forecast/data/repositories/forecast_repository_impl.dart';
 import '../../features/forecast/domain/repositories/forecast_repository.dart';
@@ -73,7 +79,9 @@ void configureDependencies() {
   getIt.registerLazySingleton<ResponseCache>(
     () => PreferencesResponseCache(getIt(), apiBaseUrl),
   );
-  getIt.registerLazySingleton<CachedReader>(() => CachedReader(getIt()));
+  getIt.registerLazySingleton<CachedReader>(
+    () => CachedReader(getIt(), getIt()),
+  );
   getIt.registerLazySingleton<ApiClient>(() => ApiClient(getIt(), getIt()));
   getIt.registerLazySingleton<ConnectionRepository>(
     () => DeviceConnectionRepository(getIt(), getIt()),
@@ -89,13 +97,13 @@ void configureDependencies() {
     () => TodayRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadToday>(() => LoadToday(getIt()));
-  getIt.registerFactory<TodayBloc>(() => TodayBloc(getIt()));
+  getIt.registerFactory<TodayBloc>(() => TodayBloc(getIt(), getIt()));
   getIt.registerLazySingleton<DebtsRemote>(() => DebtsRemote(getIt()));
   getIt.registerLazySingleton<DebtsRepository>(
     () => DebtsRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadDebts>(() => LoadDebts(getIt()));
-  getIt.registerFactory<DebtsBloc>(() => DebtsBloc(getIt()));
+  getIt.registerFactory<DebtsBloc>(() => DebtsBloc(getIt(), getIt()));
   getIt.registerLazySingleton<NewClientId>(NewClientId.new);
   getIt.registerLazySingleton<EntryRemote>(() => EntryRemote(getIt()));
   getIt.registerLazySingleton<EntryRepository>(
@@ -105,7 +113,15 @@ void configureDependencies() {
   getIt.registerLazySingleton<SaveEntry>(() => SaveEntry(getIt()));
   getIt.registerLazySingleton<UndoEntry>(() => UndoEntry(getIt()));
   getIt.registerFactory<EntryBloc>(
-    () => EntryBloc(getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
+    () => EntryBloc(
+      getIt(),
+      getIt(),
+      getIt(),
+      getIt(),
+      getIt(),
+      getIt(),
+      getIt(),
+    ),
   );
   getIt.registerLazySingleton<CloseRemote>(() => CloseRemote(getIt()));
   getIt.registerLazySingleton<CloseRepository>(
@@ -114,7 +130,15 @@ void configureDependencies() {
   getIt.registerLazySingleton<LoadClose>(() => LoadClose(getIt()));
   getIt.registerLazySingleton<ResolveClose>(() => ResolveClose(getIt()));
   getIt.registerFactory<CloseBloc>(
-    () => CloseBloc(getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
+    () => CloseBloc(
+      getIt(),
+      getIt(),
+      getIt(),
+      getIt(),
+      getIt(),
+      getIt(),
+      getIt(),
+    ),
   );
   getIt.registerLazySingleton<ChatRemote>(() => ChatRemote(getIt()));
   getIt.registerLazySingleton<ChatRepository>(
@@ -122,7 +146,7 @@ void configureDependencies() {
   );
   getIt.registerLazySingleton<SendChat>(() => SendChat(getIt()));
   getIt.registerLazySingleton<ChatBloc>(
-    () => ChatBloc(getIt(), getIt(), getIt(), getIt()),
+    () => ChatBloc(getIt(), getIt(), getIt(), getIt(), getIt()),
     dispose: (bloc) => bloc.close(),
   );
   getIt.registerLazySingleton<EvidenceRemote>(() => EvidenceRemote(getIt()));
@@ -145,11 +169,29 @@ void configureDependencies() {
   getIt.registerLazySingleton<LoadWeeklySummary>(
     () => LoadWeeklySummary(getIt()),
   );
-  getIt.registerFactory<WeeklySummaryBloc>(() => WeeklySummaryBloc(getIt()));
+  getIt.registerFactory<WeeklySummaryBloc>(
+    () => WeeklySummaryBloc(getIt(), getIt()),
+  );
   getIt.registerLazySingleton<ForecastRemote>(() => ForecastRemote(getIt()));
   getIt.registerLazySingleton<ForecastRepository>(
     () => ForecastRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadForecast>(() => LoadForecast(getIt()));
-  getIt.registerFactory<ForecastBloc>(() => ForecastBloc(getIt()));
+  getIt.registerFactory<ForecastBloc>(() => ForecastBloc(getIt(), getIt()));
+  getIt.registerLazySingleton<SessionEvents>(
+    SessionEvents.new,
+    dispose: (events) => events.dispose(),
+  );
+  getIt.registerLazySingleton<WatchSessionReset>(
+    () => WatchSessionReset(getIt()),
+  );
+  getIt.registerLazySingleton<SampleRemote>(() => SampleRemote(getIt()));
+  getIt.registerLazySingleton<SampleRepository>(
+    () => SampleRepositoryImpl(getIt(), getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<LoadSampleShop>(() => LoadSampleShop(getIt()));
+  getIt.registerLazySingleton<ResetSampleShop>(() => ResetSampleShop(getIt()));
+  getIt.registerFactory<SampleBloc>(
+    () => SampleBloc(getIt(), getIt(), getIt(), getIt()),
+  );
 }

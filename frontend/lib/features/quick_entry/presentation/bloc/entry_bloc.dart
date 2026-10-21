@@ -1,3 +1,4 @@
+import '../../../../core/domain/session_events.dart';
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/domain/amount.dart';
@@ -154,12 +155,20 @@ class RecheckEntry extends EntryEvent {
 }
 
 class EntryBloc extends Bloc<EntryEvent, EntryState> {
-  EntryBloc(this.load, this.save, this.undo, this.watch, this.check, this.ids)
-    : super(
-        EntryInitial(
-          EntryView(EntryDraft(ids(), const {}), online: watch.online),
-        ),
-      ) {
+  EntryBloc(
+    this.load,
+    this.save,
+    this.undo,
+    this.watch,
+    this.check,
+    this.ids, [
+    WatchSessionReset? resets,
+  ]) : super(
+         EntryInitial(
+           EntryView(EntryDraft(ids(), const {}), online: watch.online),
+         ),
+       ) {
+    _resets = resets?.call().listen((_) => add(const OpenEntry()));
     _connection = watch().listen((online) => add(EntryConnection(online)));
     on<EntryConnection>(
       (event, emit) => emit(
@@ -296,6 +305,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
   final WatchConnectivity watch;
   final CheckConnectivity check;
   final NewClientId ids;
+  StreamSubscription<void>? _resets;
   late final StreamSubscription<bool> _connection;
   void _failure(Emitter<EntryState> emit, EntryView view, AppFailure failure) =>
       emit(
@@ -305,6 +315,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
       );
   @override
   Future<void> close() async {
+    await _resets?.cancel();
     await _connection.cancel();
     return super.close();
   }

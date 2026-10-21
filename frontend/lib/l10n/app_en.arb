@@ -925,5 +925,45 @@
   "assumptionSupplier": "Supplier dues are projected as full payments on their due dates.",
   "@assumptionSupplier": {
     "description": "Merchant interface: assumptionSupplier"
+  },
+  "sampleTitle": "Sample shop",
+  "@sampleTitle": {
+    "description": "Merchant interface: sampleTitle"
+  },
+  "demoShopName": "Shgad fictional neighbourhood shop",
+  "@demoShopName": {
+    "description": "Merchant interface: demoShopName"
+  },
+  "fictionalShop": "This shop and every record are fictional. Use synthetic files only.",
+  "@fictionalShop": {
+    "description": "Merchant interface: fictionalShop"
+  },
+  "chatNotConfigured": "Chat is not configured on this server. The ledger screens still work.",
+  "@chatNotConfigured": {
+    "description": "Merchant interface: chatNotConfigured"
+  },
+  "resetWarning": "Replace the fictional sample ledger? This removes entries, voids and corrections you added to the sample.",
+  "@resetWarning": {
+    "description": "Merchant interface: resetWarning"
+  },
+  "useSample": "Use or reset the fictional sample",
+  "@useSample": {
+    "description": "Merchant interface: useSample"
+  },
+  "confirmReset": "Confirm sample reset",
+  "@confirmReset": {
+    "description": "Merchant interface: confirmReset"
+  },
+  "sampleReady": "The fictional sample is ready. Saved read caches and old chat answers were cleared.",
+  "@sampleReady": {
+    "description": "Merchant interface: sampleReady"
+  },
+  "openToday": "Open Today",
+  "@openToday": {
+    "description": "Merchant interface: openToday"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Merchant interface: cancel"
   }
 }

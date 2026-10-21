@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.chat import router as chat_router
 from app.api.daily_close import router as daily_close_router
+from app.api.demo import router as demo_router
 from app.api.entries import router as entries_router
 from app.api.errors import register_error_handlers
 from app.api.health import router as health_router
@@ -39,3 +40,4 @@ app.include_router(daily_close_router)
 app.include_router(queries_router)
 app.include_router(reports_router)
 app.include_router(source_evidence_router)
+app.include_router(demo_router)

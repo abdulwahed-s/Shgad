@@ -1,3 +1,4 @@
+import '../../../../core/domain/session_events.dart';
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/domain/connectivity.dart';
@@ -164,8 +165,10 @@ class CloseBloc extends Bloc<CloseEvent, CloseState> {
     this.undo,
     this.watch,
     this.check,
-    this.ids,
-  ) : super(CloseInitial(CloseView(online: watch.online))) {
+    this.ids, [
+    WatchSessionReset? resets,
+  ]) : super(CloseInitial(CloseView(online: watch.online))) {
+    _resets = resets?.call().listen((_) => add(const OpenClose()));
     subscription = watch().listen((online) => add(CloseConnection(online)));
     on<CloseConnection>(
       (event, emit) => _show(emit, state.view.copy(online: event.online)),
@@ -310,6 +313,7 @@ class CloseBloc extends Bloc<CloseEvent, CloseState> {
   final WatchConnectivity watch;
   final CheckConnectivity check;
   final NewClientId ids;
+  StreamSubscription<void>? _resets;
   late final StreamSubscription<bool> subscription;
   void _show(Emitter<CloseState> emit, CloseView view) =>
       emit(view.online ? CloseLoaded(view) : CloseOffline(view));
@@ -321,6 +325,7 @@ class CloseBloc extends Bloc<CloseEvent, CloseState> {
       );
   @override
   Future<void> close() async {
+    await _resets?.cancel();
     await subscription.cancel();
     return super.close();
   }

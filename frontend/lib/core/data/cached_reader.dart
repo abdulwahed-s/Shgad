@@ -1,19 +1,25 @@
 import '../cache/response_cache.dart';
 import '../domain/snapshot.dart';
+import '../domain/session_events.dart';
 import '../error/app_failure.dart';
 import '../network/api_client.dart';
 import '../utils/result.dart';
 
 class CachedReader {
-  CachedReader(this.cache);
+  CachedReader(this.cache, [this.events]);
   final ResponseCache cache;
+  final SessionEvents? events;
   Future<Result<Snapshot<T>>> call<T>(
     String key,
     Future<Map<String, dynamic>> Function() request,
     T Function(Map<String, dynamic>) parse,
   ) async {
+    final generation = events?.generation;
     try {
       final json = await request();
+      if (generation != events?.generation) {
+        return const Failed(AppFailure(FailureKind.unavailable));
+      }
       final data = parse(json);
       final stamp =
           json['last_synced_at'] as String? ??

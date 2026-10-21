@@ -65,8 +65,10 @@ class _TodayView extends StatelessWidget {
               ),
               const SizedBox(height: AppDimens.md),
               PrimaryButton(
-                text: l.entryTitle,
-                onPressed: () => context.push('/entry'),
+                text: data.cash.value == null ? l.useSample : l.entryTitle,
+                onPressed: () => context.push(
+                  data.cash.value == null ? '/sample' : '/entry',
+                ),
               ),
               SecondaryButton(
                 text: l.closeTitle,

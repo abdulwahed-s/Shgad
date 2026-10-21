@@ -1,3 +1,4 @@
+import '../../../../core/domain/session_events.dart';
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/domain/connectivity.dart';
@@ -90,10 +91,27 @@ class RecheckChat extends ChatEvent {
   const RecheckChat();
 }
 
+class ClearChat extends ChatEvent {
+  const ClearChat();
+}
+
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-  ChatBloc(this.send, this.watch, this.check, NewClientId ids)
-    : conversationId = ids(),
-      super(ChatInitial(ChatView(online: watch.online))) {
+  ChatBloc(
+    this.send,
+    this.watch,
+    this.check,
+    NewClientId ids, [
+    WatchSessionReset? resets,
+  ]) : conversationId = ids(),
+       super(ChatInitial(ChatView(online: watch.online))) {
+    _resets = resets?.call().listen((_) => add(const ClearChat()));
+    on<ClearChat>((event, emit) {
+      conversationId = ids();
+      _show(
+        emit,
+        ChatView(online: watch.online, revision: state.view.revision + 1),
+      );
+    });
     subscription = watch().listen((online) => add(ChatConnection(online)));
     on<ChatConnection>(
       (event, emit) => _show(emit, state.view.copy(online: event.online)),
@@ -158,12 +176,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final SendChat send;
   final WatchConnectivity watch;
   final CheckConnectivity check;
-  final String conversationId;
+  String conversationId;
+  StreamSubscription<void>? _resets;
   late final StreamSubscription<bool> subscription;
   void _show(Emitter<ChatState> emit, ChatView view) =>
       emit(view.online ? ChatLoaded(view) : ChatOffline(view));
   @override
   Future<void> close() async {
+    await _resets?.cancel();
     await subscription.cancel();
     return super.close();
   }
