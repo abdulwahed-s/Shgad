@@ -27,7 +27,7 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > The 55 fixed backend Arabic messages have human approval; frontend wording and
 > future additions still need review.
 
-## Capabilities and planned interface
+## Capabilities
 
 - Import fictional CSVs into a validated SQLite ledger with replay-safe batch receipts.
 - Record debts, partial payments, expenses, drawings, capital and cash counts through HTTP endpoints.
@@ -52,7 +52,7 @@ These examples describe the intended experience:
 | شلون كان شغلنا هالأسبوع؟ | A week-to-date summary of sales, collections, spending and estimated gross margin coverage. |
 | الشهر الجاي أكدر أوفي التزاماتي؟ | A secondary cash estimate with base, conservative and stress scenarios. |
 
-## Planned architecture
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -474,10 +474,13 @@ recovery cap. Logical prompts, development questions, schemas and scoring stayed
 unchanged. Different reasoning/resource profiles prevent a controlled model
 ranking; Gemini 3.8 Flash is the selected primary and live answer quality remains pending.
 
-The frontend was verified with Flutter 3.44.9 stable and Dart 3.12.2. It contains a static
-chat shell, defaults to Arabic RTL, and also supports English LTR. Cairo is bundled with
-its license. Backend requests use one Dio client configured with `API_BASE_URL`;
-the static shell does not call the backend or any model provider.
+The Flutter web app uses Arabic RTL by default, supports English labels, and bundles
+Cairo with its license. Today, debts, confirmed entries/undo, daily close, source
+evidence, backend-rendered chat, weekly reports and secondary cash estimates use
+the verified backend APIs through one Dio client. Chat replies remain server-rendered
+Arabic. Read-only screens cache responses with update times; offline writes are
+disabled and typed form values stay in place. No write queue or frontend provider key.
+The local SDK is Flutter3.44.9 stable/Dart3.12.2.
 
 From `frontend/`:
 
@@ -490,7 +493,7 @@ flutter test
 flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8000
 ```
 
-To build the web shell with runtime assets served locally:
+To build the web app with runtime assets served locally:
 
 ```sh
 flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=http://127.0.0.1:8000
@@ -498,8 +501,12 @@ flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=ht
 
 The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; Android builds
 and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
-Flutter merchant screens and model integration remain planned. CSV import/receipts,
-merchant entries and deterministic reports have HTTP interfaces, documented at `/docs`.
+Open **More → Sample shop** to restore the clearly fictional observed shop, then
+open Today and Chat. Reset asks before replacing sample edits and clears old caches
+and chat. It is disabled in production. The web CSV picker supports manual column
+mapping, a server-validated preview of up to five rows and explicit confirmation;
+edits require a fresh immutable preview. All files must be synthetic. The complete
+HTTP interfaces are documented at `/docs`.
 `GET /api/daily-close/{date}` compares consecutive counts against recorded cash
 flows and shows the signed unexplained difference. Missing counts remain missing.
 `POST /api/daily-close/{date}/resolve` accepts a merchant-chosen explanation or

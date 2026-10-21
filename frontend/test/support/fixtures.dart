@@ -253,3 +253,35 @@ Map<String, dynamic> forecastJson() {
     ],
   };
 }
+
+Map<String, dynamic> csvPreviewJson() => {
+  'mapping_id': 'map-test',
+  'columns': [
+    {'source_header': 'Ref', 'target_field': 'source_id'},
+    {'source_header': 'At', 'target_field': 'occurred_at'},
+    {'source_header': 'Kind', 'target_field': 'type'},
+    {'source_header': 'IQD', 'target_field': 'amount_iqd'},
+  ],
+  'unmapped_required': <String>[],
+  'preview_rows': [
+    {
+      'row': 1,
+      'parsed': {
+        'source_id': 'CSV-1',
+        'business_date': '2026-09-28',
+        'type': 'CASH_SALE',
+        'amount_iqd': 12000,
+      },
+      'errors': <Object>[],
+    },
+  ],
+  'can_confirm': true,
+};
+Map<String, dynamic> csvReceiptJson() => {
+  'batch_id': 'BATCH-IMPORT',
+  'accepted': 1,
+  'flagged_for_review': 0,
+  'rejected': 0,
+  'exact_duplicates': 0,
+  'errors': <Object>[],
+};

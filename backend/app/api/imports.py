@@ -3,7 +3,7 @@
 from inspect import isawaitable
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from app.api.dependencies import AuditTime, Clock, Database, mapping_model
 from app.schemas.csv_mapping import MappingPreview
@@ -53,18 +53,22 @@ async def map_csv(
     clock: Clock,
     now: AuditTime,
     proposer: Annotated[MappingProposer, Depends(mapping_model)],
+    columns_json: Annotated[str | None, Form(max_length=64000)] = None,
 ):
     try:
         content = await file.read(MAX_FILE_BYTES + 1)
         headers, rows = mapping_input(content, file.filename or "")
-        try:
-            proposal = proposer.propose(
-                headers=tuple(headers), sample_rows=tuple(rows[:3])
-            )
-            if isawaitable(proposal):
-                proposal = await proposal
-        except (TimeoutError, ConnectionError):
-            raise FinancialRuleError("LLM_UNAVAILABLE") from None
+        if columns_json is not None:
+            proposal = columns_json
+        else:
+            try:
+                proposal = proposer.propose(
+                    headers=tuple(headers), sample_rows=tuple(rows[:3])
+                )
+                if isawaitable(proposal):
+                    proposal = await proposal
+            except (TimeoutError, ConnectionError):
+                raise FinancialRuleError("LLM_UNAVAILABLE") from None
         return propose_mapping(
             db,
             content,

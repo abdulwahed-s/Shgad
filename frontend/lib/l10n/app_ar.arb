@@ -1169,5 +1169,226 @@
   "@cancel": {
     "description": "Merchant interface: cancel",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "importTitle": "استيراد ملف السجلات",
+  "@importTitle": {
+    "description": "Merchant interface: importTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chooseCsv": "اختار ملف سجلات تجريبي",
+  "@chooseCsv": {
+    "description": "Merchant interface: chooseCsv",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "syntheticCsvOnly": "سجلات خيالية بس. الملف يبقى بالذاكرة لحد ما تأكد؛ ماكو إرسال مؤجل بدون اتصال.",
+  "@syntheticCsvOnly": {
+    "description": "Merchant interface: syntheticCsvOnly",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "acknowledgeSynthetic": "أأكد إن كل سجلات هالملف خيالية.",
+  "@acknowledgeSynthetic": {
+    "description": "Merchant interface: acknowledgeSynthetic",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "columnMapping": "طابق الأعمدة",
+  "@columnMapping": {
+    "description": "Merchant interface: columnMapping",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "targetField": "حقل الدفتر",
+  "@targetField": {
+    "description": "Merchant interface: targetField",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "ignoreColumn": "تجاهل هالعمود",
+  "@ignoreColumn": {
+    "description": "Merchant interface: ignoreColumn",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "sourceIdField": "رقم سجل المصدر",
+  "@sourceIdField": {
+    "description": "Merchant interface: sourceIdField",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "eventTimeField": "تاريخ ووقت القيد",
+  "@eventTimeField": {
+    "description": "Merchant interface: eventTimeField",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "categoryField": "رقم صنف البضاعة",
+  "@categoryField": {
+    "description": "Merchant interface: categoryField",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "quantityField": "الكمية",
+  "@quantityField": {
+    "description": "Merchant interface: quantityField",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "currencyField": "العملة",
+  "@currencyField": {
+    "description": "Merchant interface: currencyField",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "recordedTimeField": "وقت تسجيل القيد",
+  "@recordedTimeField": {
+    "description": "Merchant interface: recordedTimeField",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "suggestMapping": "اقترح تطابق للأعمدة",
+  "@suggestMapping": {
+    "description": "Merchant interface: suggestMapping",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "previewMapping": "تحقق من هالتطابق واعرضه",
+  "@previewMapping": {
+    "description": "Merchant interface: previewMapping",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "mappingChanged": "التطابق تغير. تحقق من معاينة جديدة قبل الاستيراد.",
+  "@mappingChanged": {
+    "description": "Merchant interface: mappingChanged",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "previewFiveRows": "معاينة · أول خمس صفوف كحد أقصى",
+  "@previewFiveRows": {
+    "description": "Merchant interface: previewFiveRows",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "missingColumn": "تطابق مطلوب وناقص: {field}",
+  "@missingColumn": {
+    "description": "Merchant interface: missingColumn",
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "csvRow": "الصف {row}",
+  "@csvRow": {
+    "description": "Merchant interface: csvRow",
+    "placeholders": {
+      "row": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewImport": "راجع الاستيراد",
+  "@reviewImport": {
+    "description": "Merchant interface: reviewImport",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "importConfirmation": "تستورد {file} حسب المعاينة المتحقق منها {id}؟",
+  "@importConfirmation": {
+    "description": "Merchant interface: importConfirmation",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      },
+      "id": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "confirmImport": "أكد الاستيراد",
+  "@confirmImport": {
+    "description": "Merchant interface: confirmImport",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "savedBatch": "انحفظت دفعة الاستيراد · {id}",
+  "@savedBatch": {
+    "description": "Merchant interface: savedBatch",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "importAccepted": "مقبول: {count}",
+  "@importAccepted": {
+    "description": "Merchant interface: importAccepted",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "importFlagged": "مقبول ويحتاج مراجعة: {count}",
+  "@importFlagged": {
+    "description": "Merchant interface: importFlagged",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "importRejected": "مرفوض: {count}",
+  "@importRejected": {
+    "description": "Merchant interface: importRejected",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "importDuplicates": "مكرر بالضبط، بدون قيود جديدة: {count}",
+  "@importDuplicates": {
+    "description": "Merchant interface: importDuplicates",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "csvRowError": "الصف {row}: {reason}",
+  "@csvRowError": {
+    "description": "Merchant interface: csvRowError",
+    "placeholders": {
+      "row": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "importAnother": "استورد ملف ثاني",
+  "@importAnother": {
+    "description": "Merchant interface: importAnother",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorAmount": "استخدم مبلغ دينار كامل وموجب.",
+  "@errorAmount": {
+    "description": "Merchant interface: errorAmount",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorCategory": "رقم الصنف مو معروف.",
+  "@errorCategory": {
+    "description": "Merchant interface: errorCategory",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorIdentity": "رقم المصدر موجود بمحتوى مختلف.",
+  "@errorIdentity": {
+    "description": "Merchant interface: errorIdentity",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "csvDuplicate": "مكرر بالضبط؛ ما يضيف أثر للدفتر.",
+  "@csvDuplicate": {
+    "description": "Merchant interface: csvDuplicate",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "errorCurrency": "نقبل الدينار العراقي بس.",
+  "@errorCurrency": {
+    "description": "Merchant interface: errorCurrency",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

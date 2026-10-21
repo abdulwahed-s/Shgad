@@ -965,5 +965,192 @@
   "cancel": "Cancel",
   "@cancel": {
     "description": "Merchant interface: cancel"
+  },
+  "importTitle": "Import CSV",
+  "@importTitle": {
+    "description": "Merchant interface: importTitle"
+  },
+  "chooseCsv": "Choose a fictional CSV file",
+  "@chooseCsv": {
+    "description": "Merchant interface: chooseCsv"
+  },
+  "syntheticCsvOnly": "Fictional records only. Files stay in memory until you confirm; nothing is queued offline.",
+  "@syntheticCsvOnly": {
+    "description": "Merchant interface: syntheticCsvOnly"
+  },
+  "acknowledgeSynthetic": "I confirm that every record in this file is fictional.",
+  "@acknowledgeSynthetic": {
+    "description": "Merchant interface: acknowledgeSynthetic"
+  },
+  "columnMapping": "Match the columns",
+  "@columnMapping": {
+    "description": "Merchant interface: columnMapping"
+  },
+  "targetField": "Ledger field",
+  "@targetField": {
+    "description": "Merchant interface: targetField"
+  },
+  "ignoreColumn": "Ignore this column",
+  "@ignoreColumn": {
+    "description": "Merchant interface: ignoreColumn"
+  },
+  "sourceIdField": "Source record ID",
+  "@sourceIdField": {
+    "description": "Merchant interface: sourceIdField"
+  },
+  "eventTimeField": "Event date and time",
+  "@eventTimeField": {
+    "description": "Merchant interface: eventTimeField"
+  },
+  "categoryField": "Category ID",
+  "@categoryField": {
+    "description": "Merchant interface: categoryField"
+  },
+  "quantityField": "Quantity",
+  "@quantityField": {
+    "description": "Merchant interface: quantityField"
+  },
+  "currencyField": "Currency",
+  "@currencyField": {
+    "description": "Merchant interface: currencyField"
+  },
+  "recordedTimeField": "Recorded audit time",
+  "@recordedTimeField": {
+    "description": "Merchant interface: recordedTimeField"
+  },
+  "suggestMapping": "Suggest a mapping",
+  "@suggestMapping": {
+    "description": "Merchant interface: suggestMapping"
+  },
+  "previewMapping": "Validate and preview this mapping",
+  "@previewMapping": {
+    "description": "Merchant interface: previewMapping"
+  },
+  "mappingChanged": "Mapping changed. Validate a new preview before importing.",
+  "@mappingChanged": {
+    "description": "Merchant interface: mappingChanged"
+  },
+  "previewFiveRows": "Preview · first five rows at most",
+  "@previewFiveRows": {
+    "description": "Merchant interface: previewFiveRows"
+  },
+  "missingColumn": "Required mapping missing: {field}",
+  "@missingColumn": {
+    "description": "Merchant interface: missingColumn",
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "csvRow": "Row {row}",
+  "@csvRow": {
+    "description": "Merchant interface: csvRow",
+    "placeholders": {
+      "row": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewImport": "Review import",
+  "@reviewImport": {
+    "description": "Merchant interface: reviewImport"
+  },
+  "importConfirmation": "Import {file} using verified preview {id}?",
+  "@importConfirmation": {
+    "description": "Merchant interface: importConfirmation",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      },
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmImport": "Confirm import",
+  "@confirmImport": {
+    "description": "Merchant interface: confirmImport"
+  },
+  "savedBatch": "Saved import batch · {id}",
+  "@savedBatch": {
+    "description": "Merchant interface: savedBatch",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "importAccepted": "Accepted: {count}",
+  "@importAccepted": {
+    "description": "Merchant interface: importAccepted",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "importFlagged": "Accepted, needs review: {count}",
+  "@importFlagged": {
+    "description": "Merchant interface: importFlagged",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "importRejected": "Rejected: {count}",
+  "@importRejected": {
+    "description": "Merchant interface: importRejected",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "importDuplicates": "Exact replays, no new entries: {count}",
+  "@importDuplicates": {
+    "description": "Merchant interface: importDuplicates",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "csvRowError": "Row {row}: {reason}",
+  "@csvRowError": {
+    "description": "Merchant interface: csvRowError",
+    "placeholders": {
+      "row": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "importAnother": "Import another file",
+  "@importAnother": {
+    "description": "Merchant interface: importAnother"
+  },
+  "errorAmount": "Use a positive whole IQD amount.",
+  "@errorAmount": {
+    "description": "Merchant interface: errorAmount"
+  },
+  "errorCategory": "The category reference is unknown.",
+  "@errorCategory": {
+    "description": "Merchant interface: errorCategory"
+  },
+  "errorIdentity": "This source ID already has different content.",
+  "@errorIdentity": {
+    "description": "Merchant interface: errorIdentity"
+  },
+  "csvDuplicate": "Exact replay; no additional ledger effect.",
+  "@csvDuplicate": {
+    "description": "Merchant interface: csvDuplicate"
+  },
+  "errorCurrency": "Only Iraqi dinars are accepted.",
+  "@errorCurrency": {
+    "description": "Merchant interface: errorCurrency"
   }
 }

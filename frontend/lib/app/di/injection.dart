@@ -1,3 +1,9 @@
+import '../../features/csv_import/data/datasources/csv_remote.dart';
+import '../../features/csv_import/data/datasources/csv_picker.dart';
+import '../../features/csv_import/data/repositories/csv_repository_impl.dart';
+import '../../features/csv_import/domain/repositories/csv_repository.dart';
+import '../../features/csv_import/domain/usecases/csv_usecases.dart';
+import '../../features/csv_import/presentation/bloc/csv_bloc.dart';
 import '../../core/domain/session_events.dart';
 import '../../features/sample_shop/data/datasources/sample_remote.dart';
 import '../../features/sample_shop/data/repositories/sample_repository_impl.dart';
@@ -193,5 +199,16 @@ void configureDependencies() {
   getIt.registerLazySingleton<ResetSampleShop>(() => ResetSampleShop(getIt()));
   getIt.registerFactory<SampleBloc>(
     () => SampleBloc(getIt(), getIt(), getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<CsvRemote>(() => CsvRemote(getIt()));
+  getIt.registerLazySingleton<CsvPicker>(CsvPicker.new);
+  getIt.registerLazySingleton<CsvRepository>(
+    () => CsvRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<PickCsv>(() => PickCsv(getIt()));
+  getIt.registerLazySingleton<PreviewCsv>(() => PreviewCsv(getIt()));
+  getIt.registerLazySingleton<ConfirmCsv>(() => ConfirmCsv(getIt()));
+  getIt.registerFactory<CsvBloc>(
+    () => CsvBloc(getIt(), getIt(), getIt(), getIt(), getIt()),
   );
 }

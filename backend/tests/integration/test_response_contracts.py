@@ -9,15 +9,19 @@ from app.api.health import HealthResponse
 from app.schemas.chat import ChatResponse
 from app.schemas.csv_mapping import MappingPreview
 from app.schemas.daily_close import DailyCloseView, ResolutionReceipt
+from app.schemas.demo import DemoReceipt
 from app.schemas.entries import EntryReceipt, VoidReceipt
 from app.schemas.evidence import LedgerDetail, LedgerPage
 from app.schemas.forecast import ForecastReport
 from app.schemas.imports import ImportReceipt
 from app.schemas.queries import DebtReport, FlagsReport, MetaReport, UpcomingObligations
 from app.schemas.reports import MarginReport, WeeklyReport
+from app.schemas.source_evidence import SourceEvidencePage
 from app.schemas.tools import ErrorResponse
 
 CONTRACTS = {
+    ("get", "/api/evidence/sources"): SourceEvidencePage,
+    ("post", "/api/demo/reset"): DemoReceipt,
     ("post", "/api/chat"): ChatResponse,
     ("get", "/health"): HealthResponse,
     ("get", "/api/meta"): MetaReport,
@@ -63,6 +67,7 @@ def test_every_implemented_success_response_validates(api, tool_history):
         ("/api/reports/margin", "/api/reports/margin?period=this_week"),
         ("/api/flags", "/api/flags"),
         ("/api/daily-close/{business_date}", "/api/daily-close/2026-09-28"),
+        ("/api/evidence/sources", "/api/evidence/sources?ids=SALE-8,CAT-01"),
     ]:
         check(("get", path), api.get(url))
     check(
@@ -151,6 +156,7 @@ def test_every_implemented_success_response_validates(api, tool_history):
         ("post", "/api/imports/csv/mapping/{mapping_id}/confirm"),
         api.post(f"/api/imports/csv/mapping/{mapping['mapping_id']}/confirm"),
     )
+    check(("post", "/api/demo/reset"), api.post("/api/demo/reset"))
     assert seen == set(CONTRACTS)
 
 
