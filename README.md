@@ -13,8 +13,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > Five read-only tools, margin/weekly reports, deterministic Arabic figure rendering,
 > reconciliation and cutoff-safe cash-estimate HTTP routes are tested. Chat and CSV
 > mapping use a configurable provider client with bounded retries and failover;
-> their integration is verified with recorded provider responses. Flutter remains a
-> static localized shell; merchant screens and frontend chat integration are planned.
+> their integration is verified with recorded provider responses. Flutter web now opens on a localized Today cash/obligations view with a read-only
+> offline cache and separate counted/update times. Other merchant screens are being connected.
 > Gemini, Groq and OpenAI completed bounded development routing screens. With
 > larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
 > Both selected provider APIs now respond successfully. Live CSV previews and
@@ -36,7 +36,7 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 - Query sales, debts, reconciliation, estimated gross margin and cash estimates through five validated tools.
 - Return deterministic weekly totals and a secondary cash estimate with base, conservative and stress scenarios.
 - Render sourced figures and dates in Arabic, with validation and deterministic template fallback.
-- Planned merchant screens will put today's cash, debts, entry and daily close first.
+- Flutter web opens on today's cash and seven-day obligations, with a reusable RTL component gallery.
 - Answer chat requests through a bounded, read-only agent with verified figures and source evidence.
 
 ## Merchant questions

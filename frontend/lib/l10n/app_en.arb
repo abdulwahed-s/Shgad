@@ -173,5 +173,136 @@
   "errorInternal": "Could not verify this view. Try again.",
   "@errorInternal": {
     "description": "Merchant interface: errorInternal"
+  },
+  "todayTitle": "Today",
+  "@todayTitle": {
+    "description": "Merchant interface: todayTitle"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Merchant interface: refresh"
+  },
+  "businessDate": "Business date · {date}",
+  "@businessDate": {
+    "description": "Merchant interface: businessDate",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "countMissing": "No counted time available",
+  "@countMissing": {
+    "description": "Merchant interface: countMissing"
+  },
+  "countedAt": "Cash counted at {time}",
+  "@countedAt": {
+    "description": "Merchant interface: countedAt",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "upcomingRange": "Next seven days · {start} to {end}",
+  "@upcomingRange": {
+    "description": "Merchant interface: upcomingRange",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "supplierDues": "Supplier dues",
+  "@supplierDues": {
+    "description": "Merchant interface: supplierDues"
+  },
+  "expectedCollections": "Expected collections",
+  "@expectedCollections": {
+    "description": "Merchant interface: expectedCollections"
+  },
+  "positionExpected": "After dues · with expected collections",
+  "@positionExpected": {
+    "description": "Merchant interface: positionExpected"
+  },
+  "firstShortConfirmed": "First shortfall · confirmed cash: {date}",
+  "@firstShortConfirmed": {
+    "description": "Merchant interface: firstShortConfirmed",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "firstShortExpected": "First shortfall · with expected: {date}",
+  "@firstShortExpected": {
+    "description": "Merchant interface: firstShortExpected",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "noShortfall": "None in this period",
+  "@noShortfall": {
+    "description": "Merchant interface: noShortfall"
+  },
+  "dueAt": "Due {date}",
+  "@dueAt": {
+    "description": "Merchant interface: dueAt",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dueNow": "Due now",
+  "@dueNow": {
+    "description": "Merchant interface: dueNow"
+  },
+  "overdueExcluded": "Overdue receivables · timing unknown, excluded from expected",
+  "@overdueExcluded": {
+    "description": "Merchant interface: overdueExcluded"
+  },
+  "debtsTitle": "Debts",
+  "@debtsTitle": {
+    "description": "Merchant interface: debtsTitle"
+  },
+  "receivables": "Customers owe the shop",
+  "@receivables": {
+    "description": "Merchant interface: receivables"
+  },
+  "payables": "The shop owes suppliers",
+  "@payables": {
+    "description": "Merchant interface: payables"
+  },
+  "outstanding": "Still outstanding",
+  "@outstanding": {
+    "description": "Merchant interface: outstanding"
+  },
+  "originalAmount": "Original amount",
+  "@originalAmount": {
+    "description": "Merchant interface: originalAmount"
+  },
+  "paymentSources": "Payment source IDs: {ids}",
+  "@paymentSources": {
+    "description": "Merchant interface: paymentSources",
+    "placeholders": {
+      "ids": {
+        "type": "String"
+      }
+    }
+  },
+  "timeInBaghdad": "{time} Baghdad",
+  "@timeInBaghdad": {
+    "description": "Merchant interface: timeInBaghdad",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

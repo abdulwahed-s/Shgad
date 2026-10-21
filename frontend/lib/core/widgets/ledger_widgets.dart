@@ -3,6 +3,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../constants/app_dimens.dart';
 import '../domain/amount.dart';
 import '../utils/iqd_formatter.dart';
+import '../utils/date_formatter.dart';
 
 class LedgerCard extends StatelessWidget {
   const LedgerCard({required this.child, super.key});
@@ -173,8 +174,17 @@ class OfflineBanner extends StatelessWidget {
   const OfflineBanner({required this.updatedAt, super.key});
   final String updatedAt;
   @override
-  Widget build(BuildContext context) =>
-      InfoStrip(text: AppLocalizations.of(context).offlineUpdated(updatedAt));
+  Widget build(BuildContext context) => InfoStrip(
+    text: AppLocalizations.of(context).offlineUpdated(
+      AppLocalizations.of(context).timeInBaghdad(
+        formatDate(
+          updatedAt,
+          AppLocalizations.of(context).localeName,
+          timestamp: true,
+        ),
+      ),
+    ),
+  );
 }
 
 class EmptyState extends StatelessWidget {

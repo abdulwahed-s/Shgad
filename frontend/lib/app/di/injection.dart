@@ -10,6 +10,11 @@ import '../../core/network/api_client.dart';
 import '../../core/network/connectivity.dart';
 import '../../core/network/dio_client.dart';
 import '../router.dart';
+import '../../features/today/data/datasources/today_remote.dart';
+import '../../features/today/data/repositories/today_repository_impl.dart';
+import '../../features/today/domain/repositories/today_repository.dart';
+import '../../features/today/domain/usecases/load_today.dart';
+import '../../features/today/presentation/bloc/today_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -43,4 +48,10 @@ void configureDependencies() {
   getIt.registerLazySingleton<CheckConnectivity>(
     () => CheckConnectivity(getIt()),
   );
+  getIt.registerLazySingleton<TodayRemote>(() => TodayRemote(getIt()));
+  getIt.registerLazySingleton<TodayRepository>(
+    () => TodayRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<LoadToday>(() => LoadToday(getIt()));
+  getIt.registerFactory<TodayBloc>(() => TodayBloc(getIt()));
 }

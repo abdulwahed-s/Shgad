@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../domain/snapshot.dart';
 import '../presentation/report_bloc.dart';
+import '../utils/date_formatter.dart';
 import 'failure_view.dart';
 import 'ledger_widgets.dart';
 
@@ -33,7 +34,15 @@ class ReportView<T, B extends ReportBloc<T>> extends StatelessWidget {
               OfflineBanner(updatedAt: snapshot.updatedAt)
             else
               Text(
-                AppLocalizations.of(context).updatedAt(snapshot.updatedAt),
+                AppLocalizations.of(context).updatedAt(
+                  AppLocalizations.of(context).timeInBaghdad(
+                    formatDate(
+                      snapshot.updatedAt,
+                      AppLocalizations.of(context).localeName,
+                      timestamp: true,
+                    ),
+                  ),
+                ),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             builder(context, snapshot.data),

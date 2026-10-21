@@ -214,5 +214,158 @@
   "@errorInternal": {
     "description": "Merchant interface: errorInternal",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "todayTitle": "اليوم",
+  "@todayTitle": {
+    "description": "Merchant interface: todayTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "refresh": "حدّث",
+  "@refresh": {
+    "description": "Merchant interface: refresh",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "businessDate": "تاريخ الشغل · {date}",
+  "@businessDate": {
+    "description": "Merchant interface: businessDate",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "countMissing": "وقت العدّ مو متوفر",
+  "@countMissing": {
+    "description": "Merchant interface: countMissing",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "countedAt": "النقد معدود بوقت {time}",
+  "@countedAt": {
+    "description": "Merchant interface: countedAt",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "upcomingRange": "الأيام السبعة الجاية · {start} إلى {end}",
+  "@upcomingRange": {
+    "description": "Merchant interface: upcomingRange",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "supplierDues": "مستحقات المجهزين",
+  "@supplierDues": {
+    "description": "Merchant interface: supplierDues",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "expectedCollections": "التحصيل المتوقع",
+  "@expectedCollections": {
+    "description": "Merchant interface: expectedCollections",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "positionExpected": "الرصيد بعد المستحقات ويا التحصيل المتوقع",
+  "@positionExpected": {
+    "description": "Merchant interface: positionExpected",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "firstShortConfirmed": "أول نقص · بالنقد المؤكد: {date}",
+  "@firstShortConfirmed": {
+    "description": "Merchant interface: firstShortConfirmed",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "firstShortExpected": "أول نقص · ويا المتوقع: {date}",
+  "@firstShortExpected": {
+    "description": "Merchant interface: firstShortExpected",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "noShortfall": "ماكو بهالفترة",
+  "@noShortfall": {
+    "description": "Merchant interface: noShortfall",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "dueAt": "مستحق بتاريخ {date}",
+  "@dueAt": {
+    "description": "Merchant interface: dueAt",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "dueNow": "مستحق هسه",
+  "@dueNow": {
+    "description": "Merchant interface: dueNow",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "overdueExcluded": "ديون متأخرة · وقت التحصيل مجهول وخارج المتوقع",
+  "@overdueExcluded": {
+    "description": "Merchant interface: overdueExcluded",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "debtsTitle": "الديون",
+  "@debtsTitle": {
+    "description": "Merchant interface: debtsTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "receivables": "بذمة الزبائن للمحل",
+  "@receivables": {
+    "description": "Merchant interface: receivables",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "payables": "بذمة المحل للمجهزين",
+  "@payables": {
+    "description": "Merchant interface: payables",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "outstanding": "المبلغ الباقي",
+  "@outstanding": {
+    "description": "Merchant interface: outstanding",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "originalAmount": "المبلغ الأصلي",
+  "@originalAmount": {
+    "description": "Merchant interface: originalAmount",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "paymentSources": "أرقام سجلات الدفعات: {ids}",
+  "@paymentSources": {
+    "description": "Merchant interface: paymentSources",
+    "placeholders": {
+      "ids": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "timeInBaghdad": "{time} بغداد",
+  "@timeInBaghdad": {
+    "description": "Merchant interface: timeInBaghdad",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
   }
 }
