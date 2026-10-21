@@ -829,5 +829,35 @@
   "@send": {
     "description": "Merchant interface: send",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "dismiss": "سدّ",
+  "@dismiss": {
+    "description": "Merchant interface: dismiss",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "noEvidenceRows": "هالمعادلة ما إلها صفوف مصدر.",
+  "@noEvidenceRows": {
+    "description": "Merchant interface: noEvidenceRows",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "openingBalance": "رصيد البداية المسجل",
+  "@openingBalance": {
+    "description": "Merchant interface: openingBalance",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "unitBuyPrice": "سعر شراء الوحدة المسجل",
+  "@unitBuyPrice": {
+    "description": "Merchant interface: unitBuyPrice",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "unitSellPrice": "سعر بيع الوحدة المسجل",
+  "@unitSellPrice": {
+    "description": "Merchant interface: unitSellPrice",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "originalRow": "شوف الصف الأصلي",
+  "@originalRow": {
+    "description": "Merchant interface: originalRow",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

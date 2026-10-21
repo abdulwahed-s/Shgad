@@ -12,6 +12,7 @@ from app.api.imports import router as imports_router
 from app.api.ledger import router as ledger_router
 from app.api.queries import router as queries_router
 from app.api.reports import router as reports_router
+from app.api.source_evidence import router as source_evidence_router
 from app.schemas.tools import ErrorResponse
 
 app = FastAPI(
@@ -37,3 +38,4 @@ app.include_router(ledger_router)
 app.include_router(daily_close_router)
 app.include_router(queries_router)
 app.include_router(reports_router)
+app.include_router(source_evidence_router)

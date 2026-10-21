@@ -62,6 +62,7 @@ class AmountView extends StatelessWidget {
     this.exact = false,
     this.onTap,
     this.caption,
+    this.voided = false,
     super.key,
   });
   final Amount amount;
@@ -70,6 +71,7 @@ class AmountView extends StatelessWidget {
   final bool exact;
   final VoidCallback? onTap;
   final String? caption;
+  final bool voided;
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -98,7 +100,9 @@ class AmountView extends StatelessWidget {
                             ? Theme.of(context).textTheme.headlineLarge
                             : Theme.of(context).textTheme.titleSmall)
                         ?.copyWith(
-                          decoration: onTap == null
+                          decoration: voided
+                              ? TextDecoration.lineThrough
+                              : onTap == null
                               ? null
                               : TextDecoration.underline,
                           decorationStyle: TextDecorationStyle.dotted,

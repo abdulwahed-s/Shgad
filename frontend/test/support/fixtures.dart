@@ -115,3 +115,55 @@ Map<String, dynamic> chatJson() => {
   'used_tools': ['forecast'],
   'renderer': {'attempts': 1, 'fell_back_to_template': false},
 };
+Map<String, dynamic> ledgerJson({
+  String id = 'CNT-090',
+  bool voided = false,
+  String? correction,
+}) => {
+  'source_id': id,
+  'occurred_at': '2026-09-28T21:00:00+03:00',
+  'business_date': '2026-09-28',
+  'type': 'CASH_SALE',
+  'amount_iqd': 12000,
+  'counterparty': null,
+  'obligation_id': null,
+  'category_id': null,
+  'quantity': null,
+  'status': voided ? 'voided' : 'valid',
+  'import_batch_id': 'BATCH-TEST',
+  'source': 'manual_entry',
+  'description': 'Plain synthetic note <script>never executed</script>',
+  'void': voided
+      ? {
+          'void_id': 'VOID-1',
+          'reason': 'mistyped',
+          'voided_at': '2026-10-20T10:00:00+03:00',
+        }
+      : null,
+  'correction_of_source_id': correction,
+  'raw_row': {'synthetic': true},
+  'flags': <Object>[],
+};
+Map<String, dynamic> sourcesJson() => {
+  'items': [
+    {
+      'kind': 'transaction',
+      'source_id': 'CNT-090',
+      'transaction': ledgerJson(voided: true),
+      'category': null,
+      'opening_balance': null,
+    },
+    {
+      'kind': 'category',
+      'source_id': 'CAT-01',
+      'transaction': null,
+      'category': {
+        'category_id': 'CAT-01',
+        'name': 'سلعة تجريبية',
+        'buy_price_iqd': 1000,
+        'sell_price_iqd': 5000,
+      },
+      'opening_balance': null,
+    },
+  ],
+};

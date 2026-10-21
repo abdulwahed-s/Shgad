@@ -691,5 +691,29 @@
   "send": "Send",
   "@send": {
     "description": "Merchant interface: send"
+  },
+  "dismiss": "Close",
+  "@dismiss": {
+    "description": "Merchant interface: dismiss"
+  },
+  "noEvidenceRows": "This formula has no underlying source rows.",
+  "@noEvidenceRows": {
+    "description": "Merchant interface: noEvidenceRows"
+  },
+  "openingBalance": "Recorded opening cash",
+  "@openingBalance": {
+    "description": "Merchant interface: openingBalance"
+  },
+  "unitBuyPrice": "Recorded unit buying price",
+  "@unitBuyPrice": {
+    "description": "Merchant interface: unitBuyPrice"
+  },
+  "unitSellPrice": "Recorded unit selling price",
+  "@unitSellPrice": {
+    "description": "Merchant interface: unitSellPrice"
+  },
+  "originalRow": "Show original row",
+  "@originalRow": {
+    "description": "Merchant interface: originalRow"
   }
 }

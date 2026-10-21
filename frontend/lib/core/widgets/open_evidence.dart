@@ -1,25 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../domain/amount.dart';
-import 'ledger_widgets.dart';
+import '../domain/evidence_request.dart';
 
-void openEvidence(BuildContext context, Amount amount) {
-  openSourceEvidence(context, amount.sources, amount.formula);
-}
-
+void openEvidence(BuildContext context, Amount amount) =>
+    openSourceEvidence(context, amount.sources, amount.formula);
 void openSourceEvidence(
   BuildContext context,
   List<String> sources,
   String formula,
 ) {
-  showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    builder: (_) => EvidenceSheet(
-      formula: formula,
-      children: [
-        for (final id in sources)
-          Text(id, style: Theme.of(context).textTheme.bodySmall),
-      ],
-    ),
-  );
+  context.push('/evidence', extra: EvidenceRequest(sources, formula));
 }
