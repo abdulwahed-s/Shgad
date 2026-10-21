@@ -50,6 +50,12 @@ class MerchantPage extends StatelessWidget {
               ),
               Expanded(
                 child: TextButton(
+                  onPressed: () => context.go('/debts'),
+                  child: Text(l.debtsTitle),
+                ),
+              ),
+              Expanded(
+                child: TextButton(
                   onPressed: () => context.go('/chat'),
                   child: Text(l.chatTitle),
                 ),

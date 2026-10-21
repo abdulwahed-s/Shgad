@@ -1,6 +1,6 @@
 """Deterministic daily-workflow query endpoints with no provider dependency."""
 
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query
 
@@ -19,9 +19,17 @@ router = APIRouter(tags=["financial queries"])
 
 
 @router.get("/api/debts", response_model=DebtReport)
-async def debts(db: Database, clock: Clock, now: AuditTime, overdue_only: bool = False):
+async def debts(
+    db: Database,
+    clock: Clock,
+    now: AuditTime,
+    overdue_only: bool = False,
+    direction: Literal["receivable", "payable"] = "receivable",
+):
     return debt_report(
-        QuerySnapshot(db, clock=clock, known_at=now), overdue_only=overdue_only
+        QuerySnapshot(db, clock=clock, known_at=now),
+        overdue_only=overdue_only,
+        direction=direction,
     )
 
 

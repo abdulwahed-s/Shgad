@@ -1,3 +1,8 @@
+import '../../features/debts/data/datasources/debts_remote.dart';
+import '../../features/debts/data/repositories/debts_repository_impl.dart';
+import '../../features/debts/domain/repositories/debts_repository.dart';
+import '../../features/debts/domain/usecases/load_debts.dart';
+import '../../features/debts/presentation/bloc/debts_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
@@ -54,4 +59,10 @@ void configureDependencies() {
   );
   getIt.registerLazySingleton<LoadToday>(() => LoadToday(getIt()));
   getIt.registerFactory<TodayBloc>(() => TodayBloc(getIt()));
+  getIt.registerLazySingleton<DebtsRemote>(() => DebtsRemote(getIt()));
+  getIt.registerLazySingleton<DebtsRepository>(
+    () => DebtsRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<LoadDebts>(() => LoadDebts(getIt()));
+  getIt.registerFactory<DebtsBloc>(() => DebtsBloc(getIt()));
 }
