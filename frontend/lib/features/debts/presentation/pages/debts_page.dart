@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../app/di/injection.dart';
 import '../../../../core/presentation/report_bloc.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
@@ -38,9 +39,17 @@ class _DebtsView extends StatelessWidget {
           builder: (context, data) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DebtSectionView(section: data.receivables, title: l.receivables),
+              DebtSectionView(
+                section: data.receivables,
+                title: l.receivables,
+                payable: false,
+              ),
               const Divider(),
-              DebtSectionView(section: data.payables, title: l.payables),
+              DebtSectionView(
+                section: data.payables,
+                title: l.payables,
+                payable: true,
+              ),
             ],
           ),
         ),
@@ -53,10 +62,12 @@ class DebtSectionView extends StatelessWidget {
   const DebtSectionView({
     required this.section,
     required this.title,
+    required this.payable,
     super.key,
   });
   final DebtSection section;
   final String title;
+  final bool payable;
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -103,6 +114,22 @@ class DebtSectionView extends StatelessWidget {
                 ),
                 if (obligation.collections.isNotEmpty)
                   Text(l.paymentSources(obligation.collections.join(', '))),
+                SecondaryButton(
+                  text: payable ? l.partialPayment : l.partialCollection,
+                  onPressed: () => context.push(
+                    Uri(
+                      path: '/entry',
+                      queryParameters: {
+                        'type': payable
+                            ? 'SUPPLIER_PAYMENT'
+                            : 'CREDIT_COLLECTION',
+                        'counterparty_id': party.id,
+                        'obligation_id': obligation.id,
+                        'business_date': section.asOf,
+                      },
+                    ).toString(),
+                  ),
+                ),
               ],
             ],
           ),

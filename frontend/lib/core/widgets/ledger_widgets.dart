@@ -32,6 +32,7 @@ class StatusLabel extends StatelessWidget {
       'missing' => (l.missing, c.surfaceContainerHighest, c.onSurfaceVariant),
       'flagged' => (l.flagged, c.errorContainer, c.onErrorContainer),
       'calculated' => (l.calculated, c.tertiary, c.onTertiary),
+      'entered' => (l.entered, c.surfaceContainerHighest, c.onSurfaceVariant),
       _ => (l.verified, c.tertiary, c.onTertiary),
     };
     return Container(

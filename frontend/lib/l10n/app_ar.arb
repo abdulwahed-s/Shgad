@@ -367,5 +367,240 @@
       }
     },
     "x-review": "pending Iraqi Arabic review"
+  },
+  "entryTitle": "قيد سريع",
+  "@entryTitle": {
+    "description": "Merchant interface: entryTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "entryType": "نوع القيد",
+  "@entryType": {
+    "description": "Merchant interface: entryType",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "cashSale": "بيع نقدي مسجل",
+  "@cashSale": {
+    "description": "Merchant interface: cashSale",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "creditSale": "بيع آجل",
+  "@creditSale": {
+    "description": "Merchant interface: creditSale",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collection": "تحصيل دين",
+  "@collection": {
+    "description": "Merchant interface: collection",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "supplierInvoice": "فاتورة مجهز",
+  "@supplierInvoice": {
+    "description": "Merchant interface: supplierInvoice",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "supplierPayment": "دفعة للمجهز",
+  "@supplierPayment": {
+    "description": "Merchant interface: supplierPayment",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "operatingExpense": "مصروف المحل",
+  "@operatingExpense": {
+    "description": "Merchant interface: operatingExpense",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "ownerDrawing": "سحب صاحب المحل",
+  "@ownerDrawing": {
+    "description": "Merchant interface: ownerDrawing",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "capitalInjection": "إضافة رأس مال",
+  "@capitalInjection": {
+    "description": "Merchant interface: capitalInjection",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "cashCount": "عدّ النقد بنهاية اليوم",
+  "@cashCount": {
+    "description": "Merchant interface: cashCount",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "businessDateInput": "تاريخ الشغل · سنة-شهر-يوم",
+  "@businessDateInput": {
+    "description": "Merchant interface: businessDateInput",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "amountInput": "المبلغ · دينار كامل",
+  "@amountInput": {
+    "description": "Merchant interface: amountInput",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "partyInput": "الزبون أو المجهز",
+  "@partyInput": {
+    "description": "Merchant interface: partyInput",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "partyIdInput": "رقم الزبون أو المجهز بالضبط",
+  "@partyIdInput": {
+    "description": "Merchant interface: partyIdInput",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "partyOption": "{name} · {id}",
+  "@partyOption": {
+    "description": "Merchant interface: partyOption",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "id": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "obligationInput": "رقم الدين · من صفحة الديون",
+  "@obligationInput": {
+    "description": "Merchant interface: obligationInput",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "dueDateInput": "تاريخ الاستحقاق · سنة-شهر-يوم",
+  "@dueDateInput": {
+    "description": "Merchant interface: dueDateInput",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "noteInput": "ملاحظة · اختياري",
+  "@noteInput": {
+    "description": "Merchant interface: noteInput",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewEntry": "راجع قبل الحفظ",
+  "@reviewEntry": {
+    "description": "Merchant interface: reviewEntry",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "entryConfirmation": "تحفظ {type} بتاريخ {date} للحساب {party}؟",
+  "@entryConfirmation": {
+    "description": "Merchant interface: entryConfirmation",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "party": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "obligationReference": "الدين: {id}",
+  "@obligationReference": {
+    "description": "Merchant interface: obligationReference",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "entered": "مكتوب · راجعه قبل الحفظ",
+  "@entered": {
+    "description": "Merchant interface: entered",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "edit": "عدّل",
+  "@edit": {
+    "description": "Merchant interface: edit",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "savedSource": "انحفظ · مصدره {id}",
+  "@savedSource": {
+    "description": "Merchant interface: savedSource",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "savedEntryFormula": "القيد المحفوظ · سجل المصدر الأصلي",
+  "@savedEntryFormula": {
+    "description": "Merchant interface: savedEntryFormula",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "undo": "تراجع عن القيد",
+  "@undo": {
+    "description": "Merchant interface: undo",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "undoNotice": "التراجع يبقي الأصل ويضيف سجل إلغاء ويا السبب.",
+  "@undoNotice": {
+    "description": "Merchant interface: undoNotice",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "voidReason": "سبب التراجع",
+  "@voidReason": {
+    "description": "Merchant interface: voidReason",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "confirmUndo": "أكد التراجع",
+  "@confirmUndo": {
+    "description": "Merchant interface: confirmUndo",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "voidSaved": "إلغاء {id} · {reason}",
+  "@voidSaved": {
+    "description": "Merchant interface: voidSaved",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "correctEntry": "سجل تصحيح مرتبط",
+  "@correctEntry": {
+    "description": "Merchant interface: correctEntry",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "correctionOf": "تصحيح للقيد {id}",
+  "@correctionOf": {
+    "description": "Merchant interface: correctionOf",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "newEntry": "قيد جديد",
+  "@newEntry": {
+    "description": "Merchant interface: newEntry",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "partialCollection": "سجل تحصيل جزئي",
+  "@partialCollection": {
+    "description": "Merchant interface: partialCollection",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "partialPayment": "سجل دفعة جزئية",
+  "@partialPayment": {
+    "description": "Merchant interface: partialPayment",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "entryGeneralConfirmation": "تحفظ {type} بتاريخ {date}؟",
+  "@entryGeneralConfirmation": {
+    "description": "Merchant interface: entryGeneralConfirmation",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
   }
 }

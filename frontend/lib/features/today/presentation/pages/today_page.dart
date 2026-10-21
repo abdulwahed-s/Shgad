@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../app/di/injection.dart';
 import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/utils/date_formatter.dart';
@@ -61,6 +62,11 @@ class _TodayView extends StatelessWidget {
                         ),
                   onTap: () => openEvidence(context, data.cash),
                 ),
+              ),
+              const SizedBox(height: AppDimens.md),
+              PrimaryButton(
+                text: l.entryTitle,
+                onPressed: () => context.push('/entry'),
               ),
               const SizedBox(height: AppDimens.xl),
               SectionLabel(

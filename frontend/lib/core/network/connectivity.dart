@@ -11,6 +11,7 @@ class ConnectionSource {
   bool online = platformOnline();
   Stream<bool> get changes => _changes.stream;
   void set(bool value) {
+    if (online == value) return;
     online = value;
     if (!_changes.isClosed) _changes.add(value);
   }

@@ -304,5 +304,203 @@
         "type": "String"
       }
     }
+  },
+  "entryTitle": "Quick entry",
+  "@entryTitle": {
+    "description": "Merchant interface: entryTitle"
+  },
+  "entryType": "Entry type",
+  "@entryType": {
+    "description": "Merchant interface: entryType"
+  },
+  "cashSale": "Recorded cash sale",
+  "@cashSale": {
+    "description": "Merchant interface: cashSale"
+  },
+  "creditSale": "Credit sale",
+  "@creditSale": {
+    "description": "Merchant interface: creditSale"
+  },
+  "collection": "Debt collection",
+  "@collection": {
+    "description": "Merchant interface: collection"
+  },
+  "supplierInvoice": "Supplier invoice",
+  "@supplierInvoice": {
+    "description": "Merchant interface: supplierInvoice"
+  },
+  "supplierPayment": "Supplier payment",
+  "@supplierPayment": {
+    "description": "Merchant interface: supplierPayment"
+  },
+  "operatingExpense": "Business expense",
+  "@operatingExpense": {
+    "description": "Merchant interface: operatingExpense"
+  },
+  "ownerDrawing": "Owner drawing",
+  "@ownerDrawing": {
+    "description": "Merchant interface: ownerDrawing"
+  },
+  "capitalInjection": "Capital injection",
+  "@capitalInjection": {
+    "description": "Merchant interface: capitalInjection"
+  },
+  "cashCount": "Closing cash count",
+  "@cashCount": {
+    "description": "Merchant interface: cashCount"
+  },
+  "businessDateInput": "Business date · YYYY-MM-DD",
+  "@businessDateInput": {
+    "description": "Merchant interface: businessDateInput"
+  },
+  "amountInput": "Amount · integer IQD",
+  "@amountInput": {
+    "description": "Merchant interface: amountInput"
+  },
+  "partyInput": "Customer or supplier",
+  "@partyInput": {
+    "description": "Merchant interface: partyInput"
+  },
+  "partyIdInput": "Exact customer or supplier ID",
+  "@partyIdInput": {
+    "description": "Merchant interface: partyIdInput"
+  },
+  "partyOption": "{name} · {id}",
+  "@partyOption": {
+    "description": "Merchant interface: partyOption",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "obligationInput": "Obligation ID · from debts",
+  "@obligationInput": {
+    "description": "Merchant interface: obligationInput"
+  },
+  "dueDateInput": "Due date · YYYY-MM-DD",
+  "@dueDateInput": {
+    "description": "Merchant interface: dueDateInput"
+  },
+  "noteInput": "Note · optional",
+  "@noteInput": {
+    "description": "Merchant interface: noteInput"
+  },
+  "reviewEntry": "Review before saving",
+  "@reviewEntry": {
+    "description": "Merchant interface: reviewEntry"
+  },
+  "entryConfirmation": "Save {type} on {date} for {party}?",
+  "@entryConfirmation": {
+    "description": "Merchant interface: entryConfirmation",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "party": {
+        "type": "String"
+      }
+    }
+  },
+  "obligationReference": "Obligation: {id}",
+  "@obligationReference": {
+    "description": "Merchant interface: obligationReference",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "entered": "Entered · check before saving",
+  "@entered": {
+    "description": "Merchant interface: entered"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Merchant interface: edit"
+  },
+  "savedSource": "Saved · source {id}",
+  "@savedSource": {
+    "description": "Merchant interface: savedSource",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "savedEntryFormula": "Saved entry · immutable source record",
+  "@savedEntryFormula": {
+    "description": "Merchant interface: savedEntryFormula"
+  },
+  "undo": "Undo entry",
+  "@undo": {
+    "description": "Merchant interface: undo"
+  },
+  "undoNotice": "Undo keeps the original and adds a reasoned void record.",
+  "@undoNotice": {
+    "description": "Merchant interface: undoNotice"
+  },
+  "voidReason": "Reason for undo",
+  "@voidReason": {
+    "description": "Merchant interface: voidReason"
+  },
+  "confirmUndo": "Confirm undo",
+  "@confirmUndo": {
+    "description": "Merchant interface: confirmUndo"
+  },
+  "voidSaved": "Void {id} · {reason}",
+  "@voidSaved": {
+    "description": "Merchant interface: voidSaved",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "correctEntry": "Enter linked correction",
+  "@correctEntry": {
+    "description": "Merchant interface: correctEntry"
+  },
+  "correctionOf": "Correction of {id}",
+  "@correctionOf": {
+    "description": "Merchant interface: correctionOf",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "newEntry": "New entry",
+  "@newEntry": {
+    "description": "Merchant interface: newEntry"
+  },
+  "partialCollection": "Record partial collection",
+  "@partialCollection": {
+    "description": "Merchant interface: partialCollection"
+  },
+  "partialPayment": "Record partial payment",
+  "@partialPayment": {
+    "description": "Merchant interface: partialPayment"
+  },
+  "entryGeneralConfirmation": "Save {type} on {date}?",
+  "@entryGeneralConfirmation": {
+    "description": "Merchant interface: entryGeneralConfirmation",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -1,3 +1,9 @@
+import '../../core/domain/new_client_id.dart';
+import '../../features/quick_entry/data/datasources/entry_remote.dart';
+import '../../features/quick_entry/data/repositories/entry_repository_impl.dart';
+import '../../features/quick_entry/domain/repositories/entry_repository.dart';
+import '../../features/quick_entry/domain/usecases/entry_usecases.dart';
+import '../../features/quick_entry/presentation/bloc/entry_bloc.dart';
 import '../../features/debts/data/datasources/debts_remote.dart';
 import '../../features/debts/data/repositories/debts_repository_impl.dart';
 import '../../features/debts/domain/repositories/debts_repository.dart';
@@ -65,4 +71,15 @@ void configureDependencies() {
   );
   getIt.registerLazySingleton<LoadDebts>(() => LoadDebts(getIt()));
   getIt.registerFactory<DebtsBloc>(() => DebtsBloc(getIt()));
+  getIt.registerLazySingleton<NewClientId>(NewClientId.new);
+  getIt.registerLazySingleton<EntryRemote>(() => EntryRemote(getIt()));
+  getIt.registerLazySingleton<EntryRepository>(
+    () => EntryRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<LoadEntrySetup>(() => LoadEntrySetup(getIt()));
+  getIt.registerLazySingleton<SaveEntry>(() => SaveEntry(getIt()));
+  getIt.registerLazySingleton<UndoEntry>(() => UndoEntry(getIt()));
+  getIt.registerFactory<EntryBloc>(
+    () => EntryBloc(getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
+  );
 }
