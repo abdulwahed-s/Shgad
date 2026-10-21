@@ -85,3 +85,33 @@ Map<String, dynamic> closeJson() => {
   'resolved': <Object>[],
   'rows': ['CNT-090'],
 };
+Map<String, dynamic> chatJson() => {
+  'status': 'answered',
+  'reply_ar':
+      'عندك هسه ٤٢٠ ألف. التحصيل المتوقع ١٥٠ ألف، والنقص ٨٠ ألف إذا صار التحصيل.',
+  'figures': [
+    {'key': 'cash_on_hand', ...amount(420000, 'cash_on_hand')},
+    {
+      'key': 'expected_collection',
+      ...amount(150000, 'expected_collection', kind: 'expected'),
+    },
+    {
+      'key': 'shortfall_with_collection',
+      ...amount(80000, 'shortfall_with_collection', kind: 'calculated'),
+    },
+  ],
+  'metrics': <Object>[],
+  'dates': <String, String>{},
+  'contexts': [
+    {
+      'range': {'start': '2026-09-28', 'end': '2026-10-01'},
+      'counterparty': {'id': 'CUST-01', 'display_name': 'أبو حيدر'},
+    },
+  ],
+  'resolved_range': {'start': '2026-09-28', 'end': '2026-10-01'},
+  'resolved_counterparty': {'id': 'CUST-01', 'display_name': 'أبو حيدر'},
+  'clarification': null,
+  'assumptions_ar': <String>[],
+  'used_tools': ['forecast'],
+  'renderer': {'attempts': 1, 'fell_back_to_template': false},
+};

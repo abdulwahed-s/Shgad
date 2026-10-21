@@ -1,0 +1,27 @@
+import '../../l10n/generated/app_localizations.dart';
+
+String amountLabel(AppLocalizations l, String key) => switch (key) {
+  'cash_on_hand' => l.cashOnHand,
+  'recorded_cash_sales' || 'cash_sales' => l.cashSale,
+  'unexplained_cash_difference' => l.unexplainedDifference,
+  'credit_sales' => l.creditSale,
+  'collections' => l.collection,
+  'supplier_payments' => l.supplierPayment,
+  'operating_expenses' => l.operatingExpense,
+  'owner_drawings' => l.ownerDrawing,
+  'capital_injections' => l.capitalInjection,
+  'position_confirmed' => l.positionConfirmed,
+  'position_with_expected' => l.positionExpected,
+  'expected_collections' || 'expected_collection' => l.expectedCollections,
+  'supplier_dues' || 'supplier_due' => l.supplierDues,
+  'receivables' || 'outstanding_receivables' => l.receivables,
+  'payables' => l.payables,
+  'estimated_gross_margin' => l.estimatedMargin,
+  'coverage' => l.coverageLabel,
+  'shortfall_with_collection' => l.conditionalShortfall,
+  'shortfall_without_collection' => l.confirmedShortfall,
+  'forecast_lowest' => l.lowestCash,
+  'cash_sales_projected' => l.projectedSales,
+  'unlinked_cash_projected' => l.projectedDifference,
+  _ => l.sourcedFigure,
+};

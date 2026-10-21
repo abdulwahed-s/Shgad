@@ -14,7 +14,6 @@ class MerchantPage extends StatelessWidget {
   final List<Widget> children, actions;
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(title), actions: actions),
       body: SafeArea(
@@ -31,37 +30,46 @@ class MerchantPage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppDimens.sm),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () => context.go('/'),
-                  child: Text(l.todayTitle),
-                ),
+      bottomNavigationBar: const MerchantNavigation(),
+    );
+  }
+}
+
+class MerchantNavigation extends StatelessWidget {
+  const MerchantNavigation({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(AppDimens.sm),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextButton(
+                onPressed: () => context.go('/'),
+                child: Text(l.todayTitle),
               ),
-              Expanded(
-                child: TextButton(
-                  onPressed: () => context.go('/debts'),
-                  child: Text(l.debtsTitle),
-                ),
+            ),
+            Expanded(
+              child: TextButton(
+                onPressed: () => context.go('/debts'),
+                child: Text(l.debtsTitle),
               ),
-              Expanded(
-                child: TextButton(
-                  onPressed: () => context.go('/debts'),
-                  child: Text(l.debtsTitle),
-                ),
+            ),
+            Expanded(
+              child: TextButton(
+                onPressed: () => context.go('/debts'),
+                child: Text(l.debtsTitle),
               ),
-              Expanded(
-                child: TextButton(
-                  onPressed: () => context.go('/chat'),
-                  child: Text(l.chatTitle),
-                ),
+            ),
+            Expanded(
+              child: TextButton(
+                onPressed: () => context.go('/chat'),
+                child: Text(l.chatTitle),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

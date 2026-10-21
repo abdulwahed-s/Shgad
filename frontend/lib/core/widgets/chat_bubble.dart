@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import '../constants/app_dimens.dart';
 
 class ChatBubble extends StatelessWidget {
-  const ChatBubble({required this.text, this.merchant = false, super.key});
+  const ChatBubble({
+    required this.text,
+    this.merchant = false,
+    this.footer,
+    super.key,
+  });
 
   final String text;
   final bool merchant;
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +29,13 @@ class ChatBubble extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(AppDimens.radiusMd),
       ),
-      child: Text(text, style: theme.textTheme.bodyLarge),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(text, style: theme.textTheme.bodyLarge),
+          ?footer,
+        ],
+      ),
     );
   }
 }

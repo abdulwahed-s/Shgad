@@ -690,5 +690,144 @@
       }
     },
     "x-review": "pending Iraqi Arabic review"
+  },
+  "estimatedMargin": "هامش إجمالي تقديري",
+  "@estimatedMargin": {
+    "description": "Merchant interface: estimatedMargin",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "coverageLabel": "تغطية كلفة المبيعات المسجلة",
+  "@coverageLabel": {
+    "description": "Merchant interface: coverageLabel",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "conditionalShortfall": "النقص إذا صار التحصيل المتوقع",
+  "@conditionalShortfall": {
+    "description": "Merchant interface: conditionalShortfall",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "confirmedShortfall": "النقص بدون التحصيل المتوقع",
+  "@confirmedShortfall": {
+    "description": "Merchant interface: confirmedShortfall",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "lowestCash": "أقل نقد تقديري",
+  "@lowestCash": {
+    "description": "Merchant interface: lowestCash",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "projectedSales": "تقدير المبيعات المسجلة",
+  "@projectedSales": {
+    "description": "Merchant interface: projectedSales",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "projectedDifference": "تقدير الفرق غير المفسّر بإشارته",
+  "@projectedDifference": {
+    "description": "Merchant interface: projectedDifference",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "sourcedFigure": "من السجلات الموثقة",
+  "@sourcedFigure": {
+    "description": "Merchant interface: sourcedFigure",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chatWelcome": "اسأل عن سجلات المحل. اضغط على الرقم حتى تشوف مصدره.",
+  "@chatWelcome": {
+    "description": "Merchant interface: chatWelcome",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "checkingLedger": "دأراجع الدفتر…",
+  "@checkingLedger": {
+    "description": "Merchant interface: checkingLedger",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chatNeedsConnection": "المحادثة تحتاج اتصال. التقارير المحفوظة تبقى متاحة للقراءة.",
+  "@chatNeedsConnection": {
+    "description": "Merchant interface: chatNeedsConnection",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "promptSupplier": "عندي فلوس تكفي أدفع للمجهز الخميس؟",
+  "@promptSupplier": {
+    "description": "Merchant interface: promptSupplier",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "promptDebts": "منو بعده بذمته فلوس؟",
+  "@promptDebts": {
+    "description": "Merchant interface: promptDebts",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "promptWeek": "شلون كان شغلنا هالأسبوع؟",
+  "@promptWeek": {
+    "description": "Merchant interface: promptWeek",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "metricValue": "{value} {unit}",
+  "@metricValue": {
+    "description": "Merchant interface: metricValue",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "percentUnit": "٪",
+  "@percentUnit": {
+    "description": "Merchant interface: percentUnit",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "daysUnit": "يوم",
+  "@daysUnit": {
+    "description": "Merchant interface: daysUnit",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "countUnit": "سجل",
+  "@countUnit": {
+    "description": "Merchant interface: countUnit",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "templateReply": "جواب من قالب السجلات الموثقة",
+  "@templateReply": {
+    "description": "Merchant interface: templateReply",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "resolvedPeriod": "الفترة المحددة · {start} إلى {end}",
+  "@resolvedPeriod": {
+    "description": "Merchant interface: resolvedPeriod",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "resolvedCustomer": "الحساب المحدد · {name} ({id})",
+  "@resolvedCustomer": {
+    "description": "Merchant interface: resolvedCustomer",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "id": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chatInput": "اسأل عن الدفتر",
+  "@chatInput": {
+    "description": "Merchant interface: chatInput",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "send": "ارسل",
+  "@send": {
+    "description": "Merchant interface: send",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

@@ -1,3 +1,8 @@
+import '../../features/chat/data/datasources/chat_remote.dart';
+import '../../features/chat/data/repositories/chat_repository_impl.dart';
+import '../../features/chat/domain/repositories/chat_repository.dart';
+import '../../features/chat/domain/usecases/send_chat.dart';
+import '../../features/chat/presentation/bloc/chat_bloc.dart';
 import '../../features/daily_close/data/datasources/close_remote.dart';
 import '../../features/daily_close/data/repositories/close_repository_impl.dart';
 import '../../features/daily_close/domain/repositories/close_repository.dart';
@@ -95,5 +100,14 @@ void configureDependencies() {
   getIt.registerLazySingleton<ResolveClose>(() => ResolveClose(getIt()));
   getIt.registerFactory<CloseBloc>(
     () => CloseBloc(getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<ChatRemote>(() => ChatRemote(getIt()));
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<SendChat>(() => SendChat(getIt()));
+  getIt.registerLazySingleton<ChatBloc>(
+    () => ChatBloc(getIt(), getIt(), getIt(), getIt()),
+    dispose: (bloc) => bloc.close(),
   );
 }

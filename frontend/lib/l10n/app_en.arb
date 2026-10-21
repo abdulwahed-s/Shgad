@@ -575,5 +575,121 @@
         "type": "String"
       }
     }
+  },
+  "estimatedMargin": "Estimated gross margin",
+  "@estimatedMargin": {
+    "description": "Merchant interface: estimatedMargin"
+  },
+  "coverageLabel": "Recorded-sales price coverage",
+  "@coverageLabel": {
+    "description": "Merchant interface: coverageLabel"
+  },
+  "conditionalShortfall": "Shortfall with expected collection",
+  "@conditionalShortfall": {
+    "description": "Merchant interface: conditionalShortfall"
+  },
+  "confirmedShortfall": "Shortfall without expected collection",
+  "@confirmedShortfall": {
+    "description": "Merchant interface: confirmedShortfall"
+  },
+  "lowestCash": "Lowest estimated cash",
+  "@lowestCash": {
+    "description": "Merchant interface: lowestCash"
+  },
+  "projectedSales": "Projected recorded sales",
+  "@projectedSales": {
+    "description": "Merchant interface: projectedSales"
+  },
+  "projectedDifference": "Projected signed unexplained difference",
+  "@projectedDifference": {
+    "description": "Merchant interface: projectedDifference"
+  },
+  "sourcedFigure": "From verified records",
+  "@sourcedFigure": {
+    "description": "Merchant interface: sourcedFigure"
+  },
+  "chatWelcome": "Ask about the shop records. Tap a figure to see its sources.",
+  "@chatWelcome": {
+    "description": "Merchant interface: chatWelcome"
+  },
+  "checkingLedger": "Checking the ledger…",
+  "@checkingLedger": {
+    "description": "Merchant interface: checkingLedger"
+  },
+  "chatNeedsConnection": "Chat needs a connection. Read-only saved reports remain available.",
+  "@chatNeedsConnection": {
+    "description": "Merchant interface: chatNeedsConnection"
+  },
+  "promptSupplier": "Can I pay the supplier on Thursday?",
+  "@promptSupplier": {
+    "description": "Merchant interface: promptSupplier"
+  },
+  "promptDebts": "Who still owes the shop?",
+  "@promptDebts": {
+    "description": "Merchant interface: promptDebts"
+  },
+  "promptWeek": "How was this week?",
+  "@promptWeek": {
+    "description": "Merchant interface: promptWeek"
+  },
+  "metricValue": "{value} {unit}",
+  "@metricValue": {
+    "description": "Merchant interface: metricValue",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "percentUnit": "%",
+  "@percentUnit": {
+    "description": "Merchant interface: percentUnit"
+  },
+  "daysUnit": "days",
+  "@daysUnit": {
+    "description": "Merchant interface: daysUnit"
+  },
+  "countUnit": "records",
+  "@countUnit": {
+    "description": "Merchant interface: countUnit"
+  },
+  "templateReply": "Verified ledger template",
+  "@templateReply": {
+    "description": "Merchant interface: templateReply"
+  },
+  "resolvedPeriod": "Resolved period · {start} to {end}",
+  "@resolvedPeriod": {
+    "description": "Merchant interface: resolvedPeriod",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "resolvedCustomer": "Resolved account · {name} ({id})",
+  "@resolvedCustomer": {
+    "description": "Merchant interface: resolvedCustomer",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "chatInput": "Ask about the ledger",
+  "@chatInput": {
+    "description": "Merchant interface: chatInput"
+  },
+  "send": "Send",
+  "@send": {
+    "description": "Merchant interface: send"
   }
 }
