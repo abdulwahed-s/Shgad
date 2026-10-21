@@ -15,7 +15,10 @@ class MerchantMenu extends StatelessWidget {
         PopupMenuItem(value: '/weekly', child: Text(l.weeklyTitle)),
       ],
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppDimens.lg, vertical: AppDimens.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.lg,
+          vertical: AppDimens.md,
+        ),
         child: Text(l.more),
       ),
     );

@@ -50,6 +50,7 @@ void main() {
         await tester.pumpAndSettle();
         final tile = find.byType(ExpansionTile).first;
         await tester.ensureVisible(tile);
+        await tester.pumpAndSettle();
         await tester.tap(tile);
         await tester.pumpAndSettle();
         expect(find.text('OB-CUST-01'), findsOneWidget);
