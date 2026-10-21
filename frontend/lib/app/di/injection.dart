@@ -1,3 +1,8 @@
+import '../../features/forecast/data/datasources/forecast_remote.dart';
+import '../../features/forecast/data/repositories/forecast_repository_impl.dart';
+import '../../features/forecast/domain/repositories/forecast_repository.dart';
+import '../../features/forecast/domain/usecases/load_forecast.dart';
+import '../../features/forecast/presentation/bloc/forecast_bloc.dart';
 import '../../features/weekly_summary/data/datasources/weekly_summary_remote.dart';
 import '../../features/weekly_summary/data/repositories/weekly_summary_repository_impl.dart';
 import '../../features/weekly_summary/domain/repositories/weekly_summary_repository.dart';
@@ -141,4 +146,10 @@ void configureDependencies() {
     () => LoadWeeklySummary(getIt()),
   );
   getIt.registerFactory<WeeklySummaryBloc>(() => WeeklySummaryBloc(getIt()));
+  getIt.registerLazySingleton<ForecastRemote>(() => ForecastRemote(getIt()));
+  getIt.registerLazySingleton<ForecastRepository>(
+    () => ForecastRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<LoadForecast>(() => LoadForecast(getIt()));
+  getIt.registerFactory<ForecastBloc>(() => ForecastBloc(getIt()));
 }

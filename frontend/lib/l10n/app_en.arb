@@ -841,5 +841,89 @@
   "more": "More",
   "@more": {
     "description": "Merchant interface: more"
+  },
+  "forecastTitle": "Cash estimate",
+  "@forecastTitle": {
+    "description": "Merchant interface: forecastTitle"
+  },
+  "forecastFirstShort": "First estimated shortfall",
+  "@forecastFirstShort": {
+    "description": "Merchant interface: forecastFirstShort"
+  },
+  "forecastNoShort": "No estimated shortfall in this horizon",
+  "@forecastNoShort": {
+    "description": "Merchant interface: forecastNoShort"
+  },
+  "estimateOnly": "A secondary estimate. Expected collections and future sales are not guaranteed.",
+  "@estimateOnly": {
+    "description": "Merchant interface: estimateOnly"
+  },
+  "scenarioBase": "Base",
+  "@scenarioBase": {
+    "description": "Merchant interface: scenarioBase"
+  },
+  "scenarioConservative": "Conservative",
+  "@scenarioConservative": {
+    "description": "Merchant interface: scenarioConservative"
+  },
+  "scenarioStress": "Stress",
+  "@scenarioStress": {
+    "description": "Merchant interface: scenarioStress"
+  },
+  "chartDescription": "Estimated closing cash over thirty days; line and zero reference.",
+  "@chartDescription": {
+    "description": "Merchant interface: chartDescription"
+  },
+  "topInflows": "Largest estimated inflows",
+  "@topInflows": {
+    "description": "Merchant interface: topInflows"
+  },
+  "topOutflows": "Largest estimated outflows",
+  "@topOutflows": {
+    "description": "Merchant interface: topOutflows"
+  },
+  "forecastDay": "Estimate date",
+  "@forecastDay": {
+    "description": "Merchant interface: forecastDay"
+  },
+  "estimatedClosing": "Estimated closing cash",
+  "@estimatedClosing": {
+    "description": "Merchant interface: estimatedClosing"
+  },
+  "recordedSalesDriver": "Recorded-sales projection",
+  "@recordedSalesDriver": {
+    "description": "Merchant interface: recordedSalesDriver"
+  },
+  "differenceDriver": "Separate signed unexplained-difference projection",
+  "@differenceDriver": {
+    "description": "Merchant interface: differenceDriver"
+  },
+  "assumptionSales": "Recorded cash sales use historical weekday averages.",
+  "@assumptionSales": {
+    "description": "Merchant interface: assumptionSales"
+  },
+  "assumptionDifference": "The signed unexplained-difference driver is separate from recorded sales. No cause is inferred.",
+  "@assumptionDifference": {
+    "description": "Merchant interface: assumptionDifference"
+  },
+  "assumptionLateness": "The conservative scenario delays expected collections using recorded payment lateness.",
+  "@assumptionLateness": {
+    "description": "Merchant interface: assumptionLateness"
+  },
+  "assumptionStress": "The stress scenario assumes no collections.",
+  "@assumptionStress": {
+    "description": "Merchant interface: assumptionStress"
+  },
+  "assumptionOverdue": "Overdue customer debts are excluded from every scenario.",
+  "@assumptionOverdue": {
+    "description": "Merchant interface: assumptionOverdue"
+  },
+  "assumptionCosts": "Expenses and owner drawings follow recorded historical averages.",
+  "@assumptionCosts": {
+    "description": "Merchant interface: assumptionCosts"
+  },
+  "assumptionSupplier": "Supplier dues are projected as full payments on their due dates.",
+  "@assumptionSupplier": {
+    "description": "Merchant interface: assumptionSupplier"
   }
 }

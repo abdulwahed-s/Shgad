@@ -11,6 +11,7 @@ import '../features/evidence/presentation/pages/evidence_page.dart';
 import '../core/domain/evidence_request.dart';
 import '../core/constants/app_dimens.dart';
 import '../features/weekly_summary/presentation/pages/weekly_page.dart';
+import '../features/forecast/presentation/pages/forecast_page.dart';
 
 GoRouter createRouter() => GoRouter(
   routes: [
@@ -26,6 +27,10 @@ GoRouter createRouter() => GoRouter(
     ),
     GoRoute(path: '/gallery', builder: (context, state) => const GalleryPage()),
     GoRoute(path: '/weekly', builder: (context, state) => const WeeklyPage()),
+    GoRoute(
+      path: '/forecast',
+      builder: (context, state) => const ForecastPage(),
+    ),
     GoRoute(
       path: '/close',
       builder: (context, state) =>

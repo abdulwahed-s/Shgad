@@ -13,6 +13,7 @@ class MerchantMenu extends StatelessWidget {
       onSelected: (route) => context.push(route),
       itemBuilder: (_) => [
         PopupMenuItem(value: '/weekly', child: Text(l.weeklyTitle)),
+        PopupMenuItem(value: '/forecast', child: Text(l.forecastTitle)),
       ],
       child: Padding(
         padding: const EdgeInsets.symmetric(

@@ -202,3 +202,54 @@ Map<String, dynamic> weeklyJson() => {
   'flags': <Object>[],
   'suggestion_key': 'review_debts',
 };
+Map<String, dynamic> forecastJson() {
+  Map<String, dynamic> scenario(int closing) => {
+    'days': [
+      for (var i = 0; i < 30; i++)
+        {
+          'date': DateTime(
+            2026,
+            9,
+            29,
+          ).add(Duration(days: i)).toIso8601String().split('T').first,
+          'opening_iqd': 420000,
+          'cash_sales_iqd': 12000,
+          'unlinked_cash_iqd': -500,
+          'collections_iqd': 0,
+          'supplier_payments_iqd': 0,
+          'expenses_iqd': 1000,
+          'owner_drawings_iqd': 500,
+          'closing_iqd': closing,
+        },
+    ],
+    'lowest': {'date': '2026-10-01', 'closing_iqd': closing},
+    'first_shortfall_date': '2026-10-01',
+    'top_inflows': [
+      {
+        'label_key': 'cash_sales_projected',
+        'amount': amount(12000, 'cash_sales_projected', kind: 'expected'),
+      },
+    ],
+    'top_outflows': [
+      {
+        'label_key': 'unlinked_cash_projected',
+        'amount': amount(-500, 'unlinked_cash_projected', kind: 'expected'),
+      },
+    ],
+  };
+  return {
+    'as_of': '2026-09-28',
+    'horizon_days': 30,
+    'scenarios': {
+      'base': scenario(-80000),
+      'conservative': scenario(-120000),
+      'stress': scenario(-230000),
+    },
+    'overdue_excluded': <Object>[],
+    'assumption_keys': [
+      'collections_expected_not_guaranteed',
+      'sales_from_weekday_averages',
+      'unlinked_cash_projected_from_counts',
+    ],
+  };
+}

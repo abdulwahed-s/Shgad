@@ -1014,5 +1014,110 @@
   "@more": {
     "description": "Merchant interface: more",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "forecastTitle": "تقدير النقد",
+  "@forecastTitle": {
+    "description": "Merchant interface: forecastTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "forecastFirstShort": "أول نقص نقدي تقديري",
+  "@forecastFirstShort": {
+    "description": "Merchant interface: forecastFirstShort",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "forecastNoShort": "ماكو نقص تقديري بهالفترة",
+  "@forecastNoShort": {
+    "description": "Merchant interface: forecastNoShort",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "estimateOnly": "هذا تقدير ثانوي. التحصيل والمبيعات الجاية مو مضمونة.",
+  "@estimateOnly": {
+    "description": "Merchant interface: estimateOnly",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "scenarioBase": "أساسي",
+  "@scenarioBase": {
+    "description": "Merchant interface: scenarioBase",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "scenarioConservative": "متحفظ",
+  "@scenarioConservative": {
+    "description": "Merchant interface: scenarioConservative",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "scenarioStress": "ضغط",
+  "@scenarioStress": {
+    "description": "Merchant interface: scenarioStress",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chartDescription": "تقدير النقد بنهاية كل يوم لثلاثين يوم، ويا خط الصفر.",
+  "@chartDescription": {
+    "description": "Merchant interface: chartDescription",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "topInflows": "أكبر المبالغ الداخلة التقديرية",
+  "@topInflows": {
+    "description": "Merchant interface: topInflows",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "topOutflows": "أكبر المبالغ الطالعة التقديرية",
+  "@topOutflows": {
+    "description": "Merchant interface: topOutflows",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "forecastDay": "تاريخ التقدير",
+  "@forecastDay": {
+    "description": "Merchant interface: forecastDay",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "estimatedClosing": "النقد التقديري بنهاية اليوم",
+  "@estimatedClosing": {
+    "description": "Merchant interface: estimatedClosing",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "recordedSalesDriver": "تقدير المبيعات المسجلة",
+  "@recordedSalesDriver": {
+    "description": "Merchant interface: recordedSalesDriver",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "differenceDriver": "تقدير مستقل للفرق غير المفسّر بإشارته",
+  "@differenceDriver": {
+    "description": "Merchant interface: differenceDriver",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "assumptionSales": "المبيعات النقدية المسجلة تعتمد معدل نفس يوم الأسبوع بالسجلات.",
+  "@assumptionSales": {
+    "description": "Merchant interface: assumptionSales",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "assumptionDifference": "تقدير الفرق غير المفسّر بإشارته منفصل عن المبيعات المسجلة. ما نحدد إله سبب.",
+  "@assumptionDifference": {
+    "description": "Merchant interface: assumptionDifference",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "assumptionLateness": "السيناريو المتحفظ يأخر التحصيل المتوقع حسب تأخر الدفعات المسجل.",
+  "@assumptionLateness": {
+    "description": "Merchant interface: assumptionLateness",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "assumptionStress": "سيناريو الضغط يفترض ماكو تحصيل.",
+  "@assumptionStress": {
+    "description": "Merchant interface: assumptionStress",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "assumptionOverdue": "ديون الزبائن المتأخرة خارج كل السيناريوهات.",
+  "@assumptionOverdue": {
+    "description": "Merchant interface: assumptionOverdue",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "assumptionCosts": "المصاريف وسحب صاحب المحل تعتمد المعدلات المسجلة.",
+  "@assumptionCosts": {
+    "description": "Merchant interface: assumptionCosts",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "assumptionSupplier": "التقدير يحسب مستحقات المجهزين مدفوعة بالكامل بموعدها.",
+  "@assumptionSupplier": {
+    "description": "Merchant interface: assumptionSupplier",
+    "x-review": "pending Iraqi Arabic review"
   }
 }
