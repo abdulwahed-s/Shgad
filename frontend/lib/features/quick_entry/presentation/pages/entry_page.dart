@@ -35,9 +35,15 @@ class EntryPage extends StatelessWidget {
 }
 
 class EntryPanel extends StatelessWidget {
-  const EntryPanel({this.fields = const {}, this.onSaved, super.key});
+  const EntryPanel({
+    this.fields = const {},
+    this.onSaved,
+    this.lockedDate = false,
+    super.key,
+  });
   final Map<String, String> fields;
   final VoidCallback? onSaved;
+  final bool lockedDate;
   @override
   Widget build(BuildContext context) => BlocProvider(
     create: (_) => getIt<EntryBloc>()..add(OpenEntry(fields)),
@@ -46,13 +52,14 @@ class EntryPanel extends StatelessWidget {
       listener: (_, state) {
         if (state.view.saved != null) onSaved?.call();
       },
-      child: const EntryForm(),
+      child: EntryForm(lockedDate: lockedDate),
     ),
   );
 }
 
 class EntryForm extends StatelessWidget {
-  const EntryForm({super.key});
+  const EntryForm({this.lockedDate = false, super.key});
+  final bool lockedDate;
   @override
   Widget build(BuildContext context) => BlocBuilder<EntryBloc, EntryState>(
     builder: (context, state) {
@@ -92,7 +99,11 @@ class EntryForm extends StatelessWidget {
                       if (value != null) bloc.add(ChangeEntry('type', value));
                     },
             ),
-            EntryField(field: 'business_date', label: l.businessDateInput),
+            EntryField(
+              field: 'business_date',
+              label: l.businessDateInput,
+              readOnly: lockedDate,
+            ),
             EntryField(
               field: 'amount_iqd',
               label: l.amountInput,
@@ -254,11 +265,13 @@ class EntryField extends StatelessWidget {
     required this.field,
     required this.label,
     this.numeric = false,
+    this.readOnly = false,
     super.key,
   });
   final String field;
   final String? label;
   final bool numeric;
+  final bool readOnly;
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EntryBloc>().state;
@@ -269,6 +282,7 @@ class EntryField extends StatelessWidget {
         initialValue: state.view.draft.fields[field],
         keyboardType: numeric ? TextInputType.number : TextInputType.text,
         enabled: state is! EntryLoading,
+        readOnly: readOnly,
         decoration: InputDecoration(
           labelText: label ?? AppLocalizations.of(context).noteInput,
         ),

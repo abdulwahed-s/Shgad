@@ -602,5 +602,93 @@
       }
     },
     "x-review": "pending Iraqi Arabic review"
+  },
+  "closeTitle": "إغلاق اليوم",
+  "@closeTitle": {
+    "description": "Merchant interface: closeTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "expectedClose": "النقد المتوقع بنهاية اليوم",
+  "@expectedClose": {
+    "description": "Merchant interface: expectedClose",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "unexplainedDifference": "فرق نقد غير مفسّر",
+  "@unexplainedDifference": {
+    "description": "Merchant interface: unexplainedDifference",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "neutralDifference": "هالفرق غير مفسّر. ما نحدد سببه من هالسجلات.",
+  "@neutralDifference": {
+    "description": "Merchant interface: neutralDifference",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "recordCloseEntries": "سجل العدّ أو السحب أو الدين",
+  "@recordCloseEntries": {
+    "description": "Merchant interface: recordCloseEntries",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewDifference": "راجع الفرق",
+  "@reviewDifference": {
+    "description": "Merchant interface: reviewDifference",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "chooseResolution": "اختار شتريد تسوي بالفرق",
+  "@chooseResolution": {
+    "description": "Merchant interface: chooseResolution",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "leaveUnexplained": "خليه غير مفسّر",
+  "@leaveUnexplained": {
+    "description": "Merchant interface: leaveUnexplained",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewCashSale": "سجل بيع نقدي مو مفصّل",
+  "@reviewCashSale": {
+    "description": "Merchant interface: reviewCashSale",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewExpense": "سجل مصروف مو مسجل",
+  "@reviewExpense": {
+    "description": "Merchant interface: reviewExpense",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reviewDrawing": "سجل سحب صاحب المحل مو مسجل",
+  "@reviewDrawing": {
+    "description": "Merchant interface: reviewDrawing",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "leftUnexplained": "انحفظت المراجعة. الفرق يبقى غير مفسّر.",
+  "@leftUnexplained": {
+    "description": "Merchant interface: leftUnexplained",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "resolutionConfirmation": "تأكد {choice} بتاريخ {date}؟",
+  "@resolutionConfirmation": {
+    "description": "Merchant interface: resolutionConfirmation",
+    "placeholders": {
+      "choice": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "previousCount": "عدّ النقد السابق",
+  "@previousCount": {
+    "description": "Merchant interface: previousCount",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "voidReasonValue": "سبب الإلغاء: {reason}",
+  "@voidReasonValue": {
+    "description": "Merchant interface: voidReasonValue",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
   }
 }

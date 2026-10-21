@@ -66,3 +66,22 @@ Map<String, dynamic> debtsJson() {
     'payables': section(650000, 'SUP-01'),
   };
 }
+
+Map<String, dynamic> closeJson() => {
+  'date': '2026-09-28',
+  'count': amount(445000, 'count'),
+  'previous_count': amount(300000, 'previous_count'),
+  'expected_close': amount(420000, 'expected_close', kind: 'calculated'),
+  'unexplained_difference': amount(
+    25000,
+    'unexplained_cash_difference',
+    kind: 'flagged',
+  ),
+  'remaining_difference': amount(
+    25000,
+    'unexplained_cash_difference',
+    kind: 'flagged',
+  ),
+  'resolved': <Object>[],
+  'rows': ['CNT-090'],
+};

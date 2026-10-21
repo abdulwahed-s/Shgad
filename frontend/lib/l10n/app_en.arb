@@ -502,5 +502,78 @@
         "type": "String"
       }
     }
+  },
+  "closeTitle": "Daily close",
+  "@closeTitle": {
+    "description": "Merchant interface: closeTitle"
+  },
+  "expectedClose": "Expected closing cash",
+  "@expectedClose": {
+    "description": "Merchant interface: expectedClose"
+  },
+  "unexplainedDifference": "Unexplained cash difference",
+  "@unexplainedDifference": {
+    "description": "Merchant interface: unexplainedDifference"
+  },
+  "neutralDifference": "This difference is unexplained. These records do not identify a cause.",
+  "@neutralDifference": {
+    "description": "Merchant interface: neutralDifference"
+  },
+  "recordCloseEntries": "Record count, drawing or debt",
+  "@recordCloseEntries": {
+    "description": "Merchant interface: recordCloseEntries"
+  },
+  "reviewDifference": "Review the difference",
+  "@reviewDifference": {
+    "description": "Merchant interface: reviewDifference"
+  },
+  "chooseResolution": "Choose a review option",
+  "@chooseResolution": {
+    "description": "Merchant interface: chooseResolution"
+  },
+  "leaveUnexplained": "Leave unexplained",
+  "@leaveUnexplained": {
+    "description": "Merchant interface: leaveUnexplained"
+  },
+  "reviewCashSale": "Record unitemized cash sale",
+  "@reviewCashSale": {
+    "description": "Merchant interface: reviewCashSale"
+  },
+  "reviewExpense": "Record unrecorded expense",
+  "@reviewExpense": {
+    "description": "Merchant interface: reviewExpense"
+  },
+  "reviewDrawing": "Record unrecorded owner drawing",
+  "@reviewDrawing": {
+    "description": "Merchant interface: reviewDrawing"
+  },
+  "leftUnexplained": "Review saved. The difference stays unexplained.",
+  "@leftUnexplained": {
+    "description": "Merchant interface: leftUnexplained"
+  },
+  "resolutionConfirmation": "Confirm {choice} for {date}?",
+  "@resolutionConfirmation": {
+    "description": "Merchant interface: resolutionConfirmation",
+    "placeholders": {
+      "choice": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "previousCount": "Previous closing count",
+  "@previousCount": {
+    "description": "Merchant interface: previousCount"
+  },
+  "voidReasonValue": "Void reason: {reason}",
+  "@voidReasonValue": {
+    "description": "Merchant interface: voidReasonValue",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
   }
 }

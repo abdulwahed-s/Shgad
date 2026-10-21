@@ -6,6 +6,7 @@ import '../core/widgets/gallery_page.dart';
 import '../features/today/presentation/pages/today_page.dart';
 import '../features/debts/presentation/pages/debts_page.dart';
 import '../features/quick_entry/presentation/pages/entry_page.dart';
+import '../features/daily_close/presentation/pages/close_page.dart';
 
 GoRouter createRouter() => GoRouter(
   routes: [
@@ -20,5 +21,10 @@ GoRouter createRouter() => GoRouter(
       ),
     ),
     GoRoute(path: '/gallery', builder: (context, state) => const GalleryPage()),
+    GoRoute(
+      path: '/close',
+      builder: (context, state) =>
+          ClosePage(date: state.uri.queryParameters['date']),
+    ),
   ],
 );

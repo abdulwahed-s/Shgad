@@ -68,6 +68,10 @@ class _TodayView extends StatelessWidget {
                 text: l.entryTitle,
                 onPressed: () => context.push('/entry'),
               ),
+              SecondaryButton(
+                text: l.closeTitle,
+                onPressed: () => context.push('/close'),
+              ),
               const SizedBox(height: AppDimens.xl),
               SectionLabel(
                 text: l.upcomingRange(

@@ -1,3 +1,8 @@
+import '../../features/daily_close/data/datasources/close_remote.dart';
+import '../../features/daily_close/data/repositories/close_repository_impl.dart';
+import '../../features/daily_close/domain/repositories/close_repository.dart';
+import '../../features/daily_close/domain/usecases/close_usecases.dart';
+import '../../features/daily_close/presentation/bloc/close_bloc.dart';
 import '../../core/domain/new_client_id.dart';
 import '../../features/quick_entry/data/datasources/entry_remote.dart';
 import '../../features/quick_entry/data/repositories/entry_repository_impl.dart';
@@ -81,5 +86,14 @@ void configureDependencies() {
   getIt.registerLazySingleton<UndoEntry>(() => UndoEntry(getIt()));
   getIt.registerFactory<EntryBloc>(
     () => EntryBloc(getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<CloseRemote>(() => CloseRemote(getIt()));
+  getIt.registerLazySingleton<CloseRepository>(
+    () => CloseRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<LoadClose>(() => LoadClose(getIt()));
+  getIt.registerLazySingleton<ResolveClose>(() => ResolveClose(getIt()));
+  getIt.registerFactory<CloseBloc>(
+    () => CloseBloc(getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
   );
 }
