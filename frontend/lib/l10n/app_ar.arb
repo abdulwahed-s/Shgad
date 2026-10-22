@@ -1692,112 +1692,134 @@
   "navChat": "محادثة",
   "@navChat": {
     "description": "Short bottom navigation label; full page title unchanged.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "212e5d4bbcea7fc995d341f33b7bba6e1668decf890a5bf48acc5f0f1a9b48f0"
   },
-  "debtCustomers": "الزبائن",
+  "debtCustomers": "الزباين",
   "@debtCustomers": {
     "description": "Debt list selector, customer direction.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "15b38392c8921f2605bcbd10efd7a3b0e6656945fe072c1f5ec6fa2226ce6b73"
   },
   "debtSuppliers": "المجهزين",
   "@debtSuppliers": {
     "description": "Debt list selector, supplier direction.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "96049cb9571fac62e48a1bfe83236836d54a3e2404de586461874d3700f2badd"
   },
   "galleryDefault": "عادي",
   "@galleryDefault": {
     "description": "Component gallery state.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f3569af245009e0627ca7be479ab5e7fcd2de2fcea47b00c74550a00c43364d8"
   },
   "galleryHover": "المؤشر فوكه",
   "@galleryHover": {
     "description": "Component gallery pointer state.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "49fd5ccea333fe339d82a108d40c6c651e873a5ca5c8ff452a16feb4982e99c4"
   },
-  "galleryFocus": "تركيز الكيبورد",
+  "galleryFocus": "التركيز عليه بالكيبورد",
   "@galleryFocus": {
     "description": "Component gallery keyboard state.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1f301b2a625503a7fa60286536e136d26d80712d5d0e7f5fe5cd2531136ab22c"
   },
   "galleryPressed": "مضغوط",
   "@galleryPressed": {
     "description": "Component gallery pressed state.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6cd727639fcb016949c0b25f45bb16a18d027ff85a2ca8c641fc3b9802140790"
   },
-  "galleryDisabled": "غير متاح",
+  "galleryDisabled": "مو مفعّل",
   "@galleryDisabled": {
     "description": "Component gallery disabled state.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "ed0a237377043c9a2f92f44e6e0bb8ec8dbf4dd6709941910b7c704843601b62"
   },
-  "galleryLoading": "دأحمّل",
+  "galleryLoading": "دا يتحمّل…",
   "@galleryLoading": {
     "description": "Component gallery loading state.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "deeee07e1910783abef53400a0ba9dce60df54d07bcbd8cd7bc7685c63311061"
   },
   "galleryError": "خطأ",
   "@galleryError": {
     "description": "Component gallery error state.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "acc74dcf4c2f5679e236a839aac5d1034912392b16499358b0dfa385407e3b59"
   },
-  "galleryOffline": "بدون اتصال",
+  "galleryOffline": "ماكو اتصال",
   "@galleryOffline": {
     "description": "Component gallery offline state.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "ee10210b6922747ce39fba66e38bb24e25202315c3773af6414a8645d4894646"
   },
   "positionConfirmedShort": "الباقي من النقد المؤكد",
   "@positionConfirmedShort": {
     "description": "Compact row label, confirmed position; group specifies next seven days and supplier dues.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "73e38fab1dbc663a0ea42bd89f4521456cbcc9a54dabb7a9bfe83bfcf5ffca5a"
   },
   "positionExpectedShort": "الباقي ويا التحصيل المتوقع",
   "@positionExpectedShort": {
     "description": "Compact row label for position after dues with expected collections.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c27f6dd43fb6210d2e31f5c6be5909b9019e6281f0220583fc9050901e79b37d"
   },
   "upcomingTitle": "الأيام السبعة الجاية",
   "@upcomingTitle": {
     "description": "Section label separated from the resolved date caption.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "dc92c360c0e4a4b82c6bfe4e78db6b0539af2d100be0265a6ac3d9e7c687bb4e"
   },
-  "formulaCash": "آخر عدّ نقد أو رصيد البداية، ويا حركة النقد المسجّلة بعده.",
+  "formulaCash": "آخر عدّ للنقد أو رصيد البداية، ويا حركات النقد المسجّلة من بعده.",
   "@formulaCash": {
     "description": "Localized explanation of verified cash formula.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2b37b994a448b85e496a80dcedb2487bb2081ce2ad9177e15e7c0696cad3e8e3"
   },
   "formulaConfirmed": "النقد المتوفر − مستحقات المجهزين",
   "@formulaConfirmed": {
     "description": "Verified confirmed-position formula.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fc5c7018032d552c9c0572e6346342cd5c6bf104c2ef373c0d78a7774c40af1b"
   },
-  "formulaExpected": "النقد المتوفر + التحصيل المتوقع غير المتأخر − مستحقات المجهزين",
+  "formulaExpected": "النقد المتوفر + التحصيل المتوقع (بدون ديون الزباين المتأخرة) − مستحقات المجهزين",
   "@formulaExpected": {
     "description": "Verified expected-position formula.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c79c0b675239c2764dfea636e859d289ab413db12d8fbae803c6c5ce9a8c1058"
   },
-  "formulaClose": "عدّ النقد السابق + المبالغ المسجّلة الداخلة − المبالغ المسجّلة الطالعة",
+  "formulaClose": "مبلغ النقد بالعدّ السابق + الفلوس الداخلة المسجّلة − الفلوس الطالعة المسجّلة",
   "@formulaClose": {
     "description": "Verified expected-close formula.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "e3877f87960df179962ebe8d5aa0e3869feff7d1383ffbc8da66d97b1a4662c8"
   },
-  "formulaDifference": "عدّ النقد − النقد المتوقع بنهاية اليوم. نحتاج عدّين متتاليين حتى نحسب الفرق.",
+  "formulaDifference": "مبلغ النقد المعدود − النقد المتوقع بنهاية اليوم. نحتاج عدّين ورا بعض حتى نحسب الفرق.",
   "@formulaDifference": {
     "description": "Verified unexplained-difference formula, no inferred cause.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2abf5d8be394839f3959e503ad51b37891c7c17728a4496db20eaa37502309ee"
   },
-  "formulaDebt": "مبلغ الدين الأصلي − الدفعات الموثقة الفعّالة",
+  "formulaDebt": "مبلغ الدين الأصلي − الدفعات الموثّقة اللي انحسبت عليه وما انلغت",
   "@formulaDebt": {
     "description": "Verified outstanding debt formula.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2d127c1c6adaa24b601874a1209805d399201f6c9d488320dad0c4d1ab2c5584"
   },
   "formulaOriginal": "مبلغ الدين الأصلي المسجّل",
   "@formulaOriginal": {
     "description": "Verified original obligation formula.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "9336902b53e13fccc806e2802df81bc109d9730becf4271b226d465442ff38a3"
   },
-  "formulaMargin": "المبيعات المسعّرة − مجموع الكميات مضروبة بكلفة شراء الصنف المسجّلة",
+  "formulaMargin": "المبيعات اللي إلها سعر مسجّل − مجموع (كمية كل صنف × كلفة شراء الوحدة المسجّلة إله)",
   "@formulaMargin": {
     "description": "Estimated gross margin formula; coverage remains shown separately.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d39d5438d8537f7f391896e2caa1e670a22b5581f1d714c48ddd78d31f75250b"
   },
   "formulaRecorded": "مجموع {type} المسجّل بالفترة المحددة، بدون القيود الملغية.",
   "@formulaRecorded": {
@@ -1807,9 +1829,10 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6414ac93fde0e6e0b0e12835679d8f7c864c5652b576b7d25fd3d442dbd794af"
   },
-  "formulaProjected": "مجموع {type} التقديري بفترة التقدير.",
+  "formulaProjected": "مجموع القيم اللي قدّرناها لـ{type} بفترة التقدير.",
   "@formulaProjected": {
     "description": "Parameterized forecast-driver formula.",
     "placeholders": {
@@ -1817,31 +1840,37 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a61e950b0255ddaf55f80d0e758bc61243a6b5a3fcdb5ac7251709e536ba5e1c"
   },
-  "formulaCollections": "مجموع الديون المؤهلة للتحصيل المتوقع، بدون ديون الزبائن المتأخرة.",
+  "formulaCollections": "مجموع الديون الباقية اللي داخلة بحساب التحصيل المتوقع، بدون ديون الزباين المتأخرة.",
   "@formulaCollections": {
     "description": "Verified expected collection formula.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d68464816ac4ea08455e18c7c5fd389d60255fc70455505e2fbe8985be22d7c6"
   },
-  "formulaUnavailable": "شرح هالمعادلة مو متوفر بهاي اللغة. راجع صفوف المصدر والمعادلة الأصلية.",
+  "formulaUnavailable": "ماكو شرح لهالمعادلة بهاللغة. راجع صفوف المصدر والمعادلة الأصلية.",
   "@formulaUnavailable": {
     "description": "Honest fallback for an unmapped formula.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2d349f7becaff29e22e8df4070da4a18ed6ad9862bb86bf550fd3d058abc867b"
   },
   "originalFormula": "المعادلة الأصلية",
   "@originalFormula": {
     "description": "Explicit technical source disclosure, collapsed by default.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "337b632999eb1bc5dec8a43be208d8816646e91a37dcb00f82dbf18d9eb4293f"
   },
   "useSampleShort": "استخدم المحل التجريبي",
   "@useSampleShort": {
     "description": "Separate concise use/reset sample action.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "7d0c4166a34abb59f297905988597260f395b721aef75c00a9f82493c3523c06"
   },
-  "restoreSample": "رجّع المحل التجريبي",
+  "restoreSample": "رجّع المحل التجريبي مثل ما كان",
   "@restoreSample": {
     "description": "Separate concise use/reset sample action.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2537fa648cbe84696f292c4ad34014c01848ba6f42345a8c298f5bb02d864c8f"
   }
 }

@@ -28,9 +28,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > limitations remain.
 > The development forecast benchmark performs worse than the seven-day baseline;
 > final testing has not run.
-> The 55 fixed backend and 248 frontend Arabic messages have human approval.
-> A final independent visual review is pending; 29 new frontend messages await
-> wording review. New or edited wording requires review.
+> The 55 fixed backend and 277 frontend Arabic messages have human approval.
+> A final independent visual review is pending. New or edited wording requires review.
 
 ## Capabilities
 
@@ -695,6 +694,7 @@ Application integration is tested with recorded responses. Live development
 screening used the candidates above; Gemini 3.8 Flash is the selected primary.
 Both selected APIs now respond and both CSV previews pass. Primary-model routing
 acceptance remains pending. The 55 fixed backend Arabic messages
-have user approval. The 248 frontend messages are also reviewed: 48 user-provided
-Iraqi revisions were applied and 200 messages retained, with exact text hashes.
+have user approval. All 277 frontend messages are also reviewed: the original
+248-message review is preserved, and the 29 additions have a separate approval
+with 15 Iraqi revisions and 14 retained texts, bound to exact text hashes.
 Future additions and edits need a new review.
