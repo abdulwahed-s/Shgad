@@ -13,9 +13,11 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > Five read-only tools, margin/weekly reports, deterministic Arabic figure rendering,
 > reconciliation and cutoff-safe cash-estimate HTTP routes are tested. Chat and CSV
 > mapping use a configurable provider client with bounded retries and failover;
-> their integration is verified with recorded provider responses. Flutter web includes Today, separate customer/supplier debts, confirmed entries
-> with undo, daily-close review, backend-rendered chat, source evidence and weekly
-> reports. Read-only caches retain their update times; offline writes are disabled.
+> their integration is verified with recorded provider responses.
+> Flutter web includes Today, customer/supplier debts, confirmed entries with undo,
+> daily-close review, backend-rendered chat, source evidence, weekly reports,
+> three-scenario estimates, a fictional sample shop, CSV import and review flags.
+> Read-only caches retain update/count times; offline writes are disabled.
 > Gemini, Groq and OpenAI completed bounded development routing screens. With
 > larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
 > Both selected provider APIs now respond successfully. Live CSV previews and
@@ -37,7 +39,10 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 - Query sales, debts, reconciliation, estimated gross margin and cash estimates through five validated tools.
 - Return deterministic weekly totals and a secondary cash estimate with base, conservative and stress scenarios.
 - Render sourced figures and dates in Arabic, with validation and deterministic template fallback.
-- Flutter web opens on today's cash and seven-day obligations, with a reusable RTL component gallery.
+- Flutter web opens on today's cash and seven-day obligations, with Arabic/English layouts and Cairo typography.
+- Review entries before saving, retain their source IDs and undo through immutable void evidence.
+- Seed/reset the fictional sample through the interface; pick synthetic CSVs, edit mappings, preview and confirm imports.
+- Keep last-synced reports available offline while retaining form input and disabling writes without a queue.
 - Answer chat requests through a bounded, read-only agent with verified figures and source evidence.
 
 ## Merchant questions
@@ -620,13 +625,14 @@ The first paid retry also recorded two Gemini drafts ending at the old output
 cap. The output budget is now configurable; the selected setup uses 8,192 while
 retaining its request deadline and response-size bounds.
 
-Verified locally: **718 backend tests passed, one opt-in live test skipped**,
+Verified locally: **730 backend tests passed, one opt-in live test skipped**,
 including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
 and cutoff regressions, recorded provider integration, and offline synthetic-data
 and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
-checks pass for **120 backend/script files**; dependency checks pass.
-A running-server smoke passed **20 check groups across 19 OpenAPI paths**, using
-only a temporary fictional database.
+checks pass for **131 backend/script files**; dependency checks pass.
+An earlier running-server smoke passed **20 check groups across 19 OpenAPI paths**,
+using a temporary fictional database. Browser checks also cover sample reset,
+bulk evidence, editable CSV previews and merchant entry/void requests.
 Every implemented endpoint has a response-model contract test, including daily close,
 voids and standard error responses. Financial-rule
 regressions were observed failing before their implementation or fix.
@@ -643,12 +649,19 @@ probe requires both `SHGAD_RUN_LIVE=1` and `python -m pytest -m live`; it has a
 four-request transport cap. The separate development comparison above retains
 its forty-request cap. Neither check accesses held-out questions.
 
-Flutter verification: 4 widget tests
-(360×800, Arabic/English, text scales 1.0/1.3), Dart formatting and Flutter analysis.
-The health endpoint also returned HTTP 200 from a separate clean checkout. The release
-web shell launched in headless Chrome without runtime exceptions; RTL screenshots at
-normal and enlarged text sizes were inspected. A separate Dio smoke check reached the
-running health endpoint using `--dart-define`.
+Flutter verification: **176 tests passed**, including BLoC/repository checks,
+96 screen cases across Arabic/English, 320/360 px and 1.0/1.3 text scales,
+confirmation/undo, source evidence and T33 cache/input retention. Localization,
+formatting, analysis and a release web build pass. The SDK integration flow also
+passes in Chrome with recorded API responses. Actual release screenshots for
+every screen were inspected in Arabic RTL at 360×800 and both text scales.
+A separate browser run used real HTTP/SQLite/tools/rendering with a fake provider
+transport for sample → J1 chat → evidence → three scenarios → reset. Native CSV
+selection/preview/import and offline/write checks use only fictional data.
+These checks establish application behavior, not live-model answer quality or
+merchant usability. Android, iOS and an independent human usability test have not
+been verified. Browser IQD values outside the exact integer range are rejected;
+figures and financial calculations stay in the backend.
 
 [GitHub Actions](https://github.com/abdulwahed-s/Shgad/actions/workflows/test.yml)
 runs backend lint/format/tests and Flutter localization, formatting, analysis and tests
@@ -656,8 +669,9 @@ on pushes and pull requests. Its linked run history shows the measured CI result
 The development forecast benchmark above has run. No final forecast test or
 held-out model evaluation has run.
 
-Synthetic CSV generation, ledger import, financial tools and deterministic reports are available;
-a merchant-facing demo remains pending. The forecast results above cover one
+Synthetic CSV generation, ledger import, financial tools, deterministic reports
+and the merchant Flutter web workflow are available. Frontend Arabic review and
+merchant usability validation remain pending. The forecast results above cover one
 fictional development shop and do not meet the baseline comparison target.
 The separate model-routing/application checks retain their reported limitations;
 no held-out or general financial-answer accuracy is established.
