@@ -1390,5 +1390,50 @@
   "@errorCurrency": {
     "description": "Merchant interface: errorCurrency",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "flagsTitle": "سجلات تحتاج مراجعة",
+  "@flagsTitle": {
+    "description": "Merchant interface: flagsTitle",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "flagsIntro": "راجع صفوف المصدر قبل أي تعديل. القيود المتشابهة تبقى بالدفتر.",
+  "@flagsIntro": {
+    "description": "Merchant interface: flagsIntro",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reasonAmbiguous": "أكثر من دين ممكن يتطابق.",
+  "@reasonAmbiguous": {
+    "description": "Merchant interface: reasonAmbiguous",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reasonSimilarName": "تشابه الاسم وحده ما يأكد نفس الحساب.",
+  "@reasonSimilarName": {
+    "description": "Merchant interface: reasonSimilarName",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reasonExceeds": "الدفعة أكبر من المبلغ الباقي بالدين.",
+  "@reasonExceeds": {
+    "description": "Merchant interface: reasonExceeds",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reasonDueMissing": "تاريخ استحقاق مطلوب وناقص.",
+  "@reasonDueMissing": {
+    "description": "Merchant interface: reasonDueMissing",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "reasonDueWindow": "الدفعة خارج الفترة المسموح بيها لمطابقة الاستحقاق.",
+  "@reasonDueWindow": {
+    "description": "Merchant interface: reasonDueWindow",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "basisVerified": "أكو توزيعات موثقة؛ راجع المبلغ الباقي.",
+  "@basisVerified": {
+    "description": "Merchant interface: basisVerified",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "provideDetails": "كمل التفاصيل الناقصة قبل حسم هالسجل.",
+  "@provideDetails": {
+    "description": "Merchant interface: provideDetails",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

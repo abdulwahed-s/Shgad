@@ -16,6 +16,7 @@ class MerchantMenu extends StatelessWidget {
         PopupMenuItem(value: '/forecast', child: Text(l.forecastTitle)),
         PopupMenuItem(value: '/sample', child: Text(l.sampleTitle)),
         PopupMenuItem(value: '/import', child: Text(l.importTitle)),
+        PopupMenuItem(value: '/flags', child: Text(l.flagsTitle)),
       ],
       child: Padding(
         padding: const EdgeInsets.symmetric(

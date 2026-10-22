@@ -1,3 +1,8 @@
+import '../../features/flags/data/datasources/flags_remote.dart';
+import '../../features/flags/data/repositories/flags_repository_impl.dart';
+import '../../features/flags/domain/repositories/flags_repository.dart';
+import '../../features/flags/domain/usecases/load_flags.dart';
+import '../../features/flags/presentation/bloc/flags_bloc.dart';
 import '../../features/csv_import/data/datasources/csv_remote.dart';
 import '../../features/csv_import/data/datasources/csv_picker.dart';
 import '../../features/csv_import/data/repositories/csv_repository_impl.dart';
@@ -211,4 +216,10 @@ void configureDependencies() {
   getIt.registerFactory<CsvBloc>(
     () => CsvBloc(getIt(), getIt(), getIt(), getIt(), getIt()),
   );
+  getIt.registerLazySingleton<FlagsRemote>(() => FlagsRemote(getIt()));
+  getIt.registerLazySingleton<FlagsRepository>(
+    () => FlagsRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<LoadFlags>(() => LoadFlags(getIt()));
+  getIt.registerFactory<FlagsBloc>(() => FlagsBloc(getIt(), getIt()));
 }

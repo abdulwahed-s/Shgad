@@ -12,12 +12,24 @@ String flagTitle(AppLocalizations l, String type) => switch (type) {
   _ => l.flagAmbiguous,
 };
 String flagBasis(AppLocalizations l, String basis) => switch (basis) {
+  'definite' || 'strong' => l.basisVerified,
   'same_amount_party_day' => l.basisSameDay,
   'verified_partial_allocations' => l.basisPartial,
   'due_date_before_business_as_of' => l.basisOverdue,
   'unmatched' => l.basisUnmatched,
   _ => l.basisCandidate,
 };
+String flagReason(AppLocalizations l, String reason, String type) =>
+    switch (reason) {
+      'origin_voided' => l.flagOriginVoided,
+      'unallocated_payment' => l.flagUnallocated,
+      'ambiguous_obligations' => l.reasonAmbiguous,
+      'similar_name_only' => l.reasonSimilarName,
+      'payment_exceeds_outstanding' => l.reasonExceeds,
+      'missing_due_date' => l.reasonDueMissing,
+      'outside_due_window' => l.reasonDueWindow,
+      _ => flagTitle(l, type),
+    };
 
 class ReviewFlagView extends StatelessWidget {
   const ReviewFlagView({required this.flag, super.key});
@@ -34,15 +46,11 @@ class ReviewFlagView extends StatelessWidget {
           label: flagTitle(l, flag.type),
           onTap: () => openEvidence(context, flag.amount),
         ),
-        Text(
-          flag.reason == 'origin_voided'
-              ? l.flagOriginVoided
-              : flag.reason == 'unallocated_payment'
-              ? l.flagUnallocated
-              : flagTitle(l, flag.type),
-        ),
+        Text(flagReason(l, flag.reason, flag.type)),
         Text(flagBasis(l, flag.basis)),
-        Text(l.flagReview),
+        Text(
+          flag.nextStep == 'provide_details' ? l.provideDetails : l.flagReview,
+        ),
         Text(flag.id, style: Theme.of(context).textTheme.bodySmall),
         SecondaryButton(
           text: l.evidence,

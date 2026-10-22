@@ -1152,5 +1152,41 @@
   "errorCurrency": "Only Iraqi dinars are accepted.",
   "@errorCurrency": {
     "description": "Merchant interface: errorCurrency"
+  },
+  "flagsTitle": "Records to review",
+  "@flagsTitle": {
+    "description": "Merchant interface: flagsTitle"
+  },
+  "flagsIntro": "Review the source rows before changing anything. Similar records stay in the ledger.",
+  "@flagsIntro": {
+    "description": "Merchant interface: flagsIntro"
+  },
+  "reasonAmbiguous": "More than one obligation could match.",
+  "@reasonAmbiguous": {
+    "description": "Merchant interface: reasonAmbiguous"
+  },
+  "reasonSimilarName": "Name similarity alone does not confirm an identity.",
+  "@reasonSimilarName": {
+    "description": "Merchant interface: reasonSimilarName"
+  },
+  "reasonExceeds": "The payment exceeds the outstanding obligation amount.",
+  "@reasonExceeds": {
+    "description": "Merchant interface: reasonExceeds"
+  },
+  "reasonDueMissing": "A required due date is missing.",
+  "@reasonDueMissing": {
+    "description": "Merchant interface: reasonDueMissing"
+  },
+  "reasonDueWindow": "The payment lies outside the allowed due-date matching window.",
+  "@reasonDueWindow": {
+    "description": "Merchant interface: reasonDueWindow"
+  },
+  "basisVerified": "Existing verified allocations; review the remaining amount.",
+  "@basisVerified": {
+    "description": "Merchant interface: basisVerified"
+  },
+  "provideDetails": "Complete the missing details before resolving this record.",
+  "@provideDetails": {
+    "description": "Merchant interface: provideDetails"
   }
 }

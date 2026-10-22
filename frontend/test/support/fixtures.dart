@@ -285,3 +285,16 @@ Map<String, dynamic> csvReceiptJson() => {
   'exact_duplicates': 0,
   'errors': <Object>[],
 };
+Map<String, dynamic> flagsJson() => {
+  'items': [
+    {
+      'flag_id': 'FLAG-TEST',
+      'type': 'suspected_duplicate',
+      'reason_key': 'suspected_duplicate',
+      'amount': amount(12000, 'reconciliation_amount', kind: 'flagged'),
+      'source_ids': ['CNT-090'],
+      'confidence_basis': 'same_amount_party_day',
+      'next_step_key': 'review',
+    },
+  ],
+};
