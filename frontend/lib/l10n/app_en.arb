@@ -1192,5 +1192,131 @@
   "errorWebIqd": "This amount cannot be shown exactly in this web app.",
   "@errorWebIqd": {
     "description": "Merchant interface: errorWebIqd"
+  },
+  "navChat": "Chat",
+  "@navChat": {
+    "description": "Short bottom navigation label; full page title unchanged."
+  },
+  "debtCustomers": "Customers",
+  "@debtCustomers": {
+    "description": "Debt list selector, customer direction."
+  },
+  "debtSuppliers": "Suppliers",
+  "@debtSuppliers": {
+    "description": "Debt list selector, supplier direction."
+  },
+  "galleryDefault": "Default",
+  "@galleryDefault": {
+    "description": "Component gallery state."
+  },
+  "galleryHover": "Hover",
+  "@galleryHover": {
+    "description": "Component gallery pointer state."
+  },
+  "galleryFocus": "Keyboard focus",
+  "@galleryFocus": {
+    "description": "Component gallery keyboard state."
+  },
+  "galleryPressed": "Pressed",
+  "@galleryPressed": {
+    "description": "Component gallery pressed state."
+  },
+  "galleryDisabled": "Disabled",
+  "@galleryDisabled": {
+    "description": "Component gallery disabled state."
+  },
+  "galleryLoading": "Loading",
+  "@galleryLoading": {
+    "description": "Component gallery loading state."
+  },
+  "galleryError": "Error",
+  "@galleryError": {
+    "description": "Component gallery error state."
+  },
+  "galleryOffline": "Offline",
+  "@galleryOffline": {
+    "description": "Component gallery offline state."
+  },
+  "positionConfirmedShort": "After supplier dues",
+  "@positionConfirmedShort": {
+    "description": "Compact row label, confirmed position; group specifies next seven days and supplier dues."
+  },
+  "positionExpectedShort": "Including expected collection",
+  "@positionExpectedShort": {
+    "description": "Compact row label for position after dues with expected collections."
+  },
+  "upcomingTitle": "Next seven days",
+  "@upcomingTitle": {
+    "description": "Section label separated from the resolved date caption."
+  },
+  "formulaCash": "Latest count or opening balance, plus later recorded cash flows.",
+  "@formulaCash": {
+    "description": "Localized explanation of verified cash formula."
+  },
+  "formulaConfirmed": "Cash on hand − supplier dues",
+  "@formulaConfirmed": {
+    "description": "Verified confirmed-position formula."
+  },
+  "formulaExpected": "Cash on hand + non-overdue expected collections − supplier dues",
+  "@formulaExpected": {
+    "description": "Verified expected-position formula."
+  },
+  "formulaClose": "Previous count + recorded inflows − recorded outflows",
+  "@formulaClose": {
+    "description": "Verified expected-close formula."
+  },
+  "formulaDifference": "Counted cash − expected closing cash. Consecutive counts are required.",
+  "@formulaDifference": {
+    "description": "Verified unexplained-difference formula, no inferred cause."
+  },
+  "formulaDebt": "Original obligation − active verified allocations",
+  "@formulaDebt": {
+    "description": "Verified outstanding debt formula."
+  },
+  "formulaOriginal": "Recorded original obligation amount",
+  "@formulaOriginal": {
+    "description": "Verified original obligation formula."
+  },
+  "formulaMargin": "Priced sales − quantities multiplied by recorded category buy prices",
+  "@formulaMargin": {
+    "description": "Estimated gross margin formula; coverage remains shown separately."
+  },
+  "formulaRecorded": "Sum of recorded {type} in the resolved period, excluding voids.",
+  "@formulaRecorded": {
+    "description": "Parameterized recorded-flow formula.",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "formulaProjected": "Sum of projected {type} over the forecast horizon.",
+  "@formulaProjected": {
+    "description": "Parameterized forecast-driver formula.",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "formulaCollections": "Eligible outstanding expected collections, excluding overdue receivables.",
+  "@formulaCollections": {
+    "description": "Verified expected collection formula."
+  },
+  "formulaUnavailable": "This formula has no explanation in this language. Review the source rows and original formula.",
+  "@formulaUnavailable": {
+    "description": "Honest fallback for an unmapped formula."
+  },
+  "originalFormula": "Original formula",
+  "@originalFormula": {
+    "description": "Explicit technical source disclosure, collapsed by default."
+  },
+  "useSampleShort": "Use sample shop",
+  "@useSampleShort": {
+    "description": "Separate concise use/reset sample action."
+  },
+  "restoreSample": "Reset sample shop",
+  "@restoreSample": {
+    "description": "Separate concise use/reset sample action."
   }
 }

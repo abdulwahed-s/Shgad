@@ -9,6 +9,7 @@ import '../../../../core/utils/iqd_formatter.dart';
 import '../../../../core/widgets/amount_label.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
+import '../../../../core/widgets/merchant_shell.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../core/widgets/report_view.dart';
 import '../../../../core/widgets/review_flag_view.dart';
@@ -33,73 +34,130 @@ class _WeeklyView extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return MerchantPage(
       title: l.weeklyTitle,
-      actions: [
-        TextButton(
-          onPressed: () =>
-              context.read<WeeklySummaryBloc>().add(const RefreshReport()),
-          child: Text(l.refresh),
-        ),
-      ],
+      columns: true,
+      onRefresh: () => refreshReport(context.read<WeeklySummaryBloc>()),
       children: [
         ReportView<WeeklySummary, WeeklySummaryBloc>(
+          dateLabel: (d) => l.resolvedPeriod(
+            formatDate(d.start, l.localeName),
+            formatDate(d.end, l.localeName),
+          ),
           builder: (context, data) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                l.resolvedPeriod(
-                  formatDate(data.start, l.localeName),
-                  formatDate(data.end, l.localeName),
-                ),
-              ),
-              for (final amount in data.lines)
-                AmountView(
-                  amount: amount,
-                  label: amountLabel(l, amount.label),
-                  hero: amount.label == 'recorded_cash_sales',
-                  onTap: () => openEvidence(context, amount),
-                ),
-              const SizedBox(height: AppDimens.xl),
-              SectionLabel(text: l.agingOldest),
-              for (final debt in data.aging) ...[
-                AmountView(
-                  amount: debt.outstanding,
-                  label: l.partyOption(debt.name, debt.id),
-                  onTap: () => openEvidence(context, debt.outstanding),
-                ),
-                if (debt.days != null)
-                  Text(
-                    l.daysOverdue(
-                      IqdFormatter.digits(debt.days.toString(), l.localeName),
-                    ),
-                  ),
-              ],
-              SecondaryButton(
-                text: l.showAllDebts,
-                onPressed: () => context.push('/debts'),
-              ),
-              const SizedBox(height: AppDimens.xl),
-              SectionLabel(text: l.estimatedMargin),
-              if (data.marginShown)
-                AmountView(
-                  amount: data.margin,
-                  label: l.estimatedMargin,
-                  onTap: () => openEvidence(context, data.margin),
-                )
-              else
-                InfoStrip(text: l.insufficientMargin),
-              Text(
-                data.coverage == null
-                    ? l.coverageMissing
-                    : l.coverageValue(
-                        IqdFormatter.digits(
-                          data.coverage.toString(),
-                          l.localeName,
+              ScreenColumns(
+                start: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final amount in data.lines)
+                      if (amount.label == 'recorded_cash_sales')
+                        HeroCard(
+                          amount: amount,
+                          label: l.recordedCashSales,
+                          onTap: () => openEvidence(context, amount),
                         ),
+                    const SizedBox(height: AppDimens.lg),
+                    for (final amount in data.lines)
+                      if (amount.label == 'unexplained_cash_difference')
+                        LedgerCard(
+                          child: LedgerRow(
+                            amount: amount,
+                            label: l.unexplainedDifference,
+                            onTap: () => openEvidence(context, amount),
+                          ),
+                        ),
+                    const SizedBox(height: AppDimens.xl),
+                    LedgerGroup(
+                      title: l.weeklyTitle,
+                      children: [
+                        for (final (index, amount) in data.lines.indexed)
+                          if (amount.label != 'recorded_cash_sales' &&
+                              amount.label != 'unexplained_cash_difference')
+                            LedgerRow(
+                              amount: amount,
+                              // The unchanged model preserves API field order;
+                              // both live receivable fields use total_outstanding.
+                              label: switch (index) {
+                                8 => l.receivables,
+                                9 => l.overdueReceivables,
+                                _ => amountLabel(l, amount.label),
+                              },
+                              onTap: () => openEvidence(context, amount),
+                            ),
+                      ],
+                    ),
+                  ],
+                ),
+                end: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    LedgerGroup(
+                      title: l.agingOldest,
+                      children: [
+                        if (data.aging.isEmpty) Text(l.noRecords),
+                        for (final debt in data.aging)
+                          LedgerRow(
+                            amount: debt.outstanding,
+                            label: l.partyOption(debt.name, debt.id),
+                            caption: debt.days == null
+                                ? null
+                                : l.daysOverdue(
+                                    IqdFormatter.digits(
+                                      debt.days.toString(),
+                                      l.localeName,
+                                    ),
+                                  ),
+                            onTap: () =>
+                                openEvidence(context, debt.outstanding),
+                          ),
+                      ],
+                    ),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: TextAction(
+                        text: l.showAllDebts,
+                        onPressed: () => context.push('/debts'),
                       ),
+                    ),
+                    const SizedBox(height: AppDimens.xl),
+                    SectionLabel(text: l.estimatedMargin),
+                    LedgerCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (data.marginShown)
+                            LedgerRow(
+                              amount: data.margin,
+                              label: l.estimatedMargin,
+                              onTap: () => openEvidence(context, data.margin),
+                            )
+                          else
+                            InfoStrip(text: l.insufficientMargin),
+                          const SizedBox(height: AppDimens.sm),
+                          Text(
+                            data.coverage == null
+                                ? l.coverageMissing
+                                : l.coverageValue(
+                                    IqdFormatter.digits(
+                                      data.coverage.toString(),
+                                      l.localeName,
+                                    ),
+                                  ),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(height: AppDimens.md),
+                          InfoStrip(text: l.marginExclusions),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              InfoStrip(text: l.marginExclusions),
-              for (final flag in data.flags) ReviewFlagView(flag: flag),
-              const SizedBox(height: AppDimens.lg),
+              if (data.flags.isNotEmpty) ...[
+                const SizedBox(height: AppDimens.xl),
+                for (final flag in data.flags) ReviewFlagView(flag: flag),
+              ],
+              const SizedBox(height: AppDimens.xl),
               InfoStrip(
                 text: switch (data.suggestion) {
                   'review_unmatched_payment' => l.reviewUnmatched,

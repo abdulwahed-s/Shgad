@@ -8,6 +8,8 @@ import '../../../../core/utils/iqd_formatter.dart';
 import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
+import '../../../../core/widgets/form_fields.dart';
+import '../../../../core/widgets/step_indicator.dart';
 import '../../../../core/widgets/section_label.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../core/widgets/entry_type_text.dart';
@@ -61,44 +63,71 @@ class _CsvView extends StatelessWidget {
       return MerchantPage(
         title: l.importTitle,
         children: [
+          StepIndicator(
+            labels: [l.chooseCsv, l.columnMapping, l.confirmImport],
+            current: v.confirming || v.receipt != null
+                ? 2
+                : v.selection != null
+                ? 1
+                : 0,
+          ),
+          const SizedBox(height: AppDimens.lg),
           InfoStrip(text: l.syntheticCsvOnly),
-          if (busy) const LinearProgressIndicator(),
+          const SizedBox(height: AppDimens.lg),
+          if (busy) const InlineProgress(),
           if (!v.online) ...[
             InfoStrip(text: l.needsConnection),
+            const SizedBox(height: AppDimens.md),
             SecondaryButton(
               text: l.retry,
               onPressed: () => bloc.add(const RecheckCsv()),
             ),
           ],
-          if (state is CsvFailure)
-            InfoStrip(text: failureText(l, state.failure)),
+          if (state is CsvFailure) ...[
+            InfoStrip(text: failureText(l, state.failure), error: true),
+            const SizedBox(height: AppDimens.md),
+          ],
           if (v.receipt case final CsvReceipt receipt) ...[
             Text(
               l.savedBatch(receipt.id),
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            Text(
-              l.importAccepted(
-                IqdFormatter.digits(receipt.accepted.toString(), l.localeName),
-              ),
-            ),
-            Text(
-              l.importFlagged(
-                IqdFormatter.digits(receipt.flagged.toString(), l.localeName),
-              ),
-            ),
-            Text(
-              l.importRejected(
-                IqdFormatter.digits(receipt.rejected.toString(), l.localeName),
-              ),
-            ),
-            Text(
-              l.importDuplicates(
-                IqdFormatter.digits(
-                  receipt.duplicates.toString(),
-                  l.localeName,
+            const SizedBox(height: AppDimens.sm),
+            LedgerGroup(
+              children: [
+                Text(
+                  l.importAccepted(
+                    IqdFormatter.digits(
+                      receipt.accepted.toString(),
+                      l.localeName,
+                    ),
+                  ),
                 ),
-              ),
+                Text(
+                  l.importFlagged(
+                    IqdFormatter.digits(
+                      receipt.flagged.toString(),
+                      l.localeName,
+                    ),
+                  ),
+                ),
+                Text(
+                  l.importRejected(
+                    IqdFormatter.digits(
+                      receipt.rejected.toString(),
+                      l.localeName,
+                    ),
+                  ),
+                ),
+                Text(
+                  l.importDuplicates(
+                    IqdFormatter.digits(
+                      receipt.duplicates.toString(),
+                      l.localeName,
+                    ),
+                  ),
+                ),
+              ],
             ),
             for (final issue in receipt.issues)
               Text(
@@ -107,10 +136,18 @@ class _CsvView extends StatelessWidget {
                   csvIssueText(l, issue.code),
                 ),
               ),
-            PrimaryButton(text: l.openToday, onPressed: () => context.go('/')),
-            SecondaryButton(
-              text: l.importAnother,
-              onPressed: () => bloc.add(const NewCsvImport()),
+            const SizedBox(height: AppDimens.md),
+            ActionGroup(
+              children: [
+                PrimaryButton(
+                  text: l.openToday,
+                  onPressed: () => context.go('/'),
+                ),
+                SecondaryButton(
+                  text: l.importAnother,
+                  onPressed: () => bloc.add(const NewCsvImport()),
+                ),
+              ],
             ),
           ] else if (v.confirming) ...[
             LedgerCard(
@@ -118,26 +155,43 @@ class _CsvView extends StatelessWidget {
                 l.importConfirmation(v.selection!.file.name, v.preview!.id),
               ),
             ),
-            PrimaryButton(
-              key: const ValueKey('csv_confirm'),
-              text: l.confirmImport,
-              onPressed: !v.online || busy
-                  ? null
-                  : () => bloc.add(const ConfirmCsvImport()),
-            ),
-            SecondaryButton(
-              text: l.edit,
-              onPressed: busy ? null : () => bloc.add(const EditCsvMapping()),
+            const SizedBox(height: AppDimens.md),
+            ActionGroup(
+              children: [
+                PrimaryButton(
+                  key: const ValueKey('csv_confirm'),
+                  text: l.confirmImport,
+                  onPressed: !v.online || busy
+                      ? null
+                      : () => bloc.add(const ConfirmCsvImport()),
+                ),
+                SecondaryButton(
+                  text: l.edit,
+                  onPressed: busy
+                      ? null
+                      : () => bloc.add(const EditCsvMapping()),
+                ),
+              ],
             ),
           ] else ...[
-            SecondaryButton(
-              key: const ValueKey('csv_pick'),
-              text: l.chooseCsv,
-              onPressed: !v.online || busy
-                  ? null
-                  : () => bloc.add(const ChooseCsv()),
-            ),
+            if (v.selection != null)
+              SecondaryButton(
+                key: const ValueKey('csv_pick'),
+                text: l.chooseCsv,
+                onPressed: !v.online || busy
+                    ? null
+                    : () => bloc.add(const ChooseCsv()),
+              )
+            else
+              PrimaryButton(
+                key: const ValueKey('csv_pick'),
+                text: l.chooseCsv,
+                onPressed: !v.online || busy
+                    ? null
+                    : () => bloc.add(const ChooseCsv()),
+              ),
             if (v.selection != null) ...[
+              const SizedBox(height: AppDimens.md),
               Text(
                 v.selection!.file.name,
                 style: Theme.of(context).textTheme.titleMedium,
@@ -153,8 +207,12 @@ class _CsvView extends StatelessWidget {
               SectionLabel(text: l.columnMapping),
               for (final column in v.columns) ...[
                 const SizedBox(height: AppDimens.md),
-                Text(column.header),
-                DropdownButtonFormField<String>(
+                SelectableCaption(
+                  column.header,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                ledgerDropdown<String>(
+                  context,
                   key: ValueKey('mapping_${column.header}_${column.target}'),
                   initialValue: column.target ?? '',
                   isExpanded: true,
@@ -182,26 +240,39 @@ class _CsvView extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: AppDimens.lg),
-              SecondaryButton(
-                text: l.suggestMapping,
-                onPressed: !v.online || busy || !v.synthetic
-                    ? null
-                    : () => bloc.add(const PreviewCsvFile(suggest: true)),
+              ActionGroup(
+                children: [
+                  SecondaryButton(
+                    text: l.suggestMapping,
+                    onPressed: !v.online || busy || !v.synthetic
+                        ? null
+                        : () => bloc.add(const PreviewCsvFile(suggest: true)),
+                  ),
+                  SecondaryButton(
+                    key: const ValueKey('csv_preview'),
+                    text: l.previewMapping,
+                    onPressed: !v.online || busy || !v.synthetic
+                        ? null
+                        : () => bloc.add(const PreviewCsvFile()),
+                  ),
+                ],
               ),
-              SecondaryButton(
-                key: const ValueKey('csv_preview'),
-                text: l.previewMapping,
-                onPressed: !v.online || busy || !v.synthetic
-                    ? null
-                    : () => bloc.add(const PreviewCsvFile()),
-              ),
+              const SizedBox(height: AppDimens.md),
               if (v.dirty && v.preview != null)
                 InfoStrip(text: l.mappingChanged),
               if (v.preview != null) ...[
                 SectionLabel(text: l.previewFiveRows),
                 for (final field in v.preview!.missing)
                   Text(l.missingColumn(csvFieldText(l, field))),
-                for (final row in v.preview!.rows) CsvPreviewRowView(row: row),
+                if (MediaQuery.sizeOf(context).width <
+                    AppDimens.compactBreakpoint)
+                  for (final row in v.preview!.rows)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppDimens.lg),
+                      child: LedgerCard(child: CsvPreviewRowView(row: row)),
+                    )
+                else
+                  CsvPreviewTable(rows: v.preview!.rows),
               ],
               const SizedBox(height: AppDimens.lg),
               PrimaryButton(
@@ -241,7 +312,83 @@ class CsvPreviewRowView extends StatelessWidget {
             exact: true,
           ),
         for (final issue in row.issues)
-          InfoStrip(text: csvIssueText(l, issue.code)),
+          InfoStrip(text: csvIssueText(l, issue.code), error: true),
+      ],
+    );
+  }
+}
+
+class CsvPreviewTable extends StatelessWidget {
+  const CsvPreviewTable({required this.rows, super.key});
+  final List<CsvPreviewRow> rows;
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            dataRowMinHeight: AppDimens.minTarget,
+            dataRowMaxHeight: AppDimens.fieldHeight * 2,
+            columns: [
+              DataColumn(label: Text(l.businessDateInput)),
+              DataColumn(label: Text(l.entryType)),
+              DataColumn(label: Text(l.amountInput), numeric: true),
+              DataColumn(label: Text(l.sourceIdField)),
+            ],
+            rows: [
+              for (final row in rows)
+                DataRow(
+                  cells: [
+                    DataCell(
+                      Text(
+                        row.date == null
+                            ? l.errorDate
+                            : formatDate(row.date!, l.localeName),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        row.type == null
+                            ? l.missing
+                            : entryTypeText(l, row.type!),
+                      ),
+                    ),
+                    DataCell(
+                      row.amount == null
+                          ? Text(l.missing)
+                          : AmountView(
+                              amount: row.amount!,
+                              label: l.amountInput,
+                              exact: true,
+                              table: true,
+                            ),
+                    ),
+                    DataCell(
+                      SelectableCaption(
+                        row.sourceId ?? l.missing,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+        for (final row in rows)
+          for (final issue in row.issues)
+            Padding(
+              padding: const EdgeInsets.only(top: AppDimens.sm),
+              child: InfoStrip(
+                text: l.csvRowError(
+                  IqdFormatter.digits(row.row.toString(), l.localeName),
+                  csvIssueText(l, issue.code),
+                ),
+                error: true,
+              ),
+            ),
       ],
     );
   }

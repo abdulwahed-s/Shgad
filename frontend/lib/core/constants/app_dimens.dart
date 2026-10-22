@@ -38,4 +38,10 @@ abstract final class AppDimens {
   static const focusOffset = 2.0;
   static const chartMarkerRadius = 3.0;
   static const heroFontSize = 36.0;
+
+  static double screenGutter(double width) => width < compactBreakpoint
+      ? lg
+      : width < expandedBreakpoint
+      ? xl
+      : xxl;
 }

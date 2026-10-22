@@ -19,28 +19,47 @@ class ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(AppDimens.lg),
-      decoration: BoxDecoration(
-        color: merchant
-            ? theme.colorScheme.secondaryContainer
-            : theme.colorScheme.surface,
-        border: Border.all(
-          color: theme.colorScheme.outline,
-          width: AppDimens.borderWidth,
-        ),
-        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            text,
-            style: theme.textTheme.bodyLarge,
-            textDirection: textDirection,
+    return LayoutBuilder(
+      builder: (context, bounds) => Align(
+        alignment: merchant
+            ? AlignmentDirectional.centerStart
+            : AlignmentDirectional.centerEnd,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: bounds.maxWidth * (merchant ? .80 : .88),
           ),
-          ?footer,
-        ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimens.lg,
+              vertical: AppDimens.md,
+            ),
+            decoration: BoxDecoration(
+              color: merchant
+                  ? theme.colorScheme.secondaryContainer
+                  : theme.colorScheme.surface,
+              border: merchant
+                  ? null
+                  : Border.all(color: theme.colorScheme.outline),
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  text,
+                  style: theme.textTheme.bodyLarge,
+                  textDirection: textDirection,
+                ),
+                if (footer != null) ...[
+                  const SizedBox(height: AppDimens.md),
+                  const Divider(),
+                  const SizedBox(height: AppDimens.md),
+                  footer!,
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -5,6 +5,8 @@ import '../../../../core/presentation/report_bloc.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
 import '../../../../core/widgets/report_view.dart';
+import '../../../../core/widgets/section_label.dart';
+import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/widgets/review_flag_view.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/flags.dart';
@@ -26,19 +28,25 @@ class _FlagsView extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return MerchantPage(
       title: l.flagsTitle,
-      actions: [
-        TextButton(
-          onPressed: () => context.read<FlagsBloc>().add(const RefreshReport()),
-          child: Text(l.refresh),
-        ),
-      ],
       children: [
         ReportView<Flags, FlagsBloc>(
           builder: (context, data) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InfoStrip(text: data.items.isEmpty ? l.noRecords : l.flagsIntro),
-              for (final flag in data.items) ReviewFlagView(flag: flag),
+              const SizedBox(height: AppDimens.xl),
+              for (final type in [
+                'unmatched',
+                'suspected_duplicate',
+                'partially_paid',
+                'overdue',
+                'ambiguous',
+              ])
+                if (data.items.any((flag) => flag.type == type)) ...[
+                  SectionLabel(text: flagTitle(l, type)),
+                  for (final flag in data.items)
+                    if (flag.type == type) ReviewFlagView(flag: flag),
+                ],
             ],
           ),
         ),

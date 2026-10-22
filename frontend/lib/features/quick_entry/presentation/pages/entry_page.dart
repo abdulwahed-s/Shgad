@@ -8,6 +8,9 @@ import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
+import '../../../../core/widgets/form_fields.dart';
+import '../../../../core/widgets/confirmation_sheet.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../bloc/entry_bloc.dart';
@@ -16,38 +19,130 @@ class EntryPage extends StatelessWidget {
   const EntryPage({this.fields = const {}, super.key});
   final Map<String, String> fields;
   @override
-  Widget build(BuildContext context) => MerchantPage(
-    title: AppLocalizations.of(context).entryTitle,
-    children: [EntryPanel(fields: fields)],
+  Widget build(BuildContext context) => BlocProvider(
+    create: (_) => getIt<EntryBloc>()..add(OpenEntry(fields)),
+    child: const _EntryPageView(),
   );
 }
 
-class EntryPanel extends StatelessWidget {
-  const EntryPanel({
-    this.fields = const {},
-    this.onSaved,
-    this.lockedDate = false,
-    super.key,
-  });
-  final Map<String, String> fields;
-  final VoidCallback? onSaved;
-  final bool lockedDate;
+class _EntryPageView extends StatelessWidget {
+  const _EntryPageView();
   @override
-  Widget build(BuildContext context) => BlocProvider(
-    create: (_) => getIt<EntryBloc>()..add(OpenEntry(fields)),
-    child: BlocListener<EntryBloc, EntryState>(
-      listenWhen: (a, b) => a.view.saved != b.view.saved,
-      listener: (_, state) {
-        if (state.view.saved != null) onSaved?.call();
+  Widget build(BuildContext context) => BlocListener<EntryBloc, EntryState>(
+    listenWhen: (a, b) =>
+        a.view.mode != b.view.mode && b.view.mode == EntryMode.confirm,
+    listener: (context, state) async {
+      final bloc = context.read<EntryBloc>();
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        sheetAnimationStyle: const AnimationStyle(
+          duration: Duration.zero,
+          reverseDuration: Duration.zero,
+        ),
+        builder: (_) => BlocProvider.value(
+          value: bloc,
+          child: BlocListener<EntryBloc, EntryState>(
+            listenWhen: (a, b) => b.view.mode != EntryMode.confirm,
+            listener: (context, state) => Navigator.of(context).pop(),
+            child: ConfirmationSheet(
+              title: AppLocalizations.of(context).reviewEntry,
+              child: const EntryForm(),
+            ),
+          ),
+        ),
+      );
+      if (!bloc.isClosed && bloc.state.view.mode == EntryMode.confirm) {
+        bloc.add(const EditEntry());
+      }
+    },
+    child: BlocBuilder<EntryBloc, EntryState>(
+      builder: (context, state) {
+        final l = AppLocalizations.of(context);
+        final v = state.view;
+        final bloc = context.read<EntryBloc>();
+        return MerchantPage(
+          title: l.entryTitle,
+          form: true,
+          bottomBar: v.mode == EntryMode.edit
+              ? SizedBox(
+                  width: AppDimens.formMaxWidth,
+                  child: PrimaryButton(
+                    key: const ValueKey('entry_review'),
+                    text: l.reviewEntry,
+                    onPressed: !v.online || state is EntryLoading
+                        ? null
+                        : () => bloc.add(const PrepareEntry()),
+                  ),
+                )
+              : null,
+          children: const [
+            EntryForm(inlineConfirmation: false, showReview: false),
+          ],
+        );
       },
-      child: EntryForm(lockedDate: lockedDate),
     ),
   );
 }
 
-class EntryForm extends StatelessWidget {
-  const EntryForm({this.lockedDate = false, super.key});
+class EntryPanel extends StatefulWidget {
+  const EntryPanel({
+    this.fields = const {},
+    this.onSaved,
+    this.onVoided,
+    this.lockedDate = false,
+    this.amountFirst = false,
+    super.key,
+  });
+  final Map<String, String> fields;
+  final VoidCallback? onSaved;
+  final VoidCallback? onVoided;
   final bool lockedDate;
+  final bool amountFirst;
+  @override
+  State<EntryPanel> createState() => _EntryPanelState();
+}
+
+class _EntryPanelState extends State<EntryPanel>
+    with AutomaticKeepAliveClientMixin<EntryPanel> {
+  // A daily-close refresh can move this result outside the lazy list's cache.
+  // Keep its existing BLoC and saved/undo presentation until the route closes.
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return BlocProvider(
+      create: (_) => getIt<EntryBloc>()..add(OpenEntry(widget.fields)),
+      child: BlocListener<EntryBloc, EntryState>(
+        listenWhen: (a, b) =>
+            a.view.saved != b.view.saved || a.view.voided != b.view.voided,
+        listener: (_, state) {
+          if (state.view.voided != null) {
+            widget.onVoided?.call();
+          } else if (state.view.saved != null) {
+            widget.onSaved?.call();
+          }
+        },
+        child: EntryForm(
+          lockedDate: widget.lockedDate,
+          amountFirst: widget.amountFirst,
+        ),
+      ),
+    );
+  }
+}
+
+class EntryForm extends StatelessWidget {
+  const EntryForm({
+    this.lockedDate = false,
+    this.inlineConfirmation = true,
+    this.showReview = true,
+    this.amountFirst = false,
+    super.key,
+  });
+  final bool lockedDate, inlineConfirmation, showReview, amountFirst;
   @override
   Widget build(BuildContext context) => BlocBuilder<EntryBloc, EntryState>(
     builder: (context, state) {
@@ -67,46 +162,48 @@ class EntryForm extends StatelessWidget {
             ),
           ],
           if (state is EntryFailure)
-            InfoStrip(text: failureText(l, state.failure)),
-          if (v.mode == EntryMode.edit) ...[
-            DropdownButtonFormField<String>(
-              key: const ValueKey('entry_type'),
-              initialValue: v.draft.type,
-              isExpanded: true,
-              decoration: InputDecoration(labelText: l.entryType),
-              items: [
-                for (final type in entryTypes)
-                  DropdownMenuItem(
-                    value: type,
-                    child: Text(entryTypeText(l, type)),
-                  ),
-              ],
-              onChanged: busy
-                  ? null
-                  : (value) {
-                      if (value != null) bloc.add(ChangeEntry('type', value));
-                    },
+            InfoStrip(text: failureText(l, state.failure), error: true),
+          if (v.mode == EntryMode.edit ||
+              v.mode == EntryMode.confirm && !inlineConfirmation) ...[
+            if (amountFirst)
+              EntryField(
+                field: 'amount_iqd',
+                label: v.draft.type == 'DAILY_CASH_COUNT'
+                    ? l.cashCount
+                    : l.amountInput,
+                numeric: true,
+              ),
+            FieldLabel(
+              label: l.entryType,
+              group: true,
+              child: ChoiceChips(
+                key: const ValueKey('entry_type'),
+                choices: {
+                  for (final type in entryTypes) type: entryTypeText(l, type),
+                },
+                selected: v.draft.type,
+                onSelected: busy
+                    ? null
+                    : (value) => bloc.add(ChangeEntry('type', value)),
+              ),
             ),
-            EntryField(
-              field: 'business_date',
-              label: l.businessDateInput,
-              readOnly: lockedDate,
-            ),
-            EntryField(
-              field: 'amount_iqd',
-              label: l.amountInput,
-              numeric: true,
-            ),
+            if (!amountFirst)
+              EntryField(
+                field: 'amount_iqd',
+                label: l.amountInput,
+                numeric: true,
+              ),
             if (v.needsParty) ...[
               if (v.parties.isNotEmpty)
-                DropdownButtonFormField<String>(
+                ledgerDropdown<String>(
+                  context,
+                  decoration: InputDecoration(labelText: l.partyInput),
                   key: const ValueKey('party_choice'),
                   isExpanded: true,
                   initialValue:
                       v.parties.containsKey(v.draft.fields['counterparty_id'])
                       ? v.draft.fields['counterparty_id']
                       : null,
-                  decoration: InputDecoration(labelText: l.partyInput),
                   items: [
                     for (final p in v.parties.entries)
                       DropdownMenuItem(
@@ -133,20 +230,26 @@ class EntryForm extends StatelessWidget {
               EntryField(field: 'obligation_id', label: l.obligationInput),
             if (v.needsDue)
               EntryField(field: 'due_date', label: l.dueDateInput),
+            EntryField(
+              field: 'business_date',
+              label: l.businessDateInput,
+              readOnly: lockedDate,
+            ),
             const EntryField(field: 'note', label: null),
             if (v.draft.fields['correction_of_source_id']
                 case final String original)
               InfoStrip(text: l.correctionOf(original)),
             const SizedBox(height: AppDimens.lg),
-            PrimaryButton(
-              key: const ValueKey('entry_review'),
-              text: l.reviewEntry,
-              onPressed: !v.online || busy
-                  ? null
-                  : () => bloc.add(const PrepareEntry()),
-            ),
+            if (showReview)
+              PrimaryButton(
+                key: const ValueKey('entry_review'),
+                text: l.reviewEntry,
+                onPressed: !v.online || busy
+                    ? null
+                    : () => bloc.add(const PrepareEntry()),
+              ),
           ],
-          if (v.mode == EntryMode.confirm) ...[
+          if (v.mode == EntryMode.confirm && inlineConfirmation) ...[
             LedgerCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -175,38 +278,51 @@ class EntryForm extends StatelessWidget {
                 ],
               ),
             ),
-            PrimaryButton(
-              key: const ValueKey('entry_save'),
-              text: l.confirm,
-              onPressed: !v.online || busy
-                  ? null
-                  : () => bloc.add(const ConfirmEntry()),
-            ),
-            SecondaryButton(
-              text: l.edit,
-              onPressed: busy ? null : () => bloc.add(const EditEntry()),
+            const SizedBox(height: AppDimens.md),
+            ActionGroup(
+              children: [
+                PrimaryButton(
+                  key: const ValueKey('entry_save'),
+                  text: l.confirm,
+                  onPressed: !v.online || busy
+                      ? null
+                      : () => bloc.add(const ConfirmEntry()),
+                ),
+                SecondaryButton(
+                  text: l.edit,
+                  onPressed: busy ? null : () => bloc.add(const EditEntry()),
+                ),
+              ],
             ),
           ],
           if (v.mode == EntryMode.saved ||
               v.mode == EntryMode.undo ||
               v.mode == EntryMode.voided) ...[
             InfoStrip(text: l.savedSource(v.saved!.sourceId)),
-            SecondaryButton(
-              text: l.evidence,
-              onPressed: () => openSourceEvidence(context, [
-                v.saved!.sourceId,
-              ], l.savedEntryFormula),
+            const SizedBox(height: AppDimens.md),
+            ActionGroup(
+              children: [
+                SecondaryButton(
+                  text: l.evidence,
+                  onPressed: () => openSourceEvidence(context, [
+                    v.saved!.sourceId,
+                  ], l.savedEntryFormula),
+                ),
+                if (v.mode == EntryMode.saved)
+                  SecondaryButton(
+                    text: l.undo,
+                    onPressed: !v.online || busy
+                        ? null
+                        : () => bloc.add(const BeginUndo()),
+                  ),
+              ],
             ),
-            if (v.mode == EntryMode.saved)
-              SecondaryButton(
-                text: l.undo,
-                onPressed: !v.online || busy
-                    ? null
-                    : () => bloc.add(const BeginUndo()),
-              ),
             if (v.mode == EntryMode.undo) ...[
+              const SizedBox(height: AppDimens.md),
               InfoStrip(text: l.undoNotice),
-              TextFormField(
+              const SizedBox(height: AppDimens.md),
+              ledgerTextField(
+                context,
                 key: const ValueKey('undo_reason'),
                 enabled: !busy,
                 initialValue: v.reason,
@@ -221,7 +337,9 @@ class EntryForm extends StatelessWidget {
               ),
             ],
             if (v.mode == EntryMode.voided) ...[
+              const SizedBox(height: AppDimens.md),
               InfoStrip(text: l.voidSaved(v.voided!.voidId, v.voided!.reason)),
+              const SizedBox(height: AppDimens.md),
               SecondaryButton(
                 text: l.correctEntry,
                 onPressed: !v.online
@@ -237,11 +355,13 @@ class EntryForm extends StatelessWidget {
                       ),
               ),
             ],
-            if (v.mode != EntryMode.undo)
+            if (v.mode != EntryMode.undo) ...[
+              const SizedBox(height: AppDimens.md),
               SecondaryButton(
                 text: l.newEntry,
                 onPressed: busy ? null : () => bloc.add(const OpenEntry()),
               ),
+            ],
           ],
         ],
       );
@@ -295,22 +415,44 @@ class _EntryFieldState extends State<EntryField> {
         );
       }
     },
-    builder: (context, state) => Padding(
-      padding: const EdgeInsets.only(top: AppDimens.md),
-      child: TextFormField(
-        key: ValueKey(widget.field),
-        controller: controller,
-        keyboardType: widget.numeric
-            ? TextInputType.number
-            : TextInputType.text,
-        enabled: state is! EntryLoading,
-        readOnly: widget.readOnly,
-        decoration: InputDecoration(
-          labelText: widget.label ?? AppLocalizations.of(context).noteInput,
+    builder: (context, state) {
+      final l = AppLocalizations.of(context);
+      final bloc = context.read<EntryBloc>();
+      final enabled = state is! EntryLoading;
+      final label = widget.label ?? l.noteInput;
+      if (widget.numeric) {
+        return AmountField(
+          fieldKey: ValueKey(widget.field),
+          controller: controller,
+          label: label,
+          enabled: enabled,
+          onChanged: (value) => bloc.add(ChangeEntry(widget.field, value)),
+        );
+      }
+      if (widget.field == 'business_date' || widget.field == 'due_date') {
+        return DateField(
+          fieldKey: ValueKey(widget.field),
+          label: label,
+          value: state.view.draft.fields[widget.field] ?? '',
+          businessDate: state.view.draft.date,
+          enabled: enabled,
+          locked: widget.readOnly,
+          onChanged: (value) => bloc.add(ChangeEntry(widget.field, value)),
+        );
+      }
+      return FieldLabel(
+        label: label,
+        child: TextFormField(
+          key: ValueKey(widget.field),
+          controller: controller,
+          enabled: enabled,
+          readOnly: widget.readOnly,
+          style: Theme.of(
+            context,
+          ).extension<LedgerStyles>()!.input(enabled: enabled),
+          onChanged: (value) => bloc.add(ChangeEntry(widget.field, value)),
         ),
-        onChanged: (value) =>
-            context.read<EntryBloc>().add(ChangeEntry(widget.field, value)),
-      ),
-    ),
+      );
+    },
   );
 }

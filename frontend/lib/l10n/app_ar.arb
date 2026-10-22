@@ -1688,5 +1688,160 @@
     "description": "Merchant interface: errorWebIqd",
     "x-review": "approved Iraqi Arabic review",
     "x-review-sha256": "21d63c26f1320e5d101fd89c0e3ca39d421b4940e675f8f094187780e83eea63"
+  },
+  "navChat": "محادثة",
+  "@navChat": {
+    "description": "Short bottom navigation label; full page title unchanged.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "debtCustomers": "الزبائن",
+  "@debtCustomers": {
+    "description": "Debt list selector, customer direction.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "debtSuppliers": "المجهزين",
+  "@debtSuppliers": {
+    "description": "Debt list selector, supplier direction.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryDefault": "عادي",
+  "@galleryDefault": {
+    "description": "Component gallery state.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryHover": "المؤشر فوكه",
+  "@galleryHover": {
+    "description": "Component gallery pointer state.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryFocus": "تركيز الكيبورد",
+  "@galleryFocus": {
+    "description": "Component gallery keyboard state.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryPressed": "مضغوط",
+  "@galleryPressed": {
+    "description": "Component gallery pressed state.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryDisabled": "غير متاح",
+  "@galleryDisabled": {
+    "description": "Component gallery disabled state.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryLoading": "دأحمّل",
+  "@galleryLoading": {
+    "description": "Component gallery loading state.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryError": "خطأ",
+  "@galleryError": {
+    "description": "Component gallery error state.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "galleryOffline": "بدون اتصال",
+  "@galleryOffline": {
+    "description": "Component gallery offline state.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "positionConfirmedShort": "الباقي من النقد المؤكد",
+  "@positionConfirmedShort": {
+    "description": "Compact row label, confirmed position; group specifies next seven days and supplier dues.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "positionExpectedShort": "الباقي ويا التحصيل المتوقع",
+  "@positionExpectedShort": {
+    "description": "Compact row label for position after dues with expected collections.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "upcomingTitle": "الأيام السبعة الجاية",
+  "@upcomingTitle": {
+    "description": "Section label separated from the resolved date caption.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaCash": "آخر عدّ نقد أو رصيد البداية، ويا حركة النقد المسجّلة بعده.",
+  "@formulaCash": {
+    "description": "Localized explanation of verified cash formula.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaConfirmed": "النقد المتوفر − مستحقات المجهزين",
+  "@formulaConfirmed": {
+    "description": "Verified confirmed-position formula.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaExpected": "النقد المتوفر + التحصيل المتوقع غير المتأخر − مستحقات المجهزين",
+  "@formulaExpected": {
+    "description": "Verified expected-position formula.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaClose": "عدّ النقد السابق + المبالغ المسجّلة الداخلة − المبالغ المسجّلة الطالعة",
+  "@formulaClose": {
+    "description": "Verified expected-close formula.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaDifference": "عدّ النقد − النقد المتوقع بنهاية اليوم. نحتاج عدّين متتاليين حتى نحسب الفرق.",
+  "@formulaDifference": {
+    "description": "Verified unexplained-difference formula, no inferred cause.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaDebt": "مبلغ الدين الأصلي − الدفعات الموثقة الفعّالة",
+  "@formulaDebt": {
+    "description": "Verified outstanding debt formula.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaOriginal": "مبلغ الدين الأصلي المسجّل",
+  "@formulaOriginal": {
+    "description": "Verified original obligation formula.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaMargin": "المبيعات المسعّرة − مجموع الكميات مضروبة بكلفة شراء الصنف المسجّلة",
+  "@formulaMargin": {
+    "description": "Estimated gross margin formula; coverage remains shown separately.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaRecorded": "مجموع {type} المسجّل بالفترة المحددة، بدون القيود الملغية.",
+  "@formulaRecorded": {
+    "description": "Parameterized recorded-flow formula.",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaProjected": "مجموع {type} التقديري بفترة التقدير.",
+  "@formulaProjected": {
+    "description": "Parameterized forecast-driver formula.",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    },
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaCollections": "مجموع الديون المؤهلة للتحصيل المتوقع، بدون ديون الزبائن المتأخرة.",
+  "@formulaCollections": {
+    "description": "Verified expected collection formula.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "formulaUnavailable": "شرح هالمعادلة مو متوفر بهاي اللغة. راجع صفوف المصدر والمعادلة الأصلية.",
+  "@formulaUnavailable": {
+    "description": "Honest fallback for an unmapped formula.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "originalFormula": "المعادلة الأصلية",
+  "@originalFormula": {
+    "description": "Explicit technical source disclosure, collapsed by default.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "useSampleShort": "استخدم المحل التجريبي",
+  "@useSampleShort": {
+    "description": "Separate concise use/reset sample action.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "restoreSample": "رجّع المحل التجريبي",
+  "@restoreSample": {
+    "description": "Separate concise use/reset sample action.",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

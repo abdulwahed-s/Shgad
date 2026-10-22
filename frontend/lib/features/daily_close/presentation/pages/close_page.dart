@@ -6,6 +6,9 @@ import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
+import '../../../../core/widgets/form_fields.dart';
+import '../../../../core/widgets/page_header.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../quick_entry/presentation/pages/entry_page.dart';
@@ -40,46 +43,77 @@ class _CloseView extends StatelessWidget {
       final data = v.data;
       final bloc = context.read<CloseBloc>();
       final busy = state is CloseLoading;
+      final hideCountPanel = !v.recording && data?.count.value != null;
       return MerchantPage(
         title: l.closeTitle,
-        actions: [
-          TextButton(
-            onPressed: busy ? null : () => bloc.add(OpenClose(data?.date)),
-            child: Text(l.refresh),
-          ),
-        ],
         children: [
           if (busy) const LinearProgressIndicator(),
           if (!v.online) ...[
-            InfoStrip(text: l.needsConnection),
-            SecondaryButton(
+            InfoStrip(text: l.needsConnection, offline: true),
+            TextAction(
               text: l.retry,
               onPressed: () => bloc.add(const RecheckClose()),
             ),
           ],
           if (state is CloseFailure)
-            InfoStrip(text: failureText(l, state.failure)),
+            InfoStrip(text: failureText(l, state.failure), error: true),
           if (data != null) ...[
-            Text(l.businessDate(formatDate(data.date, l.localeName))),
-            AmountView(
-              amount: data.count,
-              label: l.cashCount,
-              hero: true,
-              onTap: () => openEvidence(context, data.count),
+            PageMeta(
+              date: l.businessDate(formatDate(data.date, l.localeName)),
+              onRefresh: busy ? null : () => bloc.add(OpenClose(data.date)),
             ),
-            AmountView(
-              amount: data.expected,
-              label: l.expectedClose,
-              onTap: () => openEvidence(context, data.expected),
+            Offstage(
+              key: ValueKey('close_entry_${data.date}'),
+              offstage: hideCountPanel,
+              child: ExcludeFocus(
+                excluding: hideCountPanel,
+                child: TickerMode(
+                  enabled: !hideCountPanel,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: AppDimens.xl),
+                    child: EntryPanel(
+                      amountFirst: true,
+                      key: ValueKey(data.date),
+                      lockedDate: true,
+                      fields: {
+                        'type': 'DAILY_CASH_COUNT',
+                        'business_date': data.date,
+                      },
+                      onSaved: () => bloc
+                        ..add(const ChooseClosePanel(true))
+                        ..add(OpenClose(data.date)),
+                      onVoided: () => bloc
+                        ..add(const ChooseClosePanel(true))
+                        ..add(OpenClose(data.date)),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            AmountView(
-              amount: data.remaining,
-              label: l.unexplainedDifference,
-              onTap: () => openEvidence(context, data.remaining),
+            LedgerGroup(
+              children: [
+                AmountView(
+                  amount: data.count,
+                  label: l.cashCount,
+                  hero: true,
+                  onTap: () => openEvidence(context, data.count),
+                ),
+                LedgerRow(
+                  amount: data.expected,
+                  label: l.expectedClose,
+                  onTap: () => openEvidence(context, data.expected),
+                ),
+                LedgerRow(
+                  amount: data.remaining,
+                  label: l.unexplainedDifference,
+                  onTap: () => openEvidence(context, data.remaining),
+                ),
+              ],
             ),
+            const SizedBox(height: AppDimens.lg),
             InfoStrip(text: l.neutralDifference),
-            Wrap(
-              spacing: AppDimens.sm,
+            const SizedBox(height: AppDimens.md),
+            ActionGroup(
               children: [
                 SecondaryButton(
                   text: l.recordCloseEntries,
@@ -91,19 +125,7 @@ class _CloseView extends StatelessWidget {
                 ),
               ],
             ),
-            Offstage(
-              offstage: !v.recording,
-              child: EntryPanel(
-                key: ValueKey(data.date),
-                lockedDate: true,
-                fields: {
-                  'type': 'DAILY_CASH_COUNT',
-                  'business_date': data.date,
-                },
-                onSaved: () => bloc.add(OpenClose(data.date)),
-              ),
-            ),
-            if (!v.recording) ...[
+            if (!v.recording && data.count.value != null) ...[
               const SizedBox(height: AppDimens.lg),
               if (v.saved) ...[
                 InfoStrip(
@@ -111,24 +133,33 @@ class _CloseView extends StatelessWidget {
                       ? l.leftUnexplained
                       : l.savedSource(v.sourceId!),
                 ),
-                if (v.sourceId != null)
-                  SecondaryButton(
-                    text: l.evidence,
-                    onPressed: () => openSourceEvidence(context, [
-                      v.sourceId!,
-                    ], l.savedEntryFormula),
+                if (v.sourceId != null) ...[
+                  const SizedBox(height: AppDimens.md),
+                  ActionGroup(
+                    children: [
+                      SecondaryButton(
+                        text: l.evidence,
+                        onPressed: () => openSourceEvidence(context, [
+                          v.sourceId!,
+                        ], l.savedEntryFormula),
+                      ),
+                      if (v.voided == null && !v.undoing)
+                        SecondaryButton(
+                          text: l.undo,
+                          onPressed: !v.online || busy
+                              ? null
+                              : () => bloc.add(const BeginReviewUndo()),
+                        ),
+                    ],
                   ),
-                if (v.sourceId != null && v.voided == null && !v.undoing)
-                  SecondaryButton(
-                    text: l.undo,
-                    onPressed: !v.online || busy
-                        ? null
-                        : () => bloc.add(const BeginReviewUndo()),
-                  ),
+                ],
+                const SizedBox(height: AppDimens.md),
               ],
               if (v.undoing) ...[
                 InfoStrip(text: l.undoNotice),
-                TextFormField(
+                const SizedBox(height: AppDimens.md),
+                ledgerTextField(
+                  context,
                   key: const ValueKey('review_undo_reason'),
                   enabled: !busy,
                   initialValue: v.reason,
@@ -163,46 +194,51 @@ class _CloseView extends StatelessWidget {
                     ],
                   ),
                 ),
-                PrimaryButton(
-                  key: const ValueKey('resolution_save'),
-                  text: l.confirm,
-                  onPressed: !v.online || busy
-                      ? null
-                      : () => bloc.add(const ConfirmResolution()),
-                ),
-                SecondaryButton(
-                  text: l.edit,
-                  onPressed: busy
-                      ? null
-                      : () => bloc.add(const EditResolution()),
+                const SizedBox(height: AppDimens.md),
+                ActionGroup(
+                  children: [
+                    PrimaryButton(
+                      key: const ValueKey('resolution_save'),
+                      text: l.confirm,
+                      onPressed: !v.online || busy
+                          ? null
+                          : () => bloc.add(const ConfirmResolution()),
+                    ),
+                    SecondaryButton(
+                      text: l.edit,
+                      onPressed: busy
+                          ? null
+                          : () => bloc.add(const EditResolution()),
+                    ),
+                  ],
                 ),
               ] else ...[
-                DropdownButtonFormField<String>(
+                Text(
+                  l.chooseResolution,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+                RadioGroup<String>(
                   key: ValueKey('resolution_${v.saved}'),
-                  initialValue: v.choice,
-                  isExpanded: true,
-                  decoration: InputDecoration(labelText: l.chooseResolution),
-                  items: [
-                    for (final choice in resolutionChoices)
-                      DropdownMenuItem(
-                        value: choice,
-                        child: Text(
-                          resolutionText(l, choice),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                  groupValue: v.choice,
+                  onChanged: (value) {
+                    if (value != null && !busy) {
+                      bloc.add(ChangeResolution('choice', value));
+                    }
+                  },
+                  child: Column(
+                    children: [
+                      for (final choice in resolutionChoices)
+                        RadioListTile<String>(
+                          value: choice,
+                          enabled: !busy,
+                          title: Text(resolutionText(l, choice)),
                         ),
-                      ),
-                  ],
-                  onChanged: busy
-                      ? null
-                      : (value) {
-                          if (value != null) {
-                            bloc.add(ChangeResolution('choice', value));
-                          }
-                        },
+                    ],
+                  ),
                 ),
                 if (v.choice != null && v.choice != 'leave_unexplained')
-                  TextFormField(
+                  ledgerTextField(
+                    context,
                     key: const ValueKey('resolution_amount'),
                     enabled: !busy,
                     initialValue: v.amount,
@@ -211,7 +247,8 @@ class _CloseView extends StatelessWidget {
                     onChanged: (value) =>
                         bloc.add(ChangeResolution('amount', value)),
                   ),
-                TextFormField(
+                ledgerTextField(
+                  context,
                   key: const ValueKey('resolution_note'),
                   enabled: !busy,
                   initialValue: v.note,
@@ -243,11 +280,11 @@ class _CloseView extends StatelessWidget {
                   ], l.savedEntryFormula),
                   child: Text(
                     history.sourceId!,
-                    style: TextStyle(
-                      decoration: history.voidReason == null
-                          ? null
-                          : TextDecoration.lineThrough,
-                    ),
+                    style: history.voidReason == null
+                        ? Theme.of(context).textTheme.bodySmall
+                        : Theme.of(
+                            context,
+                          ).extension<LedgerStyles>()!.struckCaption,
                   ),
                 ),
               if (history.voidReason != null)

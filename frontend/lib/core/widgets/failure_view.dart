@@ -32,9 +32,21 @@ class FailureView extends StatelessWidget {
   final AppFailure failure;
   final VoidCallback onRetry;
   @override
-  Widget build(BuildContext context) => EmptyState(
-    text: failureText(AppLocalizations.of(context), failure),
-    action: AppLocalizations.of(context).retry,
-    onPressed: onRetry,
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      InfoStrip(
+        text: failureText(AppLocalizations.of(context), failure),
+        error: failure.kind != FailureKind.offline,
+        offline: failure.kind == FailureKind.offline,
+      ),
+      Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextAction(
+          text: AppLocalizations.of(context).retry,
+          onPressed: onRetry,
+        ),
+      ),
+    ],
   );
 }

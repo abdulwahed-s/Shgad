@@ -5,11 +5,13 @@ import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/utils/iqd_formatter.dart';
 import '../../../../core/widgets/amount_label.dart';
+import '../../../../core/widgets/balanced_text.dart';
 import '../../../../core/widgets/chat_bubble.dart';
 import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
-import '../../../../core/widgets/merchant_page.dart';
-import '../../../../core/widgets/merchant_app_bar.dart';
+import '../../../../core/widgets/merchant_shell.dart';
+import '../../../../core/widgets/chat_composer.dart' as shared;
+import '../../../../core/theme/app_motion.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/chat_reply.dart';
@@ -30,97 +32,163 @@ class _ChatView extends StatelessWidget {
       final l = AppLocalizations.of(context);
       final bloc = context.read<ChatBloc>();
       final v = state.view;
-      return Scaffold(
-        appBar: merchantAppBar(context, l.chatTitle),
-        bottomNavigationBar: const MerchantNavigation(),
-        body: SafeArea(
-          child: Align(
-            alignment: AlignmentDirectional.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: AppDimens.contentMaxWidth,
-              ),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.all(AppDimens.lg),
-                      children: [
-                        if (v.turns.isEmpty) InfoStrip(text: l.chatWelcome),
-                        for (final turn in v.turns) ...[
-                          Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: ChatBubble(
-                              text: turn.question,
-                              merchant: true,
+      final prompts = [l.promptSupplier, l.promptDebts, l.promptWeek];
+      return MerchantScaffold(
+        title: l.chatTitle,
+        body: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppDimens.contentMaxWidth,
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ChatTranscript(
+                    revision: v.turns.length,
+                    children: [
+                      if (v.turns.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: AppDimens.xxxl),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                l.chatInput,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: AppDimens.sm),
+                              Text(l.chatWelcome),
+                              const SizedBox(height: AppDimens.xl),
+                              LedgerCard(
+                                child: Column(
+                                  children: [
+                                    for (
+                                      var i = 0;
+                                      i < prompts.length;
+                                      i++
+                                    ) ...[
+                                      if (i > 0) const Divider(),
+                                      ListTile(
+                                        title: BalancedText(prompts[i]),
+                                        onTap: () =>
+                                            bloc.add(FillChat(prompts[i])),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      for (final turn in v.turns)
+                        SoftEntrance(
+                          key: ObjectKey(turn),
+                          child: Column(
+                            children: [
+                              ChatBubble(text: turn.question, merchant: true),
+                              const SizedBox(height: AppDimens.md),
+                              ChatBubble(
+                                text: turn.reply.text,
+                                textDirection: TextDirection.rtl,
+                                footer: ChatEvidence(turn: turn),
+                              ),
+                              const SizedBox(height: AppDimens.xl),
+                            ],
+                          ),
+                        ),
+                      if (state is ChatLoading)
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: AppDimens.inlineSpinner,
+                              height: AppDimens.inlineSpinner,
+                              child: CircularProgressIndicator(
+                                strokeWidth: AppDimens.progressHeight,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: AppDimens.md),
-                          ChatBubble(
-                            text: turn.reply.text,
-                            textDirection: TextDirection.rtl,
-                            footer: ChatEvidence(turn: turn),
-                          ),
-                          const SizedBox(height: AppDimens.xl),
-                        ],
-                        if (state is ChatLoading)
-                          InfoStrip(text: l.checkingLedger),
-                        if (state is ChatFailure)
-                          InfoStrip(text: failureText(l, state.failure)),
-                      ],
-                    ),
-                  ),
-                  if (!v.online)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimens.lg,
-                      ),
-                      child: Column(
-                        children: [
-                          InfoStrip(text: l.chatNeedsConnection),
-                          SecondaryButton(
-                            text: l.retry,
-                            onPressed: () => bloc.add(const RecheckChat()),
-                          ),
-                        ],
-                      ),
-                    ),
-                  SizedBox(
-                    height: 64,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimens.lg,
-                      ),
-                      children: [
-                        PromptChip(
-                          text: l.promptSupplier,
-                          onPressed: () => bloc.add(FillChat(l.promptSupplier)),
+                            const SizedBox(width: AppDimens.sm),
+                            Expanded(child: Text(l.checkingLedger)),
+                          ],
                         ),
-                        const SizedBox(width: AppDimens.sm),
-                        PromptChip(
-                          text: l.promptDebts,
-                          onPressed: () => bloc.add(FillChat(l.promptDebts)),
+                      if (state is ChatFailure) ...[
+                        InfoStrip(
+                          text: failureText(l, state.failure),
+                          error: true,
                         ),
-                        const SizedBox(width: AppDimens.sm),
-                        PromptChip(
-                          text: l.promptWeek,
-                          onPressed: () => bloc.add(FillChat(l.promptWeek)),
+                        TextAction(
+                          text: l.retry,
+                          onPressed: () => bloc.add(const SubmitChat()),
                         ),
                       ],
-                    ),
+                      if (!v.online) ...[
+                        InfoStrip(text: l.chatNeedsConnection, offline: true),
+                        TextAction(
+                          text: l.retry,
+                          onPressed: () => bloc.add(const RecheckChat()),
+                        ),
+                      ],
+                    ],
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(AppDimens.lg),
-                    child: ChatComposer(),
-                  ),
-                ],
-              ),
+                ),
+                const ChatDraftComposer(),
+              ],
             ),
           ),
         ),
       );
     },
+  );
+}
+
+class ChatTranscript extends StatefulWidget {
+  const ChatTranscript({
+    required this.children,
+    required this.revision,
+    super.key,
+  });
+  final List<Widget> children;
+  final int revision;
+  @override
+  State<ChatTranscript> createState() => _ChatTranscriptState();
+}
+
+class _ChatTranscriptState extends State<ChatTranscript> {
+  final controller = ScrollController();
+  @override
+  void didUpdateWidget(ChatTranscript old) {
+    super.didUpdateWidget(old);
+    if (old.revision != widget.revision) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && controller.hasClients) {
+          final duration = AppMotion.sheet(context);
+          if (duration == Duration.zero) {
+            controller.jumpTo(controller.position.maxScrollExtent);
+            return;
+          }
+          controller.animateTo(
+            controller.position.maxScrollExtent,
+            duration: duration,
+            curve: Curves.easeOutCubic,
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ListView(
+    controller: controller,
+    padding: EdgeInsets.all(
+      AppDimens.screenGutter(MediaQuery.sizeOf(context).width),
+    ),
+    children: widget.children,
   );
 }
 
@@ -215,13 +283,13 @@ class ResolvedChatContext extends StatelessWidget {
 }
 
 /// Controller lifecycle only; draft, readiness and all actions belong to ChatBloc.
-class ChatComposer extends StatefulWidget {
-  const ChatComposer({super.key});
+class ChatDraftComposer extends StatefulWidget {
+  const ChatDraftComposer({super.key});
   @override
-  State<ChatComposer> createState() => _ChatComposerState();
+  State<ChatDraftComposer> createState() => _ChatComposerState();
 }
 
-class _ChatComposerState extends State<ChatComposer> {
+class _ChatComposerState extends State<ChatDraftComposer> {
   late final TextEditingController controller;
   @override
   void initState() {
@@ -249,31 +317,34 @@ class _ChatComposerState extends State<ChatComposer> {
     builder: (context, state) {
       final l = AppLocalizations.of(context);
       final bloc = context.read<ChatBloc>();
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            key: const ValueKey('chat_input'),
-            controller: controller,
-            minLines: 1,
-            maxLines: 3,
-            maxLength: 4000,
-            enabled: state is! ChatLoading,
-            decoration: InputDecoration(
-              labelText: l.chatInput,
-              counterText: '',
-            ),
-            onChanged: (text) => bloc.add(TypeChat(text)),
-          ),
-          const SizedBox(height: AppDimens.sm),
-          PrimaryButton(
-            key: const ValueKey('chat_send'),
-            text: l.send,
-            onPressed: !state.view.online || state is ChatLoading
-                ? null
-                : () => bloc.add(const SubmitChat()),
-          ),
-        ],
+      final height =
+          MediaQuery.sizeOf(context).height -
+          MediaQuery.viewInsetsOf(context).bottom;
+      return shared.ChatComposer(
+        controller: controller,
+        onChanged: (text) => bloc.add(TypeChat(text)),
+        enabled: state is! ChatLoading,
+        onSubmit: !state.view.online || state is ChatLoading
+            ? null
+            : () => bloc.add(const SubmitChat()),
+        prompts: state.view.turns.isNotEmpty && height > AppDimens.formMaxWidth
+            ? [
+                for (final prompt in [
+                  l.promptSupplier,
+                  l.promptDebts,
+                  l.promptWeek,
+                ])
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      end: AppDimens.sm,
+                    ),
+                    child: PromptChip(
+                      text: prompt,
+                      onPressed: () => bloc.add(FillChat(prompt)),
+                    ),
+                  ),
+              ]
+            : const [],
       );
     },
   );

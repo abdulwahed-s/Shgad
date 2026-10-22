@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../domain/review_flag.dart';
+import '../constants/app_dimens.dart';
 import 'ledger_widgets.dart';
 import 'open_evidence.dart';
 
@@ -37,27 +38,50 @@ class ReviewFlagView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Divider(),
-        AmountView(
-          amount: flag.amount,
-          label: flagTitle(l, flag.type),
-          onTap: () => openEvidence(context, flag.amount),
+    final reason = flagReason(l, flag.reason, flag.type);
+    final basis = flagBasis(l, flag.basis);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimens.lg),
+      child: LedgerCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            StatusPill(kind: 'flagged', text: flagTitle(l, flag.type)),
+            LedgerRow(
+              amount: flag.amount,
+              label: l.amountInput,
+              onTap: () => openEvidence(context, flag.amount),
+            ),
+            Text(reason == flagTitle(l, flag.type) ? basis : reason),
+            if (reason != flagTitle(l, flag.type)) ...[
+              const SizedBox(height: AppDimens.sm),
+              Text(basis),
+            ],
+            const SizedBox(height: AppDimens.sm),
+            Text(
+              flag.nextStep == 'provide_details'
+                  ? l.provideDetails
+                  : l.flagReview,
+            ),
+            const SizedBox(height: AppDimens.md),
+            SelectableCaption(
+              [flag.id, ...flag.sources].join(' · '),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextAction(
+                text: l.evidence,
+                onPressed: () => openSourceEvidence(
+                  context,
+                  flag.sources,
+                  flag.amount.formula,
+                ),
+              ),
+            ),
+          ],
         ),
-        Text(flagReason(l, flag.reason, flag.type)),
-        Text(flagBasis(l, flag.basis)),
-        Text(
-          flag.nextStep == 'provide_details' ? l.provideDetails : l.flagReview,
-        ),
-        Text(flag.id, style: Theme.of(context).textTheme.bodySmall),
-        SecondaryButton(
-          text: l.evidence,
-          onPressed: () =>
-              openSourceEvidence(context, flag.sources, flag.amount.formula),
-        ),
-      ],
+      ),
     );
   }
 }

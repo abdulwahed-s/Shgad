@@ -41,9 +41,7 @@ void registerAppFlow() {
       find.descendant(of: navigation, matching: find.text(l.debtsTitle)),
       findsOneWidget,
     );
-    await tap(
-      find.descendant(of: navigation, matching: find.text(l.chatTitle)),
-    );
+    await tap(find.descendant(of: navigation, matching: find.text(l.navChat)));
     await tap(find.text(l.promptSupplier));
     await tap(find.byKey(const ValueKey('chat_send')));
     for (
@@ -75,14 +73,17 @@ void registerAppFlow() {
       await tap(find.text(label));
       expect(
         tester
-            .widget<ChoiceChip>(
-              find.ancestor(
-                of: find.text(label),
-                matching: find.byType(ChoiceChip),
-              ),
+            .widget<SegmentedButton<String>>(
+              find.byType(SegmentedButton<String>),
             )
             .selected,
-        isTrue,
+        {
+          label == l.scenarioBase
+              ? 'base'
+              : label == l.scenarioConservative
+              ? 'conservative'
+              : 'stress',
+        },
       );
     }
     await more(l.sampleTitle);

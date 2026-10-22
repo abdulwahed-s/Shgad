@@ -10,6 +10,7 @@ import '../features/daily_close/presentation/pages/close_page.dart';
 import '../features/evidence/presentation/pages/evidence_page.dart';
 import '../core/domain/evidence_request.dart';
 import '../core/constants/app_dimens.dart';
+import '../core/theme/app_motion.dart';
 import '../features/weekly_summary/presentation/pages/weekly_page.dart';
 import '../features/forecast/presentation/pages/forecast_page.dart';
 import '../features/sample_shop/presentation/pages/sample_page.dart';
@@ -18,29 +19,70 @@ import '../features/flags/presentation/pages/flags_page.dart';
 
 GoRouter createRouter() => GoRouter(
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const TodayPage()),
-    GoRoute(path: '/chat', builder: (context, state) => const ChatPage()),
-    GoRoute(path: '/debts', builder: (context, state) => const DebtsPage()),
+    GoRoute(
+      path: '/',
+      pageBuilder: (context, state) => _fade(context, state, const TodayPage()),
+    ),
+    GoRoute(
+      path: '/chat',
+      pageBuilder: (context, state) => _fade(context, state, const ChatPage()),
+    ),
+    GoRoute(
+      path: '/debts',
+      pageBuilder: (context, state) => _fade(context, state, const DebtsPage()),
+    ),
     GoRoute(
       path: '/entry',
-      builder: (context, state) => EntryPage(
-        key: ValueKey(state.uri.toString()),
-        fields: state.uri.queryParameters,
+      pageBuilder: (context, state) => _fade(
+        context,
+        state,
+        EntryPage(
+          key: ValueKey(state.uri.toString()),
+          fields: state.uri.queryParameters,
+        ),
       ),
     ),
-    GoRoute(path: '/gallery', builder: (context, state) => const GalleryPage()),
-    GoRoute(path: '/flags', builder: (context, state) => const FlagsPage()),
-    GoRoute(path: '/import', builder: (context, state) => const CsvPage()),
-    GoRoute(path: '/sample', builder: (context, state) => const SamplePage()),
-    GoRoute(path: '/weekly', builder: (context, state) => const WeeklyPage()),
+    GoRoute(
+      path: '/gallery',
+      pageBuilder: (context, state) => _fade(
+        context,
+        state,
+        GalleryPage(
+          key: ValueKey(state.uri.toString()),
+          initialState: state.uri.queryParameters['state'] ?? 'default',
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/flags',
+      pageBuilder: (context, state) => _fade(context, state, const FlagsPage()),
+    ),
+    GoRoute(
+      path: '/import',
+      pageBuilder: (context, state) => _fade(context, state, const CsvPage()),
+    ),
+    GoRoute(
+      path: '/sample',
+      pageBuilder: (context, state) =>
+          _fade(context, state, const SamplePage()),
+    ),
+    GoRoute(
+      path: '/weekly',
+      pageBuilder: (context, state) =>
+          _fade(context, state, const WeeklyPage()),
+    ),
     GoRoute(
       path: '/forecast',
-      builder: (context, state) => const ForecastPage(),
+      pageBuilder: (context, state) =>
+          _fade(context, state, const ForecastPage()),
     ),
     GoRoute(
       path: '/close',
-      builder: (context, state) =>
-          ClosePage(date: state.uri.queryParameters['date']),
+      pageBuilder: (context, state) => _fade(
+        context,
+        state,
+        ClosePage(date: state.uri.queryParameters['date']),
+      ),
     ),
     GoRoute(
       path: '/evidence',
@@ -65,6 +107,11 @@ class EvidenceModalPage extends Page<void> {
     settings: this,
     isScrollControlled: true,
     useSafeArea: true,
+    showDragHandle: false,
+    sheetAnimationStyle: const AnimationStyle(
+      duration: Duration.zero,
+      reverseDuration: Duration.zero,
+    ),
     backgroundColor: Theme.of(context).colorScheme.surface,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
@@ -72,9 +119,25 @@ class EvidenceModalPage extends Page<void> {
       ),
     ),
     elevation: 1,
-    builder: (_) => FractionallySizedBox(
-      heightFactor: .92,
-      child: EvidencePage(request: request),
+    builder: (_) => SoftEntrance(
+      child: DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: .92,
+        minChildSize: .45,
+        maxChildSize: .96,
+        builder: (_, controller) =>
+            EvidencePage(request: request, controller: controller),
+      ),
     ),
   );
 }
+
+Page<void> _fade(BuildContext context, GoRouterState state, Widget child) =>
+    CustomTransitionPage<void>(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: AppMotion.route(context),
+      reverseTransitionDuration: AppMotion.route(context),
+      transitionsBuilder: (context, animation, secondary, child) =>
+          FadeTransition(opacity: animation, child: child),
+    );

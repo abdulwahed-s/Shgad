@@ -13,7 +13,7 @@ void main() {
   setUp(installRecordedApp);
   tearDown(() => getIt.reset());
   for (final locale in ['ar', 'en']) {
-    for (final width in [320.0, 360.0]) {
+    for (final width in [320.0, 360.0, 768.0, 1280.0]) {
       for (final scale in [1.0, 1.3]) {
         for (final route in [
           '/',
@@ -71,25 +71,40 @@ void main() {
                 l.scenarioStress,
                 l.scenarioBase,
               ]) {
+                await tester.scrollUntilVisible(
+                  find.text(label),
+                  200,
+                  scrollable: find
+                      .descendant(
+                        of: find.byKey(const ValueKey('merchant_scroll')),
+                        matching: find.byType(Scrollable),
+                      )
+                      .first,
+                );
+                await tester.pumpAndSettle();
                 await tester.tap(find.text(label));
                 await tester.pumpAndSettle();
-                expect(
-                  tester
-                      .widget<ChoiceChip>(
-                        find.ancestor(
-                          of: find.text(label),
-                          matching: find.byType(ChoiceChip),
-                        ),
-                      )
-                      .selected,
-                  isTrue,
+                final control = tester.widget<SegmentedButton<String>>(
+                  find.byType(SegmentedButton<String>),
                 );
+                expect(control.selected, {
+                  label == l.scenarioBase
+                      ? 'base'
+                      : label == l.scenarioConservative
+                      ? 'conservative'
+                      : 'stress',
+                });
               }
               expect(find.byType(CustomPaint), findsWidgets);
               await tester.scrollUntilVisible(
                 find.text(l.estimateOnly),
                 200,
-                scrollable: find.byType(Scrollable).first,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
               );
               await tester.pumpAndSettle();
               expect(find.text(l.estimateOnly), findsOneWidget);
@@ -97,33 +112,54 @@ void main() {
               await tester.scrollUntilVisible(
                 find.text(l.neutralDifference),
                 250,
-                scrollable: find.byType(Scrollable).first,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
               );
               await tester.pumpAndSettle();
               expect(find.text(l.neutralDifference), findsOneWidget);
               await tester.scrollUntilVisible(
                 find.byKey(const ValueKey('resolution_false')),
                 250,
-                scrollable: find.byType(Scrollable).first,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
               );
               await tester.pumpAndSettle();
-              final dropdown = find
-                  .byType(DropdownButtonFormField<String>)
-                  .first;
+              final choices = find.byType(RadioGroup<String>);
               expect(
-                tester
-                    .widget<DropdownButtonFormField<String>>(dropdown)
-                    .initialValue,
+                tester.widget<RadioGroup<String>>(choices).groupValue,
                 isNull,
               );
             } else if (route == '/import') {
               await tester.tap(find.byKey(const ValueKey('csv_pick')));
               await tester.pumpAndSettle();
+              await tester.scrollUntilVisible(
+                find.text('fictional.csv'),
+                200,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
+              );
               expect(find.text('fictional.csv'), findsOneWidget);
               await tester.scrollUntilVisible(
                 find.byType(CheckboxListTile),
                 200,
-                scrollable: find.byType(Scrollable).first,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
               );
               await tester.pumpAndSettle();
               await tester.tap(find.byType(CheckboxListTile));
@@ -131,7 +167,12 @@ void main() {
               await tester.scrollUntilVisible(
                 find.byKey(const ValueKey('csv_preview')),
                 250,
-                scrollable: find.byType(Scrollable).first,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
               );
               await tester.pumpAndSettle();
               await tester.tap(find.byKey(const ValueKey('csv_preview')));
@@ -139,7 +180,12 @@ void main() {
               await tester.scrollUntilVisible(
                 find.text(l.previewFiveRows),
                 250,
-                scrollable: find.byType(Scrollable).first,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
               );
               await tester.pumpAndSettle();
               expect(find.text(l.previewFiveRows), findsOneWidget);
@@ -148,7 +194,12 @@ void main() {
               await tester.scrollUntilVisible(
                 find.byKey(const ValueKey('sample_prepare')),
                 200,
-                scrollable: find.byType(Scrollable).first,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
               );
               await tester.pumpAndSettle();
               await tester.tap(find.byKey(const ValueKey('sample_prepare')));
@@ -156,7 +207,12 @@ void main() {
               await tester.scrollUntilVisible(
                 find.text(l.resetWarning),
                 200,
-                scrollable: find.byType(Scrollable).first,
+                scrollable: find
+                    .descendant(
+                      of: find.byKey(const ValueKey('merchant_scroll')),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
               );
               await tester.pumpAndSettle();
               expect(find.text(l.resetWarning), findsOneWidget);
@@ -177,9 +233,63 @@ void main() {
             } else if (route == '/') {
               expect(find.text(l.cashOnHand), findsOneWidget);
             }
+            final semantics = tester.ensureSemantics();
+            await tester.pump();
+            await expectLater(
+              tester,
+              meetsGuideline(androidTapTargetGuideline),
+            );
+            await expectLater(
+              tester,
+              meetsGuideline(labeledTapTargetGuideline),
+            );
+            semantics.dispose();
             expect(tester.takeException(), isNull);
           });
         }
+      }
+    }
+  }
+  for (final width in [320.0, 360.0]) {
+    for (final locale in ['ar', 'en']) {
+      for (final route in ['/entry', '/close', '/chat', '/import']) {
+        testWidgets('Keyboard inset $route $locale $width scale1.3', (
+          tester,
+        ) async {
+          tester.view.physicalSize = Size(width, 800);
+          tester.view.devicePixelRatio = 1;
+          tester.view.viewInsets = const FakeViewPadding(bottom: 320);
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+          addTearDown(tester.view.resetViewInsets);
+          getIt<GoRouter>().go(route);
+          await tester.pumpWidget(
+            ShgadApp(locale: Locale(locale), textScale: 1.3),
+          );
+          await tester.pumpAndSettle();
+          if (route == '/chat') {
+            final l = AppLocalizations.of(
+              tester.element(find.byKey(const ValueKey('chat_input'))),
+            );
+            await tester.enterText(
+              find.byKey(const ValueKey('chat_input')),
+              l.promptSupplier,
+            );
+            await tester.pumpAndSettle();
+            expect(find.text(l.promptSupplier), findsWidgets);
+          } else if (route == '/entry') {
+            final amount = find.byKey(const ValueKey('amount_iqd'));
+            await tester.ensureVisible(amount);
+            await tester.pumpAndSettle();
+            await tester.enterText(amount, '12000');
+            await tester.pumpAndSettle();
+            expect(
+              tester.widget<TextFormField>(amount).controller!.text,
+              isNotEmpty,
+            );
+          }
+          expect(tester.takeException(), isNull);
+        });
       }
     }
   }

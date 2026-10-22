@@ -2,29 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/di/injection.dart';
-import '../../../../core/constants/app_dimens.dart';
 import '../../../../core/domain/evidence_request.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
+import '../../../../core/widgets/form_fields.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../core/widgets/entry_type_text.dart';
-import '../../domain/entities/source_record.dart';
+import '../../domain/entities/source_record.dart' as source;
 import '../bloc/evidence_bloc.dart';
 
 class EvidencePage extends StatelessWidget {
-  const EvidencePage({required this.request, super.key});
+  const EvidencePage({required this.request, this.controller, super.key});
   final EvidenceRequest request;
+  final ScrollController? controller;
   @override
   Widget build(BuildContext context) => BlocProvider(
     create: (_) => getIt<EvidenceBloc>()..add(OpenEvidence(request)),
-    child: const _EvidenceView(),
+    child: _EvidenceView(controller: controller),
   );
 }
 
 class _EvidenceView extends StatelessWidget {
-  const _EvidenceView();
+  const _EvidenceView({this.controller});
+  final ScrollController? controller;
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<EvidenceBloc, EvidenceState>(
@@ -36,32 +38,16 @@ class _EvidenceView extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(AppDimens.lg),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l.evidence,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: l.dismiss,
-                      onPressed: () => context.pop(),
-                      icon: const Icon(Icons.close_outlined),
-                    ),
-                  ],
-                ),
-              ),
               if (busy) const LinearProgressIndicator(),
               Expanded(
                 child: EvidenceSheet(
+                  showHeader: true,
+                  controller: controller,
                   formula: v.request.formula,
                   children: [
                     if (!v.online) ...[
                       InfoStrip(text: l.needsConnection),
-                      SecondaryButton(
+                      TextAction(
                         text: l.retry,
                         onPressed: () => bloc.add(const RecheckEvidence()),
                       ),
@@ -79,7 +65,7 @@ class _EvidenceView extends StatelessWidget {
                       ),
                     for (final record in v.records) ...[
                       const Divider(),
-                      Text(
+                      SelectableCaption(
                         record.id,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           decoration: record.row?.status == 'voided'
@@ -98,13 +84,14 @@ class _EvidenceView extends StatelessWidget {
                           l.businessDate(
                             formatDate(record.date!, l.localeName),
                           ),
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                         AmountView(
                           amount: record.opening!,
                           label: l.openingBalance,
                           exact: true,
                         ),
-                        SelectableText(
+                        SelectableCaption(
                           record.rawText,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
@@ -121,7 +108,7 @@ class _EvidenceView extends StatelessWidget {
                           label: l.unitSellPrice,
                           exact: true,
                         ),
-                        SelectableText(
+                        SelectableCaption(
                           record.rawText,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
@@ -130,7 +117,8 @@ class _EvidenceView extends StatelessWidget {
                     if (v.voidSource != null) ...[
                       InfoStrip(text: l.undoNotice),
                       Text(l.savedSource(v.voidSource!)),
-                      TextFormField(
+                      ledgerTextField(
+                        context,
                         key: ValueKey('void_reason_${v.voidSource}'),
                         enabled: !busy,
                         initialValue: v.reason,
@@ -161,7 +149,7 @@ class EvidenceLedgerRow extends StatelessWidget {
     required this.busy,
     super.key,
   });
-  final LedgerRow row;
+  final source.LedgerRow row;
   final bool online, busy;
   @override
   Widget build(BuildContext context) {
@@ -170,10 +158,10 @@ class EvidenceLedgerRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l.businessDate(formatDate(row.date, l.localeName))),
-        AmountView(
+        LedgerRow(
           amount: row.amount,
           label: entryTypeText(l, row.type),
+          caption: l.businessDate(formatDate(row.date, l.localeName)),
           exact: true,
           voided: row.status == 'voided',
         ),
@@ -190,7 +178,7 @@ class EvidenceLedgerRow extends StatelessWidget {
               formatDate(row.voidedAt!, l.localeName, timestamp: true),
             ),
           ),
-          SecondaryButton(
+          TextAction(
             text: l.correctEntry,
             onPressed: !online || busy
                 ? null
@@ -203,26 +191,26 @@ class EvidenceLedgerRow extends StatelessWidget {
           ),
         ],
         if (row.correctionOf != null)
-          SecondaryButton(
+          TextAction(
             text: l.correctionOf(row.correctionOf!),
             onPressed: () => openSourceEvidence(context, [
               row.correctionOf!,
             ], l.savedEntryFormula),
           ),
         if (row.rawText.isEmpty)
-          SecondaryButton(
+          TextAction(
             text: l.originalRow,
             onPressed: !online || busy
                 ? null
                 : () => bloc.add(OpenSourceDetail(row.id)),
           )
         else
-          SelectableText(
+          SelectableCaption(
             row.rawText,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         if (row.status != 'voided')
-          SecondaryButton(
+          TextAction(
             text: l.undo,
             onPressed: !online || busy
                 ? null
