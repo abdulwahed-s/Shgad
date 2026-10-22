@@ -18,6 +18,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > daily-close review, backend-rendered chat, source evidence, weekly reports,
 > three-scenario estimates, a fictional sample shop, CSV import and review flags.
 > Read-only caches retain update/count times; offline writes are disabled.
+> The interface adapts from compact bottom navigation to medium/expanded rails,
+> with accessible ledger colors, shared controls and keyboard focus.
 > Gemini, Groq and OpenAI completed bounded development routing screens. With
 > larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
 > Both selected provider APIs now respond successfully. Live CSV previews and
@@ -27,7 +29,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > The development forecast benchmark performs worse than the seven-day baseline;
 > final testing has not run.
 > The 55 fixed backend and 248 frontend Arabic messages have human approval.
-> New or edited wording requires review.
+> A final independent visual review is pending; 29 new frontend messages await
+> wording review. New or edited wording requires review.
 
 ## Capabilities
 
@@ -40,7 +43,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 - Return deterministic weekly totals and a secondary cash estimate with base, conservative and stress scenarios.
 - Render sourced figures and dates in Arabic, with validation and deterministic template fallback.
 - Flutter web opens on today's cash and seven-day obligations, with Arabic/English layouts and Cairo typography.
-- Review entries before saving, retain their source IDs and undo through immutable void evidence.
+- Responsive navigation and ledger layouts cover phones, tablets and desktops; controls support keyboard focus and reduced motion.
+- Review entries before saving, retain source IDs and undo through immutable void evidence; daily-close values refresh after saves and undos.
 - Seed/reset the fictional sample through the interface; pick synthetic CSVs, edit mappings, preview and confirm imports.
 - Keep last-synced reports available offline while retaining form input and disabling writes without a queue.
 - Answer chat requests through a bounded, read-only agent with verified figures and source evidence.
