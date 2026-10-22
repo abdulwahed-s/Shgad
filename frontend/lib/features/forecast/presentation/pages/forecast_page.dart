@@ -95,7 +95,7 @@ class _ForecastView extends StatelessWidget {
                 Semantics(
                   label: l.chartDescription,
                   child: SizedBox(
-                    height: 180,
+                    height: AppDimens.chartHeight,
                     child: CustomPaint(
                       painter: ForecastPainter(
                         v.trace!,
@@ -110,14 +110,14 @@ class _ForecastView extends StatelessWidget {
                 for (final amount in selected.inflows)
                   AmountView(
                     amount: amount,
-                    label: amountLabel(l, amount.label),
+                    label: amountLabel(l, amount.label, projected: true),
                     onTap: () => openEvidence(context, amount),
                   ),
                 SectionLabel(text: l.topOutflows),
                 for (final amount in selected.outflows)
                   AmountView(
                     amount: amount,
-                    label: amountLabel(l, amount.label),
+                    label: amountLabel(l, amount.label, projected: true),
                     onTap: () => openEvidence(context, amount),
                   ),
                 const SizedBox(height: AppDimens.xl),

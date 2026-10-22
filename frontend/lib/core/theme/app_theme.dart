@@ -6,6 +6,7 @@ import 'app_text_styles.dart';
 abstract final class AppTheme {
   static ThemeData get light => ThemeData(
     useMaterial3: true,
+    visualDensity: VisualDensity.standard,
     fontFamily: 'Cairo',
     scaffoldBackgroundColor: AppColors.paper,
     colorScheme: const ColorScheme.light(
@@ -15,6 +16,13 @@ abstract final class AppTheme {
       onSecondary: AppColors.ink,
       surface: AppColors.surface,
       onSurface: AppColors.ink,
+      onSurfaceVariant: AppColors.inkMuted,
+      onSecondaryContainer: AppColors.green,
+      surfaceContainerLowest: AppColors.surface,
+      surfaceContainerLow: AppColors.surface,
+      surfaceContainer: AppColors.surface,
+      surfaceContainerHigh: AppColors.surfaceSunk,
+      surfaceTint: AppColors.surface,
       surfaceContainerHighest: AppColors.surfaceSunk,
       outline: AppColors.line,
       error: AppColors.clay,
@@ -44,6 +52,10 @@ abstract final class AppTheme {
       centerTitle: false,
       elevation: 0,
       scrolledUnderElevation: 0,
+    ),
+    popupMenuTheme: const PopupMenuThemeData(
+      elevation: 0,
+      color: AppColors.surface,
     ),
     dividerTheme: const DividerThemeData(color: AppColors.line, thickness: 1),
     inputDecorationTheme: InputDecorationTheme(

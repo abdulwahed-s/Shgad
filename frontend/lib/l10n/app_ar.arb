@@ -1435,5 +1435,10 @@
   "@provideDetails": {
     "description": "Merchant interface: provideDetails",
     "x-review": "pending Iraqi Arabic review"
+  },
+  "errorWebIqd": "هالمبلغ ما ينعرض بدقة بهاي النسخة.",
+  "@errorWebIqd": {
+    "description": "Merchant interface: errorWebIqd",
+    "x-review": "pending Iraqi Arabic review"
   }
 }

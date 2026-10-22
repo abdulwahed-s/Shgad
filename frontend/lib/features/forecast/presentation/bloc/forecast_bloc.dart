@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../../../../core/domain/session_events.dart';
+import '../../../../core/domain/connectivity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/domain/amount.dart';
 import '../../../../core/domain/snapshot.dart';
@@ -111,8 +112,9 @@ sealed class ForecastEvent {
 }
 
 class RefreshForecast extends ForecastEvent {
-  const RefreshForecast({this.clear = false});
+  const RefreshForecast({this.clear = false, this.online});
   final bool clear;
+  final bool? online;
 }
 
 class ChooseScenario extends ForecastEvent {
@@ -126,15 +128,43 @@ class ChooseForecastDay extends ForecastEvent {
 }
 
 class ForecastBloc extends Bloc<ForecastEvent, ForecastState> {
-  ForecastBloc(this.load, [WatchSessionReset? resets])
-    : super(const ForecastInitial(ForecastView())) {
+  ForecastBloc(
+    this.load, [
+    WatchSessionReset? resets,
+    WatchLedgerChanges? changes,
+    WatchConnectivity? connectivity,
+  ]) : super(const ForecastInitial(ForecastView())) {
     _resets = resets?.call().listen((_) {
       _generation++;
       add(const RefreshForecast(clear: true));
     });
+    _changes = changes?.call().listen((_) {
+      _generation++;
+      add(const RefreshForecast());
+    });
+    _connection = connectivity?.call().listen(
+      (online) => add(RefreshForecast(online: online)),
+    );
     on<RefreshForecast>((event, emit) async {
       final request = ++_generation;
       final old = event.clear ? const ForecastView() : state.view;
+      if (event.online == false && old.snapshot != null) {
+        final snapshot = old.snapshot!;
+        _show(
+          emit,
+          ForecastView(
+            snapshot: Snapshot(
+              snapshot.data,
+              snapshot.updatedAt,
+              offline: true,
+            ),
+            scenario: old.scenario,
+            dayIndex: old.dayIndex,
+            trace: old.trace,
+          ),
+        );
+        return;
+      }
       emit(ForecastLoading(old));
       final result = await load();
       if (request != _generation) return;
@@ -167,9 +197,13 @@ class ForecastBloc extends Bloc<ForecastEvent, ForecastState> {
   final LoadForecast load;
   int _generation = 0;
   StreamSubscription<void>? _resets;
+  StreamSubscription<void>? _changes;
+  StreamSubscription<bool>? _connection;
   @override
   Future<void> close() async {
     await _resets?.cancel();
+    await _changes?.cancel();
+    await _connection?.cancel();
     return super.close();
   }
 

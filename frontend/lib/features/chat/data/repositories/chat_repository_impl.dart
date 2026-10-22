@@ -17,8 +17,8 @@ class ChatRepositoryImpl implements ChatRepository {
       );
     } on ApiException catch (e) {
       return Failed(e.failure);
-    } catch (_) {
-      return const Failed(AppFailure(FailureKind.internal));
+    } catch (error) {
+      return Failed(dataFailure(error));
     }
   }
 }

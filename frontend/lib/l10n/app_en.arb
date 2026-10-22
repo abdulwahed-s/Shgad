@@ -1188,5 +1188,9 @@
   "provideDetails": "Complete the missing details before resolving this record.",
   "@provideDetails": {
     "description": "Merchant interface: provideDetails"
+  },
+  "errorWebIqd": "This amount cannot be shown exactly in this web app.",
+  "@errorWebIqd": {
+    "description": "Merchant interface: errorWebIqd"
   }
 }

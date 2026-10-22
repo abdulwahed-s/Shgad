@@ -140,13 +140,8 @@ class CsvBloc extends Bloc<CsvEvent, CsvState> {
   CsvBloc(this.pick, this.preview, this.confirm, this.watch, this.check)
     : super(CsvInitial(CsvView(online: watch.online))) {
     subscription = watch().listen((online) => add(CsvConnection(online)));
-    on<CsvConnection>(
-      (event, emit) => _show(emit, state.view.copy(online: event.online)),
-    );
-    on<RecheckCsv>(
-      (event, emit) async =>
-          _show(emit, state.view.copy(online: await check())),
-    );
+    on<CsvConnection>((event, emit) => _connect(emit, event.online));
+    on<RecheckCsv>((event, emit) async => _connect(emit, await check()));
     on<ChooseCsv>((event, emit) async {
       final view = state.view;
       if (!view.online || state is CsvLoading) return;
@@ -255,8 +250,22 @@ class CsvBloc extends Bloc<CsvEvent, CsvState> {
   final WatchConnectivity watch;
   final CheckConnectivity check;
   late final StreamSubscription<bool> subscription;
-  void _show(Emitter<CsvState> emit, CsvView view) =>
-      emit(view.online ? CsvLoaded(view) : CsvOffline(view));
+  void _connect(Emitter<CsvState> emit, bool online) {
+    final view = state.view.copy(online: online);
+    emit(
+      state is CsvLoading
+          ? CsvLoading(view)
+          : online
+          ? CsvLoaded(view)
+          : CsvOffline(view),
+    );
+  }
+
+  void _show(Emitter<CsvState> emit, CsvView view) {
+    final current = view.copy(online: watch.online);
+    emit(current.online ? CsvLoaded(current) : CsvOffline(current));
+  }
+
   void _failure(Emitter<CsvState> emit, CsvView view, AppFailure failure) =>
       emit(
         failure.kind == FailureKind.offline

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/di/injection.dart';
 import '../../../../core/presentation/report_bloc.dart';
+import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
 import '../../../../core/widgets/open_evidence.dart';
@@ -75,7 +76,7 @@ class DebtSectionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SectionLabel(text: title),
-        Text(l.businessDate(section.asOf)),
+        Text(l.businessDate(formatDate(section.asOf, l.localeName))),
         AmountView(
           amount: section.total,
           label: title,
@@ -100,7 +101,7 @@ class DebtSectionView extends StatelessWidget {
                 Text(
                   obligation.due == null
                       ? l.errorDueDate
-                      : l.dueAt(obligation.due!),
+                      : l.dueAt(formatDate(obligation.due!, l.localeName)),
                 ),
                 AmountView(
                   amount: obligation.original,

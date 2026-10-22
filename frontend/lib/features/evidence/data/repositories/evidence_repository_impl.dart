@@ -14,8 +14,8 @@ class EvidenceRepositoryImpl implements EvidenceRepository {
       return Success(await action());
     } on ApiException catch (e) {
       return Failed(e.failure);
-    } catch (_) {
-      return const Failed(AppFailure(FailureKind.internal));
+    } catch (error) {
+      return Failed(dataFailure(error));
     }
   }
 

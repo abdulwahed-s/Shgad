@@ -51,6 +51,16 @@ void main() {
     },
   );
   test('Exact abbreviation only; evidence retains integer and signs', () {
+    expect(
+      IqdFormatter.format(
+        9007199254740991,
+        'en',
+        'thousand IQD',
+        'IQD',
+        exact: true,
+      ),
+      '9,007,199,254,740,991 IQD',
+    );
     expect(IqdFormatter.format(420000, 'ar', 'ألف', 'دينار'), '٤٢٠ ألف');
     expect(
       IqdFormatter.format(420001, 'en', 'thousand IQD', 'IQD'),
@@ -79,6 +89,23 @@ void main() {
       throwsFormatException,
     );
   });
+  test(
+    'Web refuses unsafe IQD integers instead of displaying rounded figures',
+    () {
+      for (final value in [9007199254740992, -9007199254740992]) {
+        expect(
+          () => parseAmount({
+            'amount_iqd': value,
+            'kind': 'verified',
+            'label_key': 'cash',
+            'source_ids': ['SOURCE'],
+            'formula': 'recorded',
+          }),
+          throwsFormatException,
+        );
+      }
+    },
+  );
   test(
     'Read cache retains server update stamp on network failure only',
     () async {

@@ -10,7 +10,7 @@ import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
 import '../../../../core/widgets/section_label.dart';
 import '../../../../l10n/generated/app_localizations.dart';
-import '../../../quick_entry/presentation/pages/entry_page.dart';
+import '../../../../core/widgets/entry_type_text.dart';
 import '../../domain/entities/csv_import.dart';
 import '../bloc/csv_bloc.dart';
 

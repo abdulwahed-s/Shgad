@@ -32,11 +32,7 @@ class _SampleView extends StatelessWidget {
         title: l.sampleTitle,
         children: [
           Text(l.demoShopName, style: Theme.of(context).textTheme.titleLarge),
-          InfoStrip(text: l.fictionalShop),
-          if (v.shop != null) ...[
-            Text(l.businessDate(formatDate(v.shop!.date, l.localeName))),
-            if (!v.shop!.llmAvailable) InfoStrip(text: l.chatNotConfigured),
-          ],
+          if (!v.confirm) InfoStrip(text: l.fictionalShop),
           if (busy) const LinearProgressIndicator(),
           if (!v.online) ...[
             InfoStrip(text: l.needsConnection),
@@ -78,6 +74,10 @@ class _SampleView extends StatelessWidget {
                   ? null
                   : () => bloc.add(const PrepareSampleReset()),
             ),
+          if (v.shop != null) ...[
+            Text(l.businessDate(formatDate(v.shop!.date, l.localeName))),
+            if (!v.shop!.llmAvailable) InfoStrip(text: l.chatNotConfigured),
+          ],
         ],
       );
     },

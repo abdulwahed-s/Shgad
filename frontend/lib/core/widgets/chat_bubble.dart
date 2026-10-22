@@ -7,12 +7,14 @@ class ChatBubble extends StatelessWidget {
     required this.text,
     this.merchant = false,
     this.footer,
+    this.textDirection,
     super.key,
   });
 
   final String text;
   final bool merchant;
   final Widget? footer;
+  final TextDirection? textDirection;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,11 @@ class ChatBubble extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(text, style: theme.textTheme.bodyLarge),
+          Text(
+            text,
+            style: theme.textTheme.bodyLarge,
+            textDirection: textDirection,
+          ),
           ?footer,
         ],
       ),

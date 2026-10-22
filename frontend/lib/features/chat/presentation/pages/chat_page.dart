@@ -9,7 +9,7 @@ import '../../../../core/widgets/chat_bubble.dart';
 import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
-import '../../../../core/widgets/merchant_menu.dart';
+import '../../../../core/widgets/merchant_app_bar.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/chat_reply.dart';
@@ -31,10 +31,7 @@ class _ChatView extends StatelessWidget {
       final bloc = context.read<ChatBloc>();
       final v = state.view;
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l.chatTitle),
-          actions: const [MerchantMenu()],
-        ),
+        appBar: merchantAppBar(context, l.chatTitle),
         bottomNavigationBar: const MerchantNavigation(),
         body: SafeArea(
           child: Align(
@@ -61,6 +58,7 @@ class _ChatView extends StatelessWidget {
                           const SizedBox(height: AppDimens.md),
                           ChatBubble(
                             text: turn.reply.text,
+                            textDirection: TextDirection.rtl,
                             footer: ChatEvidence(turn: turn),
                           ),
                           const SizedBox(height: AppDimens.xl),

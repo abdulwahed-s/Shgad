@@ -1,6 +1,7 @@
 import '../../../../core/error/app_failure.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/domain/session_events.dart';
 import '../../domain/entities/csv_import.dart';
 import '../../domain/repositories/csv_repository.dart';
 import '../datasources/csv_picker.dart';
@@ -8,14 +9,17 @@ import '../datasources/csv_remote.dart';
 import '../models/csv_model.dart';
 
 class CsvRepositoryImpl implements CsvRepository {
-  CsvRepositoryImpl(this.remote, this.picker);
+  CsvRepositoryImpl(this.remote, this.picker, [this.events]);
   final CsvRemote remote;
   final CsvPicker picker;
+  final SessionEvents? events;
   Future<Result<T>> _result<T>(Future<T> Function() action) async {
     try {
       return Success(await action());
     } on ApiException catch (e) {
       return Failed(e.failure);
+    } on IqdFormatException catch (error) {
+      return Failed(dataFailure(error));
     } on FormatException {
       return const Failed(
         AppFailure(FailureKind.validation, messageKey: 'error_import_rejected'),
@@ -49,6 +53,9 @@ class CsvRepositoryImpl implements CsvRepository {
     ),
   );
   @override
-  Future<Result<CsvReceipt>> confirm(String mappingId) =>
-      _result(() async => CsvModel.receipt(await remote.confirm(mappingId)));
+  Future<Result<CsvReceipt>> confirm(String mappingId) => _result(() async {
+    final receipt = CsvModel.receipt(await remote.confirm(mappingId));
+    events?.changed();
+    return receipt;
+  });
 }

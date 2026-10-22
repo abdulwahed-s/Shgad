@@ -29,6 +29,9 @@ class CachedReader {
     } on ApiException catch (e) {
       if (e.failure.kind == FailureKind.offline) {
         final record = await cache.read(key);
+        if (generation != events?.generation) {
+          return const Failed(AppFailure(FailureKind.unavailable));
+        }
         if (record != null) {
           try {
             return Success(
@@ -40,8 +43,8 @@ class CachedReader {
         }
       }
       return Failed(e.failure);
-    } catch (_) {
-      return const Failed(AppFailure(FailureKind.internal));
+    } catch (error) {
+      return Failed(dataFailure(error));
     }
   }
 }

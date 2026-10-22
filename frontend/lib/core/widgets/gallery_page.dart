@@ -1,3 +1,4 @@
+import 'merchant_app_bar.dart';
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../constants/app_dimens.dart';
@@ -20,7 +21,7 @@ class GalleryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l.galleryTitle)),
+      appBar: merchantAppBar(context, l.galleryTitle, menu: false),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(

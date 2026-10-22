@@ -9,7 +9,7 @@ import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
-import '../../../quick_entry/presentation/pages/entry_page.dart';
+import '../../../../core/widgets/entry_type_text.dart';
 import '../../domain/entities/source_record.dart';
 import '../bloc/evidence_bloc.dart';
 
@@ -132,6 +132,7 @@ class _EvidenceView extends StatelessWidget {
                       Text(l.savedSource(v.voidSource!)),
                       TextFormField(
                         key: ValueKey('void_reason_${v.voidSource}'),
+                        enabled: !busy,
                         initialValue: v.reason,
                         decoration: InputDecoration(labelText: l.voidReason),
                         onChanged: (value) =>

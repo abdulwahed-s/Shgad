@@ -3,5 +3,10 @@ import '../../domain/entities/weekly_summary.dart';
 import '../../domain/usecases/load_weekly_summary.dart';
 
 class WeeklySummaryBloc extends ReportBloc<WeeklySummary> {
-  WeeklySummaryBloc(LoadWeeklySummary super.load, [super.resets]);
+  WeeklySummaryBloc(
+    LoadWeeklySummary super.load, [
+    super.resets,
+    super.changes,
+    super.connectivity,
+  ]);
 }

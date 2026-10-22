@@ -5,6 +5,7 @@ import 'ledger_widgets.dart';
 
 String failureText(AppLocalizations l, AppFailure failure) =>
     switch (failure.messageKey) {
+      'error_web_iqd_range' => l.errorWebIqd,
       'error_difference_sign_mismatch' => l.errorSign,
       'error_difference_exceeded' => l.errorExceeded,
       'error_missing_count' => l.errorCount,

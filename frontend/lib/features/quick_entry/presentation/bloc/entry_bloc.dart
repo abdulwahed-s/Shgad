@@ -170,24 +170,24 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
        ) {
     _resets = resets?.call().listen((_) => add(const OpenEntry()));
     _connection = watch().listen((online) => add(EntryConnection(online)));
-    on<EntryConnection>(
-      (event, emit) => emit(
-        event.online
-            ? EntryLoaded(state.view.copy(online: true))
-            : EntryOffline(state.view.copy(online: false)),
-      ),
-    );
+    on<EntryConnection>((event, emit) => _connect(emit, event.online));
     on<RecheckEntry>((event, emit) async {
+      if (state is EntryLoading) return;
       final online = await check();
-      emit(
-        online
-            ? EntryLoaded(state.view.copy(online: true))
-            : EntryOffline(state.view.copy(online: false)),
-      );
+      _connect(emit, online);
+      if (online && state.view.draft.date.isEmpty) {
+        add(OpenEntry(state.view.draft.fields));
+      }
     });
     on<OpenEntry>((event, emit) async {
       final view = EntryView(
-        EntryDraft(ids(), {'type': 'CASH_SALE', ...event.fields}),
+        EntryDraft(ids(), {
+          'type': 'CASH_SALE',
+          ...event.fields,
+          if (event.fields['type'] != null &&
+              !entryTypes.contains(event.fields['type']))
+            'type': 'CASH_SALE',
+        }),
         online: watch.online,
       );
       emit(EntryLoading(view));
@@ -201,6 +201,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
                   ...view.draft.fields,
                 }),
                 parties: value.parties,
+                online: watch.online,
               ),
             ),
           );
@@ -262,7 +263,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
       emit(EntryLoading(view));
       switch (await save(view.draft)) {
         case Success<SavedEntry>(:final value):
-          emit(EntryLoaded(view.copy(mode: EntryMode.saved, saved: value)));
+          _show(emit, view.copy(mode: EntryMode.saved, saved: value));
         case Failed<SavedEntry>(:final failure):
           _failure(emit, view, failure);
       }
@@ -271,9 +272,11 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
       if (state.view.saved == null || !state.view.online) return;
       emit(EntryLoaded(state.view.copy(mode: EntryMode.undo, undoId: ids())));
     });
-    on<ChangeUndoReason>(
-      (event, emit) => emit(EntryLoaded(state.view.copy(reason: event.reason))),
-    );
+    on<ChangeUndoReason>((event, emit) {
+      if (state is! EntryLoading) {
+        _show(emit, state.view.copy(reason: event.reason));
+      }
+    });
     on<ConfirmUndo>((event, emit) async {
       final view = state.view;
       if (!view.online ||
@@ -293,7 +296,7 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
         view.reason.trim(),
       )) {
         case Success<VoidedEntry>(:final value):
-          emit(EntryLoaded(view.copy(mode: EntryMode.voided, voided: value)));
+          _show(emit, view.copy(mode: EntryMode.voided, voided: value));
         case Failed<VoidedEntry>(:final failure):
           _failure(emit, view, failure);
       }
@@ -307,6 +310,22 @@ class EntryBloc extends Bloc<EntryEvent, EntryState> {
   final NewClientId ids;
   StreamSubscription<void>? _resets;
   late final StreamSubscription<bool> _connection;
+  void _connect(Emitter<EntryState> emit, bool online) {
+    final view = state.view.copy(online: online);
+    emit(
+      state is EntryLoading
+          ? EntryLoading(view)
+          : online
+          ? EntryLoaded(view)
+          : EntryOffline(view),
+    );
+  }
+
+  void _show(Emitter<EntryState> emit, EntryView view) {
+    final current = view.copy(online: watch.online);
+    emit(current.online ? EntryLoaded(current) : EntryOffline(current));
+  }
+
   void _failure(Emitter<EntryState> emit, EntryView view, AppFailure failure) =>
       emit(
         failure.kind == FailureKind.offline

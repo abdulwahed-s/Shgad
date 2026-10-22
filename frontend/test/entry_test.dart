@@ -9,6 +9,7 @@ import 'package:shgad/core/network/api_client.dart';
 import 'package:shgad/core/utils/result.dart';
 import 'package:shgad/features/quick_entry/data/datasources/entry_remote.dart';
 import 'package:shgad/features/quick_entry/data/repositories/entry_repository_impl.dart';
+import 'package:shgad/features/quick_entry/data/models/entry_model.dart';
 import 'package:shgad/features/quick_entry/domain/entities/entry.dart';
 import 'package:shgad/features/quick_entry/domain/repositories/entry_repository.dart';
 import 'package:shgad/features/quick_entry/domain/usecases/entry_usecases.dart';
@@ -59,6 +60,24 @@ void main() {
     );
   });
   tearDown(() => connection.controller.close());
+  test(
+    'Changing entry type cannot send hidden old obligation or due-date fields',
+    () {
+      final payload = EntryModel.payload(
+        const EntryDraft('id', {
+          'type': 'CASH_SALE',
+          'business_date': '2026-09-28',
+          'amount_iqd': '12000',
+          'counterparty_id': 'CUST-01',
+          'obligation_id': 'OB-1',
+          'due_date': '2026-09-30',
+        }),
+      );
+      expect(payload['counterparty_id'], isNull);
+      expect(payload['obligation_id'], isNull);
+      expect(payload['due_date'], isNull);
+    },
+  );
   test(
     'Repository sends strict integer IQD and exact allowed fields; maps typed error',
     () async {
@@ -198,4 +217,29 @@ void main() {
     verify(() => repo.undo('ENT-1', any(), 'mistyped')).called(1);
     await bloc.close();
   });
+  test(
+    'Connection loss during a pending save keeps the operation locked and draft intact',
+    () async {
+      final pending = Completer<Result<SavedEntry>>();
+      when(() => repo.save(any())).thenAnswer((_) => pending.future);
+      final bloc = build();
+      try {
+        bloc.add(const OpenEntry({'amount_iqd': '١٢٠٠٠'}));
+        await bloc.stream.firstWhere((s) => s is EntryLoaded);
+        bloc.add(const PrepareEntry());
+        await bloc.stream.firstWhere((s) => s.view.mode == EntryMode.confirm);
+        bloc.add(const ConfirmEntry());
+        await bloc.stream.firstWhere((s) => s is EntryLoading);
+        connection.set(false);
+        await Future<void>.delayed(Duration.zero);
+        expect(bloc.state, isA<EntryLoading>());
+        bloc.add(const ChangeEntry('amount_iqd', '99999'));
+        await Future<void>.delayed(Duration.zero);
+        expect(bloc.state.view.draft.amountText, '١٢٠٠٠');
+      } finally {
+        pending.complete(const Failed(AppFailure(FailureKind.offline)));
+        await bloc.close();
+      }
+    },
+  );
 }

@@ -108,17 +108,21 @@ void configureDependencies() {
     () => TodayRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadToday>(() => LoadToday(getIt()));
-  getIt.registerFactory<TodayBloc>(() => TodayBloc(getIt(), getIt()));
+  getIt.registerFactory<TodayBloc>(
+    () => TodayBloc(getIt(), getIt(), getIt(), getIt()),
+  );
   getIt.registerLazySingleton<DebtsRemote>(() => DebtsRemote(getIt()));
   getIt.registerLazySingleton<DebtsRepository>(
     () => DebtsRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadDebts>(() => LoadDebts(getIt()));
-  getIt.registerFactory<DebtsBloc>(() => DebtsBloc(getIt(), getIt()));
+  getIt.registerFactory<DebtsBloc>(
+    () => DebtsBloc(getIt(), getIt(), getIt(), getIt()),
+  );
   getIt.registerLazySingleton<NewClientId>(NewClientId.new);
   getIt.registerLazySingleton<EntryRemote>(() => EntryRemote(getIt()));
   getIt.registerLazySingleton<EntryRepository>(
-    () => EntryRepositoryImpl(getIt()),
+    () => EntryRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadEntrySetup>(() => LoadEntrySetup(getIt()));
   getIt.registerLazySingleton<SaveEntry>(() => SaveEntry(getIt()));
@@ -136,7 +140,7 @@ void configureDependencies() {
   );
   getIt.registerLazySingleton<CloseRemote>(() => CloseRemote(getIt()));
   getIt.registerLazySingleton<CloseRepository>(
-    () => CloseRepositoryImpl(getIt()),
+    () => CloseRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadClose>(() => LoadClose(getIt()));
   getIt.registerLazySingleton<ResolveClose>(() => ResolveClose(getIt()));
@@ -181,14 +185,16 @@ void configureDependencies() {
     () => LoadWeeklySummary(getIt()),
   );
   getIt.registerFactory<WeeklySummaryBloc>(
-    () => WeeklySummaryBloc(getIt(), getIt()),
+    () => WeeklySummaryBloc(getIt(), getIt(), getIt(), getIt()),
   );
   getIt.registerLazySingleton<ForecastRemote>(() => ForecastRemote(getIt()));
   getIt.registerLazySingleton<ForecastRepository>(
     () => ForecastRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadForecast>(() => LoadForecast(getIt()));
-  getIt.registerFactory<ForecastBloc>(() => ForecastBloc(getIt(), getIt()));
+  getIt.registerFactory<ForecastBloc>(
+    () => ForecastBloc(getIt(), getIt(), getIt(), getIt()),
+  );
   getIt.registerLazySingleton<SessionEvents>(
     SessionEvents.new,
     dispose: (events) => events.dispose(),
@@ -208,7 +214,7 @@ void configureDependencies() {
   getIt.registerLazySingleton<CsvRemote>(() => CsvRemote(getIt()));
   getIt.registerLazySingleton<CsvPicker>(CsvPicker.new);
   getIt.registerLazySingleton<CsvRepository>(
-    () => CsvRepositoryImpl(getIt(), getIt()),
+    () => CsvRepositoryImpl(getIt(), getIt(), getIt()),
   );
   getIt.registerLazySingleton<PickCsv>(() => PickCsv(getIt()));
   getIt.registerLazySingleton<PreviewCsv>(() => PreviewCsv(getIt()));
@@ -221,5 +227,10 @@ void configureDependencies() {
     () => FlagsRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<LoadFlags>(() => LoadFlags(getIt()));
-  getIt.registerFactory<FlagsBloc>(() => FlagsBloc(getIt(), getIt()));
+  getIt.registerFactory<FlagsBloc>(
+    () => FlagsBloc(getIt(), getIt(), getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<WatchLedgerChanges>(
+    () => WatchLedgerChanges(getIt()),
+  );
 }

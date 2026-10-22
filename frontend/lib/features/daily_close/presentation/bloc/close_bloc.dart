@@ -170,13 +170,13 @@ class CloseBloc extends Bloc<CloseEvent, CloseState> {
   ]) : super(CloseInitial(CloseView(online: watch.online))) {
     _resets = resets?.call().listen((_) => add(const OpenClose()));
     subscription = watch().listen((online) => add(CloseConnection(online)));
-    on<CloseConnection>(
-      (event, emit) => _show(emit, state.view.copy(online: event.online)),
-    );
-    on<RecheckClose>(
-      (event, emit) async =>
-          _show(emit, state.view.copy(online: await check())),
-    );
+    on<CloseConnection>((event, emit) => _connect(emit, event.online));
+    on<RecheckClose>((event, emit) async {
+      if (state is CloseLoading) return;
+      final online = await check();
+      _connect(emit, online);
+      if (online) add(OpenClose(state.view.data?.date));
+    });
     on<OpenClose>((event, emit) async {
       final view = state.view;
       emit(CloseLoading(view));
@@ -315,8 +315,22 @@ class CloseBloc extends Bloc<CloseEvent, CloseState> {
   final NewClientId ids;
   StreamSubscription<void>? _resets;
   late final StreamSubscription<bool> subscription;
-  void _show(Emitter<CloseState> emit, CloseView view) =>
-      emit(view.online ? CloseLoaded(view) : CloseOffline(view));
+  void _connect(Emitter<CloseState> emit, bool online) {
+    final view = state.view.copy(online: online);
+    emit(
+      state is CloseLoading
+          ? CloseLoading(view)
+          : online
+          ? CloseLoaded(view)
+          : CloseOffline(view),
+    );
+  }
+
+  void _show(Emitter<CloseState> emit, CloseView view) {
+    final current = view.copy(online: watch.online);
+    emit(current.online ? CloseLoaded(current) : CloseOffline(current));
+  }
+
   void _failure(Emitter<CloseState> emit, CloseView view, AppFailure failure) =>
       emit(
         failure.kind == FailureKind.offline

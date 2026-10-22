@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shgad/core/data/cached_reader.dart';
 import 'package:shgad/core/domain/snapshot.dart';
+import 'package:shgad/core/domain/connectivity.dart';
 import 'package:shgad/core/error/app_failure.dart';
 import 'package:shgad/core/network/api_client.dart';
 import 'package:shgad/core/utils/result.dart';
@@ -14,6 +15,7 @@ import 'package:shgad/features/forecast/domain/repositories/forecast_repository.
 import 'package:shgad/features/forecast/domain/usecases/load_forecast.dart';
 import 'package:shgad/features/forecast/presentation/bloc/forecast_bloc.dart';
 import 'core_test.dart' show MemoryCache;
+import 'entry_test.dart' show FakeConnection;
 import 'support/fixtures.dart';
 
 class MockForecastRemote extends Mock implements ForecastRemote {}
@@ -21,6 +23,38 @@ class MockForecastRemote extends Mock implements ForecastRemote {}
 class MockForecastRepository extends Mock implements ForecastRepository {}
 
 void main() {
+  test(
+    'An open forecast marks retained scenario data offline and refreshes after reconnection',
+    () async {
+      final connection = FakeConnection();
+      final repo = MockForecastRepository();
+      final data = ForecastModel.parse(forecastJson());
+      when(
+        repo.load,
+      ).thenAnswer((_) async => Success(Snapshot(data, 'saved-stamp')));
+      final bloc = ForecastBloc(
+        LoadForecast(repo),
+        null,
+        null,
+        WatchConnectivity(connection),
+      );
+      bloc.add(const RefreshForecast());
+      await bloc.stream.firstWhere((s) => s is ForecastLoaded);
+      bloc.add(const ChooseScenario('stress'));
+      await bloc.stream.firstWhere((s) => s.view.scenario == 'stress');
+      connection.set(false);
+      await bloc.stream.firstWhere((s) => s is ForecastOffline);
+      expect(bloc.state.view.snapshot!.updatedAt, 'saved-stamp');
+      expect(bloc.state.view.snapshot!.data, same(data));
+      expect(bloc.state.view.scenario, 'stress');
+      verify(repo.load).called(1);
+      connection.set(true);
+      await bloc.stream.firstWhere((s) => s is ForecastLoaded);
+      verify(repo.load).called(1);
+      await bloc.close();
+      await connection.controller.close();
+    },
+  );
   test(
     'Forecast repository preserves all three thirty-day estimates and cache time',
     () async {

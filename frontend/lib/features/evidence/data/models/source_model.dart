@@ -1,10 +1,11 @@
+import '../../../../core/data/amount_model.dart';
 import 'dart:convert';
 import '../../../../core/domain/amount.dart';
 import '../../domain/entities/source_record.dart';
 
 class SourceModel {
   static Amount _amount(dynamic value, String id, String kind) => Amount(
-    value: value as int?,
+    value: readIqd(value),
     kind: value == null ? 'missing' : kind,
     label: 'source',
     sources: [id],
@@ -15,7 +16,7 @@ class SourceModel {
     date: j['business_date'] as String,
     type: j['type'] as String,
     amount: _amount(
-      j['amount_iqd'],
+      readRequiredIqd(j['amount_iqd']),
       j['source_id'] as String,
       j['status'] == 'valid' ? 'verified' : 'flagged',
     ),

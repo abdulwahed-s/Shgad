@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../constants/app_dimens.dart';
-import 'merchant_menu.dart';
+import 'merchant_app_bar.dart';
 
 class MerchantPage extends StatelessWidget {
   const MerchantPage({
@@ -16,7 +16,7 @@ class MerchantPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: const [MerchantMenu()]),
+      appBar: merchantAppBar(context, title),
       body: SafeArea(
         child: Align(
           alignment: AlignmentDirectional.topCenter,
@@ -57,12 +57,6 @@ class MerchantNavigation extends StatelessWidget {
               child: TextButton(
                 onPressed: () => context.go('/'),
                 child: Text(l.todayTitle),
-              ),
-            ),
-            Expanded(
-              child: TextButton(
-                onPressed: () => context.go('/debts'),
-                child: Text(l.debtsTitle),
               ),
             ),
             Expanded(

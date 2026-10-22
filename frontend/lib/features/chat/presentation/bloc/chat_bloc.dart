@@ -113,13 +113,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       );
     });
     subscription = watch().listen((online) => add(ChatConnection(online)));
-    on<ChatConnection>(
-      (event, emit) => _show(emit, state.view.copy(online: event.online)),
-    );
-    on<RecheckChat>(
-      (event, emit) async =>
-          _show(emit, state.view.copy(online: await check())),
-    );
+    on<ChatConnection>((event, emit) => _connect(emit, event.online));
+    on<RecheckChat>((event, emit) async => _connect(emit, await check()));
     on<TypeChat>((event, emit) {
       if (state is! ChatLoading) {
         _show(emit, state.view.copy(draft: event.text));
@@ -179,8 +174,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   String conversationId;
   StreamSubscription<void>? _resets;
   late final StreamSubscription<bool> subscription;
-  void _show(Emitter<ChatState> emit, ChatView view) =>
-      emit(view.online ? ChatLoaded(view) : ChatOffline(view));
+  void _connect(Emitter<ChatState> emit, bool online) {
+    final view = state.view.copy(online: online);
+    emit(
+      state is ChatLoading
+          ? ChatLoading(view)
+          : online
+          ? ChatLoaded(view)
+          : ChatOffline(view),
+    );
+  }
+
+  void _show(Emitter<ChatState> emit, ChatView view) {
+    final current = view.copy(online: watch.online);
+    emit(current.online ? ChatLoaded(current) : ChatOffline(current));
+  }
+
   @override
   Future<void> close() async {
     await _resets?.cancel();

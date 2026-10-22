@@ -1,3 +1,4 @@
+import '../../../../core/widgets/entry_type_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -10,19 +11,6 @@ import '../../../../core/widgets/merchant_page.dart';
 import '../../../../core/widgets/open_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../bloc/entry_bloc.dart';
-
-String entryTypeText(AppLocalizations l, String type) => switch (type) {
-  'CASH_SALE' => l.cashSale,
-  'CREDIT_SALE' => l.creditSale,
-  'CREDIT_COLLECTION' => l.collection,
-  'SUPPLIER_INVOICE' => l.supplierInvoice,
-  'SUPPLIER_PAYMENT' => l.supplierPayment,
-  'OPERATING_EXPENSE' => l.operatingExpense,
-  'OWNER_DRAWING' => l.ownerDrawing,
-  'CAPITAL_INJECTION' => l.capitalInjection,
-  'DAILY_CASH_COUNT' => l.cashCount,
-  _ => l.entryTitle,
-};
 
 class EntryPage extends StatelessWidget {
   const EntryPage({this.fields = const {}, super.key});
@@ -220,6 +208,7 @@ class EntryForm extends StatelessWidget {
               InfoStrip(text: l.undoNotice),
               TextFormField(
                 key: const ValueKey('undo_reason'),
+                enabled: !busy,
                 initialValue: v.reason,
                 decoration: InputDecoration(labelText: l.voidReason),
                 onChanged: (value) => bloc.add(ChangeUndoReason(value)),
@@ -260,7 +249,7 @@ class EntryForm extends StatelessWidget {
   );
 }
 
-class EntryField extends StatelessWidget {
+class EntryField extends StatefulWidget {
   const EntryField({
     required this.field,
     required this.label,
@@ -273,22 +262,55 @@ class EntryField extends StatelessWidget {
   final bool numeric;
   final bool readOnly;
   @override
-  Widget build(BuildContext context) {
-    final state = context.watch<EntryBloc>().state;
-    return Padding(
-      padding: const EdgeInsets.only(top: AppDimens.md),
-      child: TextFormField(
-        key: ValueKey(field),
-        initialValue: state.view.draft.fields[field],
-        keyboardType: numeric ? TextInputType.number : TextInputType.text,
-        enabled: state is! EntryLoading,
-        readOnly: readOnly,
-        decoration: InputDecoration(
-          labelText: label ?? AppLocalizations.of(context).noteInput,
-        ),
-        onChanged: (value) =>
-            context.read<EntryBloc>().add(ChangeEntry(field, value)),
-      ),
+  State<EntryField> createState() => _EntryFieldState();
+}
+
+/// Keeps the editing controller in step with server-loaded BLoC values.
+class _EntryFieldState extends State<EntryField> {
+  late final TextEditingController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController(
+      text: context.read<EntryBloc>().state.view.draft.fields[widget.field],
     );
   }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => BlocConsumer<EntryBloc, EntryState>(
+    listenWhen: (a, b) =>
+        a.view.draft.fields[widget.field] != b.view.draft.fields[widget.field],
+    listener: (_, state) {
+      final text = state.view.draft.fields[widget.field] ?? '';
+      if (controller.text != text) {
+        controller.value = TextEditingValue(
+          text: text,
+          selection: TextSelection.collapsed(offset: text.length),
+        );
+      }
+    },
+    builder: (context, state) => Padding(
+      padding: const EdgeInsets.only(top: AppDimens.md),
+      child: TextFormField(
+        key: ValueKey(widget.field),
+        controller: controller,
+        keyboardType: widget.numeric
+            ? TextInputType.number
+            : TextInputType.text,
+        enabled: state is! EntryLoading,
+        readOnly: widget.readOnly,
+        decoration: InputDecoration(
+          labelText: widget.label ?? AppLocalizations.of(context).noteInput,
+        ),
+        onChanged: (value) =>
+            context.read<EntryBloc>().add(ChangeEntry(widget.field, value)),
+      ),
+    ),
+  );
 }

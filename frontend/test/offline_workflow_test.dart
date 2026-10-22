@@ -69,7 +69,7 @@ void main() {
       await tester.pumpWidget(const ShgadApp());
       await tester.pumpAndSettle();
       final router = getIt<GoRouter>();
-      router.go('/entry');
+      router.push('/entry');
       await tester.pumpAndSettle();
       await tester.enterText(find.byKey(const ValueKey('amount_iqd')), '١٢٠٠٠');
       await tester.enterText(
@@ -87,7 +87,8 @@ void main() {
       expect(
         tester
             .widget<TextFormField>(find.byKey(const ValueKey('amount_iqd')))
-            .initialValue,
+            .controller!
+            .text,
         '١٢٠٠٠',
       );
       expect(find.text('ملاحظة محفوظة'), findsOneWidget);

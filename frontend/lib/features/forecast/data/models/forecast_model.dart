@@ -10,9 +10,9 @@ class ForecastModel {
           .map(
             (d) => ForecastDay(
               d['date'] as String,
-              d['closing_iqd'] as int,
-              d['cash_sales_iqd'] as int,
-              d['unlinked_cash_iqd'] as int,
+              readRequiredIqd(d['closing_iqd']),
+              readRequiredIqd(d['cash_sales_iqd']),
+              readRequiredIqd(d['unlinked_cash_iqd']),
             ),
           )
           .toList();

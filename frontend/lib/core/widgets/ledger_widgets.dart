@@ -217,8 +217,8 @@ class NumberBadge extends StatelessWidget {
   final int number;
   @override
   Widget build(BuildContext context) => Container(
-    width: 32,
-    height: 32,
+    width: MediaQuery.textScalerOf(context).scale(AppDimens.numberBadgeSize),
+    height: MediaQuery.textScalerOf(context).scale(AppDimens.numberBadgeSize),
     alignment: Alignment.center,
     decoration: BoxDecoration(
       shape: BoxShape.circle,

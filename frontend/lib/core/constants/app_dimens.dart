@@ -9,5 +9,8 @@ abstract final class AppDimens {
   static const radiusMd = 10.0;
   static const radiusLg = 14.0;
   static const borderWidth = 1.0;
+  static const toolbarHeight = 64.0;
+  static const chartHeight = 180.0;
+  static const numberBadgeSize = 22.0;
   static const contentMaxWidth = 640.0;
 }

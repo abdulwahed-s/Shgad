@@ -1,3 +1,5 @@
+import '../constants/data_limits.dart';
+
 abstract final class DigitNormalizer {
   static String normalize(String input) {
     const arabic = '٠١٢٣٤٥٦٧٨٩';
@@ -19,7 +21,7 @@ abstract final class DigitNormalizer {
     if (!RegExp(r'^[0-9]+$').hasMatch(text)) return null;
     final value = int.tryParse(text);
     // Keep web input exact; ledger validates its own bounded integer separately.
-    return value != null && value > 0 && value <= 9007199254740991
+    return value != null && value > 0 && value <= DataLimits.maxExactIqd
         ? value
         : null;
   }

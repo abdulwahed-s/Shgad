@@ -130,6 +130,7 @@ class _CloseView extends StatelessWidget {
                 InfoStrip(text: l.undoNotice),
                 TextFormField(
                   key: const ValueKey('review_undo_reason'),
+                  enabled: !busy,
                   initialValue: v.reason,
                   decoration: InputDecoration(labelText: l.voidReason),
                   onChanged: (value) => bloc.add(ChangeReviewReason(value)),
@@ -203,6 +204,7 @@ class _CloseView extends StatelessWidget {
                 if (v.choice != null && v.choice != 'leave_unexplained')
                   TextFormField(
                     key: const ValueKey('resolution_amount'),
+                    enabled: !busy,
                     initialValue: v.amount,
                     decoration: InputDecoration(labelText: l.amountInput),
                     keyboardType: TextInputType.number,
@@ -211,6 +213,7 @@ class _CloseView extends StatelessWidget {
                   ),
                 TextFormField(
                   key: const ValueKey('resolution_note'),
+                  enabled: !busy,
                   initialValue: v.note,
                   decoration: InputDecoration(labelText: l.noteInput),
                   onChanged: (value) =>

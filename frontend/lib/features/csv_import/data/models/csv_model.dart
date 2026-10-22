@@ -1,3 +1,4 @@
+import '../../../../core/data/amount_model.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import '../../../../core/domain/amount.dart';
@@ -70,7 +71,7 @@ class CsvModel {
     List<String>.from(j['unmapped_required'] as List),
     (j['preview_rows'] as List).map((r) {
       final p = r['parsed'];
-      final value = p?['amount_iqd'] as int?;
+      final value = readIqd(p?['amount_iqd']);
       return CsvPreviewRow(
         r['row'] as int,
         p?['source_id'] as String?,

@@ -87,11 +87,9 @@ class SampleBloc extends Bloc<SampleEvent, SampleState> {
   SampleBloc(this.load, this.reset, this.watch, this.check)
     : super(SampleInitial(SampleView(online: watch.online))) {
     subscription = watch().listen((online) => add(SampleConnection(online)));
-    on<SampleConnection>(
-      (event, emit) => _show(emit, state.view.copy(online: event.online)),
-    );
+    on<SampleConnection>((event, emit) => _connect(emit, event.online));
     on<RecheckSample>((event, emit) async {
-      _show(emit, state.view.copy(online: await check()));
+      _connect(emit, await check());
       if (state.view.online) add(const OpenSample());
     });
     on<OpenSample>((event, emit) async {
@@ -128,8 +126,22 @@ class SampleBloc extends Bloc<SampleEvent, SampleState> {
   final WatchConnectivity watch;
   final CheckConnectivity check;
   late final StreamSubscription<bool> subscription;
-  void _show(Emitter<SampleState> emit, SampleView view) =>
-      emit(view.online ? SampleLoaded(view) : SampleOffline(view));
+  void _connect(Emitter<SampleState> emit, bool online) {
+    final view = state.view.copy(online: online);
+    emit(
+      state is SampleLoading
+          ? SampleLoading(view)
+          : online
+          ? SampleLoaded(view)
+          : SampleOffline(view),
+    );
+  }
+
+  void _show(Emitter<SampleState> emit, SampleView view) {
+    final current = view.copy(online: watch.online);
+    emit(current.online ? SampleLoaded(current) : SampleOffline(current));
+  }
+
   void _failure(
     Emitter<SampleState> emit,
     SampleView view,

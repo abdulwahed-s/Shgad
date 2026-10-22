@@ -123,11 +123,9 @@ class EvidenceBloc extends Bloc<EvidenceEvent, EvidenceState> {
     this.ids,
   ) : super(EvidenceInitial(EvidenceView(online: watch.online))) {
     subscription = watch().listen((online) => add(EvidenceConnection(online)));
-    on<EvidenceConnection>(
-      (event, emit) => _show(emit, state.view.copy(online: event.online)),
-    );
+    on<EvidenceConnection>((event, emit) => _connect(emit, event.online));
     on<RecheckEvidence>((event, emit) async {
-      _show(emit, state.view.copy(online: await check()));
+      _connect(emit, await check());
       if (state.view.online) add(OpenEvidence(state.view.request));
     });
     on<OpenEvidence>((event, emit) async {
@@ -208,8 +206,22 @@ class EvidenceBloc extends Bloc<EvidenceEvent, EvidenceState> {
   final CheckConnectivity check;
   final NewClientId ids;
   late final StreamSubscription<bool> subscription;
-  void _show(Emitter<EvidenceState> emit, EvidenceView view) =>
-      emit(view.online ? EvidenceLoaded(view) : EvidenceOffline(view));
+  void _connect(Emitter<EvidenceState> emit, bool online) {
+    final view = state.view.copy(online: online);
+    emit(
+      state is EvidenceLoading
+          ? EvidenceLoading(view)
+          : online
+          ? EvidenceLoaded(view)
+          : EvidenceOffline(view),
+    );
+  }
+
+  void _show(Emitter<EvidenceState> emit, EvidenceView view) {
+    final current = view.copy(online: watch.online);
+    emit(current.online ? EvidenceLoaded(current) : EvidenceOffline(current));
+  }
+
   void _failure(
     Emitter<EvidenceState> emit,
     EvidenceView view,
