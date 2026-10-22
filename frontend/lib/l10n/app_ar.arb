@@ -3,102 +3,122 @@
   "appTitle": "شكد",
   "@appTitle": {
     "description": "Shgad app display name.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2b00d307ff33d199c081cc12a57dc04edc74c4b23575d9d4b33b1b7558cb93ec"
   },
   "chatTitle": "محادثة المحل",
   "@chatTitle": {
     "description": "Section label for the Phase 0 chat shell.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "dc0fc5e60a4ff3db7b7fd56c00cf1aab3b41cedd12aa616a2a3d07a1edde8c98"
   },
-  "chatSetupNotice": "المحادثة بعد ما متاحة بهالنسخة.",
+  "chatSetupNotice": "المحادثة بعدها مو متوفرة بهالنسخة.",
   "@chatSetupNotice": {
     "description": "Honest notice: this skeleton cannot send or answer questions yet.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b2e8c3465ebdbce117c5c3e3ac36ca125c71d8c4e61f95c8eb625ef4eb085c1d"
   },
   "verified": "مؤكد",
   "@verified": {
     "description": "Merchant interface: verified",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1318e3f22d039a1294d570f82320c586d51a7cf77e6f10f8a134542851d29f40"
   },
   "expected": "متوقع",
   "@expected": {
     "description": "Merchant interface: expected",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d3f7827161a3f798d84bd7e0411ad19d7712785cee7ecb040ade0ee4a0c29574"
   },
   "calculated": "محسوب من السجلات",
   "@calculated": {
     "description": "Merchant interface: calculated",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "e166093e2ae75cbe533f90cf47700e2a8ebee771342b969efd9d126e2b9eb3c0"
   },
   "missing": "ناقص",
   "@missing": {
     "description": "Merchant interface: missing",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c9b3b03a0746987811acdbf8b810166263338f8d0ff0dc9fc9092c8b5618bfe0"
   },
   "flagged": "يحتاج مراجعة",
   "@flagged": {
     "description": "Merchant interface: flagged",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "e6b8da58e6982a24658e6861415523eff97162f17ff6d05ba6338d5959c50415"
   },
   "thousand": "ألف",
   "@thousand": {
     "description": "Merchant interface: thousand",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "840a81f8058f56fa66753174430d737b7b67c5dc508e579a43e99fa6d17e02e0"
   },
   "iqd": "دينار",
   "@iqd": {
     "description": "Merchant interface: iqd",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "4804d2af3c17763e2ab3c6fc8b45314faf9b4fe060cbbcfac7d4c1c261dac9b8"
   },
   "galleryTitle": "معرض المكونات",
   "@galleryTitle": {
     "description": "Merchant interface: galleryTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "003844277b426bf225f3425f1f8f415b96e94199beec31da3322876f550ae10b"
   },
   "gallerySpecimens": "نماذج المكونات · أرقام تجريبية",
   "@gallerySpecimens": {
     "description": "Merchant interface: gallerySpecimens",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "718fec33bda4cfaf382aa4c723449e0b804976ae771285d63460a5f0cf96139c"
   },
   "galleryTimestamp": "٢٨ أيلول · ٢١:٠٠",
   "@galleryTimestamp": {
     "description": "Merchant interface: galleryTimestamp",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "afbc38c87adadbaa5f239104a8669ef53b76a16d1deb05cbe8e5adbea7ff7931"
   },
   "cashOnHand": "النقد المتوفر",
   "@cashOnHand": {
     "description": "Merchant interface: cashOnHand",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "9bab37e2563c94bae6c41f596d83ad7586d03a94623c1ea737742312c8e2ea0a"
   },
-  "positionConfirmed": "الرصيد بعد المستحقات بالنقد المؤكد",
+  "positionConfirmed": "شكد يبقى من النقد المؤكد بعد دفع المستحقات",
   "@positionConfirmed": {
     "description": "Merchant interface: positionConfirmed",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "da698afd8fd8e1ecb1bd705d6c96c6308742bd7a623eac77ef2079ed3908a5a0"
   },
   "expectedNotice": "التحصيل المتوقع مو مضمون.",
   "@expectedNotice": {
     "description": "Merchant interface: expectedNotice",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d1f8ce49ab2421c3a513e2d9d06de4d686a7dbe4faa872f50089bd8b7ceb37a7"
   },
   "galleryQuestion": "أكدر أدفع للمجهز الخميس؟",
   "@galleryQuestion": {
     "description": "Merchant interface: galleryQuestion",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "256737d60bb3d230014ebdca9d96b19674e36e842a24d0e9fcfa6ee1beddb94e"
   },
   "galleryAnswer": "راجع النقد المؤكد والتحصيل المتوقع كل واحد بروحه.",
   "@galleryAnswer": {
     "description": "Merchant interface: galleryAnswer",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "461ed74060e5232c7e85cc6dc2cf05c4094ac60b4e828c11ac902722ef483c14"
   },
   "confirm": "أكد واحفظ",
   "@confirm": {
     "description": "Merchant interface: confirm",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a9c4a4ddf4410e15ea8bb744b8733093001e198192a07b94c10d3203157870a2"
   },
   "evidence": "مصدر الرقم",
   "@evidence": {
     "description": "Merchant interface: evidence",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "de55dbab0b2054741bbe96386145cfda9f9403ac39ec9b82f40de11625b90c28"
   },
   "offlineUpdated": "بدون اتصال · آخر تحديث {time}",
   "@offlineUpdated": {
@@ -108,17 +128,20 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a9c63bad7f706ef6f69c40c0390386408c8f2f5355c84d8425da980ee442c8c3"
   },
   "noRecords": "ماكو سجلات لهالعرض.",
   "@noRecords": {
     "description": "Merchant interface: noRecords",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fb0bd14f24542959f52a8f6e3aab2612d53d4142ebffe47243c74dd2bc0662a7"
   },
   "retry": "جرّب مرة ثانية",
   "@retry": {
     "description": "Merchant interface: retry",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1dc5f338a7c3dd04b619b74606e0405741f90318b427aac3e024011c518b3a4b"
   },
   "updatedAt": "آخر تحديث {time}",
   "@updatedAt": {
@@ -128,102 +151,122 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6ddee2fafa6c939a874e8aa0505f289ab210b44539fbed8554c40a57545dfc1f"
   },
-  "needsConnection": "تحتاج اتصال. القيم اللي كتبتها تبقى هنا.",
+  "needsConnection": "لازم تتصل بالإنترنت. القيم اللي كتبتها تبقى هنا.",
   "@needsConnection": {
     "description": "Merchant interface: needsConnection",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6c4b8756dd8a6f7fc2c49c8fa9d7d8d291a87e416ac0835c9f319c1c10ba2b8e"
   },
   "errorSign": "هالاختيار ما يطابق إشارة الفرق.",
   "@errorSign": {
     "description": "Merchant interface: errorSign",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "eb1d404e262c9a0224fe6bee5ed57b26ace1171b6de5491d34df7dde421b11b7"
   },
   "errorExceeded": "المبلغ أكبر من الفرق الباقي.",
   "@errorExceeded": {
     "description": "Merchant interface: errorExceeded",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "8eae74b818ea3d59086b8b64e4110a3d3a66c0f2a55fe41128416537c0b9cf42"
   },
-  "errorCount": "سجل عدّ النقد لليومين المتتاليين أول.",
+  "errorCount": "أول شي، سجّل عدّ النقد ليومين ورا بعض.",
   "@errorCount": {
     "description": "Merchant interface: errorCount",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "8da176f01d1e6e25c09baf2b7c1407a99850e05738c55eca9a7578da15335ab5"
   },
   "errorBalance": "رصيد البداية ناقص. سجله أول.",
   "@errorBalance": {
     "description": "Merchant interface: errorBalance",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "ac272951e36314cde320781a521fd2d5630ff5623734bec82873393c3bf37450"
   },
-  "errorCosts": "كلف الشراء المسجلة ناقصة.",
+  "errorCosts": "أكو نقص بكلف الشراء المسجّلة.",
   "@errorCosts": {
     "description": "Merchant interface: errorCosts",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "251ed15023bbfd1301cd1605b8b884cf46a09a543c0ee5cec8efe095c99cb1ef"
   },
   "errorHistory": "السجلات ما تكفي للتقدير.",
   "@errorHistory": {
     "description": "Merchant interface: errorHistory",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "21d24e312df39ac7caf6b948d531dcd3582ce04ada15ff858a5040815f13f592"
   },
-  "errorDueDate": "كمل تاريخ الاستحقاق الناقص.",
+  "errorDueDate": "تاريخ الاستحقاق ناقص، كمّله.",
   "@errorDueDate": {
     "description": "Merchant interface: errorDueDate",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "59abacbd740704c7980da4a1a16c54ea334a1789d728cb4975e9d399a83d04c9"
   },
   "errorParty": "اختار رقم الزبون أو المجهز بالضبط.",
   "@errorParty": {
     "description": "Merchant interface: errorParty",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "befa8599bbe45810093c232b8ce1301da29b3bfe0fb2733a5b01247853901a7a"
   },
   "errorDate": "وضح تاريخ الشغل.",
   "@errorDate": {
     "description": "Merchant interface: errorDate",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fa169877454040c4fd13e70ef783d074fa2bd28d7ba3cf7370407fb4f3510bbc"
   },
   "errorMapping": "بعض الأعمدة المطلوبة ما تطابقت.",
   "@errorMapping": {
     "description": "Merchant interface: errorMapping",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "74fd8803d5edea15b77c71121e6789ffd4bbce411113846c885e8d628880e172"
   },
-  "errorImport": "راجع ملف السجلات وأخطاء صفوفه.",
+  "errorImport": "راجع ملف السجلات وشوف الأخطاء اللي بصفوفه.",
   "@errorImport": {
     "description": "Merchant interface: errorImport",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "52301ae1a95063ba362c9b3f9dbe39a84d92a4f1575114766d0b4dfd59b1454f"
   },
   "errorValidation": "راجع القيم وأرقام السجلات وجرب مرة ثانية.",
   "@errorValidation": {
     "description": "Merchant interface: errorValidation",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1a41f7f95ea1c23a2abc5a66262a73ea130b6cc85d1e132467a19b2bc9406550"
   },
   "errorMissing": "السجلات المطلوبة ناقصة.",
   "@errorMissing": {
     "description": "Merchant interface: errorMissing",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "891050746e2d62861d622bdea311bf8ac540c86e02949a03745a039c02da3226"
   },
   "errorNotFound": "هالسجل مو موجود.",
   "@errorNotFound": {
     "description": "Merchant interface: errorNotFound",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "12f176c1c4999115b6d39d56da2c032eda6b673a12085b1640ba7d7337e817d1"
   },
   "errorUnavailable": "الخدمة مو متاحة. جرب بعد شوية.",
   "@errorUnavailable": {
     "description": "Merchant interface: errorUnavailable",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "882b34a3b8a556e447bb9c9d6946732f1f728aeaac9d109a1c5085bf1fcc364b"
   },
   "errorInternal": "ما كدرنا نتحقق من هالعرض. جرب مرة ثانية.",
   "@errorInternal": {
     "description": "Merchant interface: errorInternal",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "bdcd10fb1850542ee1c7aa0b6cbeec452f7d7c1e9ea02f32c1732cef9f54b7ac"
   },
   "todayTitle": "اليوم",
   "@todayTitle": {
     "description": "Merchant interface: todayTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2422f71e7f4eadec4174ce00779ea06be25d4d35a068f899cd882b23cf8fe212"
   },
   "refresh": "حدّث",
   "@refresh": {
     "description": "Merchant interface: refresh",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2389f5c624e59e47a8214d2d71be31fe36c5bfff52bfedeba25827d46981a307"
   },
   "businessDate": "تاريخ الشغل · {date}",
   "@businessDate": {
@@ -233,14 +276,16 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f16b2728885526b44088f9accf8c7120d9f4cc4c968fb9d57c480a7a66cefe2e"
   },
   "countMissing": "وقت العدّ مو متوفر",
   "@countMissing": {
     "description": "Merchant interface: countMissing",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fa61dd655f21aabe242ca24de7bfe14270dcab38dd3ae2a9886c6100db98cadf"
   },
-  "countedAt": "النقد معدود بوقت {time}",
+  "countedAt": "انعدّ النقد الساعة {time}",
   "@countedAt": {
     "description": "Merchant interface: countedAt",
     "placeholders": {
@@ -248,7 +293,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6abcc2a0d4692bcca5f4f7be9cee7979e2249eab88ceee4c5b23f293b91faa4c"
   },
   "upcomingRange": "الأيام السبعة الجاية · {start} إلى {end}",
   "@upcomingRange": {
@@ -261,22 +307,26 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d21a6090789b95670fa555417db5766fe0ddd046d3e42aed9a0a23cf4cfb9e0a"
   },
   "supplierDues": "مستحقات المجهزين",
   "@supplierDues": {
     "description": "Merchant interface: supplierDues",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2011bcf6c3dd5144715b158cb83399e9dbb4141dec40ca3cf8291d90f5ad376d"
   },
   "expectedCollections": "التحصيل المتوقع",
   "@expectedCollections": {
     "description": "Merchant interface: expectedCollections",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d9c00790eacbb17c41744495effd0c734c85f5a9dd699688758c3f3079a02525"
   },
   "positionExpected": "الرصيد بعد المستحقات ويا التحصيل المتوقع",
   "@positionExpected": {
     "description": "Merchant interface: positionExpected",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2768551b2e7ca50b45f711f4b7ba481eb479a0fcc50809ea3dda285c74c58a33"
   },
   "firstShortConfirmed": "أول نقص · بالنقد المؤكد: {date}",
   "@firstShortConfirmed": {
@@ -286,7 +336,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "ab750e5b61532a1b71f2e2e74cc36027ca64befe9810a41f3623e876fbd67429"
   },
   "firstShortExpected": "أول نقص · ويا المتوقع: {date}",
   "@firstShortExpected": {
@@ -296,12 +347,14 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c4a4782e2f2430693867b73c4b6bbe8487ce6ea06f0672c17c45efbd2bf43efa"
   },
   "noShortfall": "ماكو بهالفترة",
   "@noShortfall": {
     "description": "Merchant interface: noShortfall",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0b5b1a53f6f39f39d62898c18eacea098f1b6d74c604ae7d26d3d2a2a7ed6966"
   },
   "dueAt": "مستحق بتاريخ {date}",
   "@dueAt": {
@@ -311,42 +364,50 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "241c45be85b9963a3b638a8ecdb29e47c2e6405d7fbb60250afc34f3804cebc4"
   },
   "dueNow": "مستحق هسه",
   "@dueNow": {
     "description": "Merchant interface: dueNow",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c0a748ce4f7a46c7856ff63938d3029b5ae135287114aa2cfcee9473a9ac5651"
   },
-  "overdueExcluded": "ديون متأخرة · وقت التحصيل مجهول وخارج المتوقع",
+  "overdueExcluded": "ديون متأخرة · ما نعرف وكت تنجمع، ولهذا مو محسوبة بالتحصيل المتوقع",
   "@overdueExcluded": {
     "description": "Merchant interface: overdueExcluded",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0947692f86d94873811790c42d68d79bb74225420498c4381731a03ed50a2780"
   },
   "debtsTitle": "الديون",
   "@debtsTitle": {
     "description": "Merchant interface: debtsTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b99cab522e0f1109b467741357d9faa5b6afdb895c052ed78107d02991bb7c4e"
   },
-  "receivables": "بذمة الزبائن للمحل",
+  "receivables": "الفلوس اللي بذمّة الزباين للمحل",
   "@receivables": {
     "description": "Merchant interface: receivables",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b0cf82d401628af03dc1db59e9e59850997ebda35e4114cf90ba9959210814c8"
   },
-  "payables": "بذمة المحل للمجهزين",
+  "payables": "الفلوس اللي بذمّة المحل للمجهزين",
   "@payables": {
     "description": "Merchant interface: payables",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "e4969e2eeb9cf50125b1dd577d1dd851c585c610fa8447c0aec2872f423f0f79"
   },
   "outstanding": "المبلغ الباقي",
   "@outstanding": {
     "description": "Merchant interface: outstanding",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2c6712ebdd59126fd7c37750fc176a5885b3f1689cecaf71be6fe7cafbbde527"
   },
   "originalAmount": "المبلغ الأصلي",
   "@originalAmount": {
     "description": "Merchant interface: originalAmount",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "ab7099c73d2c71d88562d295d6596b561b3d0a5de57eb65f8ace904c71268b79"
   },
   "paymentSources": "أرقام سجلات الدفعات: {ids}",
   "@paymentSources": {
@@ -356,7 +417,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "da591e475965af3bb41fbbebd2f68c072b5a6c7f1b2d8e19097360f97b029610"
   },
   "timeInBaghdad": "{time} بغداد",
   "@timeInBaghdad": {
@@ -366,82 +428,98 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b26a49e93b63ec57882b059590391428c3535132ff190b6130a12a107bf29451"
   },
   "entryTitle": "قيد سريع",
   "@entryTitle": {
     "description": "Merchant interface: entryTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "31aad1b7e559637ba0863eafefee901a28dc2a3a26219d4ab57ec6f76433a6c6"
   },
   "entryType": "نوع القيد",
   "@entryType": {
     "description": "Merchant interface: entryType",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a7d71124026bd7d796ce4fd72cf9d96f91dd6f6567855bbee076ae12e83d2387"
   },
   "cashSale": "بيع نقدي مسجل",
   "@cashSale": {
     "description": "Merchant interface: cashSale",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "31c98ebfcee89431c516543a8fcd24f88443d89ea0303d02b41b265590692cc7"
   },
   "creditSale": "بيع آجل",
   "@creditSale": {
     "description": "Merchant interface: creditSale",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0d567e73198899c2d0c965924608da137c2c1c24416baed9a2f6bec374bdeaa1"
   },
   "collection": "تحصيل دين",
   "@collection": {
     "description": "Merchant interface: collection",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "930c1a0ea40f2325b69c4eff7ae16f0dabbf8a5f494494dc21fda8f29102ade7"
   },
   "supplierInvoice": "فاتورة مجهز",
   "@supplierInvoice": {
     "description": "Merchant interface: supplierInvoice",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0c036085c7e7c53d47d1654b392cf4f11eab9582982d8918e8781317c641b363"
   },
   "supplierPayment": "دفعة للمجهز",
   "@supplierPayment": {
     "description": "Merchant interface: supplierPayment",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "cadff17cd37c02b1aaff357aa6df157f218ccf179251dee60faef601f54fd80c"
   },
   "operatingExpense": "مصروف المحل",
   "@operatingExpense": {
     "description": "Merchant interface: operatingExpense",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "acfbd0a4f9f317acf7b931885b07ec5792ae18d53c98a038b857642f05cb89ea"
   },
   "ownerDrawing": "سحب صاحب المحل",
   "@ownerDrawing": {
     "description": "Merchant interface: ownerDrawing",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c9f4022caaeee6e430ce3976bb2ae5e754cdac3995abd54b311541be272b6de3"
   },
   "capitalInjection": "إضافة رأس مال",
   "@capitalInjection": {
     "description": "Merchant interface: capitalInjection",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fd4136b7751bcc9af05c3207681d113c721c6cbb63aee7d031b38cfd8b57ce4d"
   },
   "cashCount": "عدّ النقد بنهاية اليوم",
   "@cashCount": {
     "description": "Merchant interface: cashCount",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d1843b09c345feee8bfda4f8e654f0a86df61fd12050d6754a47bf368d56450c"
   },
   "businessDateInput": "تاريخ الشغل · سنة-شهر-يوم",
   "@businessDateInput": {
     "description": "Merchant interface: businessDateInput",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "de11e2b95945431ec0d55245eb78100b209289e47cb78a01a1b0cc25d5c5118f"
   },
   "amountInput": "المبلغ · دينار كامل",
   "@amountInput": {
     "description": "Merchant interface: amountInput",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "beb2eebf6988ef4bfba8a8e87be2d35a9141b55c3e95e4c5cc9d16cf8051bb89"
   },
   "partyInput": "الزبون أو المجهز",
   "@partyInput": {
     "description": "Merchant interface: partyInput",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "9168dc5ea1fa6c21e1e6d871dc67ebc58bcac9aba6dd9bc0980c3d21d2f1abbe"
   },
   "partyIdInput": "رقم الزبون أو المجهز بالضبط",
   "@partyIdInput": {
     "description": "Merchant interface: partyIdInput",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b2b467d62a84bc12f63c609c8677d29ed73973d2e24e00b4ee9b895d40161781"
   },
   "partyOption": "{name} · {id}",
   "@partyOption": {
@@ -454,29 +532,34 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a55ecb4d58a1a95aff368c7e914d48480b4d454fc86592c96ac91b095c1981c8"
   },
   "obligationInput": "رقم الدين · من صفحة الديون",
   "@obligationInput": {
     "description": "Merchant interface: obligationInput",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "441a2242680c33d3fc333e09324cf95f686488476e33603f6fde09d4b9256625"
   },
   "dueDateInput": "تاريخ الاستحقاق · سنة-شهر-يوم",
   "@dueDateInput": {
     "description": "Merchant interface: dueDateInput",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "76662c48344882198fa51ebbca1e0844f9c6da03c438bc5e6d726779af8fb7df"
   },
   "noteInput": "ملاحظة · اختياري",
   "@noteInput": {
     "description": "Merchant interface: noteInput",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "756e6ce7a92cfc4af27cb9a350dcc36799e8acddc374def58bb293d611bc22d7"
   },
   "reviewEntry": "راجع قبل الحفظ",
   "@reviewEntry": {
     "description": "Merchant interface: reviewEntry",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "582a3f6ff577a2f5e9e75eae38fef1f6418d2c34c885edca391c9f48eb07d505"
   },
-  "entryConfirmation": "تحفظ {type} بتاريخ {date} للحساب {party}؟",
+  "entryConfirmation": "تريد تحفظ {type} بتاريخ {date} لحساب {party}؟",
   "@entryConfirmation": {
     "description": "Merchant interface: entryConfirmation",
     "placeholders": {
@@ -490,7 +573,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1b553dcdfc368c58f80ed4039cf1fad17abc3453e75c1e3b0b13f330774bb051"
   },
   "obligationReference": "الدين: {id}",
   "@obligationReference": {
@@ -500,17 +584,20 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "db2032614e4afbadf979b28d1846196a78b6bae448e13002268998b0932b7744"
   },
-  "entered": "مكتوب · راجعه قبل الحفظ",
+  "entered": "انكتب · راجعه قبل الحفظ",
   "@entered": {
     "description": "Merchant interface: entered",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "45077518d33f9ec3fc686c37e2b5960146fa3f4e03e2abd0408e583521672a09"
   },
   "edit": "عدّل",
   "@edit": {
     "description": "Merchant interface: edit",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d46ffc4e978dd63b1afcdb56fd0825218c92bec8e974d0f8bd72441c0aaf3008"
   },
   "savedSource": "انحفظ · مصدره {id}",
   "@savedSource": {
@@ -520,32 +607,38 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d8c94f049d5827394a656f6da924e18327db4fd967a90aa9323ee941332f262f"
   },
   "savedEntryFormula": "القيد المحفوظ · سجل المصدر الأصلي",
   "@savedEntryFormula": {
     "description": "Merchant interface: savedEntryFormula",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "dc6b984ec2abadb8b52559c57f2d6643b32366eb3534e2f556db63131cc9957e"
   },
   "undo": "تراجع عن القيد",
   "@undo": {
     "description": "Merchant interface: undo",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "724f93238ae95fc8600a5bc47ffb012a401cea3beef01eec42fb8fd56cebe5a4"
   },
-  "undoNotice": "التراجع يبقي الأصل ويضيف سجل إلغاء ويا السبب.",
+  "undoNotice": "التراجع ما يمسح القيد الأصلي، بس يضيف سجل إلغاء ويا السبب.",
   "@undoNotice": {
     "description": "Merchant interface: undoNotice",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "7650603ab2bf17340660c23da49ef40b90706e931a0ae82cf02836bc9a97589b"
   },
   "voidReason": "سبب التراجع",
   "@voidReason": {
     "description": "Merchant interface: voidReason",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "8664dd22ae880342f654fbb7565be0d4c085f5ffd8e338c39f4a98338da2653b"
   },
   "confirmUndo": "أكد التراجع",
   "@confirmUndo": {
     "description": "Merchant interface: confirmUndo",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "5e1efb333bb42b9bb8c976eb0371e6135f23e12b630db680c6e0144f45c99486"
   },
   "voidSaved": "إلغاء {id} · {reason}",
   "@voidSaved": {
@@ -558,12 +651,14 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "3cbd519a1fb8cbcefb27218a6f34773c612af741c107dcd1883655f542cf0e84"
   },
   "correctEntry": "سجل تصحيح مرتبط",
   "@correctEntry": {
     "description": "Merchant interface: correctEntry",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0a579cdeee433e163e8a868c34774428ba03cf8b4bc321c8797300a0398975fc"
   },
   "correctionOf": "تصحيح للقيد {id}",
   "@correctionOf": {
@@ -573,22 +668,26 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d16e1f282afeb6164884ee02f1b620894d24f36c447664d12336643abb283e21"
   },
   "newEntry": "قيد جديد",
   "@newEntry": {
     "description": "Merchant interface: newEntry",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b8bc111b9567749b986523655fc6ff3b28044925d2374e8bc6c2f424c8bf1e05"
   },
   "partialCollection": "سجل تحصيل جزئي",
   "@partialCollection": {
     "description": "Merchant interface: partialCollection",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "8f4bb76a8cc1227308a327f57b6c719a091a5680c34e0223da6a361901512059"
   },
   "partialPayment": "سجل دفعة جزئية",
   "@partialPayment": {
     "description": "Merchant interface: partialPayment",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c87aab1d2d4203480c10dc89a3b6933a9ed1da15b2af1432684862927a57c6ef"
   },
   "entryGeneralConfirmation": "تحفظ {type} بتاريخ {date}؟",
   "@entryGeneralConfirmation": {
@@ -601,69 +700,82 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "cfda484563f0e4d8e118a9f1af3903056e2ad5825dda27a86277f4987edb9a9c"
   },
   "closeTitle": "إغلاق اليوم",
   "@closeTitle": {
     "description": "Merchant interface: closeTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "219b4e00234f68068d652b32f37120292331c955719a220e928214a9daf515d4"
   },
   "expectedClose": "النقد المتوقع بنهاية اليوم",
   "@expectedClose": {
     "description": "Merchant interface: expectedClose",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "ce105fd01fdadc28258c97f280c5749dffbd420217783b2bf394cccce917ddcd"
   },
   "unexplainedDifference": "فرق نقد غير مفسّر",
   "@unexplainedDifference": {
     "description": "Merchant interface: unexplainedDifference",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "28b483bc7eac89988ded99ef1073b167ca44c163ffb2940381649ee14e24f970"
   },
-  "neutralDifference": "هالفرق غير مفسّر. ما نحدد سببه من هالسجلات.",
+  "neutralDifference": "هالفرق ما نعرف سببه، وما نكدر نحدده من هالسجلات.",
   "@neutralDifference": {
     "description": "Merchant interface: neutralDifference",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "ea3bbb056336a50e89965d5bc461b8a19657fc15e149af744eb1b86ff1cb44a8"
   },
   "recordCloseEntries": "سجل العدّ أو السحب أو الدين",
   "@recordCloseEntries": {
     "description": "Merchant interface: recordCloseEntries",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f93e1af63390415c6f05765bdf3f003a66f367d7054f4e5cf39422f9b48b0dd8"
   },
   "reviewDifference": "راجع الفرق",
   "@reviewDifference": {
     "description": "Merchant interface: reviewDifference",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1e96c849801774cca6444c12e16b1261bd87ef70aba79648f21a342e5751cd42"
   },
   "chooseResolution": "اختار شتريد تسوي بالفرق",
   "@chooseResolution": {
     "description": "Merchant interface: chooseResolution",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d0531b1fcaa9873673ec002dd03ab49d0865f2afcfe5fa55e6c06529b7542a10"
   },
   "leaveUnexplained": "خليه غير مفسّر",
   "@leaveUnexplained": {
     "description": "Merchant interface: leaveUnexplained",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "62eb6fd07746e2a4bad69e23e51c5062d538b0124e80f830bb8ae83e63eb0b48"
   },
   "reviewCashSale": "سجل بيع نقدي مو مفصّل",
   "@reviewCashSale": {
     "description": "Merchant interface: reviewCashSale",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fc518ae7d1163a48c58feeffc4f633e840b4d2ba592664cd3f3d7ee933f67f33"
   },
-  "reviewExpense": "سجل مصروف مو مسجل",
+  "reviewExpense": "سجّل مصروف بعده مو مسجّل",
   "@reviewExpense": {
     "description": "Merchant interface: reviewExpense",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "836d392f6cde83bd71154e248f8c2745b1b51fb90142208ed452f742e0b26362"
   },
-  "reviewDrawing": "سجل سحب صاحب المحل مو مسجل",
+  "reviewDrawing": "سجّل سحب صاحب المحل اللي بعده مو مسجّل",
   "@reviewDrawing": {
     "description": "Merchant interface: reviewDrawing",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "7be11181d6379d1be2c7b28e1dec1c3ebe58ce753b1e3b22366ea3f7a0b225af"
   },
   "leftUnexplained": "انحفظت المراجعة. الفرق يبقى غير مفسّر.",
   "@leftUnexplained": {
     "description": "Merchant interface: leftUnexplained",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a46e71dbb4d8080e20c7df784b48d8f0b3c92789b1790d224e051fcd194a0351"
   },
-  "resolutionConfirmation": "تأكد {choice} بتاريخ {date}؟",
+  "resolutionConfirmation": "متأكد تريد تثبّت {choice} بتاريخ {date}؟",
   "@resolutionConfirmation": {
     "description": "Merchant interface: resolutionConfirmation",
     "placeholders": {
@@ -674,12 +786,14 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d0f85b7f9b9a490f2e1047f38f2a8070298a9e354c840f9e9e8f62f83db8c404"
   },
   "previousCount": "عدّ النقد السابق",
   "@previousCount": {
     "description": "Merchant interface: previousCount",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "846a897549f7cc421d1f29e351c395e0ba5983f6e94d3d4480f0882cb20f1161"
   },
   "voidReasonValue": "سبب الإلغاء: {reason}",
   "@voidReasonValue": {
@@ -689,77 +803,92 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b1449a36e1a5e938672bd4eea90b1e214b55e5f3e3c0d45494da40862f886ae5"
   },
   "estimatedMargin": "هامش إجمالي تقديري",
   "@estimatedMargin": {
     "description": "Merchant interface: estimatedMargin",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "803a5e74462b9d12def6e00b06a63edec14c30830292b160086df9d7b5530b47"
   },
   "coverageLabel": "تغطية كلفة المبيعات المسجلة",
   "@coverageLabel": {
     "description": "Merchant interface: coverageLabel",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b2d6b42d030bd772488181b4201adfe4a0a5334326747154310b3f75be59ee6f"
   },
   "conditionalShortfall": "النقص إذا صار التحصيل المتوقع",
   "@conditionalShortfall": {
     "description": "Merchant interface: conditionalShortfall",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "4eb75325dbb706f9858deeaced209e88005aecd7d9ab913e173dfdb5504647e8"
   },
   "confirmedShortfall": "النقص بدون التحصيل المتوقع",
   "@confirmedShortfall": {
     "description": "Merchant interface: confirmedShortfall",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "750f4e18551beba771baa8cca81ea0962f20170dbc1869a53142886af04839d5"
   },
   "lowestCash": "أقل نقد تقديري",
   "@lowestCash": {
     "description": "Merchant interface: lowestCash",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "01bb6e2f0b803359264f42792c547830b8eb3c25ec3ddd6d29610acefd8b8639"
   },
   "projectedSales": "تقدير المبيعات المسجلة",
   "@projectedSales": {
     "description": "Merchant interface: projectedSales",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "881926fd2c743126b90f73ca756d6cb8649cf7d8ffa2041302eb590dba934cba"
   },
-  "projectedDifference": "تقدير الفرق غير المفسّر بإشارته",
+  "projectedDifference": "تقدير الفرق اللي ما نعرف سببه، سواء موجب لو سالب",
   "@projectedDifference": {
     "description": "Merchant interface: projectedDifference",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "30c99a1b9330c67359dc5aaf689b81bd12d7b324dc61dafb49f7d14f329d38cf"
   },
   "sourcedFigure": "من السجلات الموثقة",
   "@sourcedFigure": {
     "description": "Merchant interface: sourcedFigure",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "e2972fba4afebeb8327992203a9b09212dae0e2e61ca72d2af11c2972948f891"
   },
   "chatWelcome": "اسأل عن سجلات المحل. اضغط على الرقم حتى تشوف مصدره.",
   "@chatWelcome": {
     "description": "Merchant interface: chatWelcome",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c2193e2e969ff47afa22eb3d9f84b6d3326e6b669cf3c79d884f5c933528c600"
   },
   "checkingLedger": "دأراجع الدفتر…",
   "@checkingLedger": {
     "description": "Merchant interface: checkingLedger",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "40fa844aefb1ba83276dac9b984ae68a306826b1f6c6d77ae2251b967e506c14"
   },
-  "chatNeedsConnection": "المحادثة تحتاج اتصال. التقارير المحفوظة تبقى متاحة للقراءة.",
+  "chatNeedsConnection": "المحادثة ما تشتغل بدون إنترنت. تكدر تبقى تقرأ التقارير المحفوظة.",
   "@chatNeedsConnection": {
     "description": "Merchant interface: chatNeedsConnection",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6bc520da1a58bfd807280af5a49233ad721c459272c57e57b3772c8b65b2df20"
   },
   "promptSupplier": "عندي فلوس تكفي أدفع للمجهز الخميس؟",
   "@promptSupplier": {
     "description": "Merchant interface: promptSupplier",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "591851c76e060f5f9cfaf56511ef53ac65ce6d09759c1ec33fdf1b7d14b2fd4b"
   },
   "promptDebts": "منو بعده بذمته فلوس؟",
   "@promptDebts": {
     "description": "Merchant interface: promptDebts",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0301096038267b28e589558c8e5b12e78b8b934c3c228a016a6346a06c568ce6"
   },
   "promptWeek": "شلون كان شغلنا هالأسبوع؟",
   "@promptWeek": {
     "description": "Merchant interface: promptWeek",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "410f1caedaad1567dd390724c3396c5a06b26c7c3ffdd72c96fdf749ae1f4491"
   },
   "metricValue": "{value} {unit}",
   "@metricValue": {
@@ -772,27 +901,32 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "efb24e7b0b671ca5b72eb9af8007086379de37a5a6deb701cc93b5abc583f23a"
   },
   "percentUnit": "٪",
   "@percentUnit": {
     "description": "Merchant interface: percentUnit",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a489ae36a167dbefd7e57b8890ec160fad09d7dcd56b631319a62fcb525e1f8b"
   },
   "daysUnit": "يوم",
   "@daysUnit": {
     "description": "Merchant interface: daysUnit",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "eb07f635d8831be8113e9c609462cf09681365fdeb7f9ea3a24625beea1f9eb2"
   },
   "countUnit": "سجل",
   "@countUnit": {
     "description": "Merchant interface: countUnit",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a925525adbfc89072f0eef25abcb921a82d375d13c41d25cade19579f7e3706e"
   },
-  "templateReply": "جواب من قالب السجلات الموثقة",
+  "templateReply": "جواب جاهز مبني على السجلات الموثّقة",
   "@templateReply": {
     "description": "Merchant interface: templateReply",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "79e5fb8efb9bf2e9b79d47dbb557330f0c0804fa602de83edbe5d30903a1bb78"
   },
   "resolvedPeriod": "الفترة المحددة · {start} إلى {end}",
   "@resolvedPeriod": {
@@ -805,7 +939,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "9fce38eef577140159d028bb04baefee2cf27f956426f4b6a370b2f0c6cd499b"
   },
   "resolvedCustomer": "الحساب المحدد · {name} ({id})",
   "@resolvedCustomer": {
@@ -818,72 +953,86 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "7bcbd985a24d324e00214cd49172718dbd8fabdcd68aedf4549cc6b8f6c59a1e"
   },
   "chatInput": "اسأل عن الدفتر",
   "@chatInput": {
     "description": "Merchant interface: chatInput",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b4895f26ec1f3e2023f82ab7a781391a94a895a768c9a5681c5fba1095b04f05"
   },
-  "send": "ارسل",
+  "send": "دزّ",
   "@send": {
     "description": "Merchant interface: send",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0b6c7d5758c76548b223fdeee6c06aef5847d56d81940e09b21dd51bf3716104"
   },
   "dismiss": "سدّ",
   "@dismiss": {
     "description": "Merchant interface: dismiss",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "bf20e6ef952c31d478e471378979237c6768a231b2114267b622e8f1caf2c06a"
   },
-  "noEvidenceRows": "هالمعادلة ما إلها صفوف مصدر.",
+  "noEvidenceRows": "ماكو صفوف من السجلات الأصلية مرتبطة بهالمعادلة.",
   "@noEvidenceRows": {
     "description": "Merchant interface: noEvidenceRows",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "9bb96080d2ccee62f5572289b3b64dbd2fb90beacacfc92dd6c49817ab783dfa"
   },
   "openingBalance": "رصيد البداية المسجل",
   "@openingBalance": {
     "description": "Merchant interface: openingBalance",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "de199ee185a09c38915bb0d05a7ef14f58768c7201cf54413157a9b5fe3a6cbd"
   },
   "unitBuyPrice": "سعر شراء الوحدة المسجل",
   "@unitBuyPrice": {
     "description": "Merchant interface: unitBuyPrice",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "266874d4d1d031da09a14f686e0123bca7efc85c396d2b4df526370dc02291c3"
   },
   "unitSellPrice": "سعر بيع الوحدة المسجل",
   "@unitSellPrice": {
     "description": "Merchant interface: unitSellPrice",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "02cecd212c711d348c5e3454a38efa2da2d27b4eef2aa8473f80857fead4a5d3"
   },
   "originalRow": "شوف الصف الأصلي",
   "@originalRow": {
     "description": "Merchant interface: originalRow",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "3d8c6eb5cad27d028fa7eeedbe5f89d978662eab8610d41cc0e910388a97342b"
   },
   "weeklyTitle": "ملخص الأسبوع",
   "@weeklyTitle": {
     "description": "Merchant interface: weeklyTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "5959eb3fc9db9ad9eba840bb02de5459b547243a049fd33d02a876eeaf8c5ca7"
   },
   "recordedCashSales": "المبيعات النقدية المسجلة",
   "@recordedCashSales": {
     "description": "Merchant interface: recordedCashSales",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "03ccf1b7b27a1f204f0c3acfc9857eae12a1c15838e450131ab07c567d0f5499"
   },
   "overdueReceivables": "ديون الزبائن المتأخرة",
   "@overdueReceivables": {
     "description": "Merchant interface: overdueReceivables",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "59291e595f74ab786376c303bd0686726292744c793aa93b25afd96698b00529"
   },
   "totalRecordedSales": "مجموع المبيعات المسجلة",
   "@totalRecordedSales": {
     "description": "Merchant interface: totalRecordedSales",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "72b8596340e2c7030c8ff391f63e690aa48d8be427201de043c4ecc09319369e"
   },
-  "agingOldest": "الديون الأقدم أول",
+  "agingOldest": "أقدم الديون بالبداية",
   "@agingOldest": {
     "description": "Merchant interface: agingOldest",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f6187ac54dce1d045eb9c175553789119d9effe2ddac76487ec5ab467696b293"
   },
   "daysOverdue": "متأخر {days} يوم",
   "@daysOverdue": {
@@ -893,12 +1042,14 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "62216e5e058e86b0222055b8fa23d1ffff9ccf21bc2d54cd1760976cf0039998"
   },
   "showAllDebts": "شوف كل الديون",
   "@showAllDebts": {
     "description": "Merchant interface: showAllDebts",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "56b12a52fbd6f486ec706b1f83afa2d56c8158c457adea02976a44bca9fd6326"
   },
   "coverageValue": "تغطية كلفة المبيعات المسجلة: {value}٪",
   "@coverageValue": {
@@ -908,354 +1059,424 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "04829da0404631628b7ee101746ff844937917a4848fcd1154a016b46eb66668"
   },
   "coverageMissing": "تغطية كلفة المبيعات المسجلة مو متوفرة.",
   "@coverageMissing": {
     "description": "Merchant interface: coverageMissing",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "af70303ed0ae2b4a57f0f4e38642f6a60d0141d3999ade60afa94ca272464dfd"
   },
   "insufficientMargin": "المبيعات المسجلة اللي إلها كلفة ما تكفي لعرض الهامش الإجمالي التقديري.",
   "@insufficientMargin": {
     "description": "Merchant interface: insufficientMargin",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0d05f6d90c9b2498384257c8344f5b89276c1471106d6c64a520a341d4881b27"
   },
   "marginExclusions": "الهامش الإجمالي التقديري يشمل المبيعات المسجلة المسعّرة. المصاريف غير المسجلة مو مشمولة، والفرق غير المفسّر خارج تغطية الكلفة.",
   "@marginExclusions": {
     "description": "Merchant interface: marginExclusions",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "582a943395423d2793c61a651dd800fe95fe54deb0b396294f3af0531aceb0aa"
   },
   "reviewUnmatched": "راجع الدفعات اللي ما تطابقت وكمل تفاصيلها.",
   "@reviewUnmatched": {
     "description": "Merchant interface: reviewUnmatched",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "5ba6213d7705bb3f2acf2b47745b10ad73f6c88ae0a69b299db8a32cc2f7f841"
   },
   "reviewDuplicate": "راجع القيود المتشابهة قبل أي تعديل.",
   "@reviewDuplicate": {
     "description": "Merchant interface: reviewDuplicate",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "8e36347191f8442446fafc6857b4546fb7f40dfb83d64163c1312ca4deaf26c6"
   },
   "reviewDebts": "راجع الديون الباقية وتواريخ استحقاقها.",
   "@reviewDebts": {
     "description": "Merchant interface: reviewDebts",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0fb7eb70bcab85fbacabc6087a4e6d81fccaced76240c41cc713a11aa0c054f0"
   },
   "noActionNeeded": "ماكو سجل يحتاج مراجعة هنا.",
   "@noActionNeeded": {
     "description": "Merchant interface: noActionNeeded",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "837a0eeeb5097b32189a6a8b1fcd286b53d2ef2bd097cfcb6e215e1b9d442148"
   },
   "flagUnmatched": "دفعة مو متطابقة",
   "@flagUnmatched": {
     "description": "Merchant interface: flagUnmatched",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "08f0e98150e16d32bcf38dbbeabfb1c9c9bb1db6073605f2cbfa219c51fad4d6"
   },
   "flagDuplicate": "اشتباه تكرار",
   "@flagDuplicate": {
     "description": "Merchant interface: flagDuplicate",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "dbb969db2285a795fb818bbc835f68c7c9b7e39c9f6dd3adbc1093d09f4cd5dd"
   },
   "flagPartial": "مدفوع جزئياً",
   "@flagPartial": {
     "description": "Merchant interface: flagPartial",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "4527457505300fd1781e10d0cf0490fab2de6fb896d1208f3dd7871f2c9a466f"
   },
   "flagOverdue": "متأخر",
   "@flagOverdue": {
     "description": "Merchant interface: flagOverdue",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1a5ec3e42761d069f5f518b2602a2fe33cf8a2b40c3c53d6b0454ac2f68e48fe"
   },
   "flagAmbiguous": "تطابق مو واضح",
   "@flagAmbiguous": {
     "description": "Merchant interface: flagAmbiguous",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1d2f7ec643ab6a5453b8f65b72e62a6891d95369c8544ea95a86bab6b9ca082b"
   },
   "flagOriginVoided": "قيد الدين الأصلي ملغي.",
   "@flagOriginVoided": {
     "description": "Merchant interface: flagOriginVoided",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "49611d89721b8e5615372ff6061266cbcaa92f6038c63099a120c0771c45159c"
   },
   "flagUnallocated": "جزء من هالدفعة ما إله ربط موثق.",
   "@flagUnallocated": {
     "description": "Merchant interface: flagUnallocated",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f49ecf94a877141b8acf89d6c1c5b3619467d924357b8d24da99531a7037bbc1"
   },
   "flagReview": "راجع المصادر قبل أي تعديل.",
   "@flagReview": {
     "description": "Merchant interface: flagReview",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "8f73838b1a41248d569ddc275ca8c9ddd89e241e9337ed846e17ebdb1882dc77"
   },
   "basisSameDay": "نفس المبلغ والحساب بنفس يوم الشغل، وأرقام المصدر مختلفة.",
   "@basisSameDay": {
     "description": "Merchant interface: basisSameDay",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d9329eb2d1038e24b74c7112a0369ca1ed858fe910fb93f44532323d3a5353c3"
   },
   "basisPartial": "توزيعات جزئية موثقة.",
   "@basisPartial": {
     "description": "Merchant interface: basisPartial",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "7430950abbf747f15be84309ab976337ad2c3dcf2ddd6f67c2ec138a63e4ac65"
   },
   "basisOverdue": "تاريخ الاستحقاق قبل تاريخ الشغل.",
   "@basisOverdue": {
     "description": "Merchant interface: basisOverdue",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "cfa52ba44a3bf6693b17fe806de12bbc04105caa126304c2e3cd553a867eac57"
   },
-  "basisCandidate": "تطابق محتمل يحتاج مراجعتك.",
+  "basisCandidate": "يمكن أكو تطابق، بس لازم تراجعه.",
   "@basisCandidate": {
     "description": "Merchant interface: basisCandidate",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "7f521caca27af57dcab8d79e2cb58beb6e3db215d66d78e31b2d55e9475ac270"
   },
   "basisUnmatched": "ماكو تطابق موثق ويا دين.",
   "@basisUnmatched": {
     "description": "Merchant interface: basisUnmatched",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f76dd2c1214a209b830141b579ffa20ab3b517df8f34fd14fab373b14ef9724b"
   },
   "more": "بعد",
   "@more": {
     "description": "Merchant interface: more",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "3dc3397bee390bea9d9dcfaadbb79efb206b92bddaf4deeefcd6b788ced78f20"
   },
   "forecastTitle": "تقدير النقد",
   "@forecastTitle": {
     "description": "Merchant interface: forecastTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2e9be12ca55462e4550b476d9acaa8a7b86e4cc8caf83c726de4a8e1700e80f6"
   },
   "forecastFirstShort": "أول نقص نقدي تقديري",
   "@forecastFirstShort": {
     "description": "Merchant interface: forecastFirstShort",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "764785f312209bf4638e13d92472e5e3a3fcffc0e6c44aa0d45f90f77fce84a3"
   },
   "forecastNoShort": "ماكو نقص تقديري بهالفترة",
   "@forecastNoShort": {
     "description": "Merchant interface: forecastNoShort",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "55b02e0115b5a5c41a1c309302743dfd737c855baf98b6fc0c172d30b5fe0852"
   },
   "estimateOnly": "هذا تقدير ثانوي. التحصيل والمبيعات الجاية مو مضمونة.",
   "@estimateOnly": {
     "description": "Merchant interface: estimateOnly",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "af8556c217612579f23de6119574e385b2c6c0bd5570474c5e594fa49eb5effe"
   },
   "scenarioBase": "أساسي",
   "@scenarioBase": {
     "description": "Merchant interface: scenarioBase",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b0010a7718c64532b014f9f2649f53e71f84a7c979f704770f9f7e45f284bfbe"
   },
   "scenarioConservative": "متحفظ",
   "@scenarioConservative": {
     "description": "Merchant interface: scenarioConservative",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "cfad6c2f6be3e38a6f92d94c93591c54952d9d292d642b9ab324a9bad5f7d665"
   },
   "scenarioStress": "ضغط",
   "@scenarioStress": {
     "description": "Merchant interface: scenarioStress",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c89f3895a355014a42729662a6ff92423e5ff439d58b70c841e0960df80ea4a0"
   },
   "chartDescription": "تقدير النقد بنهاية كل يوم لثلاثين يوم، ويا خط الصفر.",
   "@chartDescription": {
     "description": "Merchant interface: chartDescription",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6a1a1aa0d95261f234cabe37d090c17c1beaf985f9317d13c739b03af5043a68"
   },
-  "topInflows": "أكبر المبالغ الداخلة التقديرية",
+  "topInflows": "أكبر مبالغ متوقّع تدخل",
   "@topInflows": {
     "description": "Merchant interface: topInflows",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0347c2f01aed51ccf15878049a83f6f0ae31b1447217044fb3a75ba0b83db108"
   },
-  "topOutflows": "أكبر المبالغ الطالعة التقديرية",
+  "topOutflows": "أكبر مبالغ متوقّع تطلع",
   "@topOutflows": {
     "description": "Merchant interface: topOutflows",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a2638b99f41238dca33049f32d69c3c1cf6725b5139d66be7925c88c2f2a190b"
   },
   "forecastDay": "تاريخ التقدير",
   "@forecastDay": {
     "description": "Merchant interface: forecastDay",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "38be8b6f265fc6e4e4be75746d5df57bd22dca950915c329200e3837a240e55b"
   },
   "estimatedClosing": "النقد التقديري بنهاية اليوم",
   "@estimatedClosing": {
     "description": "Merchant interface: estimatedClosing",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f86a1dc8b0301e2a5ddccaa0ddb904b4b74a3ada253a8ecd580286f748dcb7bc"
   },
   "recordedSalesDriver": "تقدير المبيعات المسجلة",
   "@recordedSalesDriver": {
     "description": "Merchant interface: recordedSalesDriver",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "881926fd2c743126b90f73ca756d6cb8649cf7d8ffa2041302eb590dba934cba"
   },
-  "differenceDriver": "تقدير مستقل للفرق غير المفسّر بإشارته",
+  "differenceDriver": "تقدير منفصل للفرق اللي ما نعرف سببه، سواء موجب لو سالب",
   "@differenceDriver": {
     "description": "Merchant interface: differenceDriver",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "9172727f97baa6d15055269e8bae21fadee04d0ad8d927a423505f1fc136e5ad"
   },
-  "assumptionSales": "المبيعات النقدية المسجلة تعتمد معدل نفس يوم الأسبوع بالسجلات.",
+  "assumptionSales": "تقدير المبيعات النقدية المسجّلة يعتمد على معدّل نفس اليوم من الأسبوع حسب السجلات.",
   "@assumptionSales": {
     "description": "Merchant interface: assumptionSales",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "afc05b31f5419418aa7542800b775f258b58477a3a17b4970c6ab41b192da8a5"
   },
-  "assumptionDifference": "تقدير الفرق غير المفسّر بإشارته منفصل عن المبيعات المسجلة. ما نحدد إله سبب.",
+  "assumptionDifference": "نحسب تقدير الفرق اللي ما نعرف سببه، سواء موجب لو سالب، بشكل منفصل عن المبيعات المسجّلة، وما ننسب إله سبب.",
   "@assumptionDifference": {
     "description": "Merchant interface: assumptionDifference",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "5a11995b04795694622e71c8e91271e2a5048b467065e2bb95ee9a68150221a7"
   },
-  "assumptionLateness": "السيناريو المتحفظ يأخر التحصيل المتوقع حسب تأخر الدفعات المسجل.",
+  "assumptionLateness": "بالسيناريو المتحفّظ، نحسب التحصيل المتوقع راح يتأخّر حسب تأخّر الدفعات المسجّل.",
   "@assumptionLateness": {
     "description": "Merchant interface: assumptionLateness",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "002a30b1789b59a6d70d531015d8b1a1894e407525a914bf579dfbbfc2e158b0"
   },
   "assumptionStress": "سيناريو الضغط يفترض ماكو تحصيل.",
   "@assumptionStress": {
     "description": "Merchant interface: assumptionStress",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "9c794504887a0e6808c5a1e6bfb9f8b5d3512fa569adb1ef686db98134296b42"
   },
-  "assumptionOverdue": "ديون الزبائن المتأخرة خارج كل السيناريوهات.",
+  "assumptionOverdue": "ديون الزباين المتأخرة مو محسوبة بأي سيناريو.",
   "@assumptionOverdue": {
     "description": "Merchant interface: assumptionOverdue",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b13398be437fdec960c28b2b0bec2bba255af473a8a6258af1624429338f665d"
   },
-  "assumptionCosts": "المصاريف وسحب صاحب المحل تعتمد المعدلات المسجلة.",
+  "assumptionCosts": "نحسب المصاريف وسحب صاحب المحل حسب المعدّلات المسجّلة.",
   "@assumptionCosts": {
     "description": "Merchant interface: assumptionCosts",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "bc7cfe12dca43aa42196ace21b79045d1febfc7163a2645dd8f48ff207c756f7"
   },
-  "assumptionSupplier": "التقدير يحسب مستحقات المجهزين مدفوعة بالكامل بموعدها.",
+  "assumptionSupplier": "بالتقدير، نعتبر كل مستحقات المجهزين مدفوعة بوكتها.",
   "@assumptionSupplier": {
     "description": "Merchant interface: assumptionSupplier",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "e2a9c00ecab085137223fd36b50e98b80bbbf7b00a5d655f08fe40858819bc4b"
   },
   "sampleTitle": "المحل التجريبي",
   "@sampleTitle": {
     "description": "Merchant interface: sampleTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c97fbd5d57468ea65af1eed2236ea5d693f638a32038d1db9341477bf1529cb5"
   },
   "demoShopName": "محل شكد التجريبي",
   "@demoShopName": {
     "description": "Merchant interface: demoShopName",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fced4cae28902a446446c90c4bafe540bc961bf0e5c031fc544ff18917ec9fac"
   },
   "fictionalShop": "هذا المحل وكل سجلاته خيالية. استخدم ملفات تجريبية بس.",
   "@fictionalShop": {
     "description": "Merchant interface: fictionalShop",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "99499fc16170ba26210d1041dff61f3217978fc4c00168d0b1fd551c5ece5ff4"
   },
-  "chatNotConfigured": "المحادثة مو مهيأة بهالخادم. صفحات الدفتر تبقى تشتغل.",
+  "chatNotConfigured": "المحادثة مو مضبوطة إعداداتها بهالسيرفر. صفحات الدفتر تبقى تشتغل.",
   "@chatNotConfigured": {
     "description": "Merchant interface: chatNotConfigured",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "16490413f896e2b0d6146d666b8bc2f01f9f19f40f773b98d1868762f85717dd"
   },
-  "resetWarning": "تبدل دفتر المحل التجريبي؟ هذا يمسح القيود والإلغاءات والتصحيحات اللي ضفتها للتجربة.",
+  "resetWarning": "تريد ترجع دفتر المحل التجريبي مثل ما كان؟ هذا يمسح القيود والإلغاءات والتصحيحات اللي ضفتها للتجربة.",
   "@resetWarning": {
     "description": "Merchant interface: resetWarning",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fe6e2ce86ae20373eff1ac5e890e2ed4683c4187acd780d9e84332190748669b"
   },
-  "useSample": "استخدم أو رجّع المحل التجريبي",
+  "useSample": "استخدم المحل التجريبي أو رجّعه مثل ما كان",
   "@useSample": {
     "description": "Merchant interface: useSample",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "00577a8f35de9d73888b8c188d7fc5e0c9bc0d3966d523b839c4f7b0206ec162"
   },
   "confirmReset": "أكد إعادة المحل التجريبي",
   "@confirmReset": {
     "description": "Merchant interface: confirmReset",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "3b2c3ac47059d24b6ccaef16334e8b2c7655e9736ab3adb3511580b232290caa"
   },
   "sampleReady": "المحل التجريبي جاهز. انمسحت النسخ المحفوظة وأجوبة المحادثة القديمة.",
   "@sampleReady": {
     "description": "Merchant interface: sampleReady",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "e754163144f20c326a342e735665d332cd79731606888f3bfab13b68ca72b96b"
   },
   "openToday": "افتح صفحة اليوم",
   "@openToday": {
     "description": "Merchant interface: openToday",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "af557009044e1e52a519a902df1ce107a8a9f7a0c97d699885d4707d2d87ec22"
   },
   "cancel": "إلغاء",
   "@cancel": {
     "description": "Merchant interface: cancel",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "9a30dc2a96b897abdf7412f2bc0e09c6979d7a932c0bfc7567dcff37b73e50bb"
   },
   "importTitle": "استيراد ملف السجلات",
   "@importTitle": {
     "description": "Merchant interface: importTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "446fee595ffe6509b3b8de43bf98346788500cf9c90d3c054b7fbe7d02a2f3d4"
   },
   "chooseCsv": "اختار ملف سجلات تجريبي",
   "@chooseCsv": {
     "description": "Merchant interface: chooseCsv",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f3de79416c3d4382d48049a3f162b6f73083f45603e2b73c4b40606560009e73"
   },
   "syntheticCsvOnly": "سجلات خيالية بس. الملف يبقى بالذاكرة لحد ما تأكد؛ ماكو إرسال مؤجل بدون اتصال.",
   "@syntheticCsvOnly": {
     "description": "Merchant interface: syntheticCsvOnly",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a69923716fc0ada789bfbb9223e46badf30f471d834b7be01cb2bccedd2e69b8"
   },
   "acknowledgeSynthetic": "أأكد إن كل سجلات هالملف خيالية.",
   "@acknowledgeSynthetic": {
     "description": "Merchant interface: acknowledgeSynthetic",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d401976c5e8c233c841243eb67fd16d3cfe5aaacde70c9b24338beb2f4899143"
   },
   "columnMapping": "طابق الأعمدة",
   "@columnMapping": {
     "description": "Merchant interface: columnMapping",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2d6032ffa9d8b106e40337041ac9841d85d8f5a71349357a031a95d016feb86d"
   },
   "targetField": "حقل الدفتر",
   "@targetField": {
     "description": "Merchant interface: targetField",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "cc5b4d30bc4d5e78a064fe0c244beb0c0b5536efe782c54d375dd2a68adb403a"
   },
   "ignoreColumn": "تجاهل هالعمود",
   "@ignoreColumn": {
     "description": "Merchant interface: ignoreColumn",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "69807bff5fe10ef4a0f077e527f7972a9004f5a314d92621c2099266047dd5f5"
   },
   "sourceIdField": "رقم سجل المصدر",
   "@sourceIdField": {
     "description": "Merchant interface: sourceIdField",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "8282697a01afd9f180cba6c372fde71e97d124113c7c996546a0dd2eee75f13b"
   },
   "eventTimeField": "تاريخ ووقت القيد",
   "@eventTimeField": {
     "description": "Merchant interface: eventTimeField",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "7baef6cc12ef03469371b9b0f99dea30fe30cb711017c7504f98f7bd0f4e15cc"
   },
   "categoryField": "رقم صنف البضاعة",
   "@categoryField": {
     "description": "Merchant interface: categoryField",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6a04ddd9abc72046ed129d3e04dff523832addb6a935665ed9e2146a1f92e34f"
   },
   "quantityField": "الكمية",
   "@quantityField": {
     "description": "Merchant interface: quantityField",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "935e21853946d9a9d4adff46550a1f4ed56ca8e98acf54b6717e03bf010621f9"
   },
   "currencyField": "العملة",
   "@currencyField": {
     "description": "Merchant interface: currencyField",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "30ce3a1dae2ce83f5c271a4ac7931862ca947e82d9e39b56af3133fe82c7e093"
   },
   "recordedTimeField": "وقت تسجيل القيد",
   "@recordedTimeField": {
     "description": "Merchant interface: recordedTimeField",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "3ea82f98a38478936a09a611ebfb11a201b95c4b2d74eecb5930722696bf9923"
   },
-  "suggestMapping": "اقترح تطابق للأعمدة",
+  "suggestMapping": "اقترح شلون نطابق الأعمدة",
   "@suggestMapping": {
     "description": "Merchant interface: suggestMapping",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "c342f35acbd88f74f9d9625853b41fc3cd373d2881a71406dd67071ec02871f7"
   },
-  "previewMapping": "تحقق من هالتطابق واعرضه",
+  "previewMapping": "دقّق المطابقة وطلّع المعاينة",
   "@previewMapping": {
     "description": "Merchant interface: previewMapping",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "03476a3f9aac58643b32c2cd696c23067c7406d6c3ca8b6ca2482e76b7cd8ad4"
   },
-  "mappingChanged": "التطابق تغير. تحقق من معاينة جديدة قبل الاستيراد.",
+  "mappingChanged": "تطابق الأعمدة تغيّر. سوّ معاينة جديدة ودقّقها قبل الاستيراد.",
   "@mappingChanged": {
     "description": "Merchant interface: mappingChanged",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "cdd61df69169c0a7aadff3b8ccc8379f83e23f0a94b2deb8daa6d0d930afe9d4"
   },
   "previewFiveRows": "معاينة · أول خمس صفوف كحد أقصى",
   "@previewFiveRows": {
     "description": "Merchant interface: previewFiveRows",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "4829c5ee97271524e6029431855bd10006556be6d97f9e8abe8c46c9be679276"
   },
-  "missingColumn": "تطابق مطلوب وناقص: {field}",
+  "missingColumn": "هالحقل بعده مو مربوط بعمود: {field}",
   "@missingColumn": {
     "description": "Merchant interface: missingColumn",
     "placeholders": {
@@ -1263,7 +1484,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "cc9640721f6858223beaa8f7c894e6e89bd4f7212a8b0580377154838469be99"
   },
   "csvRow": "الصف {row}",
   "@csvRow": {
@@ -1273,14 +1495,16 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0fb35bd05beec438bd7fd937a6e9e456d517e6f92cba8e64278dd0277a6acba9"
   },
   "reviewImport": "راجع الاستيراد",
   "@reviewImport": {
     "description": "Merchant interface: reviewImport",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1d0633cf29578687a1446e845772b791441e034fe75b1a0eacc3875f2c4ffa09"
   },
-  "importConfirmation": "تستورد {file} حسب المعاينة المتحقق منها {id}؟",
+  "importConfirmation": "تريد تستورد {file} على أساس المعاينة اللي تأكدت منها {id}؟",
   "@importConfirmation": {
     "description": "Merchant interface: importConfirmation",
     "placeholders": {
@@ -1291,12 +1515,14 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "f9ebd69a3fb9a1af54e56bfad062ee0c2f6ac265a4d4ffe956eca9add09dde67"
   },
   "confirmImport": "أكد الاستيراد",
   "@confirmImport": {
     "description": "Merchant interface: confirmImport",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "2d20decf0d658713eee22c3c3958a5cdec61681d11062bd10e23e177dae015f8"
   },
   "savedBatch": "انحفظت دفعة الاستيراد · {id}",
   "@savedBatch": {
@@ -1306,7 +1532,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "dc084a8948cd94675a03d42a99022ed52f5ff893deb84d610f3539a65eed5b1d"
   },
   "importAccepted": "مقبول: {count}",
   "@importAccepted": {
@@ -1316,7 +1543,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "3603438565c3874540826c2457d4922e329f32276d1a7d889632d85b4dc79c68"
   },
   "importFlagged": "مقبول ويحتاج مراجعة: {count}",
   "@importFlagged": {
@@ -1326,7 +1554,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "d6a001f775e90ed72918977024f7010945166880f671f70d88e207be3197b4c7"
   },
   "importRejected": "مرفوض: {count}",
   "@importRejected": {
@@ -1336,9 +1565,10 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b812aec2a6d41d2e9accebd9a5d690da877ebae75f969d7f138feeba86cea4b3"
   },
-  "importDuplicates": "مكرر بالضبط، بدون قيود جديدة: {count}",
+  "importDuplicates": "مكرّر نفس الشي، وما انضافت قيود جديدة: {count}",
   "@importDuplicates": {
     "description": "Merchant interface: importDuplicates",
     "placeholders": {
@@ -1346,7 +1576,8 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "0dde2c15cfd45f45c28cefe52ea38cb19dd9d96ed9f5568287379fa112689620"
   },
   "csvRowError": "الصف {row}: {reason}",
   "@csvRowError": {
@@ -1359,86 +1590,103 @@
         "type": "String"
       }
     },
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6ddca1d821699811239ec626e8c04101d39d5e3742c0ff96c10f9ca38abb4cd6"
   },
   "importAnother": "استورد ملف ثاني",
   "@importAnother": {
     "description": "Merchant interface: importAnother",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a9abba6825607dbd0e94a6b53e7a3cb52c754074bb5098d45434dde0999cdae5"
   },
-  "errorAmount": "استخدم مبلغ دينار كامل وموجب.",
+  "errorAmount": "دخّل مبلغ بالدينار، بدون كسور وأكبر من صفر.",
   "@errorAmount": {
     "description": "Merchant interface: errorAmount",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "fed05e3676ff03c6952b65d92158302b14869474dbe263a7127ab44f7a122918"
   },
   "errorCategory": "رقم الصنف مو معروف.",
   "@errorCategory": {
     "description": "Merchant interface: errorCategory",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "92db32c45d98a4a48000450cf9fc211c1939db7fa255c7d007bd530e728d3df5"
   },
   "errorIdentity": "رقم المصدر موجود بمحتوى مختلف.",
   "@errorIdentity": {
     "description": "Merchant interface: errorIdentity",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "1b34ed9519fd4884d272e000c81cc27a40f0401d34e3c25a42a530c69a5e258b"
   },
-  "csvDuplicate": "مكرر بالضبط؛ ما يضيف أثر للدفتر.",
+  "csvDuplicate": "نفس السجل مكرّر بالضبط؛ ما يغيّر شي بالدفتر.",
   "@csvDuplicate": {
     "description": "Merchant interface: csvDuplicate",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "99d5b4b06c6e8f8143301b8c01cb7b1bbff0300cadebf8985611940604af0e38"
   },
   "errorCurrency": "نقبل الدينار العراقي بس.",
   "@errorCurrency": {
     "description": "Merchant interface: errorCurrency",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "3abd4041e7d623690aa62f2653f1ba5885fef17372a3655f99a255128d8413b1"
   },
   "flagsTitle": "سجلات تحتاج مراجعة",
   "@flagsTitle": {
     "description": "Merchant interface: flagsTitle",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "27a95583fb9e62cbf84d8d4f4fbbf5abad28fed9a284305e895f7d68ddd0cdbe"
   },
   "flagsIntro": "راجع صفوف المصدر قبل أي تعديل. القيود المتشابهة تبقى بالدفتر.",
   "@flagsIntro": {
     "description": "Merchant interface: flagsIntro",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "18da26947f1ce4730119ce301e6b3ebe3b1cc4add95042e16dd9a072a72bbb2e"
   },
   "reasonAmbiguous": "أكثر من دين ممكن يتطابق.",
   "@reasonAmbiguous": {
     "description": "Merchant interface: reasonAmbiguous",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "6d464b4d82a294fd7d226320c10f5e2f8ac2aecd8f05b4dbc3f7c80eba0fba79"
   },
   "reasonSimilarName": "تشابه الاسم وحده ما يأكد نفس الحساب.",
   "@reasonSimilarName": {
     "description": "Merchant interface: reasonSimilarName",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "42f77e5e283306b877dece67f8d93a2e96b219ffd92b999a6c9941fd826d572e"
   },
   "reasonExceeds": "الدفعة أكبر من المبلغ الباقي بالدين.",
   "@reasonExceeds": {
     "description": "Merchant interface: reasonExceeds",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "b8a4199bb42107f27dbbc036c8dbc936c9512d1bd8a6c5cf726d00bb7f09e0a8"
   },
-  "reasonDueMissing": "تاريخ استحقاق مطلوب وناقص.",
+  "reasonDueMissing": "تاريخ الاستحقاق مطلوب، بس بعده ناقص.",
   "@reasonDueMissing": {
     "description": "Merchant interface: reasonDueMissing",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "5f8556d0d3ee53f7a557ef59b11777a007ae28224dfccc3eb6be380950facce4"
   },
-  "reasonDueWindow": "الدفعة خارج الفترة المسموح بيها لمطابقة الاستحقاق.",
+  "reasonDueWindow": "هالدفعة مو ضمن الفترة المسموح بيها حتى نطابقها ويا تاريخ الاستحقاق.",
   "@reasonDueWindow": {
     "description": "Merchant interface: reasonDueWindow",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "dd3082dead9b11367bc62c64da05d42d5acfcfc5de0af1589f5dabd1954a207b"
   },
   "basisVerified": "أكو توزيعات موثقة؛ راجع المبلغ الباقي.",
   "@basisVerified": {
     "description": "Merchant interface: basisVerified",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "e8e43d4c18ff79b752e26dbec67bf3fe3f60a3553669edfb69ba488cce56905d"
   },
-  "provideDetails": "كمل التفاصيل الناقصة قبل حسم هالسجل.",
+  "provideDetails": "كمّل التفاصيل الناقصة قبل لا تحسم موضوع هالسجل.",
   "@provideDetails": {
     "description": "Merchant interface: provideDetails",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "a400751a7941cea859f1061b8ee08032f5a9a506d5f9c8b831487d38e8911cdc"
   },
   "errorWebIqd": "هالمبلغ ما ينعرض بدقة بهاي النسخة.",
   "@errorWebIqd": {
     "description": "Merchant interface: errorWebIqd",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-sha256": "21d63c26f1320e5d101fd89c0e3ca39d421b4940e675f8f094187780e83eea63"
   }
 }

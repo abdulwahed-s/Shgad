@@ -26,8 +26,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > limitations remain.
 > The development forecast benchmark performs worse than the seven-day baseline;
 > final testing has not run.
-> The 55 fixed backend Arabic messages have human approval; frontend wording and
-> future additions still need review.
+> The 55 fixed backend and 248 frontend Arabic messages have human approval.
+> New or edited wording requires review.
 
 ## Capabilities
 
@@ -670,9 +670,9 @@ The development forecast benchmark above has run. No final forecast test or
 held-out model evaluation has run.
 
 Synthetic CSV generation, ledger import, financial tools, deterministic reports
-and the merchant Flutter web workflow are available. Frontend Arabic review and
-merchant usability validation remain pending. The forecast results above cover one
-fictional development shop and do not meet the baseline comparison target.
+and the merchant Flutter web workflow are available. Current frontend Arabic
+wording is reviewed; merchant usability validation remains pending. The forecast
+results above cover one fictional development shop and do not meet the baseline comparison target.
 The separate model-routing/application checks retain their reported limitations;
 no held-out or general financial-answer accuracy is established.
 
@@ -691,4 +691,6 @@ Application integration is tested with recorded responses. Live development
 screening used the candidates above; Gemini 3.8 Flash is the selected primary.
 Both selected APIs now respond and both CSV previews pass. Primary-model routing
 acceptance remains pending. The 55 fixed backend Arabic messages
-have user approval. Frontend Arabic wording still needs review.
+have user approval. The 248 frontend messages are also reviewed: 48 user-provided
+Iraqi revisions were applied and 200 messages retained, with exact text hashes.
+Future additions and edits need a new review.
