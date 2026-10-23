@@ -232,8 +232,8 @@ receivables are excluded. Unknown starting cash, essential history or due dates 
 typed clarification errors. Later entries, payment links and voids cannot change an
 earlier forecast. The service enforces the observed calendar boundary and loads no
 files or evaluation answers. `GET /api/reports/forecast` exposes the service;
-forecast UI integration and final accuracy testing remain pending. Observed-data
-development errors are reported below.
+the web workflow shows these secondary estimates; final accuracy testing remains
+pending. Observed-data development errors are reported below.
 
 Seeded fictional data and offline development truth are available. From the
 repository root (standard library only):
@@ -351,8 +351,9 @@ An explicit `--provider openai --openai-model gpt-6-luna` comparison uses a loca
 `OPENAI_API_KEY`. This comparison-only path uses Responses with medium reasoning,
 no temperature override and optional response storage disabled. It preserves the
 same logical prompts, tool parameter schemas and scoring. API/reasoning differences
-limit comparisons with the compatible-chat providers. OpenAI is not an application
-provider in this implementation.
+limit comparisons with the compatible-chat providers. The application also supports
+OpenAI as the configured fallback; these comparison results do not measure fallback
+behavior.
 Only an explicit live run loads credentials; the default
 dry run leaves `.env` untouched. Never paste keys into chat. It compares interpretation
 and native tool selection against development labels, including customer and period.
@@ -707,6 +708,12 @@ imports the export's missing parent ledger through the real importer, with label
 unchanged: duplicateTP1/FP0/FN0 and unmatchedTP1/FP0/FN0. These two tiny fixture
 cases establish setup correctness, not general reconciliation quality. Original
 reports and freezes remain available; later scorer changes are disclosed.
+The [latest synthetic receipt](results/evaluation_replay_client_lifecycle_2026-10-23.md)
+retains those counts after documented alias, portable-hash and client-routing
+corrections. It reproduces from an isolated checkout with no credentials, future
+outcomes or unseen shops present. All 803 offline backend tests pass; the live
+test is deselected. Lint, formatting and dependency checks also pass. These
+checks establish infrastructure behavior; live Q&A remains blocked below.
 The [development forecast receipt](results/evaluation_forecast_dev_2026-10-23.md)
 reproduces the earlier below-baseline results with240 prediction and45 realized
 rows, and no realized outcome after28 September. Zero realized-shortfall
