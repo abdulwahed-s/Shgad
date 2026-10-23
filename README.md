@@ -708,9 +708,9 @@ imports the export's missing parent ledger through the real importer, with label
 unchanged: duplicateTP1/FP0/FN0 and unmatchedTP1/FP0/FN0. These two tiny fixture
 cases establish setup correctness, not general reconciliation quality. Original
 reports and freezes remain available; later scorer changes are disclosed.
-The [latest synthetic receipt](results/evaluation_replay_cash_selector_2026-10-23.md)
-retains those counts after documented alias, portable-hash and client-routing
-corrections. It reproduces from an isolated checkout with no credentials, future
+The [latest synthetic receipt](results/evaluation_replay_reviewed_requirements_2026-10-23.md)
+retains those counts after the reviewed historical-selector registry and public
+annotation import. It reproduces from an isolated checkout with no credentials, future
 outcomes or unseen shops present. All 882 offline backend tests pass; the live
 test is deselected. Lint, formatting and dependency checks also pass. These
 checks establish infrastructure behavior; live Q&A remains blocked below. Replay
@@ -738,6 +738,11 @@ before credentials; authorization flags cannot bypass them.
 All selectors and independent reference calculations are preflighted before calls
 and stay outside the model's context. Independent numeric calculations,
 context/evidence checks, exact aliases and synthetic replay remain tested.
+Historical facts require their actual economic target, knowledge cutoff, labels,
+comparison prerequisites and audit evidence. Current production cannot emit all
+new historical fields; those requirements remain scoring failures. The
+[frozen evaluation configuration](results/evaluation_method_freeze_reviewed_requirements.json)
+binds the reviewed inputs and method. Original receipts are preserved.
 
 Live runs require explicit paid-call authorization,
 a matching freeze and bounded actual requests:96 development or180 sealed,
