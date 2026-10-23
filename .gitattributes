@@ -1,3 +1,5 @@
 # Preserve generation/source hashes across Windows and Unix checkouts.
 /data/** text eol=lf
 /scripts/** text eol=lf
+/results/** text eol=lf
+/backend/tests/evaluation/fixtures/*.json text eol=lf

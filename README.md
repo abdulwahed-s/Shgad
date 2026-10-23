@@ -681,6 +681,45 @@ results above cover one fictional development shop and do not meet the baseline 
 The separate model-routing/application checks retain their reported limitations;
 no held-out or general financial-answer accuracy is established.
 
+## Reproducible evaluation
+
+The historical harness separates development and sealed runs. Its default command
+prints a plan without loading credentials or opening sealed questions:
+
+```sh
+python scripts/run_evaluation.py --split dev --mode plan
+python scripts/run_evaluation.py --split dev --mode replay --output results/evaluation_replay.json
+python scripts/run_evaluation.py --split dev --mode forecast --forecast-split dev --output results/evaluation_forecast_dev.json
+```
+
+The checked-in freeze binds evaluator sources, observed input hashes, prompts,
+tool schemas and settings. Reports use actual UTC execution times and code commits,
+keep exact counts and preserve existing receipts. Forecast reporting adds separate
+prediction and realized CSVs; cutoff75 realized rows stop at day90.
+
+The [four-case synthetic replay](results/evaluation_replay_2026-10-23.md), executed
+23 October at source `15abb817`, checks3/3 numeric answers,1/1 clarification,
+4/4 joint selections and7/7 evidenced claims using12 fabricated completions and
+zero provider requests. It is a protocol test, not a model-quality measurement.
+Its initial raw-export reconciliation setup reported precision2/4 and recall2/2;
+the duplicate export's parent-ledger context is being checked separately.
+The [development forecast receipt](results/evaluation_forecast_dev_2026-10-23.md)
+reproduces the earlier below-baseline results with240 prediction and45 realized
+rows, and no realized outcome after28 September. Zero realized-shortfall
+denominators still give null timing/safety rates.
+
+Live runs require explicit paid-call authorization, a matching freeze and bounded
+actual requests:96 development or180 sealed, at most6 per question including
+retries/fallback, at least10 seconds apart,30-second deadlines and8192 output
+tokens. A separate blind probe records intent; tool/customer/period are taken from
+the production response. All four must match jointly. Every required figure,
+unit/category and customer/period must match for whole-question numeric credit.
+Unsupported historical evidence shapes fail closed. Safe handling and source-row
+coverage are separate metrics. Sealed access uses only `HELDOUT_PATH`, verifies
+its committed SHA-256 before parsing and requires separate authorization. Its
+JSON/Markdown/stdout remain aggregate-only. Paid evaluation, sealed evaluation and
+the frozen final/unseen forecast test have not run.
+
 ## Data and scope
 
 All datasets must be fictional. Real customer and transaction records are outside the scope
