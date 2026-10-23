@@ -49,6 +49,18 @@ FAILURES = {
 }
 
 
+POST_RUN_CHANGES = [
+    dict(
+        after_run="evaluation_replay_2026-10-23.json",
+        previous_code_commit="15abb817c8d9dfa4221546c2bf29f8ab36748ddd",
+        previous_report_sha256="a2765f7f37dfa35c90c6fb3f7ee389aac7ead73d61e26176876805bf35ee2f86",
+        change="seed_small_happy_path_parent_before_duplicate_export",
+        scope="development_reconciliation_setup_only_labels_prompts_financial_method_unchanged",
+        original_results_preserved=True,
+    )
+]
+
+
 def encoded(value):
     return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
@@ -262,7 +274,7 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
         target_assessment=targets,
         reconciliation=reconciliation,
         forecast=forecast,
-        post_run_changes=[],
+        post_run_changes=POST_RUN_CHANGES,
         limitations=[
             "synthetic_data_only_no_merchant_validation",
             "synthetic_replay_is_protocol_testing_not_model_quality"
@@ -332,6 +344,8 @@ def markdown(report):
         + "`.",
         "",
         "Target assessment: `" + encoded(report["target_assessment"]) + "`.",
+        "",
+        "Post-run changes: `" + encoded(report["post_run_changes"]) + "`.",
         "",
         "Request accounting: `" + encoded(report["requests"]) + "`.",
         "",

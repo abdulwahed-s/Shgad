@@ -146,6 +146,33 @@ def test_unknown_failure_text_cannot_escape_into_heldout_aggregates():
         )
 
 
+def test_corrected_report_discloses_original_run_and_preserves_unmet_targets():
+    result = public_report(
+        split="heldout",
+        mode="live",
+        rows=[row()],
+        metadata=metadata(),
+        reconciliation={},
+        forecast=dict(frozen_code_commit="a" * 40, summary={}),
+    )
+    assert result["target_assessment"]["historical_accuracy"]["met"] is False
+    assert (
+        result["post_run_changes"][0]["after_run"]
+        == "evaluation_replay_2026-10-23.json"
+    )
+    assert result["post_run_changes"][0]["original_results_preserved"] is True
+
+
+def test_original_freeze_refuses_after_post_run_evaluator_change():
+    from scripts.evaluation_reports import ROOT, frozen_snapshot, verify_freeze
+
+    with pytest.raises(ValueError, match="EVALUATOR_CHANGED_SINCE_FREEZE"):
+        verify_freeze(
+            ROOT / "results/evaluation_method_freeze.json",
+            frozen_snapshot(require_clean=False),
+        )
+
+
 def test_independent_catalogue_does_not_import_backend_services():
     import ast
 

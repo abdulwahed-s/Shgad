@@ -32,6 +32,18 @@ def evaluate(data_root):
             history, reference_parties(data_root), as_of=day
         ) as db:
             db.execute("PRAGMA query_only=OFF")
+            context = None
+            if fixture == "duplicate_rows.csv":
+                # This export is a slice of small_happy_path. Its HAPPY-R
+                # origin must exist before importing the repeated collections.
+                context = import_csv(
+                    db,
+                    data_root / "fixtures/small_happy_path.csv",
+                    clock=BusinessClock(day),
+                    imported_at=cutoff(day),
+                )
+                if context.rejected:
+                    raise ValueError("RECONCILIATION_CONTEXT_IMPORT_FAILED")
             receipt = import_csv(
                 db,
                 data_root / "fixtures" / fixture,
@@ -48,6 +60,8 @@ def evaluate(data_root):
                 accepted=receipt.accepted,
                 exact_duplicates=receipt.exact_duplicates,
                 flagged_for_review=receipt.flagged_for_review,
+                context_fixture="small_happy_path.csv" if context else None,
+                context_accepted=context.accepted if context else 0,
             )
             for flag in flags:
                 if flag.type in predicted:
