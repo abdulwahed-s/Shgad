@@ -94,6 +94,43 @@ def test_t31_right_amount_and_tool_wrong_customer_or_period_fails(field, value):
     assert not result["numeric_correct"] and not result["joint_correct"]
 
 
+def test_documented_selected_sales_alias_satisfies_same_requested_category():
+    spec, catalogue, observed = sample()
+    spec |= dict(calculation="sales", parameters=dict(kind="cash"))
+    catalogue["selected_sales"] = dict(catalogue["cash_sales"])
+    observed["claims"] = [dict(observed["claims"][0], field="selected_sales")]
+    result = grade_question(spec, catalogue, {"cash_sales"}, observed)
+    assert result["numeric_correct"]
+    observed["claims"][0]["label"] = "credit_sales"
+    assert not grade_question(spec, catalogue, {"cash_sales"}, observed)[
+        "numeric_correct"
+    ]
+
+
+def test_single_requested_customer_balance_does_not_need_duplicate_total_and_subtotal():
+    spec, _, observed = sample()
+    spec |= dict(calculation="debts", parameters=dict(direction="receivable"))
+    total = dict(
+        value=90000, unit="IQD", label="total_outstanding", source_ids=["CREDIT"]
+    )
+    party = total | dict(label="outstanding")
+    catalogue = {
+        "receivables.total_outstanding": total,
+        "receivables.customers.0.outstanding": party,
+    }
+    required = set(catalogue)
+    for field in catalogue:
+        observed["claims"] = [
+            dict(field=field, **catalogue[field], formula="original - allocations")
+        ]
+        assert grade_question(spec, catalogue, required, observed)["numeric_correct"]
+    # Equal amounts alone never make two parties or evidence sets aliases.
+    catalogue["receivables.customers.0.outstanding"] = party | dict(
+        source_ids=["OTHER"]
+    )
+    assert not grade_question(spec, catalogue, required, observed)["numeric_correct"]
+
+
 @pytest.mark.parametrize("sources", [["MISSING"], ["CREDIT"], ["SALE", "CREDIT"], []])
 def test_traceability_requires_complete_explanatory_rows_not_any_existing_id(sources):
     spec, catalogue, observed = sample()

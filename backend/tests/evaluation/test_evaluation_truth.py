@@ -110,3 +110,8 @@ def test_required_multi_figure_categories_are_explicit_and_not_model_selected():
     assert required_fields(spec, dict.fromkeys(keys)) == {"credit_sales"}
     spec["expected_behavior"] = "clarify"
     assert required_fields(spec, dict.fromkeys(keys)) == set()
+
+
+def test_margin_requires_margin_and_coverage_not_unrequested_unpriced_count():
+    spec = dict(calculation="margin", expected_behavior="answer", parameters={})
+    assert required_fields(spec, {}) == {"gross_margin", "coverage_pct"}

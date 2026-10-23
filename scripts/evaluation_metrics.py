@@ -44,6 +44,40 @@ def compare_claim(expected, claim):
     return correct, supported
 
 
+def proven_aliases(key, catalogue, spec):
+    """OR only across documented aliases for the same fact and scope/evidence."""
+    result = {key}
+    if spec.get("calculation") == "sales":
+        selected = {
+            "cash": "cash_sales",
+            "credit": "credit_sales",
+            "all": "total_sales",
+        }[spec.get("parameters", {}).get("kind", "all")]
+        pair = {selected, "selected_sales"}
+        if key in pair and all(name in catalogue for name in pair):
+            if catalogue[selected] == catalogue["selected_sales"]:
+                result |= pair
+    if spec.get("calculation") == "debts" and len(spec["counterparty_ids"]) == 1:
+        for direction in ("receivables", "payables"):
+            total = direction + ".total_outstanding"
+            party = direction + ".customers.0.outstanding"
+            if (
+                key not in {total, party}
+                or direction + ".customers.1.outstanding" in catalogue
+            ):
+                continue
+            if total not in catalogue or party not in catalogue:
+                continue
+            left, right = catalogue[total], catalogue[party]
+            if (
+                left["value"] == right["value"]
+                and left["unit"] == right["unit"]
+                and set(left["source_ids"]) == set(right["source_ids"])
+            ):
+                result |= {total, party}
+    return result
+
+
 def grade_question(spec, catalogue, required, observed):
     """Full question denominator; a missing/failed answer cannot disappear."""
     fields = {
@@ -61,7 +95,7 @@ def grade_question(spec, catalogue, required, observed):
         correct.append(numeric)
         traced.append(evidence)
         if numeric:
-            matched.add(key)
+            matched.update(proven_aliases(key, catalogue, spec))
     unchanged = observed.get("ledger_unchanged", True)
     numeric_correct = (
         spec["expected_behavior"] == "answer"

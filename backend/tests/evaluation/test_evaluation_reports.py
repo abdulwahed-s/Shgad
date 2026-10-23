@@ -117,6 +117,31 @@ def test_cli_refuses_before_plan_credentials_or_private_access(
     assert json.loads(capsys.readouterr().err) == {"error": code}
 
 
+@pytest.mark.parametrize("split", ["dev", "heldout"])
+def test_unresolved_required_fact_policy_blocks_even_authorized_live_flags(
+    split, monkeypatch, capsys
+):
+    monkeypatch.setattr(
+        run_evaluation, "plan", lambda *a, **kw: pytest.fail("premature IO")
+    )
+    assert (
+        run_evaluation.main(
+            [
+                "--split",
+                split,
+                "--mode",
+                "live",
+                "--authorize-paid",
+                "--authorize-heldout",
+            ]
+        )
+        == 1
+    )
+    assert json.loads(capsys.readouterr().err) == dict(
+        error="REQUIRED_FACT_POLICY_NOT_FROZEN"
+    )
+
+
 def test_heldout_plan_never_reads_env_or_question_file(monkeypatch):
     from scripts import evaluation_reports
 
@@ -171,6 +196,20 @@ def test_original_freeze_refuses_after_post_run_evaluator_change():
             ROOT / "results/evaluation_method_freeze.json",
             frozen_snapshot(require_clean=False),
         )
+
+
+def test_public_seal_metadata_line_endings_do_not_change_observed_dataset_digest(
+    tmp_path,
+):
+    from scripts.evaluation_reports import digest, input_inventory
+
+    folder = tmp_path / "evaluation"
+    folder.mkdir()
+    path = folder / "heldout_60_manifest.json"
+    path.write_bytes(b'{"format_sentinel":true}\r\n')
+    windows = digest(input_inventory(tmp_path))
+    path.write_bytes(b'{"format_sentinel":true}\n')
+    assert digest(input_inventory(tmp_path)) == windows
 
 
 def test_independent_catalogue_does_not_import_backend_services():

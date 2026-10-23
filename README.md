@@ -701,15 +701,27 @@ The [four-case synthetic replay](results/evaluation_replay_2026-10-23.md), execu
 23 October at source `15abb817`, checks3/3 numeric answers,1/1 clarification,
 4/4 joint selections and7/7 evidenced claims using12 fabricated completions and
 zero provider requests. It is a protocol test, not a model-quality measurement.
-Its initial raw-export reconciliation setup reported precision2/4 and recall2/2;
-the duplicate export's parent-ledger context is being checked separately.
+Its initial raw-export reconciliation setup reported precision2/4 and recall2/2.
+The [post-run setup receipt](results/evaluation_replay_context_2026-10-23.md)
+imports the export's missing parent ledger through the real importer, with labels
+unchanged: duplicateTP1/FP0/FN0 and unmatchedTP1/FP0/FN0. These two tiny fixture
+cases establish setup correctness, not general reconciliation quality. Original
+reports and freezes remain available; later scorer changes are disclosed.
 The [development forecast receipt](results/evaluation_forecast_dev_2026-10-23.md)
 reproduces the earlier below-baseline results with240 prediction and45 realized
 rows, and no realized outcome after28 September. Zero realized-shortfall
 denominators still give null timing/safety rates.
 
-Live runs require explicit paid-call authorization, a matching freeze and bounded
-actual requests:96 development or180 sealed, at most6 per question including
+**Live Q&A remains blocked by a specification gap:** existing structured labels do
+not distinguish total-only requests from requests for a cash/credit breakdown.
+An approved requirement-annotation or interpretation policy is needed before
+broad whole-question accuracy can be measured. Authorization flags cannot bypass
+this guard. Independent numeric calculations, context/evidence checks, exact
+alias handling and the well-scoped synthetic replay remain tested.
+
+Once that gap is resolved, live runs require explicit paid-call authorization,
+a matching freeze and bounded actual requests:96 development or180 sealed,
+at most6 per question including
 retries/fallback, at least10 seconds apart,30-second deadlines and8192 output
 tokens. A separate blind probe records intent; tool/customer/period are taken from
 the production response. All four must match jointly. Every required figure,

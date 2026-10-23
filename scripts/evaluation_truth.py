@@ -319,7 +319,7 @@ def required_fields(spec, catalogue):
             )
         }
     if calculation == "margin":
-        return {"gross_margin", "coverage_pct", "unpriced_sales_count"}
+        return {"gross_margin", "coverage_pct"}
     if calculation == "j1":
         return {
             "j1." + key

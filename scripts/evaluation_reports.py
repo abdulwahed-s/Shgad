@@ -32,6 +32,8 @@ SETTINGS = dict(
     other_joint_fields="production_response_only_no_probe_repair",
     claims="unique_renderer_figure_metric_keys_excluding_projections_and_context_dates",
     unknown_historical_claims="fail_closed",
+    required_fact_policy="unresolved_question_v1_output_selection",
+    input_hash_normalization="LF_for_public_seal_metadata_only_other_inputs_exact_bytes",
 )
 FAILURES = {
     "whole_question_incorrect",
@@ -57,7 +59,22 @@ POST_RUN_CHANGES = [
         change="seed_small_happy_path_parent_before_duplicate_export",
         scope="development_reconciliation_setup_only_labels_prompts_financial_method_unchanged",
         original_results_preserved=True,
-    )
+    ),
+    dict(
+        after_run="evaluation_replay_context_2026-10-23.json",
+        previous_code_commit="af79b4edae2154ef10f8fddaad36afd35f8a4648",
+        previous_report_sha256="6d3a074cf828c1ca731ecca672ff3454dc7e280b93e90023babc55871e31fc46",
+        change="accept_proven_figure_aliases_and_margin_plus_coverage_minimum",
+        scope="scorer_semantics_only_no_prompt_financial_method_or_gold_change",
+        original_results_preserved=True,
+    ),
+    dict(
+        after_run="evaluation_replay_context_2026-10-23.json",
+        previous_code_commit="af79b4edae2154ef10f8fddaad36afd35f8a4648",
+        change="normalize_public_seal_metadata_line_endings_for_portable_dataset_hash",
+        scope="private_question_byte_hash_verification_and_original_seal_unchanged",
+        original_results_preserved=True,
+    ),
 ]
 
 
@@ -137,7 +154,12 @@ def input_inventory(data_root=ROOT / "data"):
         if path.is_symlink() or path.resolve() != path.absolute():
             raise ValueError("INPUT_OUTSIDE_ALLOWLIST")
         name = path.relative_to(data_root).as_posix()
-        inventory[name] = sha256(path) if path.is_file() else None
+        if name == "evaluation/heldout_60_manifest.json" and path.is_file():
+            inventory[name] = hashlib.sha256(
+                path.read_bytes().replace(b"\r\n", b"\n")
+            ).hexdigest()
+        else:
+            inventory[name] = sha256(path) if path.is_file() else None
     return inventory
 
 
@@ -287,6 +309,7 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
             "unavailable_provider_answers_remain_in_full_denominators",
             "no_final_or_unseen_forecast_run_in_historical_mode",
             "zero_denominators_are_null_not_success",
+            "question_v1_required_output_selection_awaits_human_decision",
         ],
     )
     if split == "dev":

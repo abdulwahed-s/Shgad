@@ -165,6 +165,7 @@ def plan(split, *, max_requests=None, require_clean=False):
         provider_requests=0,
         authorization_required=["paid_provider_calls"]
         + (["heldout_evaluation"] if split == "heldout" else []),
+        measurement_blockers=["REQUIRED_FACT_POLICY_NOT_FROZEN"],
     )
 
 
@@ -264,7 +265,7 @@ def parser():
     result.add_argument(
         "--freeze-manifest",
         type=Path,
-        default=ROOT / "results/evaluation_method_freeze_reconciliation_context.json",
+        default=ROOT / "results/evaluation_method_freeze_portable_aliases.json",
     )
     result.add_argument("--write-freeze", action="store_true")
     result.add_argument(
@@ -346,6 +347,8 @@ def main(argv=None):
             and not args.authorize_heldout
         ):
             raise EvaluationError("HELDOUT_NOT_AUTHORIZED")
+        if args.mode == "live":
+            raise EvaluationError("REQUIRED_FACT_POLICY_NOT_FROZEN")
         if args.write_freeze and args.mode != "plan":
             raise EvaluationError("FREEZE_REQUIRES_PLAN_MODE")
         prepared = plan(

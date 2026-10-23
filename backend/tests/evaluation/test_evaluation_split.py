@@ -67,6 +67,13 @@ def test_hash_mismatch_refuses_before_parse_even_invalid_utf8(tmp_path, monkeypa
     assert "SECRET" not in str(error.value) and str(path) not in str(error.value)
 
 
+def test_private_question_newlines_still_require_exact_bytes(tmp_path, monkeypatch):
+    root, path, _, _ = sealed_sentinels(tmp_path, monkeypatch)
+    path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n"))
+    with pytest.raises(harness.EvaluationError, match="HELDOUT_HASH_MISMATCH"):
+        harness.load_questions("heldout", authorized=True, data_root=root)
+
+
 def test_heldout_requires_explicit_gate_before_env_or_file_access(monkeypatch):
     monkeypatch.setattr(
         harness.os, "getenv", lambda _: pytest.fail("read env before gate")
