@@ -47,6 +47,13 @@ def compare_claim(expected, claim):
 def proven_aliases(key, catalogue, spec):
     """OR only across documented aliases for the same fact and scope/evidence."""
     result = {key}
+    cash_keys = {"cash_on_hand", "upcoming.cash_on_hand", "j1.cash_on_hand"}
+    if key in cash_keys and key in catalogue:
+        result |= {
+            alias
+            for alias in cash_keys
+            if alias in catalogue and catalogue[alias] == catalogue[key]
+        }
     if spec.get("calculation") == "sales":
         selected = {
             "cash": "cash_sales",

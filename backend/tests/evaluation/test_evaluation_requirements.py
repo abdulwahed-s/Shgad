@@ -380,3 +380,19 @@ def test_early_dev_seal_gate_rejects_external_question_link_before_hash(
     assert json.loads(capsys.readouterr().err) == dict(
         error="PUBLIC_INPUT_PATH_REQUIRED"
     )
+
+
+def test_standalone_cash_selector_loads_and_preflights_without_private_questions(
+    tmp_path, monkeypatch
+):
+    root, questions, sha, _, _, rows, _, write = fixture(tmp_path, split="dev")
+    rows[0]["required_fields"] = ["cash_on_hand"]
+    write()
+    monkeypatch.setattr(requirements.os, "getenv", lambda _: pytest.fail("private env"))
+    selected, _ = requirements.load("dev", questions, sha, data_root=root)
+    q = question("FORMAT-A")
+    q["spec"]["calculation"] = "cash"
+    q["spec"]["parameters"] = {}
+    references = run_evaluation.prepare_references([q], {q["id"]: selected[q["id"]]})
+    assert references[q["id"]][3] == {"cash_on_hand"}
+    assert references[q["id"]][2]["cash_on_hand"]["unit"] == "IQD"

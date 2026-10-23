@@ -115,3 +115,38 @@ def test_required_multi_figure_categories_are_explicit_and_not_model_selected():
 def test_margin_requires_margin_and_coverage_not_unrequested_unpriced_count():
     spec = dict(calculation="margin", expected_behavior="answer", parameters={})
     assert required_fields(spec, {}) == {"gross_margin", "coverage_pct"}
+
+
+def test_standalone_cash_on_hand_is_cutoff_cash_with_exact_evidence():
+    """FINANCIAL_RULES §2: count + later inflows - later outflows, not sales."""
+    ledger = TruthLedger(
+        [
+            row("count", "DAILY_CASH_COUNT", 100000, day="2026-09-27"),
+            row("sale", "CASH_SALE", 20000),
+            row("draw", "OWNER_DRAWING", 8000),
+            row("capital", "CAPITAL_INJECTION", 7000),
+            row("expense", "OPERATING_EXPENSE", 3000),
+        ]
+    )
+    catalogue = claim_catalogue(
+        ledger, date(2026, 9, 28), date(2026, 9, 28), date(2026, 9, 28)
+    )
+    assert catalogue["cash_on_hand"] == dict(
+        value=116000,
+        unit="IQD",
+        label="cash_on_hand",
+        source_ids=["capital", "count", "draw", "expense", "sale"],
+    )
+    assert catalogue["cash_on_hand"] == catalogue["upcoming.cash_on_hand"]
+    earlier = claim_catalogue(
+        ledger, date(2026, 9, 27), date(2026, 9, 27), date(2026, 9, 27)
+    )
+    assert earlier["cash_on_hand"]["value"] == 100000
+    assert earlier["cash_on_hand"]["source_ids"] == ["count"]
+
+
+def test_standalone_cash_on_hand_missing_balance_has_no_zero_claim():
+    catalogue = claim_catalogue(
+        TruthLedger([]), date(2026, 9, 28), date(2026, 9, 28), date(2026, 9, 28)
+    )
+    assert "cash_on_hand" not in catalogue

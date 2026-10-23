@@ -30,6 +30,7 @@ MANIFEST_KEYS = {
     "selector_spec_sha256",
 }
 SCALAR_FIELDS = {
+    "cash_on_hand",
     "cash_sales",
     "credit_sales",
     "total_sales",

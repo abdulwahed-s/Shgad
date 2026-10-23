@@ -205,6 +205,7 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
         cash = ledger.cash(as_of)
     except TruthError:
         cash = {"amount_iqd": None, "source_ids": []}
+    add("cash_on_hand", cash["amount_iqd"], "cash_on_hand", cash["source_ids"])
     dues = [r for r in balances if r["kind"] == "payable" and r["due_date"] == str(end)]
     expected = [
         r

@@ -186,3 +186,31 @@ def test_reconciliation_separate_and_combined_no_blanket_flagging_or_double_coun
         recall=dict(numerator=1, denominator=2, rate=0.5),
     )
     assert reconciliation_metrics({}, {})["combined"]["precision"]["rate"] is None
+
+
+@pytest.mark.parametrize(
+    "field", ["cash_on_hand", "upcoming.cash_on_hand", "j1.cash_on_hand"]
+)
+def test_standalone_cash_selector_accepts_only_proven_same_cutoff_fact(field):
+    spec, _, observed = sample()
+    spec |= dict(calculation="cash", parameters={})
+    cash = dict(value=50000, unit="IQD", label="cash_on_hand", source_ids=["COUNT"])
+    catalogue = {
+        key: dict(cash)
+        for key in ("cash_on_hand", "upcoming.cash_on_hand", "j1.cash_on_hand")
+    }
+    observed["claims"] = [dict(field=field, **cash, formula="count + later flows")]
+    assert grade_question(spec, catalogue, {"cash_on_hand"}, observed)[
+        "numeric_correct"
+    ]
+    assert (
+        grade_question(spec, catalogue, {"cash_on_hand"}, observed)["traceability"][
+            "numerator"
+        ]
+        == 1
+    )
+    if field != "cash_on_hand":
+        catalogue["cash_on_hand"] = cash | dict(source_ids=["DIFFERENT-COUNT"])
+        assert not grade_question(spec, catalogue, {"cash_on_hand"}, observed)[
+            "numeric_correct"
+        ]

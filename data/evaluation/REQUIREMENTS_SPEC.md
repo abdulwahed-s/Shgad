@@ -7,6 +7,9 @@ Builders may define this contract and handmade format fixtures only. Do not infe
 selectors from model answers or evaluation outcomes. Original question files and
 their seals remain unchanged.
 
+Registry revision: `2026-10-23-cash-on-hand`. The JSONL/manifest schema is unchanged;
+the refreshed contract hash binds this additive selector revision.
+
 Each UTF-8 JSONL line has exactly two fields:
 
 ```json
@@ -33,10 +36,22 @@ create an alias. Unknown fields or projected series are never silently ignored.
 
 ## Field registry and semantics
 
-Scalar fields: `cash_sales`, `credit_sales`, `total_sales`, `selected_sales`,
+Scalar fields: `cash_on_hand`, `cash_sales`, `credit_sales`, `total_sales`, `selected_sales`,
 `unexplained_cash_difference`, `gross_margin`, `coverage_pct`,
 `unpriced_sales_count`, `priced_sales`, `cost_of_goods`,
 `after_recorded_expenses`.
+
+`cash_on_hand` is standalone confirmed cash at `business_as_of`, independent of
+the requested historical sales period or future obligation window. Follow
+FINANCIAL_RULES §2: latest active count plus subsequent recorded cash inflows
+minus outflows known at that cutoff, or opening balance plus subsequent flows
+when no count exists. Its unit is integer IQD and its evidence is that count/
+opening source plus all contributing subsequent cash rows. Missing opening cash
+and counts mean unavailable, never zero. No projected sales or expected
+collections enter it. The existing `upcoming.cash_on_hand` and `j1.cash_on_hand`
+views satisfy this selector only when the independent catalogue proves the same
+cutoff fact, value, unit, label and complete source set. Other cash positions,
+projections or equally valued facts are not interchangeable.
 
 Sales use the resolved inclusive historical period and recorded rows only.
 `selected_sales` follows the original spec's kind (cash/credit/all).

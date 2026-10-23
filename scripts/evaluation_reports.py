@@ -91,6 +91,14 @@ POST_RUN_CHANGES = [
         scope="original_questions_and_seal_unchanged_no_builder_annotations_or_provider_calls",
         original_results_preserved=True,
     ),
+    dict(
+        after_run="evaluation_replay_sealed_requirements_2026-10-23.json",
+        previous_code_commit="5647fc1ef7263218afcff37714b4d24b567c01c2",
+        previous_report_sha256="a0f094aecad331c62edb9f39c69b022d040472173426b8bcde88b16e48284340",
+        change="add_standalone_cash_on_hand_selector_from_FINANCIAL_RULES_2",
+        scope="independent_annotation_format_request_only_no_private_questions_or_outcomes_viewed",
+        original_results_preserved=True,
+    ),
 ]
 
 
