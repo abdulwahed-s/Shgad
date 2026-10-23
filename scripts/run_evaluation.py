@@ -265,7 +265,7 @@ def parser():
     result.add_argument(
         "--freeze-manifest",
         type=Path,
-        default=ROOT / "results/evaluation_method_freeze_portable_aliases.json",
+        default=ROOT / "results/evaluation_method_freeze_client_lifecycle.json",
     )
     result.add_argument("--write-freeze", action="store_true")
     result.add_argument(

@@ -34,6 +34,7 @@ SETTINGS = dict(
     unknown_historical_claims="fail_closed",
     required_fact_policy="unresolved_question_v1_output_selection",
     input_hash_normalization="LF_for_public_seal_metadata_only_other_inputs_exact_bytes",
+    provider_preference_lifetime="production_conversation_only_not_probe_or_prior_questions",
 )
 FAILURES = {
     "whole_question_incorrect",
@@ -73,6 +74,13 @@ POST_RUN_CHANGES = [
         previous_code_commit="af79b4edae2154ef10f8fddaad36afd35f8a4648",
         change="normalize_public_seal_metadata_line_endings_for_portable_dataset_hash",
         scope="private_question_byte_hash_verification_and_original_seal_unchanged",
+        original_results_preserved=True,
+    ),
+    dict(
+        after_run="evaluation_replay_portable_2026-10-23.json",
+        previous_code_commit="cacae7a665019c8c4c2256b82dc4cb213ea84ff3",
+        change="reset_provider_preference_after_probe_and_between_questions",
+        scope="align_evaluator_with_fresh_per_chat_production_client_preserve_attempts_and_pacing",
         original_results_preserved=True,
     ),
 ]

@@ -77,6 +77,12 @@ class BudgetedClient(LLMClient):
 
     def begin_question(self, _=None):
         self.question_attempts = 0
+        self.reset_routing()
+
+    def reset_routing(self):
+        # Production creates a new client for each chat request. The separate
+        # intent probe must not influence the app conversation's provider order.
+        self._preferred = None
 
     async def _request(self, provider, payload, key):
         if (

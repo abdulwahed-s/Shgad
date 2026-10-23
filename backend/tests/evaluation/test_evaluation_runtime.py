@@ -152,3 +152,167 @@ def test_earlier_business_cutoff_keeps_opening_balance_known_at_that_cutoff():
         snapshot = QuerySnapshot(db, clock=BusinessClock(as_of), known_at=cutoff(as_of))
         cash, _ = snapshot.cash()
         assert cash.amount_iqd == expected and expected > 0
+
+
+def test_each_question_starts_primary_like_fresh_production_chat_client():
+    sent = []
+
+    def respond(request):
+        sent.append(request.url.host)
+        if len(sent) <= 2:
+            return httpx.Response(429)
+        content = '{"intent":"sales"}'
+        if request.url.host == "api.openai.com":
+            return httpx.Response(
+                200,
+                json=dict(
+                    status="completed",
+                    output=[
+                        dict(
+                            type="message",
+                            role="assistant",
+                            id="msg-sentinel",
+                            status="completed",
+                            content=[
+                                dict(type="output_text", text=content, annotations=[])
+                            ],
+                        )
+                    ],
+                ),
+            )
+        return httpx.Response(
+            200,
+            json=dict(choices=[dict(message=dict(role="assistant", content=content))]),
+        )
+
+    async def no_sleep(_):
+        pass
+
+    async def exercise():
+        async with BudgetedClient(
+            Settings(
+                llm_provider="gemini",
+                llm_model_id="synthetic-primary",
+                gemini_api_key="fictional-gemini-key",
+                llm_fallback_provider="openai",
+                llm_fallback_model_id="synthetic-fallback",
+                openai_api_key="fictional-openai-key",
+            ),
+            max_requests=6,
+            spacing_seconds=0,
+            sleep=no_sleep,
+            transport=httpx.MockTransport(respond),
+        ) as client:
+            client.begin_question()
+            first = await client.complete(
+                [dict(role="user", content="format sentinel")]
+            )
+            assert first.provider == "openai"
+            client.begin_question()
+            second = await client.complete(
+                [dict(role="user", content="format sentinel")]
+            )
+            assert second.provider == "gemini"
+            assert client.attempts == 4 and client.question_attempts == 1
+
+    asyncio.run(exercise())
+
+
+def test_probe_fallback_does_not_change_production_routing_or_reset_request_budget():
+    sent = []
+
+    def respond(request):
+        sent.append(request.url.host)
+        if len(sent) <= 2:
+            return httpx.Response(429)
+        if len(sent) == 3:
+            return httpx.Response(
+                200,
+                json=dict(
+                    status="completed",
+                    output=[
+                        dict(
+                            type="message",
+                            role="assistant",
+                            id="msg-probe",
+                            status="completed",
+                            content=[
+                                dict(
+                                    type="output_text",
+                                    text='{"intent":"sales"}',
+                                    annotations=[],
+                                )
+                            ],
+                        )
+                    ],
+                ),
+            )
+        if len(sent) == 4:
+            message = dict(
+                role="assistant",
+                content=None,
+                tool_calls=[
+                    dict(
+                        id="call-sentinel",
+                        type="function",
+                        function=dict(
+                            name="get_sales",
+                            arguments=json.dumps(dict(period="this_week", kind="cash")),
+                        ),
+                    )
+                ],
+            )
+        else:
+            message = dict(
+                role="assistant",
+                content=json.dumps(
+                    dict(
+                        status="answered",
+                        draft_ar=(
+                            "{{fig:cash_sales}} {{fig:unexplained_cash_difference}}"
+                        ),
+                    )
+                ),
+            )
+        return httpx.Response(200, json=dict(choices=[dict(message=message)]))
+
+    async def no_sleep(_):
+        pass
+
+    async def exercise():
+        history = observed_history("primary", date(2026, 9, 28), ROOT / "data")
+        with production_database(
+            history, reference_parties(ROOT / "data"), as_of=date(2026, 9, 28)
+        ) as db:
+            async with BudgetedClient(
+                Settings(
+                    llm_provider="gemini",
+                    llm_model_id="synthetic-primary",
+                    gemini_api_key="fictional-gemini-key",
+                    llm_fallback_provider="openai",
+                    llm_fallback_model_id="synthetic-fallback",
+                    openai_api_key="fictional-openai-key",
+                ),
+                max_requests=6,
+                spacing_seconds=0,
+                sleep=no_sleep,
+                transport=httpx.MockTransport(respond),
+            ) as client:
+                client.begin_question()
+                result = await observe(
+                    PromptInput("شكد بعنا كاش هالأسبوع؟", "2026-09-28"),
+                    client=client,
+                    connection=db,
+                )
+                assert result["behavior"] == "answer" and result["tools"] == [
+                    "get_sales"
+                ]
+                assert client.attempts == client.question_attempts == 5
+
+    asyncio.run(exercise())
+    assert (
+        sent
+        == ["generativelanguage.googleapis.com"] * 2
+        + ["api.openai.com"]
+        + ["generativelanguage.googleapis.com"] * 2
+    )

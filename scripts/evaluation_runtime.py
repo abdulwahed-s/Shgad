@@ -186,6 +186,8 @@ async def observe(prompt, *, client, connection):
         intent = value["intent"]
     except (LLMUnavailable, ValueError, TypeError, KeyError):
         probe_failure = "intent_probe_failed"
+    if hasattr(client, "reset_routing"):
+        client.reset_routing()
     calls = []
     real_invoke = orchestrator.invoke
 
