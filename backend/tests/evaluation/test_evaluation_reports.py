@@ -121,6 +121,13 @@ def test_cli_refuses_before_plan_credentials_or_private_access(
 def test_missing_independent_requirements_block_even_authorized_live_flags(
     split, monkeypatch, capsys
 ):
+    from scripts import evaluation_requirements
+
+    monkeypatch.setattr(
+        evaluation_requirements,
+        "status",
+        lambda *a, **kw: dict(status="missing", blocker="REQUIREMENTS_SEAL_REQUIRED"),
+    )
     monkeypatch.setattr(
         run_evaluation, "plan", lambda *a, **kw: pytest.fail("premature IO")
     )

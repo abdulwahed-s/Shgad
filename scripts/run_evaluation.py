@@ -194,10 +194,9 @@ def prepare_references(questions, requirements, *, data_root=ROOT / "data"):
     """Validate ALL sealed requirements against independent truth before paid I/O."""
     from datetime import date
 
-    from scripts.evaluation_requirements import RequirementsError
+    from scripts.evaluation_requirements import HISTORICAL_FIELDS, RequirementsError
     from scripts.evaluation_runtime import observed_history
     from scripts.evaluation_truth import claim_catalogue
-    from scripts.make_ground_truth import answer_question
 
     try:
         if set(requirements) != {q["id"] for q in questions}:
@@ -205,6 +204,9 @@ def prepare_references(questions, requirements, *, data_root=ROOT / "data"):
         references = {}
         for question in questions:
             spec = question["spec"]
+            required = requirements[question["id"]]
+            if required & HISTORICAL_FIELDS and spec["resolved_period"] is None:
+                raise ValueError()
             as_of = date.fromisoformat(question["business_as_of"])
             history = observed_history(question["dataset"], as_of, data_root)
             period = spec["resolved_period"] or dict(start=str(as_of), end=str(as_of))
@@ -216,14 +218,13 @@ def prepare_references(questions, requirements, *, data_root=ROOT / "data"):
                 parties=spec["counterparty_ids"],
                 parameters=spec["parameters"],
             )
-            required = requirements[question["id"]]
             if bool(required) != (spec["expected_behavior"] == "answer"):
                 raise ValueError()
             if not required <= catalogue.keys():
                 raise ValueError()
-            truth = answer_question(question, data_root)
-            if spec["expected_behavior"] == "answer" and truth["behavior"] != "answer":
-                raise ValueError()
+            # The reviewed fields define numeric prerequisites. An unrelated
+            # legacy calculation (e.g. cash balance for movement-only fields)
+            # must not veto independently available selected facts.
             references[question["id"]] = as_of, history, catalogue, required
     except (Exception, KeyboardInterrupt):
         raise RequirementsError("REQUIREMENTS_REFERENCE_INVALID") from None
@@ -340,7 +341,7 @@ def parser():
     result.add_argument(
         "--freeze-manifest",
         type=Path,
-        default=ROOT / "results/evaluation_method_freeze_cash_selector.json",
+        default=ROOT / "results/evaluation_method_freeze_reviewed_requirements.json",
     )
     result.add_argument("--write-freeze", action="store_true")
     result.add_argument(

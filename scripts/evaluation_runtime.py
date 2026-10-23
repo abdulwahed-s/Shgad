@@ -40,7 +40,16 @@ def observed_history(dataset, as_of, data_root):
     if any((folder / name).resolve() != (folder / name).absolute() for name in names):
         raise ValueError("INPUT_OUTSIDE_ALLOWLIST")
     ledger = load_ledger(folder, None if dataset == "primary" else dataset)
-    return cutoff_history(ledger, as_of)
+    history = cutoff_history(ledger, as_of)
+    # These exact files are the frozen observed package, with complete ledger
+    # coverage through K. An undated opening is baseline metadata, never an
+    # invented historical record timestamp. No final/unseen input qualifies.
+    dates = [date.fromisoformat(r["business_date"]) for r in ledger.rows]
+    if ledger.opening:
+        dates.append(date.fromisoformat(ledger.opening["business_date"]))
+    history.evaluation_coverage = (min(dates), as_of) if dates else None
+    history.evaluation_opening_baseline = True
+    return history
 
 
 @contextmanager

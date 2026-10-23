@@ -1,0 +1,20 @@
+{
+  "schema_version": "shgad-requirements-v1",
+  "split": "heldout",
+  "question_sha256": "af854dd2c6d2659cfe08b8b3cbccb3c97b0c38b70308ae12dd3ec1dd012d6609",
+  "sha256": "923c9b14003d0df9316f3c72ced001d2cc1ee6805ac2276b63e6f34c4e41a746",
+  "selector_spec_sha256": "cdf840db3adab966e71021f9b6d103f4e845f07a4cb4b0aa498ae4aea20b73af",
+  "total_count": 60,
+  "answer_count": 40,
+  "counts_by_behavior": {
+    "answer": 40,
+    "clarify": 11,
+    "refuse": 9
+  },
+  "reviewed_count": 60,
+  "human_reviewed": true,
+  "independent_of_build": true,
+  "generator_tool": "Codex independent annotation agents and local JSON assembly",
+  "generator_model_id": "not_exposed",
+  "reviewed_at": "2026-10-23T17:56:33.119639+00:00"
+}

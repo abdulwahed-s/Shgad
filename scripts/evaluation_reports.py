@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from scripts.data_contract import FIXTURES, sha256
+from scripts.evaluation_historical import BASELINE_POLICY
 from scripts.evaluation_metrics import aggregate_questions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,6 +36,10 @@ SETTINGS = dict(
     required_fact_policy="independent_sealed_figure_selectors_v1_D50",
     input_hash_normalization="LF_for_public_seal_metadata_only_other_inputs_exact_bytes",
     provider_preference_lifetime="production_conversation_only_not_probe_or_prior_questions",
+    historical_opening_baseline_policy=BASELINE_POLICY,
+    historical_scope="original_resolved_economic_period_and_question_knowledge_cutoff",
+    historical_aliases="none",
+    historical_completeness="frozen_allowlisted_observed_package_only",
 )
 FAILURES = {
     "whole_question_incorrect",
@@ -97,6 +102,14 @@ POST_RUN_CHANGES = [
         previous_report_sha256="a0f094aecad331c62edb9f39c69b022d040472173426b8bcde88b16e48284340",
         change="add_standalone_cash_on_hand_selector_from_FINANCIAL_RULES_2",
         scope="independent_annotation_format_request_only_no_private_questions_or_outcomes_viewed",
+        original_results_preserved=True,
+    ),
+    dict(
+        after_run="evaluation_replay_cash_selector_2026-10-23.json",
+        previous_code_commit="783592d3d2a37bc1e66c60a4642a3cf58fc76560",
+        previous_report_sha256="a115b49d939e55e59f0161481aac8285bf8388f085202795390b3661f3f57e14",
+        change="adopt_approved_ten_historical_closing_selectors_and_public_reviewed_seals",
+        scope="independent_scorer_only_no_prompt_application_forecast_or_original_question_change",
         original_results_preserved=True,
     ),
 ]

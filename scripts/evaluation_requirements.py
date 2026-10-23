@@ -29,7 +29,19 @@ MANIFEST_KEYS = {
     "counts_by_behavior",
     "selector_spec_sha256",
 }
-SCALAR_FIELDS = {
+HISTORICAL_FIELDS = {
+    "period_end.cash_on_hand",
+    "period_end.receivables.total_outstanding",
+    "period_end.payables.total_outstanding",
+    "period.cash_inflows_iqd",
+    "period.cash_outflows_iqd",
+    "closing.expected_cash_iqd",
+    "closing.counted_cash_iqd",
+    "closing.unexplained_difference_iqd",
+    "closing.pre_count_book_cash_iqd",
+    "closing.book_to_count_difference_iqd",
+}
+SCALAR_FIELDS = HISTORICAL_FIELDS | {
     "cash_on_hand",
     "cash_sales",
     "credit_sales",

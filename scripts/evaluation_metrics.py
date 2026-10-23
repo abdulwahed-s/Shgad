@@ -1,5 +1,6 @@
 """Historical metrics, roadmap §12.2. Pure functions; no application imports."""
 
+import json
 import re
 from collections import Counter
 
@@ -30,6 +31,20 @@ def compare_claim(expected, claim):
             integer_value(claim.get("value")) == expected["value"]
             and claim.get("unit") == expected["unit"]
             and claim.get("label") == expected["label"]
+            and all(
+                type(claim.get(key)) is type(expected[key])
+                and claim.get(key) == expected[key]
+                for key in (
+                    "economic_period",
+                    "knowledge_cutoff",
+                    "historical_reconstruction",
+                    "reconstruction_label",
+                    "strict_daily_comparison_available",
+                    "strict_daily_comparison_note",
+                    "baseline_source_id",
+                )
+                if key in expected
+            )
         )
     except (TypeError, ValueError):
         correct = False
@@ -40,8 +55,45 @@ def compare_claim(expected, claim):
         and len(cited) == len(set(cited))
         and set(cited) == set(expected["source_ids"])
         and bool(claim.get("formula", "").strip())
+        and (
+            "prerequisite_source_ids" not in expected
+            or same_unique_records(
+                expected["prerequisite_source_ids"],
+                claim.get("prerequisite_source_ids"),
+            )
+        )
+        and all(
+            same_unique_records(expected[key], claim.get(key), identifier)
+            for key, identifier in (
+                ("void_provenance", "void_id"),
+                ("allocation_provenance", "payment_link_id"),
+            )
+            if key in expected
+        )
     )
     return correct, supported
+
+
+def same_unique_records(expected, observed, identifier=None):
+    """Order-independent evidence identity/content, with duplicate rejection."""
+
+    def canonical(records):
+        if not isinstance(records, list):
+            raise ValueError()
+        ids = [row[identifier] if identifier else row for row in records]
+        if any(not isinstance(key, str) or not key for key in ids) or len(ids) != len(
+            set(ids)
+        ):
+            raise ValueError()
+        return {
+            key: json.dumps(row, sort_keys=True, allow_nan=False)
+            for key, row in zip(ids, records, strict=True)
+        }
+
+    try:
+        return canonical(expected) == canonical(observed)
+    except (ValueError, TypeError, KeyError):
+        return False
 
 
 def proven_aliases(key, catalogue, spec):

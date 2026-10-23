@@ -8,10 +8,28 @@ historical claim shapes fail closed instead of receiving provenance credit.
 from collections import defaultdict
 from datetime import timedelta
 
+from scripts.evaluation_historical import historical_catalogue
 from scripts.make_ground_truth import SALES, TruthError, cutoff
 
 
 def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
+    catalogue = historical_catalogue(
+        ledger, as_of, start, end, parties=parties, parameters=parameters
+    )
+    try:
+        catalogue.update(
+            _legacy_catalogue(
+                ledger, as_of, start, end, parties=parties, parameters=parameters
+            )
+        )
+    except TruthError:
+        # An unavailable legacy view never invents zero, or suppresses a
+        # separately available historical fact with different prerequisites.
+        pass
+    return catalogue
+
+
+def _legacy_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
     parameters = parameters or {}
     catalogue = {}
     rows = ledger.visible(as_of)
@@ -28,6 +46,12 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
 
     def debt_ids(items):
         return [s for r in items for s in r["source_ids"]]
+
+    def available(function, *args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except TruthError:
+            return None
 
     sale_rows = [r for r in selected if r["type"] in SALES]
     for key, kind, label in (
@@ -47,13 +71,14 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
         {"cash": "cash_sales", "credit": "credit_sales", "all": "total_sales"}[kind]
     ]
     if end <= as_of:
-        sales = ledger.sales(start, end, known_at=cutoff(as_of))
-        add(
-            "unexplained_cash_difference",
-            sales["unexplained_difference_iqd"],
-            "unexplained_cash_difference",
-            sales["difference_source_ids"],
-        )
+        sales = available(ledger.sales, start, end, known_at=cutoff(as_of))
+        if sales is not None:
+            add(
+                "unexplained_cash_difference",
+                sales["unexplained_difference_iqd"],
+                "unexplained_cash_difference",
+                sales["difference_source_ids"],
+            )
     for key, kind in (
         ("owner_drawings", "OWNER_DRAWING"),
         ("operating_expenses", "OPERATING_EXPENSE"),
@@ -67,8 +92,12 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
         for r in sale_rows
         if ledger.categories.get(r["category_id"], {}).get("buy_price_iqd") is not None
     ]
-    if priced:
-        margin = ledger.margin(start, min(end, as_of), known_at=cutoff(as_of))
+    margin = (
+        available(ledger.margin, start, min(end, as_of), known_at=cutoff(as_of))
+        if priced
+        else None
+    )
+    if margin is not None:
         categories = sorted({r["category_id"] for r in priced})
         evidence = ids(priced) + categories
         expenses = [r for r in selected if r["type"] == "OPERATING_EXPENSE"]
@@ -122,7 +151,10 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
                 [key],
             )
 
-    balances = [r for r in ledger.debts(as_of) if r["outstanding_iqd"] > 0]
+    debts = available(ledger.debts, as_of)
+    balances = (
+        [r for r in debts if r["outstanding_iqd"] > 0] if debts is not None else []
+    )
     filtered = [r for r in balances if not parties or r["counterparty_id"] in parties]
     if parameters.get("overdue_only"):
         filtered = [r for r in filtered if r["days_overdue"] > 0]
@@ -132,6 +164,8 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
         if r["type"] in {"CREDIT_SALE", "SUPPLIER_INVOICE"}
     }
     for direction, singular in (("receivables", "receivable"), ("payables", "payable")):
+        if debts is None:
+            break
         debts = [r for r in filtered if r["kind"] == singular]
         add(
             direction + ".total_outstanding",
@@ -214,7 +248,11 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
         and r["due_date"]
         and str(as_of) <= r["due_date"] <= str(end)
     ]
-    if as_of <= end <= as_of + timedelta(days=29) and cash["amount_iqd"] is not None:
+    if (
+        as_of <= end <= as_of + timedelta(days=29)
+        and cash["amount_iqd"] is not None
+        and debts is not None
+    ):
         j1 = ledger.j1(as_of, end)
         due_ids, expected_ids, cash_ids = (
             debt_ids(dues),
@@ -237,7 +275,9 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
             ),
         ):
             add("j1." + key, j1[source_key], key, sources)
-    upcoming = ledger.upcoming(as_of, parameters.get("days", 7))
+    upcoming = available(ledger.upcoming, as_of, parameters.get("days", 7))
+    if upcoming is None:
+        return catalogue
     due_ids, expected_ids, cash_ids = (
         debt_ids(upcoming["dues"]),
         debt_ids(upcoming["expected"]),

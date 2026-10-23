@@ -396,3 +396,47 @@ def test_standalone_cash_selector_loads_and_preflights_without_private_questions
     references = run_evaluation.prepare_references([q], {q["id"]: selected[q["id"]]})
     assert references[q["id"]][3] == {"cash_on_hand"}
     assert references[q["id"]][2]["cash_on_hand"]["unit"] == "IQD"
+
+
+@pytest.mark.parametrize("field", sorted(requirements.HISTORICAL_FIELDS))
+def test_approved_historical_selectors_load_from_handmade_format_only(tmp_path, field):
+    root, questions, sha, _, _, rows, _, write = fixture(tmp_path, split="dev")
+    rows[0]["required_fields"] = [field]
+    write()
+    selected, _ = requirements.load("dev", questions, sha, data_root=root)
+    assert selected["FORMAT-A"] == {field}
+
+
+def test_historical_selector_requires_original_unique_period_never_defaults_today():
+    q = question()
+    q["spec"]["resolved_period"] = None
+    with pytest.raises(RequirementsError, match="REQUIREMENTS_REFERENCE_INVALID"):
+        run_evaluation.prepare_references([q], {q["id"]: {"period_end.cash_on_hand"}})
+
+
+def test_selected_cash_movement_preflight_needs_no_unrequested_cash_baseline(tmp_path):
+    from scripts.data_contract import write_csv
+
+    q = question()
+    q["dataset"] = "small_happy_path"
+    q["spec"]["calculation"] = "cash"
+    q["spec"]["parameters"] = {}
+    row = dict(
+        transaction_id="FORMAT-SALE",
+        source_id="FORMAT-SALE",
+        type="CASH_SALE",
+        amount_iqd=30,
+        business_date="2026-09-28",
+        occurred_at="2026-09-28T12:00:00+03:00",
+        recorded_at="2026-09-28T12:00:00+03:00",
+        category_id=None,
+        quantity=None,
+        obligation_id=None,
+        counterparty_id=None,
+        due_date=None,
+    )
+    write_csv(tmp_path / "fixtures/small_happy_path.csv", [row], row.keys())
+    result = run_evaluation.prepare_references(
+        [q], {q["id"]: {"period.cash_inflows_iqd"}}, data_root=tmp_path
+    )
+    assert result[q["id"]][2]["period.cash_inflows_iqd"]["value"] == 30

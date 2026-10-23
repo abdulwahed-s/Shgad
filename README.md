@@ -711,7 +711,7 @@ reports and freezes remain available; later scorer changes are disclosed.
 The [latest synthetic receipt](results/evaluation_replay_cash_selector_2026-10-23.md)
 retains those counts after documented alias, portable-hash and client-routing
 corrections. It reproduces from an isolated checkout with no credentials, future
-outcomes or unseen shops present. All 841 offline backend tests pass; the live
+outcomes or unseen shops present. All 882 offline backend tests pass; the live
 test is deselected. Lint, formatting and dependency checks also pass. These
 checks establish infrastructure behavior; live Q&A remains blocked below. Replay
 uses explicit synthetic-fixture requirements and does not replace independent
@@ -721,20 +721,25 @@ reproduces the earlier below-baseline results with240 prediction and45 realized
 rows, and no realized outcome after28 September. Zero realized-shortfall
 denominators still give null timing/safety rates.
 
-**Live Q&A awaits independently supplied requirement annotations.** The approved
-policy uses separately sealed figure selectors to distinguish total-only,
+**Independent requirement annotations have been supplied and public inputs validated.**
+The policy uses separately sealed figure selectors to distinguish total-only,
 cash/credit-breakdown and debt-list requests. Original question bytes and seals
 stay unchanged. The [selector contract](data/evaluation/REQUIREMENTS_SPEC.md)
 defines the exact fields, ordering, review/provenance and hash bindings.
 The standalone `cash_on_hand` selector represents confirmed cutoff cash; missing
-cash stays unavailable and equivalent views require matching evidence. Builders
-have authored only the contract and fabricated format tests. Missing annotations
-block live evaluation before credentials; authorization flags cannot bypass it.
+cash stays unavailable and equivalent views require matching evidence. Ten added
+historical/closing selectors separate economic dates from knowledge cutoffs and
+strict daily differences from book comparisons. All32 public development
+annotations preflight against independent calculations. Public seals attest full
+human review32/60; the private60 annotations remain unopened and unverified here.
+Builders authored the contract/calculators and fabricated tests; the supplied
+annotation records are unchanged. Missing or invalid seals block live evaluation
+before credentials; authorization flags cannot bypass them.
 All selectors and independent reference calculations are preflighted before calls
 and stay outside the model's context. Independent numeric calculations,
 context/evidence checks, exact aliases and synthetic replay remain tested.
 
-After independent annotations are supplied and frozen, live runs require explicit paid-call authorization,
+Live runs require explicit paid-call authorization,
 a matching freeze and bounded actual requests:96 development or180 sealed,
 at most6 per question including
 retries/fallback, at least10 seconds apart,30-second deadlines and8192 output
