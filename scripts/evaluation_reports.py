@@ -32,7 +32,7 @@ SETTINGS = dict(
     other_joint_fields="production_response_only_no_probe_repair",
     claims="unique_renderer_figure_metric_keys_excluding_projections_and_context_dates",
     unknown_historical_claims="fail_closed",
-    required_fact_policy="unresolved_question_v1_output_selection",
+    required_fact_policy="independent_sealed_figure_selectors_v1_D50",
     input_hash_normalization="LF_for_public_seal_metadata_only_other_inputs_exact_bytes",
     provider_preference_lifetime="production_conversation_only_not_probe_or_prior_questions",
 )
@@ -81,6 +81,14 @@ POST_RUN_CHANGES = [
         previous_code_commit="cacae7a665019c8c4c2256b82dc4cb213ea84ff3",
         change="reset_provider_preference_after_probe_and_between_questions",
         scope="align_evaluator_with_fresh_per_chat_production_client_preserve_attempts_and_pacing",
+        original_results_preserved=True,
+    ),
+    dict(
+        after_run="evaluation_replay_client_lifecycle_2026-10-23.json",
+        previous_code_commit="e5d0bdf8142dc835672c1188fa34528467e7110f",
+        previous_report_sha256="0cf92aa3dcf12cfb9123472c03f4d8e4035e12e794a7a022e099090f603fd124",
+        change="D50_require_independent_sealed_figure_selectors_for_live_grading",
+        scope="original_questions_and_seal_unchanged_no_builder_annotations_or_provider_calls",
         original_results_preserved=True,
     ),
 ]
@@ -153,6 +161,10 @@ def input_inventory(data_root=ROOT / "data"):
             "evaluation/development_questions.jsonl",
             "evaluation/heldout_60_manifest.json",
             "evaluation/reconciliation_expected.json",
+            "evaluation/REQUIREMENTS_SPEC.md",
+            "evaluation/dev_requirements_manifest.json",
+            "evaluation/heldout_requirements_manifest.json",
+            "evaluation/development_requirements.jsonl",
             "fixtures/duplicate_rows.csv",
             "fixtures/unmatched_payment.csv",
         )
@@ -162,7 +174,15 @@ def input_inventory(data_root=ROOT / "data"):
         if path.is_symlink() or path.resolve() != path.absolute():
             raise ValueError("INPUT_OUTSIDE_ALLOWLIST")
         name = path.relative_to(data_root).as_posix()
-        if name == "evaluation/heldout_60_manifest.json" and path.is_file():
+        if (
+            name
+            in {
+                "evaluation/heldout_60_manifest.json",
+                "evaluation/dev_requirements_manifest.json",
+                "evaluation/heldout_requirements_manifest.json",
+            }
+            and path.is_file()
+        ):
             inventory[name] = hashlib.sha256(
                 path.read_bytes().replace(b"\r\n", b"\n")
             ).hexdigest()
@@ -268,6 +288,27 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
             assessed=applicable,
             met=metric["rate"] >= target if applicable else None,
         )
+    from scripts.evaluation_requirements import MANIFEST_KEYS
+
+    raw_requirements = metadata.get(
+        "requirements", dict(status="synthetic_replay_legacy_rule_fixture_only")
+    )
+    requirement_keys = MANIFEST_KEYS | {
+        "status",
+        "manifest_sha256",
+        "blocker",
+        "independent_seal_used",
+    }
+    requirement_receipt = {
+        key: raw_requirements[key]
+        for key in sorted(requirement_keys & raw_requirements.keys())
+    }
+    if "counts_by_behavior" in requirement_receipt:
+        requirement_receipt["counts_by_behavior"] = {
+            key: raw_requirements["counts_by_behavior"][key]
+            for key in ("answer", "clarify", "refuse")
+            if key in raw_requirements["counts_by_behavior"]
+        }
     report = dict(
         schema_version="shgad-evaluation-v1",
         split=split,
@@ -305,6 +346,7 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
         reconciliation=reconciliation,
         forecast=forecast,
         post_run_changes=POST_RUN_CHANGES,
+        requirements=requirement_receipt,
         limitations=[
             "synthetic_data_only_no_merchant_validation",
             "synthetic_replay_is_protocol_testing_not_model_quality"
@@ -317,7 +359,7 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
             "unavailable_provider_answers_remain_in_full_denominators",
             "no_final_or_unseen_forecast_run_in_historical_mode",
             "zero_denominators_are_null_not_success",
-            "question_v1_required_output_selection_awaits_human_decision",
+            "independent_requirement_annotations_required_for_live_measurement",
         ],
     )
     if split == "dev":
@@ -381,6 +423,8 @@ def markdown(report):
         "Request accounting: `" + encoded(report["requests"]) + "`.",
         "",
         "Frozen settings: `" + encoded(report["settings"]) + "`.",
+        "",
+        "Requirement seal: `" + encoded(report["requirements"]) + "`.",
         "",
         "Reconciliation (seeded development fixtures, separate from Q&A): `"
         + encoded(report["reconciliation"])

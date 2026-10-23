@@ -118,7 +118,7 @@ def test_cli_refuses_before_plan_credentials_or_private_access(
 
 
 @pytest.mark.parametrize("split", ["dev", "heldout"])
-def test_unresolved_required_fact_policy_blocks_even_authorized_live_flags(
+def test_missing_independent_requirements_block_even_authorized_live_flags(
     split, monkeypatch, capsys
 ):
     monkeypatch.setattr(
@@ -138,7 +138,7 @@ def test_unresolved_required_fact_policy_blocks_even_authorized_live_flags(
         == 1
     )
     assert json.loads(capsys.readouterr().err) == dict(
-        error="REQUIRED_FACT_POLICY_NOT_FROZEN"
+        error="REQUIREMENTS_SEAL_REQUIRED"
     )
 
 
@@ -169,6 +169,32 @@ def test_unknown_failure_text_cannot_escape_into_heldout_aggregates():
             reconciliation={},
             forecast={},
         )
+
+
+def test_requirement_selectors_ids_and_paths_are_never_heldout_report_fields():
+    data = metadata() | dict(
+        requirements=dict(
+            status="sealed",
+            sha256="f" * 64,
+            total_count=1,
+            ids=["PRIVATE-ID"],
+            required_fields=["PRIVATE-SELECTOR"],
+            path="PRIVATE-PATH",
+            rows=[dict(id="PRIVATE-ID")],
+        )
+    )
+    result = public_report(
+        split="heldout",
+        mode="live",
+        rows=[row()],
+        metadata=data,
+        reconciliation={},
+        forecast=dict(frozen_code_commit="a" * 40, summary={}),
+    )
+    assert result["requirements"] == dict(
+        status="sealed", sha256="f" * 64, total_count=1
+    )
+    assert "PRIVATE" not in json.dumps(result) and "PRIVATE" not in markdown(result)
 
 
 def test_corrected_report_discloses_original_run_and_preserves_unmet_targets():

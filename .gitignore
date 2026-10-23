@@ -4,6 +4,8 @@
 *.key
 # held-out benchmark must never be committed before publication (§12.1a)
 heldout_60_questions*
+*.requirements.jsonl
+heldout_requirements.jsonl
 # python
 .venv/
 __pycache__/

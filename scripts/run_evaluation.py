@@ -138,6 +138,7 @@ def load_questions(split, *, authorized=False, data_root=ROOT / "data"):
 
 def plan(split, *, max_requests=None, require_clean=False):
     from scripts.evaluation_reports import frozen_snapshot
+    from scripts.evaluation_requirements import status
 
     snapshot = frozen_snapshot(require_clean=require_clean)
     if split == "heldout":
@@ -146,6 +147,23 @@ def plan(split, *, max_requests=None, require_clean=False):
     else:
         questions, digest = load_questions("dev")
         count = len(questions)
+    requirements = status(split, digest)
+    if requirements["status"] == "sealed" and requirements["total_count"] != count:
+        from scripts.evaluation_requirements import RequirementsError
+
+        raise RequirementsError("INVALID_REQUIREMENTS_MANIFEST")
+    if requirements["status"] == "sealed":
+        expected_counts = (
+            seal["counts_by_behavior"]
+            if split == "heldout"
+            else dict(Counter(q["spec"]["expected_behavior"] for q in questions))
+        )
+        if {k: v for k, v in requirements["counts_by_behavior"].items() if v} != {
+            k: v for k, v in expected_counts.items() if v
+        }:
+            from scripts.evaluation_requirements import RequirementsError
+
+            raise RequirementsError("INVALID_REQUIREMENTS_MANIFEST")
     cap = snapshot["settings"]["request_limits_by_split"][split]
     limit = max_requests if max_requests is not None else cap
     if type(limit) is not int or not 1 <= limit <= min(count * 6, cap):
@@ -165,12 +183,61 @@ def plan(split, *, max_requests=None, require_clean=False):
         provider_requests=0,
         authorization_required=["paid_provider_calls"]
         + (["heldout_evaluation"] if split == "heldout" else []),
-        measurement_blockers=["REQUIRED_FACT_POLICY_NOT_FROZEN"],
+        requirements=requirements,
+        measurement_blockers=[requirements["blocker"]]
+        if requirements["status"] == "missing"
+        else [],
     )
 
 
+def prepare_references(questions, requirements, *, data_root=ROOT / "data"):
+    """Validate ALL sealed requirements against independent truth before paid I/O."""
+    from datetime import date
+
+    from scripts.evaluation_requirements import RequirementsError
+    from scripts.evaluation_runtime import observed_history
+    from scripts.evaluation_truth import claim_catalogue
+    from scripts.make_ground_truth import answer_question
+
+    try:
+        if set(requirements) != {q["id"] for q in questions}:
+            raise ValueError()
+        references = {}
+        for question in questions:
+            spec = question["spec"]
+            as_of = date.fromisoformat(question["business_as_of"])
+            history = observed_history(question["dataset"], as_of, data_root)
+            period = spec["resolved_period"] or dict(start=str(as_of), end=str(as_of))
+            catalogue = claim_catalogue(
+                history,
+                as_of,
+                date.fromisoformat(period["start"]),
+                date.fromisoformat(period["end"]),
+                parties=spec["counterparty_ids"],
+                parameters=spec["parameters"],
+            )
+            required = requirements[question["id"]]
+            if bool(required) != (spec["expected_behavior"] == "answer"):
+                raise ValueError()
+            if not required <= catalogue.keys():
+                raise ValueError()
+            truth = answer_question(question, data_root)
+            if spec["expected_behavior"] == "answer" and truth["behavior"] != "answer":
+                raise ValueError()
+            references[question["id"]] = as_of, history, catalogue, required
+    except (Exception, KeyboardInterrupt):
+        raise RequirementsError("REQUIREMENTS_REFERENCE_INVALID") from None
+    return references
+
+
 async def evaluate_questions(
-    questions, *, client, data_root=ROOT / "data", replay=None
+    questions,
+    *,
+    client,
+    data_root=ROOT / "data",
+    replay=None,
+    requirements=None,
+    references=None,
 ):
     """Specs/truth stay in this scorer; the runtime receives only PromptInput."""
     from datetime import date
@@ -186,6 +253,10 @@ async def evaluate_questions(
     from scripts.evaluation_truth import claim_catalogue, required_fields
     from scripts.make_ground_truth import answer_question
 
+    if requirements is None and replay is None:
+        raise EvaluationError("REQUIREMENTS_SEAL_REQUIRED")
+    if requirements is not None and references is None:
+        references = prepare_references(questions, requirements, data_root=data_root)
     rows = []
     parties = reference_parties(data_root)
     stopped = False
@@ -198,26 +269,30 @@ async def evaluate_questions(
             observed["failure"] = "request_budget_exhausted"
         else:
             try:
-                as_of = date.fromisoformat(question["business_as_of"])
-                history = observed_history(question["dataset"], as_of, data_root)
-                period = spec["resolved_period"] or dict(
-                    start=str(as_of), end=str(as_of)
-                )
-                catalogue = claim_catalogue(
-                    history,
-                    as_of,
-                    date.fromisoformat(period["start"]),
-                    date.fromisoformat(period["end"]),
-                    parties=spec["counterparty_ids"],
-                    parameters=spec["parameters"],
-                )
-                required = required_fields(spec, catalogue)
-                reference = answer_question(question, data_root)
-                if (
-                    spec["expected_behavior"] == "answer"
-                    and reference["behavior"] != "answer"
-                ):
-                    raise EvaluationError("GROUND_TRUTH_UNAVAILABLE")
+                if references is not None:
+                    as_of, history, catalogue, required = references[question["id"]]
+                else:
+                    # Legacy selection remains solely for fabricated replay.
+                    as_of = date.fromisoformat(question["business_as_of"])
+                    history = observed_history(question["dataset"], as_of, data_root)
+                    period = spec["resolved_period"] or dict(
+                        start=str(as_of), end=str(as_of)
+                    )
+                    catalogue = claim_catalogue(
+                        history,
+                        as_of,
+                        date.fromisoformat(period["start"]),
+                        date.fromisoformat(period["end"]),
+                        parties=spec["counterparty_ids"],
+                        parameters=spec["parameters"],
+                    )
+                    required = required_fields(spec, catalogue)
+                    reference = answer_question(question, data_root)
+                    if spec["expected_behavior"] == "answer" and (
+                        not required <= catalogue.keys()
+                        or reference["behavior"] != "answer"
+                    ):
+                        raise EvaluationError("GROUND_TRUTH_UNAVAILABLE")
                 client.begin_question(
                     replay[question["id"]] if replay is not None else None
                 )
@@ -265,7 +340,7 @@ def parser():
     result.add_argument(
         "--freeze-manifest",
         type=Path,
-        default=ROOT / "results/evaluation_method_freeze_client_lifecycle.json",
+        default=ROOT / "results/evaluation_method_freeze_sealed_requirements.json",
     )
     result.add_argument("--write-freeze", action="store_true")
     result.add_argument(
@@ -292,6 +367,7 @@ def main(argv=None):
         write_new,
         write_report,
     )
+    from scripts.evaluation_requirements import RequirementsError
 
     try:
         if args.mode == "replay":
@@ -348,7 +424,18 @@ def main(argv=None):
         ):
             raise EvaluationError("HELDOUT_NOT_AUTHORIZED")
         if args.mode == "live":
-            raise EvaluationError("REQUIRED_FACT_POLICY_NOT_FROZEN")
+            from scripts.evaluation_requirements import status
+
+            dev_path = ROOT / "data/evaluation/development_questions.jsonl"
+            if args.split == "dev" and dev_path.resolve() != dev_path.absolute():
+                raise EvaluationError("PUBLIC_INPUT_PATH_REQUIRED")
+            question_sha = (
+                seal_metadata()["sha256"]
+                if args.split == "heldout"
+                else sha256(dev_path)
+            )
+            if status(args.split, question_sha)["status"] != "sealed":
+                raise EvaluationError("REQUIREMENTS_SEAL_REQUIRED")
         if args.write_freeze and args.mode != "plan":
             raise EvaluationError("FREEZE_REQUIRES_PLAN_MODE")
         prepared = plan(
@@ -425,6 +512,15 @@ def main(argv=None):
                 full_development_question_count=prepared["question_count"],
             )
         else:
+            from scripts.evaluation_requirements import load
+
+            requirements, requirements_receipt = load(
+                args.split,
+                questions,
+                question_hash,
+                authorized=args.authorize_heldout,
+            )
+            references = prepare_references(questions, requirements)
             from app.config import runtime_settings
             from scripts.evaluation_clients import BudgetedClient
 
@@ -448,7 +544,12 @@ def main(argv=None):
 
             async def live():
                 async with client:
-                    return await evaluate_questions(questions, client=client)
+                    return await evaluate_questions(
+                        questions,
+                        client=client,
+                        requirements=requirements,
+                        references=references,
+                    )
 
             rows = asyncio.run(live())
             provider, model = "gemini+openai-fallback", "gemini-3.8-flash+gpt-6-luna"
@@ -463,6 +564,13 @@ def main(argv=None):
             freeze_sha256=sha256(args.freeze_manifest),
             frozen_code_commit=frozen["code_commit"],
         )
+        if args.mode == "live":
+            metadata["requirements"] = requirements_receipt
+        else:
+            metadata["requirements"] = dict(
+                status="synthetic_replay_legacy_rule_fixture_only",
+                independent_seal_used=False,
+            )
         report = public_report(
             split=args.split,
             mode=args.mode,
@@ -491,7 +599,7 @@ def main(argv=None):
         error = sys.exc_info()[1]
         code = (
             str(error)
-            if isinstance(error, EvaluationError)
+            if isinstance(error, (EvaluationError, RequirementsError))
             else "EVALUATION_PREPARATION_OR_REPORT_FAILED"
         )
         print(json.dumps(dict(error=code)), file=sys.stderr)
