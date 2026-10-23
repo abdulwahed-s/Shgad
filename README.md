@@ -708,10 +708,10 @@ imports the export's missing parent ledger through the real importer, with label
 unchanged: duplicateTP1/FP0/FN0 and unmatchedTP1/FP0/FN0. These two tiny fixture
 cases establish setup correctness, not general reconciliation quality. Original
 reports and freezes remain available; later scorer changes are disclosed.
-The [latest synthetic receipt](results/evaluation_replay_sealed_requirements_2026-10-23.md)
+The [latest synthetic receipt](results/evaluation_replay_cash_selector_2026-10-23.md)
 retains those counts after documented alias, portable-hash and client-routing
 corrections. It reproduces from an isolated checkout with no credentials, future
-outcomes or unseen shops present. All 835 offline backend tests pass; the live
+outcomes or unseen shops present. All 841 offline backend tests pass; the live
 test is deselected. Lint, formatting and dependency checks also pass. These
 checks establish infrastructure behavior; live Q&A remains blocked below. Replay
 uses explicit synthetic-fixture requirements and does not replace independent
@@ -725,7 +725,9 @@ denominators still give null timing/safety rates.
 policy uses separately sealed figure selectors to distinguish total-only,
 cash/credit-breakdown and debt-list requests. Original question bytes and seals
 stay unchanged. The [selector contract](data/evaluation/REQUIREMENTS_SPEC.md)
-defines the exact fields, ordering, review/provenance and hash bindings. Builders
+defines the exact fields, ordering, review/provenance and hash bindings.
+The standalone `cash_on_hand` selector represents confirmed cutoff cash; missing
+cash stays unavailable and equivalent views require matching evidence. Builders
 have authored only the contract and fabricated format tests. Missing annotations
 block live evaluation before credentials; authorization flags cannot bypass it.
 All selectors and independent reference calculations are preflighted before calls
