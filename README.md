@@ -29,7 +29,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > The development forecast benchmark performs worse than the seven-day baseline;
 > final testing has not run.
 > The 55 fixed backend and 277 frontend Arabic messages have human approval.
-> A final independent visual review is pending. New or edited wording requires review.
+> The developer manually accepted the current visuals; advisory layout findings remain.
+> New or edited wording requires review.
 
 ## Capabilities
 
@@ -47,6 +48,7 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 - Seed/reset the fictional sample through the interface; pick synthetic CSVs, edit mappings, preview and confirm imports.
 - Keep last-synced reports available offline while retaining form input and disabling writes without a queue.
 - Answer chat requests through a bounded, read-only agent with verified figures and source evidence.
+- Grade historical responses with independent integer-IQD calculations, exact customer/period checks and source-row validation; keep sealed questions separate from development inputs.
 
 ## Merchant questions
 

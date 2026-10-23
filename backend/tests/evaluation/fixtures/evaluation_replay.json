@@ -1,0 +1,34 @@
+{
+  "kind": "synthetic-format-replay",
+  "model_id": "synthetic-format-sentinel",
+  "cases": {
+    "DEV-001": {
+      "intent": "sales",
+      "turns": [
+        {"calls": [{"name": "get_sales", "arguments": {"period": "this_week", "kind": "cash"}}]},
+        {"action": {"status": "answered", "draft_ar": "المبيعات {{fig:cash_sales}} والفرق {{fig:unexplained_cash_difference}}."}}
+      ]
+    },
+    "DEV-006": {
+      "intent": "debts",
+      "turns": [
+        {"calls": [{"name": "get_debts", "arguments": {"counterparty_query": "أبو حيدر", "direction": "receivable"}}]},
+        {"action": {"status": "answered", "draft_ar": "الباقي {{fig:receivables.total_outstanding}}، وحساب الزبون {{fig:receivables.customers.0.outstanding}}."}}
+      ]
+    },
+    "DEV-015": {
+      "intent": "estimated_gross_margin",
+      "turns": [
+        {"calls": [{"name": "get_margin", "arguments": {"period": "this_week"}}]},
+        {"action": {"status": "answered", "draft_ar": "الهامش التقديري {{fig:gross_margin}}، والمبيعات غير المسعرة {{fig:unpriced_sales_count}}."}}
+      ]
+    },
+    "DEV-027": {
+      "intent": "reconciliation",
+      "turns": [
+        {"calls": [{"name": "reconcile", "arguments": {"period": "today", "types": ["suspected_duplicate", "ambiguous"]}}]},
+        {"action": {"status": "clarification", "message_key": "clarify_request"}}
+      ]
+    }
+  }
+}

@@ -1,0 +1,377 @@
+"""Public provenance and aggregate held-out artifacts; no private row serialization."""
+
+import hashlib
+import json
+import platform
+import sqlite3
+import subprocess
+from datetime import UTC, datetime
+from pathlib import Path
+
+from scripts.data_contract import FIXTURES, sha256
+from scripts.evaluation_metrics import aggregate_questions
+
+ROOT = Path(__file__).resolve().parents[1]
+SETTINGS = dict(
+    primary_provider="gemini",
+    primary_model_id="gemini-3.8-flash",
+    fallback_provider="openai",
+    fallback_model_id="gpt-6-luna",
+    timeout_seconds=30,
+    max_output_tokens=8192,
+    compatible_temperature=0,
+    openai_reasoning="medium",
+    openai_store=False,
+    retries_per_provider=1,
+    max_requests_per_question=6,
+    request_limits_by_split={"dev": 96, "heldout": 180},
+    minimum_spacing_seconds=10,
+    max_tool_calls=8,
+    max_agent_completions=4,
+    intent_observation="separate_blind_intent_probe",
+    other_joint_fields="production_response_only_no_probe_repair",
+    claims="unique_renderer_figure_metric_keys_excluding_projections_and_context_dates",
+    unknown_historical_claims="fail_closed",
+)
+FAILURES = {
+    "whole_question_incorrect",
+    "unsafe_or_wrong_decision",
+    "wrong_intent",
+    "wrong_tool",
+    "wrong_customer",
+    "wrong_period",
+    "ledger_changed",
+    "unsupported_claim",
+    "intent_probe_failed",
+    "runtime_failure",
+    "ground_truth_unavailable",
+    "request_budget_exhausted",
+}
+
+
+def encoded(value):
+    return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+
+
+def digest(value):
+    return hashlib.sha256(encoded(value).encode()).hexdigest()
+
+
+def git(*args):
+    return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
+
+
+def provenance(*, require_clean=True):
+    if require_clean and git(
+        "status", "--porcelain", "--", "backend", "scripts", "data"
+    ):
+        raise ValueError("COMMIT_VERIFIED_CODE_BEFORE_MEASURED_RUN")
+    paths = sorted(
+        [
+            p
+            for folder in (ROOT / "scripts", ROOT / "backend/app")
+            for p in folder.rglob("*.py")
+        ]
+        + [ROOT / "backend/pyproject.toml"]
+    )
+    if any(p.resolve() != p.absolute() for p in paths):
+        raise ValueError("SOURCE_OUTSIDE_ALLOWLIST")
+    return dict(
+        code_commit=git("rev-parse", "HEAD"),
+        source_hashes={
+            p.relative_to(ROOT).as_posix(): hashlib.sha256(
+                p.read_bytes().replace(b"\r\n", b"\n")
+            ).hexdigest()
+            for p in paths
+        },
+        python_version=platform.python_version(),
+        sqlite_version=sqlite3.sqlite_version,
+    )
+
+
+def input_inventory(data_root=ROOT / "data"):
+    """Fixed observed files; never discover future, answers or unseen shops."""
+    data_root = Path(data_root)
+    paths = []
+    for dataset in ("primary", *sorted(FIXTURES)):
+        folder = data_root / ("synthetic" if dataset == "primary" else "fixtures")
+        prefix = "" if dataset == "primary" else dataset + "."
+        names = ["observed_90d.csv" if dataset == "primary" else dataset + ".csv"]
+        names += [
+            prefix + name
+            for name in (
+                "opening_balance.json",
+                "categories.csv",
+                "obligations.csv",
+                "payment_links.csv",
+                "entry_voids.csv",
+            )
+        ]
+        paths.extend(folder / name for name in names)
+    paths += [
+        data_root / name
+        for name in (
+            "synthetic/counterparties.csv",
+            "evaluation/QUESTION_SPEC.md",
+            "evaluation/development_questions.jsonl",
+            "evaluation/heldout_60_manifest.json",
+            "evaluation/reconciliation_expected.json",
+            "fixtures/duplicate_rows.csv",
+            "fixtures/unmatched_payment.csv",
+        )
+    ]
+    inventory = {}
+    for path in paths:
+        if path.is_symlink() or path.resolve() != path.absolute():
+            raise ValueError("INPUT_OUTSIDE_ALLOWLIST")
+        name = path.relative_to(data_root).as_posix()
+        inventory[name] = sha256(path) if path.is_file() else None
+    return inventory
+
+
+def prompt_receipt():
+    from app.agents.system_instructions import PROMPT_SHA256, PROMPT_VERSION
+    from app.agents.tool_registry import definitions
+    from scripts.evaluation_runtime import INTENT_INSTRUCTIONS
+
+    return dict(
+        prompt_version=PROMPT_VERSION,
+        prompt_hash=PROMPT_SHA256,
+        intent_prompt_hash=hashlib.sha256(INTENT_INSTRUCTIONS.encode()).hexdigest(),
+        tool_schema_hash=digest(definitions()),
+    )
+
+
+def frozen_snapshot(*, require_clean=True):
+    inventory = input_inventory()
+    return dict(
+        schema_version="shgad-evaluation-freeze-v1",
+        **provenance(require_clean=require_clean),
+        **prompt_receipt(),
+        settings=SETTINGS,
+        dataset_sha256=digest(inventory),
+        input_hashes=inventory,
+    )
+
+
+def verify_freeze(path, current):
+    frozen = json.loads(Path(path).read_text(encoding="utf-8"))
+    keys = (
+        "schema_version",
+        "source_hashes",
+        "prompt_hash",
+        "intent_prompt_hash",
+        "tool_schema_hash",
+        "settings",
+        "dataset_sha256",
+        "input_hashes",
+    )
+    if any(frozen.get(key) != current.get(key) for key in keys):
+        raise ValueError("EVALUATOR_CHANGED_SINCE_FREEZE")
+    commit = frozen.get("code_commit", "")
+    if len(commit) != 40 or any(c not in "0123456789abcdef" for c in commit):
+        raise ValueError("INVALID_FROZEN_COMMIT")
+    subprocess.run(
+        ["git", "merge-base", "--is-ancestor", commit, "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    )
+    for name, expected in frozen["source_hashes"].items():
+        raw = subprocess.check_output(["git", "show", f"{commit}:{name}"], cwd=ROOT)
+        if hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest() != expected:
+            raise ValueError("FREEZE_COMMIT_SOURCE_MISMATCH")
+    return frozen
+
+
+def forecast_archive():
+    """Reference the original dev measurement, without rerunning or future access."""
+    path = ROOT / "results/forecast_dev_2026-10-20.json"
+    freeze = ROOT / "results/forecast_method_freeze.json"
+    report = json.loads(path.read_text(encoding="utf-8"))
+    frozen = json.loads(freeze.read_text(encoding="utf-8"))
+    return dict(
+        status="archived_development_measurement_not_rerun",
+        report_file=path.name,
+        report_sha256=sha256(path),
+        method_freeze_sha256=sha256(freeze),
+        frozen_code_commit=frozen["code_commit"],
+        executed_at=report["executed_at"],
+        split="dev",
+        scored_days_by_cutoff={"60": 30, "75": 15},
+        summary=report["summary"],
+        final_test_run=False,
+        post_test_changes=[],
+    )
+
+
+def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
+    # Rebuild the public object from fixed keys. Never remove a few private fields
+    # from a copy of a held-out row: no row, response, ID, party, date or text leaves.
+    for row in rows:
+        if not set(row["failures"]) <= FAILURES:
+            raise ValueError("INVALID_PUBLIC_FAILURE_CODE")
+    summary = aggregate_questions(rows)
+    targets = {}
+    for key, target in (
+        ("historical_accuracy", 0.95),
+        ("safe_handling", 0.95),
+        ("traceability", 1.0),
+        ("joint_accuracy", 0.90),
+    ):
+        metric = summary[key]
+        applicable = split == "heldout" and mode == "live" and metric["denominator"] > 0
+        targets[key] = dict(
+            target=target,
+            assessed=applicable,
+            met=metric["rate"] >= target if applicable else None,
+        )
+    report = dict(
+        schema_version="shgad-evaluation-v1",
+        split=split,
+        mode=mode,
+        reporting="aggregate_only"
+        if split == "heldout"
+        else "development_examples_permitted",
+        **{
+            key: metadata[key]
+            for key in (
+                "started_at",
+                "executed_at",
+                "code_commit",
+                "source_hashes",
+                "dataset_sha256",
+                "input_hashes",
+                "question_sha256",
+                "provider",
+                "model_id",
+                "settings",
+                "prompt_hash",
+                "prompt_version",
+                "intent_prompt_hash",
+                "tool_schema_hash",
+                "requests",
+                "freeze_sha256",
+                "frozen_code_commit",
+                "python_version",
+                "sqlite_version",
+            )
+        },
+        question_count=len(rows),
+        metrics=summary,
+        target_assessment=targets,
+        reconciliation=reconciliation,
+        forecast=forecast,
+        post_run_changes=[],
+        limitations=[
+            "synthetic_data_only_no_merchant_validation",
+            "synthetic_replay_is_protocol_testing_not_model_quality"
+            if mode == "replay"
+            else "intent_probe_is_separate_from_production_routing",
+            "customer_period_and_tools_are_actual_production_fields",
+            "all_required_figures_and_units_categories_and_context_must_match",
+            "unmapped_historical_claims_fail_closed_no_evidence_credit",
+            "historical_metrics_do_not_score_projection_accuracy",
+            "unavailable_provider_answers_remain_in_full_denominators",
+            "no_final_or_unseen_forecast_run_in_historical_mode",
+            "zero_denominators_are_null_not_success",
+        ],
+    )
+    if split == "dev":
+        report["cases"] = rows
+    return report
+
+
+def markdown(report):
+    lines = [
+        "# Synthetic evaluation receipt",
+        "",
+        f"Mode: `{report['mode']}`. Split: `{report['split']}`. "
+        f"Reporting: `{report['reporting']}`.",
+        f"Actual execution: {report['started_at']} to {report['executed_at']}.",
+        f"Code commit: `{report['code_commit']}`. Model: `{report['model_id']}`.",
+        f"Dataset SHA-256: `{report['dataset_sha256']}`.",
+        f"Questions SHA-256: `{report['question_sha256']}`.",
+        f"Prompt SHA-256: `{report['prompt_hash']}`.",
+        f"Intent prompt SHA-256: `{report['intent_prompt_hash']}`.",
+        f"Tool schema SHA-256: `{report['tool_schema_hash']}`.",
+        "",
+        (
+            "Synthetic replay checks exercise the protocol; "
+            "they are not live-model accuracy results."
+        )
+        if report["mode"] == "replay"
+        else (
+            "Targets are evaluated against reported counts; "
+            "no tuning on held-out results."
+        ),
+        "",
+        "| Metric | Correct / eligible | Rate |",
+        "|---|---:|---:|",
+    ]
+    for key in (
+        "historical_accuracy",
+        "safe_handling",
+        "traceability",
+        "joint_accuracy",
+    ):
+        value = report["metrics"][key]
+        lines.append(
+            f"| {key} | {value['numerator']} / {value['denominator']} "
+            f"| {value['rate']} |"
+        )
+    lines += ["", "| Category | Total | Passed | Failed |", "|---|---:|---:|---:|"]
+    for key, value in report["metrics"]["categories"].items():
+        lines.append(
+            f"| {key} | {value['total']} | {value['passed']} | {value['failed']} |"
+        )
+    lines += [
+        "",
+        "Aggregate failure counts: `"
+        + encoded(report["metrics"]["failure_counts"])
+        + "`.",
+        "",
+        "Target assessment: `" + encoded(report["target_assessment"]) + "`.",
+        "",
+        "Request accounting: `" + encoded(report["requests"]) + "`.",
+        "",
+        "Frozen settings: `" + encoded(report["settings"]) + "`.",
+        "",
+        "Reconciliation (seeded development fixtures, separate from Q&A): `"
+        + encoded(report["reconciliation"])
+        + "`.",
+        "",
+        "Forecast: archived development only; no new final/unseen run.",
+        f"Frozen forecast commit: `{report['forecast']['frozen_code_commit']}`.",
+        "Forecast summary: `" + encoded(report["forecast"]["summary"]) + "`.",
+        "",
+        "Limitations: " + "; ".join(report["limitations"]) + ".",
+        "",
+    ]
+    if report["split"] == "dev":
+        lines += ["Development failures (not held-out examples):", ""]
+        for row in report["cases"]:
+            if row["failures"]:
+                lines.append(f"- {row['id']}: {', '.join(row['failures'])}.")
+    return "\n".join(lines)
+
+
+def write_new(path, value):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8", newline="\n") as stream:
+        stream.write(value)
+
+
+def write_report(path, report):
+    path = Path(path)
+    if path.suffix != ".json" or path.exists() or path.with_suffix(".md").exists():
+        raise ValueError("RESULT_ALREADY_EXISTS_OR_INVALID_PATH")
+    body = json.dumps(report, sort_keys=True, ensure_ascii=False, indent=2) + "\n"
+    summary = markdown(report)
+    write_new(path, body)
+    write_new(path.with_suffix(".md"), summary)
+
+
+def now():
+    return datetime.now(UTC).isoformat()
