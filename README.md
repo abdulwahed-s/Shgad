@@ -643,9 +643,19 @@ live drill on 24 October 2026 at `c37b31d` stopped at CSV mapping: Gemini
 successful provider response. Deterministic health, weekly and scenario checks
 passed; live import confirmation, chat/evidence and controlled fallback were not
 reached. No automatic rerun occurred. Response bodies were not retained, so the
-specific limit/authentication causes and actual billing are unverified. Current
-live demo access remains blocked; this integration failure does not change the
-original evaluation scores or their denominators.
+specific limit/authentication causes and actual billing are unverified.
+
+After the user reported replenishing both balances and explicitly requested a
+retry, one fresh run at `f825b8f` passed all **14 integration checks** on
+24 October 2026. It used six of the 12 allowed provider attempts: four Gemini
+responses and two OpenAI responses, all HTTP 200. Fresh CSV mapping, explicit
+confirmation, replay protection, ledger/report updates, grounded chat/source
+evidence, controlled OpenAI fallback, malformed-input rejection and sample reset
+passed. Two primary-outage faults were injected locally without Gemini network
+calls. The earlier failed receipt remains preserved. These are two separate
+integration runs, not new answer-quality benchmarks; original evaluation scores,
+missed targets and denominators remain unchanged. Actual monetary cost was not
+measured, and no further provider run is automatically authorized.
 The running browser demo has no session-wide billing cap, so its live use needs
 its own authorization. Recorded responses must always be identified as recorded.
 
