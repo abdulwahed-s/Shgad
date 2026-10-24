@@ -617,7 +617,8 @@ The recorded drill generates new fictional CSV IDs and amounts, exercises mappin
 preview, confirmation, ledger, tools, rendered response and raw evidence, then
 checks weekly reports, all three scenarios, replay safety, malformed input,
 simulated timeout, fallback and sample reset. It uses a temporary database and
-fake provider wire responses. Its Arabic test question is pending language review.
+fake provider wire responses. Its Arabic test question uses the exact wording
+supplied by the user during language review on 24 October 2026.
 The plan command loads no credentials and makes no requests. Keep receipts local;
 existing receipt paths are never overwritten. These are integration checks, not
 answer-quality evaluations or human rehearsals.

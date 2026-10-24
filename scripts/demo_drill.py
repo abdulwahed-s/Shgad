@@ -37,8 +37,8 @@ ALIASES = {
     "Kind": "type",
     "Unused": None,
 }
-# New demo question, PENDING Iraqi Arabic review; never an approval claim.
-QUESTION = "شكد طلع مجموع بيعنا النقدي بهالأسبوع لحد هسه؟"
+# Exact user-supplied Iraqi Arabic replacement approved on 2026-10-24.
+QUESTION = "شكد بعنا كاش من أول هالأسبوع لهسه؟"
 
 
 def fresh_csv():
@@ -221,7 +221,7 @@ async def run_drill(*, mode, request_cap, authorize_paid=False):
         "checks": {},
         "human_rehearsals": 0,
         "human_daily_close_timings": [],
-        "question_copy_review": "pending Iraqi Arabic review",
+        "question_copy_review": "approved user-supplied wording, 2026-10-24",
     }
     overrides = dict(app.dependency_overrides)
     # A temporary ledger prevents mutation of the developer's database.
