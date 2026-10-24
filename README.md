@@ -656,7 +656,7 @@ calls. The earlier failed receipt remains preserved. These are two separate
 integration runs, not new answer-quality benchmarks; original evaluation scores,
 missed targets and denominators remain unchanged. Actual monetary cost was not
 measured, and no further provider run is automatically authorized.
-The running browser demo has no session-wide billing cap, so its live use needs
+The standard backend has no session-wide billing cap, so its live use needs
 its own authorization. Recorded responses must always be identified as recorded.
 
 Keep both servers on `127.0.0.1`. Phone/LAN/tunnel/hosted use is not ready: it
@@ -664,9 +664,30 @@ requires authenticated scoped access, HTTPS, explicit trusted CORS origins,
 server-side secret storage, request limits and verified recovery/cold starts.
 Offline reports require warming their caches while connected. Offline chat and
 writes remain unavailable, with retained drafts and no queued submissions.
-Two actual human rehearsals, venue connectivity and five developer-only daily-close
-timings remain unmeasured. The target is under two minutes per sample business day;
-automated test durations do not establish that target or merchant validation.
+Two actual human demo rehearsals and venue connectivity remain unverified.
+On 24 October 2026, one developer (the user) completed the fictional entry-and-review
+workflow for five consecutive sample business dates at `9c5f1bd`, using a stopwatch:
+
+| Sample business date | User-reported elapsed time |
+|---|---|
+| 24 September 2026 | Approximately 60 seconds |
+| 25 September 2026 | 43 seconds |
+| 26 September 2026 | 40 seconds |
+| 27 September 2026 | 37 seconds |
+| 28 September 2026 | 25 seconds |
+
+All five reported times are below the 120-second target. Each trial used a fresh
+observed-data prefix through the preceding sample date; seeding and an initial
+untimed walkthrough were outside the timed intervals. Read-only HTTP checks
+verified the saved cash count, owner drawing, credit sale and difference review.
+The user reported no errors, failed saves or corrections. The first trial used
+smaller drawing/credit amounts than suggested and saved two leave-unexplained
+reviews; the second used a due date one day earlier than suggested. The third
+used different amounts, explicitly confirmed intentional; the last two permitted
+user-chosen fictional integer IQD amounts. Those variations and original records
+are retained. Exact human start/end times were not supplied, and the first reading
+was rounded. These are developer-entered synthetic records, not physical cash-counting
+measurements or merchant validation; automated test durations are excluded.
 
 `GET /api/daily-close/{date}` compares consecutive counts against recorded cash
 flows and shows the signed unexplained difference. Missing counts remain missing.
