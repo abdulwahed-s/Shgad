@@ -636,8 +636,16 @@ retries and fallback, across one fresh mapping and two chat actions. Controlled
 primary-outage injection happens locally before transmission. Configuration must
 match the selected Gemini/OpenAI models, 30-second deadline and 8,192-token cap;
 OpenAI uses the application's existing medium reasoning/store:false profile.
-Use development runtime settings with keys kept locally. No new paid calls were
-made for these demo preparations; key presence does not establish current access.
+Use development runtime settings with keys kept locally. One explicitly authorized
+live drill on 24 October 2026 at `c37b31d` stopped at CSV mapping: Gemini
+`gemini-3.8-flash` returned HTTP 429 twice and OpenAI `gpt-6-luna` returned HTTP
+401 once. Three provider attempts were made within the 12-attempt cap, with no
+successful provider response. Deterministic health, weekly and scenario checks
+passed; live import confirmation, chat/evidence and controlled fallback were not
+reached. No automatic rerun occurred. Response bodies were not retained, so the
+specific limit/authentication causes and actual billing are unverified. Current
+live demo access remains blocked; this integration failure does not change the
+original evaluation scores or their denominators.
 The running browser demo has no session-wide billing cap, so its live use needs
 its own authorization. Recorded responses must always be identified as recorded.
 
