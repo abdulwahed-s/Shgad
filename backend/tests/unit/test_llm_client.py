@@ -58,6 +58,59 @@ def test_429_backoff_then_success_with_identical_schemas():
     assert delays == [2] and sent[0]["tools"] == sent[1]["tools"] == list(definitions())
 
 
+@pytest.mark.parametrize("malformed", ["deep_json", "invalid_gzip"])
+def test_malformed_body_defers_to_approved_openai_fallback(malformed):
+    hosts = []
+
+    def respond(request):
+        hosts.append(request.url.host)
+        if len(hosts) == 1:
+            if malformed == "invalid_gzip":
+                return httpx.Response(
+                    200, headers={"Content-Encoding": "gzip"}, content=b"invalid-gzip"
+                )
+            return httpx.Response(200, content="[" * 20000 + "]" * 20000)
+        return httpx.Response(
+            200,
+            json={
+                "status": "completed",
+                "output": [
+                    {
+                        "type": "message",
+                        "role": "assistant",
+                        "content": [
+                            {
+                                "type": "output_text",
+                                "text": (
+                                    '{"status":"refused",'
+                                    '"message_key":"unsupported_write"}'
+                                ),
+                            }
+                        ],
+                    }
+                ],
+            },
+        )
+
+    reply, delays = run(
+        respond,
+        settings(
+            llm_fallback_provider="openai",
+            llm_fallback_model_id="gpt-6-luna",
+            openai_api_key="fictional-fallback",
+        ),
+    )
+    assert hosts == ["generativelanguage.googleapis.com", "api.openai.com"]
+    assert reply.provider == "openai" and delays == []
+
+
+def test_deep_tool_argument_json_fails_closed():
+    from app.agents.llm_client import strict_json
+
+    with pytest.raises(ValueError, match="JSON_NESTING_LIMIT"):
+        strict_json("[" * 20000 + "]" * 20000)
+
+
 @pytest.mark.parametrize(
     "retry_after",
     ["999999", "99999999999999999999", " 60 ", "Fri, 31 Dec 9999 23:59:59 GMT"],

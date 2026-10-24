@@ -1,7 +1,10 @@
 """Allowlisted validated read-only dispatch, independent of any LLM (§8.1)."""
 
 import sqlite3
+import sys
+from contextlib import contextmanager
 from datetime import date
+from time import monotonic
 
 from pydantic import BaseModel, ValidationError
 
@@ -32,6 +35,37 @@ TOOLS = {
     "reconcile": (ReconcileArguments, reconcile.run),
     "forecast": (ForecastArguments, forecast.run),
 }
+TOOL_TIMEOUT_SECONDS = 10
+
+
+class _ToolTimeout(Exception):
+    pass
+
+
+@contextmanager
+def _python_deadline(deadline):
+    """Interrupt Python loops on this synchronous SQLite thread, then restore it.
+
+    SQL uses a progress callback too. Bounded C operations are checked on return.
+    The loop never awaits while the thread-local trace hook is installed.
+    """
+    previous = sys.gettrace()
+    lines = 0
+
+    def trace(frame, event, arg):
+        nonlocal lines
+        if event == "line":
+            lines += 1
+            if lines % 1024 == 0 and monotonic() >= deadline:
+                sys.settrace(previous)
+                raise _ToolTimeout
+        return trace
+
+    try:
+        sys.settrace(trace)
+        yield
+    finally:
+        sys.settrace(previous)
 
 
 def _metadata(value, path=""):
@@ -143,26 +177,38 @@ def _invoke(name, arguments, *, connection, clock, known_at=None, user_message="
 
 def invoke(name, arguments, *, connection, clock, known_at=None, user_message=""):
     """Hold one consistent SQLite read snapshot through service and provenance."""
+    deadline = monotonic() + TOOL_TIMEOUT_SECONDS
+    query_only = connection.execute("PRAGMA query_only").fetchone()[0]
     try:
+        connection.execute("PRAGMA query_only=ON")
+        connection.set_progress_handler(lambda: int(monotonic() >= deadline), 1000)
         connection.execute("SAVEPOINT read_only_tool")
         try:
-            return _invoke(
-                name,
-                arguments,
-                connection=connection,
-                clock=clock,
-                known_at=known_at,
-                user_message=user_message,
-            )
+            with _python_deadline(deadline):
+                result = _invoke(
+                    name,
+                    arguments,
+                    connection=connection,
+                    clock=clock,
+                    known_at=known_at,
+                    user_message=user_message,
+                )
+            if monotonic() >= deadline:
+                raise sqlite3.OperationalError("TOOL_TIMEOUT")
+            return result
         finally:
+            connection.set_progress_handler(None, 0)
             connection.execute("RELEASE SAVEPOINT read_only_tool")
-    except sqlite3.Error:
+    except (sqlite3.Error, _ToolTimeout):
         return ToolEnvelope(
             ok=False,
             result=None,
             error=ErrorDetail(code="INTERNAL", message_key="error_internal"),
             clarification_key="clarify_internal",
         )
+    finally:
+        connection.set_progress_handler(None, 0)
+        connection.execute(f"PRAGMA query_only={int(query_only)}")
 
 
 def definitions():

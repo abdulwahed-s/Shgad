@@ -1,5 +1,6 @@
 """Bounded read-only tool calling; only the existing verifier/renderer emits values."""
 
+import asyncio
 import json
 import re
 
@@ -259,7 +260,24 @@ def response(rendered, outputs, used):
     )
 
 
+CONVERSATION_TIMEOUT_SECONDS = 120
+
+
 async def converse(request, *, client, connection, clock, known_at):
+    try:
+        async with asyncio.timeout(CONVERSATION_TIMEOUT_SECONDS):
+            return await _converse(
+                request,
+                client=client,
+                connection=connection,
+                clock=clock,
+                known_at=known_at,
+            )
+    except TimeoutError:
+        return fixed("llm_unavailable", "busy")
+
+
+async def _converse(request, *, client, connection, clock, known_at):
     if ambiguous_weekday(request.message, clock):
         return fixed("clarification", "clarify_period")
     messages = [

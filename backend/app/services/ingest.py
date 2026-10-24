@@ -30,6 +30,7 @@ from app.schemas.ledger import (
 )
 from app.services.business_clock import BusinessClock
 from app.services.errors import FinancialRuleError
+from app.services.import_limits import bounded_import, checkpoint
 from app.services.ledger_rules import knowledge_cutoff
 from app.services.observed import OBSERVED_START, observed_day
 from app.services.reconcile import match_payment
@@ -121,14 +122,22 @@ def _csv_rows(content: bytes) -> tuple[str, list[dict[str, str]]]:
     return hashlib.sha256(content).hexdigest(), rows
 
 
+@bounded_import
 def read_csv_content(content: bytes) -> tuple[list[str], list[dict[str, str]]]:
     """Bounded strict CSV decoding shared by canonical import and mapping."""
     if len(content) > MAX_FILE_BYTES:
         raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "FILE_SIZE"})
     try:
-        reader = csv.reader(
-            io.StringIO(content.decode("utf-8-sig"), newline=""), strict=True
-        )
+        decoded = content.decode("utf-8-sig")
+        if any(ord(c) < 32 and c not in "\t\r\n" for c in decoded):
+            raise FinancialRuleError(
+                "IMPORT_REJECTED", details={"reason": "INVALID_FILE"}
+            )
+        if decoded.lstrip().startswith(("<", "{", "[", "PK\x03")):
+            raise FinancialRuleError(
+                "IMPORT_REJECTED", details={"reason": "INVALID_FILE"}
+            )
+        reader = csv.reader(io.StringIO(decoded, newline=""), strict=True)
         header = next(reader)
         if (
             not header
@@ -141,6 +150,7 @@ def read_csv_content(content: bytes) -> tuple[list[str], list[dict[str, str]]]:
             )
         rows = []
         for cells in reader:
+            checkpoint()
             if len(cells) != len(header):
                 raise FinancialRuleError(
                     "IMPORT_REJECTED", details={"reason": "CSV_COLUMNS"}
@@ -308,6 +318,7 @@ def import_csv(
     )
 
 
+@bounded_import
 def import_csv_bytes(
     connection: sqlite3.Connection,
     content: bytes,
@@ -330,6 +341,7 @@ def import_csv_bytes(
     )
 
 
+@bounded_import
 def _import_rows(
     connection,
     file_hash,
@@ -366,6 +378,7 @@ def _import_rows(
         )
         accepted = flagged = rejected = 0
         for number, raw in enumerate(rows, 1):
+            checkpoint()
             raw_id = f"{batch_id}-RAW-{number}"
             evidence = raw_rows[number - 1] if raw_rows is not None else raw
             try:
@@ -517,9 +530,12 @@ def _import_rows(
                         status="rejected",
                     ),
                 )
+        checkpoint()
         connection.execute(
             """UPDATE import_batches SET accepted_count = ?, flagged_count = ?,
             rejected_count = ?, status = 'completed' WHERE import_batch_id = ?""",
             (accepted, flagged, rejected, batch_id),
         )
-        return get_import_receipt(connection, batch_id)
+        receipt = get_import_receipt(connection, batch_id)
+        checkpoint()
+        return receipt

@@ -1,5 +1,6 @@
 """Thin synthetic CSV upload and batch-receipt routes (roadmap §7.1/B.2)."""
 
+import asyncio
 from inspect import isawaitable
 from typing import Annotated
 
@@ -19,6 +20,18 @@ from app.services.errors import FinancialRuleError
 from app.services.ingest import MAX_FILE_BYTES, get_import_receipt, import_csv_bytes
 
 router = APIRouter(prefix="/api/imports", tags=["imports"])
+MAPPING_TIMEOUT_SECONDS = 125
+
+
+def validate_media(file):
+    # Native browser CSV pickers also use plain text or generic binary MIME.
+    if (file.content_type or "").split(";", 1)[0].lower() not in {
+        "text/csv",
+        "application/csv",
+        "text/plain",
+        "application/octet-stream",
+    }:
+        raise FinancialRuleError("IMPORT_REJECTED", details={"reason": "FILE_TYPE"})
 
 
 @router.post("/csv", response_model=ImportReceipt)
@@ -29,6 +42,7 @@ async def upload_csv(
     now: AuditTime,
 ):
     try:
+        validate_media(file)
         content = await file.read(MAX_FILE_BYTES + 1)
         return import_csv_bytes(
             db,
@@ -56,6 +70,7 @@ async def map_csv(
     columns_json: Annotated[str | None, Form(max_length=64000)] = None,
 ):
     try:
+        validate_media(file)
         content = await file.read(MAX_FILE_BYTES + 1)
         headers, rows = mapping_input(content, file.filename or "")
         if columns_json is not None:
@@ -66,7 +81,8 @@ async def map_csv(
                     headers=tuple(headers), sample_rows=tuple(rows[:3])
                 )
                 if isawaitable(proposal):
-                    proposal = await proposal
+                    async with asyncio.timeout(MAPPING_TIMEOUT_SECONDS):
+                        proposal = await proposal
             except (TimeoutError, ConnectionError):
                 raise FinancialRuleError("LLM_UNAVAILABLE") from None
         return propose_mapping(

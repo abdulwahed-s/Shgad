@@ -13,6 +13,7 @@ from app.api.imports import router as imports_router
 from app.api.ledger import router as ledger_router
 from app.api.queries import router as queries_router
 from app.api.reports import router as reports_router
+from app.api.request_safety import RequestSafety
 from app.api.source_evidence import router as source_evidence_router
 from app.schemas.tools import ErrorResponse
 
@@ -21,14 +22,16 @@ app = FastAPI(
     version="0.1.0",
     responses={
         status: {"model": ErrorResponse}
-        for status in (400, 404, 405, 413, 415, 422, 500, 503)
+        for status in (400, 403, 404, 405, 408, 413, 415, 422, 429, 500, 503)
     },
 )
+app.add_middleware(RequestSafety)
 app.add_middleware(
     CORSMiddleware,
     allow_origin_regex=r"https?://(?:localhost|127\.0\.0\.1)(?::[0-9]+)?",
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type"],
+    expose_headers=["X-Request-ID", "Retry-After"],
 )
 register_error_handlers(app)
 app.include_router(health_router)

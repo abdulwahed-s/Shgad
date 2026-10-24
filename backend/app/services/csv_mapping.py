@@ -16,6 +16,7 @@ from app.db.records import atomic_import
 from app.schemas.csv_mapping import MappingPreview, MappingProposal, PreviewRow
 from app.schemas.imports import ImportErrorDetail
 from app.services.errors import FinancialRuleError
+from app.services.import_limits import bounded_import, checkpoint
 from app.services.ingest import (
     _REQUIRED,
     _import_rows,
@@ -174,6 +175,7 @@ def _preview_rows(connection, content, proposal, *, clock, audit, missing):
         connection.execute("RELEASE SAVEPOINT mapping_preview")
 
 
+@bounded_import
 def propose_mapping(
     connection, content, *, filename, proposer: MappingProposer, clock, created_at
 ) -> MappingPreview:
@@ -202,6 +204,7 @@ def propose_mapping(
             and all(not r.errors for r in preview_rows),
         )
         _, _, columns_json, _ = _mapped_input(content, proposal)
+        checkpoint()
         connection.execute(
             """INSERT INTO csv_mappings
             (mapping_id, filename, content, columns_json, preview_json,
@@ -220,6 +223,7 @@ def propose_mapping(
         return preview
 
 
+@bounded_import
 def confirm_mapping(connection, mapping_id, *, clock, confirmed_at):
     audit = parse_timestamp(confirmed_at)
     with atomic_import(connection):

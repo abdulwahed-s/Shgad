@@ -27,6 +27,68 @@ def test_exactly_five_allowlisted_strict_tool_definitions():
     assert all(d["additionalProperties"] is False for d in tools.values())
 
 
+def test_tool_deadline_interrupts_sql_and_restores_connection(ledger, monkeypatch):
+    from app.agents import tool_registry
+
+    before = tuple(ledger.iterdump())
+    now = [0.0]
+    monkeypatch.setattr(tool_registry, "monotonic", lambda: now[0])
+    real_model = tool_registry.TOOLS["get_sales"][0]
+
+    def expensive(snapshot, **kwargs):
+        now[0] = 11
+        snapshot.connection.execute(
+            "WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL "
+            "SELECT x+1 FROM n WHERE x<1000000) SELECT sum(x) FROM n"
+        ).fetchone()
+        pytest.fail("SQL should be interrupted")
+
+    monkeypatch.setitem(tool_registry.TOOLS, "get_sales", (real_model, expensive))
+    result = call(ledger, "get_sales", {"period": "today"})
+    assert not result.ok and result.error.code == "INTERNAL"
+    assert ledger.execute("PRAGMA query_only").fetchone()[0] == 0
+    assert tuple(ledger.iterdump()) == before
+
+
+def test_registry_itself_blocks_writes(ledger, monkeypatch):
+    from app.agents import tool_registry
+
+    real_model = tool_registry.TOOLS["get_sales"][0]
+
+    def forbidden(snapshot, **kwargs):
+        snapshot.connection.execute("DELETE FROM counterparties")
+
+    monkeypatch.setitem(tool_registry.TOOLS, "get_sales", (real_model, forbidden))
+    before = tuple(ledger.iterdump())
+    result = call(ledger, "get_sales", {"period": "today"})
+    assert not result.ok and result.error.code == "INTERNAL"
+    assert tuple(ledger.iterdump()) == before
+
+
+def test_tool_deadline_interrupts_python_loop_and_restores_trace(ledger, monkeypatch):
+    import sys
+
+    from app.agents import tool_registry
+
+    now = [0.0]
+    monkeypatch.setattr(tool_registry, "monotonic", lambda: now[0])
+    real_model = tool_registry.TOOLS["get_sales"][0]
+    previous = sys.gettrace()
+
+    def expensive(snapshot, **kwargs):
+        now[0] = 11
+        while True:
+            pass
+
+    monkeypatch.setitem(tool_registry.TOOLS, "get_sales", (real_model, expensive))
+    before = tuple(ledger.iterdump())
+    result = call(ledger, "get_sales", {"period": "today"})
+    assert not result.ok and result.error.code == "INTERNAL"
+    assert sys.gettrace() is previous
+    assert ledger.execute("PRAGMA query_only").fetchone()[0] == 0
+    assert tuple(ledger.iterdump()) == before
+
+
 @pytest.mark.parametrize(
     "name,args",
     [

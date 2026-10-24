@@ -31,7 +31,7 @@ def api(ledger):
             async def send():
                 async with AsyncClient(
                     transport=ASGITransport(app=app, raise_app_exceptions=False),
-                    base_url="http://test",
+                    base_url="http://127.0.0.1",
                 ) as client:
                     return await client.request(method, url, **kwargs)
 

@@ -48,6 +48,28 @@ class LLMUnavailable(Exception):
 
 
 def strict_json(text):
+    # Bound object depth before decoding/copying/serializing provider structures.
+    value = text.decode("utf-8") if isinstance(text, bytes) else text
+    if not isinstance(value, str):
+        raise ValueError("INVALID_JSON")
+    depth, quoted, escaped = 0, False, False
+    for char in value:
+        if quoted:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                quoted = False
+        elif char == '"':
+            quoted = True
+        elif char in "[{":
+            depth += 1
+            if depth > 64:
+                raise ValueError("JSON_NESTING_LIMIT")
+        elif char in "]}":
+            depth -= 1
+
     def pairs(items):
         result = {}
         for key, value in items:
@@ -59,7 +81,10 @@ def strict_json(text):
     def constant(value):
         raise ValueError("INVALID_JSON")
 
-    return json.loads(text, object_pairs_hook=pairs, parse_constant=constant)
+    try:
+        return json.loads(value, object_pairs_hook=pairs, parse_constant=constant)
+    except RecursionError:
+        raise ValueError("JSON_NESTING_LIMIT") from None
 
 
 def provider_configs(settings):
@@ -283,7 +308,13 @@ class LLMClient:
                     reason = "needs_internet"
                     if attempt == 1:
                         break
-                except (ValueError, TypeError, KeyError, IndexError):
+                except (
+                    ValueError,
+                    TypeError,
+                    KeyError,
+                    IndexError,
+                    httpx.DecodingError,
+                ):
                     reason = "invalid_response"
                     break
                 await self.sleep(delay)

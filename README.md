@@ -107,12 +107,31 @@ Then, from `backend/`, use that environment's Python:
 python -m pytest -q
 python -m ruff check .
 python -m ruff format --check .
-python -m uvicorn app.main:app --reload
+python -m uvicorn app.main:app --host 127.0.0.1 --no-access-log --reload
 ```
 
 Activate the environment first (`.venv/Scripts/Activate.ps1` in PowerShell or
 `source .venv/bin/activate` on macOS/Linux). `GET http://127.0.0.1:8000/health`
 returns `{"status":"ok","version":"0.1.0"}` without configuration values.
+The supported server mode is one local worker for the fictional merchant. Remote
+socket peers, non-loopback hosts and unrelated browser origins are rejected;
+forwarded headers do not grant access. Bodies, receive time and per-peer request
+rates are bounded. Handler and request-limit responses carry a server-generated
+request ID (CORS preflights are handled separately); application
+logs contain only the ID, status and elapsed time. Keep access logging disabled as
+shown above. Network/public hosting requires a separate authentication and origin
+configuration before deployment.
+
+CSV uploads check extension, media type, UTF-8 and content, with limits of 5 MiB,
+10,000 rows and ten seconds of deterministic processing. Imports roll back on
+timeout; replay/entry keys prevent duplicate writes. Read-only tools have ten-second
+SQL/Python deadlines and chat has a 120-second total budget. Provider failures use
+bounded retries and the configured Gemini/OpenAI fallback; malformed responses fail
+closed. There is no CSV/spreadsheet export endpoint.
+
+These security changes were made after the published measurements. They do not
+replace the original scores or establish improved answer/forecast quality; no paid,
+sealed or final evaluation was repeated for this work.
 For local development, copy `.env.example` to a repository-root `.env` if it does
 not already exist, then edit it locally. The backend loads that exact file from
 either the root or `backend/` working directory. Non-empty process environment
@@ -188,8 +207,8 @@ with closing(connect_database("shgad.db")) as connection:
 ```
 
 This creates the schema only. Preload fictional reference and opening records
-before importing or recording debts. Demo reset and automatic demo-data loading
-remain planned.
+before importing or recording debts, or explicitly restore the fictional sample
+through the sample-shop screen. Reset is disabled in production mode.
 
 `POST /api/entries` records cash/credit sales, supplier invoices, explicit partial
 collections/payments, expenses, drawings, capital and daily cash counts. Amounts
@@ -662,7 +681,7 @@ probe requires both `SHGAD_RUN_LIVE=1` and `python -m pytest -m live`; it has a
 four-request transport cap. The separate development comparison above retains
 its forty-request cap. Neither check accesses held-out questions.
 
-Flutter verification: **176 tests passed**, including BLoC/repository checks,
+Earlier Flutter workflow verification: **176 tests passed**, including BLoC/repository checks,
 96 screen cases across Arabic/English, 320/360 px and 1.0/1.3 text scales,
 confirmation/undo, source evidence and T33 cache/input retention. Localization,
 formatting, analysis and a release web build pass. The SDK integration flow also
@@ -675,6 +694,16 @@ These checks establish application behavior, not live-model answer quality or
 merchant usability. Android, iOS and an independent human usability test have not
 been verified. Browser IQD values outside the exact integer range are rejected;
 figures and financial calculations stay in the backend.
+
+Fresh offline security/reliability verification on 24 October 2026 passed **914
+backend tests** with one live test deselected and **358 Flutter tests**. Backend
+lint/format checks cover 153 files; Dart formatting covers 184 files, analysis is
+clean, pinned dependency checks pass, and the release web build succeeds. Local
+Chrome drills confirm exact cache timestamps on all five read-only screens,
+retained offline drafts, disabled writes, connection-required chat, and fake
+Gemini/OpenAI outage/fallback behavior. A positive source/build allowlist scan
+found zero secret-pattern matches. This is post-evaluation verification with fake
+provider responses; the original quality measurements below remain unchanged.
 
 [GitHub Actions](https://github.com/abdulwahed-s/Shgad/actions/workflows/test.yml)
 runs backend lint/format/tests and Flutter localization, formatting, analysis and tests

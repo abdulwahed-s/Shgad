@@ -10,8 +10,10 @@ from app.schemas.ledger import OpeningBalance, Transaction
 @pytest.fixture(autouse=True)
 def offline_provider_environment(request, monkeypatch):
     """Default tests never read local credentials or inherit live provider IDs."""
+    from app.api.request_safety import _windows
     from app.config import get_settings
 
+    _windows.clear()
     get_settings.cache_clear()
     if request.node.get_closest_marker("live") is None:
         monkeypatch.setenv("APP_ENV", "test")

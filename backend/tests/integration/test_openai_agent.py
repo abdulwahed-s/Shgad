@@ -10,6 +10,82 @@ from app.config import Settings
 from app.schemas.chat import ChatResponse
 
 
+@pytest.mark.parametrize("failure", [429, 503, "timeout"])
+def test_d39_primary_and_fallback_exhaustion_preserves_deterministic_screens(
+    api, tool_history, failure
+):
+    from app.agents.messages_ar import text
+    from app.api.dependencies import llm_client
+    from app.main import app
+
+    sent, delays = [], []
+    before = tuple(tool_history.iterdump())
+
+    def respond(request):
+        sent.append(request.url.host)
+        if failure == "timeout":
+            raise httpx.ReadTimeout("fictional secret must stay hidden")
+        return httpx.Response(failure, headers={"Retry-After": "1"})
+
+    async def sleep(delay):
+        delays.append(delay)
+
+    async def client():
+        async with LLMClient(
+            Settings(
+                llm_provider="gemini",
+                llm_model_id="gemini-3.8-flash",
+                gemini_api_key="fake-gemini",
+                llm_fallback_provider="openai",
+                llm_fallback_model_id="gpt-6-luna",
+                openai_api_key="fake-openai",
+            ),
+            transport=httpx.MockTransport(respond),
+            sleep=sleep,
+        ) as value:
+            yield value
+
+    app.dependency_overrides[llm_client] = client
+    response = api.post(
+        "/api/chat",
+        json={"message": "شكد بعت اليوم؟", "conversation_id": "fake-outage"},
+    )
+    result = ChatResponse.model_validate_json(response.content)
+    assert result.status == "llm_unavailable" and not result.figures
+    assert result.reply_ar == text("needs_internet" if failure == "timeout" else "busy")
+    assert sent == ["generativelanguage.googleapis.com"] * 2 + ["api.openai.com"] * 2
+    assert delays == [1, 1]
+    assert api.get("/health").json() == {"status": "ok", "version": "0.1.0"}
+    assert api.get("/api/debts").status_code == 200
+    assert api.get("/api/reports/weekly").status_code == 200
+    assert tuple(tool_history.iterdump()) == before
+
+
+def test_conversation_total_deadline_restores_readonly_connection(
+    api, ledger, monkeypatch
+):
+    import asyncio
+
+    from app.agents import orchestrator
+    from app.api.dependencies import llm_client
+    from app.main import app
+
+    class StalledClient:
+        async def complete(self, *args, **kwargs):
+            await asyncio.sleep(1)
+
+    async def client():
+        yield StalledClient()
+
+    monkeypatch.setattr(orchestrator, "CONVERSATION_TIMEOUT_SECONDS", 0.001)
+    app.dependency_overrides[llm_client] = client
+    response = api.post(
+        "/api/chat", json={"message": "شكد بعت اليوم؟", "conversation_id": "timeout"}
+    )
+    assert response.json()["status"] == "llm_unavailable"
+    assert ledger.execute("PRAGMA query_only").fetchone()[0] == 0
+
+
 def native_calls(name, arguments):
     return [
         {
