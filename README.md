@@ -22,12 +22,16 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > with accessible ledger colors, shared controls and keyboard focus.
 > Gemini, Groq and OpenAI completed bounded development routing screens. With
 > larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
-> Both selected provider APIs now respond successfully. Live CSV previews and
+> Both selected provider APIs responded in earlier checks. Live CSV previews and
 > controlled fallback checks pass. A five-case application check matched four
 > expected tool sets and three full responses; weekly-summary and response-format
 > limitations remain.
-> The development forecast benchmark performs worse than the seven-day baseline;
-> final testing has not run.
+> The larger development evaluation scored 12/20 numeric answers and 6/12 safe
+> decisions, below target; request limits, transport failures and HTTP 401
+> responses are included. The sealed evaluation scored 8/40 numeric answers,
+> 0/20 safe decisions and 12/60 joint selections, also below target; unavailable
+> cases remain failures. Both development and final forecast benchmarks perform
+> worse than the seven-day baseline. Measured receipts are linked below.
 > The 55 fixed backend and 277 frontend Arabic messages have human approval.
 > The developer manually accepted the current visuals; advisory layout findings remain.
 > New or edited wording requires review.
@@ -232,8 +236,8 @@ receivables are excluded. Unknown starting cash, essential history or due dates 
 typed clarification errors. Later entries, payment links and voids cannot change an
 earlier forecast. The service enforces the observed calendar boundary and loads no
 files or evaluation answers. `GET /api/reports/forecast` exposes the service;
-the web workflow shows these secondary estimates; final accuracy testing remains
-pending. Observed-data development errors are reported below.
+the web workflow shows these secondary estimates. Development and frozen final
+accuracy measurements are reported below; all three scenarios underperform the baseline.
 
 Seeded fictional data and offline development truth are available. From the
 repository root (standard library only):
@@ -274,7 +278,8 @@ Missing or ambiguous anchor counts give typed errors. Existing result files
 are never overwritten.
 The final-test path requires a separate explicit run flag and a matching frozen
 method/settings/source-commit receipt before opening final outcomes or extra shops.
-No final test has run. Conservative collection dates round the exact median
+The frozen final test has run on the primary shop and three previously unseen
+synthetic shops; its receipt is linked below. Conservative collection dates round the exact median
 lateness half up once to whole days before adding it to the due date.
 **Forecast development results — 20 October 2026.** The actual offline run at
 source `1dc2179ab1fe80ba799b11c518f1838fb10a523d` used method
@@ -318,9 +323,10 @@ per-cutoff errors, dates, counts, source/input hashes and all 30 prediction rows
 The [method freeze](results/forecast_method_freeze.json) predates this run and
 pins the same code/settings and observed inputs. Independent calculations match
 all six complete prediction series; separate error-sum checks agree.
-Only the primary fictional shop's observed data was used. Final outcomes,
-the three reserved shops and held-out questions remain unaccessed. No final or
-real-world accuracy is established, and no method was tuned after this run.
+Only the primary fictional shop's observed data was used in that development run.
+Final outcomes and the three reserved shops stayed unseen until the separately
+authorized final benchmark below. No real-world accuracy is established, and
+the original method and development report remain unchanged.
 
 See [data/README.md](data/README.md) for file boundaries and generation
 metadata. Same-seed regeneration was byte-identical in a fresh process,
@@ -331,7 +337,8 @@ The historical test set has 60 human-reviewed questions and a
 remain outside the repository. Generation used a separate session of the same
 tool used during development. Memory controls were requested; isolation was not
 independently verified and the exact generator model ID was not exposed.
-No held-out model evaluation has run.
+The first aggregate-only sealed result below misses all four answer/selection/
+traceability targets.
 
 `scripts/model_smoke_test.py` prepares a provider comparison using ten fixed,
 reviewed development questions and the existing five read-only tool schemas.
@@ -599,7 +606,7 @@ After the user reported paid access was active, a fresh check at `abaed05` used
 200. Both CSV previews and controlled OpenAI fallback passed. Gemini matched
 three of five expected tool/customer/period cases; the weekly-summary and
 duplicate-record tool-set misses remained. Two answers used deterministic
-templates. These are development application results, with no held-out run.
+templates. These development application checks predate the sealed result below.
 
 The versioned agent policy now clarifies that possible duplicate-payment
 comparisons inspect read-only reconciliation flags before asking for record
@@ -672,15 +679,18 @@ figures and financial calculations stay in the backend.
 [GitHub Actions](https://github.com/abdulwahed-s/Shgad/actions/workflows/test.yml)
 runs backend lint/format/tests and Flutter localization, formatting, analysis and tests
 on pushes and pull requests. Its linked run history shows the measured CI results.
-The development forecast benchmark above has run. No final forecast test or
-held-out model evaluation has run.
+Development, sealed Q&A and frozen final forecast benchmarks have run. Their
+actual counts and limitations are reported below; answer and routing targets
+are not met.
 
 Synthetic CSV generation, ledger import, financial tools, deterministic reports
 and the merchant Flutter web workflow are available. Current frontend Arabic
 wording is reviewed; merchant usability validation remains pending. The forecast
-results above cover one fictional development shop and do not meet the baseline comparison target.
-The separate model-routing/application checks retain their reported limitations;
-no held-out or general financial-answer accuracy is established.
+development results above cover one fictional shop and do not meet the baseline comparison target.
+The final four-shop benchmark below also misses that target.
+The separate model-routing/application checks retain their reported limitations.
+Held-out accuracy is measured below; general financial-answer quality and merchant
+readiness are not established.
 
 ## Reproducible evaluation
 
@@ -713,7 +723,7 @@ retains those counts after the reviewed historical-selector registry and public
 annotation import. It reproduces from an isolated checkout with no credentials, future
 outcomes or unseen shops present. All 882 offline backend tests pass; the live
 test is deselected. Lint, formatting and dependency checks also pass. These
-checks establish infrastructure behavior; live Q&A remains blocked below. Replay
+checks establish infrastructure behavior; live development measurements follow below. Replay
 uses explicit synthetic-fixture requirements and does not replace independent
 annotations for live measurements.
 The [development forecast receipt](results/evaluation_forecast_dev_2026-10-23.md)
@@ -731,7 +741,8 @@ cash stays unavailable and equivalent views require matching evidence. Ten added
 historical/closing selectors separate economic dates from knowledge cutoffs and
 strict daily differences from book comparisons. All32 public development
 annotations preflight against independent calculations. Public seals attest full
-human review32/60; the private60 annotations remain unopened and unverified here.
+human review of 32/60. Private annotations stay outside builder context; the
+authorized sealed evaluator verified their bytes/schema before provider calls.
 Builders authored the contract/calculators and fabricated tests; the supplied
 annotation records are unchanged. Missing or invalid seals block live evaluation
 before credentials; authorization flags cannot bypass them.
@@ -754,8 +765,82 @@ unit/category and customer/period must match for whole-question numeric credit.
 Unsupported historical evidence shapes fail closed. Safe handling and source-row
 coverage are separate metrics. Sealed access uses only `HELDOUT_PATH`, verifies
 its committed SHA-256 before parsing and requires separate authorization. Its
-JSON/Markdown/stdout remain aggregate-only. Paid evaluation, sealed evaluation and
-the frozen final/unseen forecast test have not run.
+JSON/Markdown/stdout remain aggregate-only. Paid development, sealed scoring and
+the frozen final forecast test have run as recorded below.
+
+**Measured development evaluation - 23 October 2026.** The
+[first live receipt](results/evaluation_dev_live_FIRST.md) at code `4e13092`
+uses the reviewed freeze and original 32 development questions. These are
+end-to-end results on fictional data, including unavailable/budget-limited cases.
+
+| Metric | Correct / eligible | Rate | Target |
+|---|---:|---:|---:|
+| Whole-question numeric accuracy | 12 / 20 | 60.00% | 95% |
+| Safe clarification/refusal | 6 / 12 | 50.00% | 95% |
+| Joint intent/tool/customer/period | 14 / 32 | 43.75% | 90% |
+| Correctly evidenced historical claims | 66 / 67 | 98.51% | 100% |
+
+Each rate is below the corresponding held-out target; development scores are
+reported separately. All 96 allowed requests were used: 90 Gemini 3.8 Flash,
+6 GPT-6 Luna fallback; 77 HTTP 200 responses, 6 HTTP 401 responses and 13 transport
+failures. Five questions were unserved after the budget was exhausted; they
+remain in the full denominators. Authentication and transport failures are
+retained. These figures do not isolate model skill from application
+limitations, transport availability or request limits. Original prompts, method,
+settings and results are preserved; no rerun selected a better score.
+The two seeded reconciliation fixtures retain duplicate TP1/FP0/FN0 and
+unmatched TP1/FP0/FN0, combined precision/recall 2/2; this tiny fixture check does
+not establish general reconciliation quality.
+
+**Sealed evaluation - 23 October 2026.** The
+[first aggregate receipt](results/evaluation_heldout_FIRST.md) uses the same
+code `4e13092`, reviewed freeze and original question seal: 60 questions,
+40 answerable, 11 clarify and 9 refuse. No question, private annotation, expected
+answer, source snippet or per-question result is included in its reports.
+
+| Metric | Correct / eligible | Rate | Target |
+|---|---:|---:|---:|
+| Whole-question numeric accuracy | 8 / 40 | 20.00% | 95% |
+| Safe clarification/refusal | 0 / 20 | 0.00% | 95% |
+| Joint intent/tool/customer/period | 12 / 60 | 20.00% | 90% |
+| Correctly evidenced historical claims | 38 / 39 | 97.44% | 100% |
+
+All four targets are missed. The run used 180 actual requests: 145 Gemini 3.8 Flash
+and 35 GPT-6 Luna fallback attempts. Status totals are 68 HTTP 200, 35 HTTP 401,
+57 HTTP 429 and 20 transport failures. Twenty questions were unserved when the
+request cap was reached; all 60 questions remain in the denominators. Per-field
+selection counts are intent 26/60, tool 38/60, customer 47/60 and period 22/60. Claim
+coverage concerns emitted historical claims and does not credit missing answers.
+These end-to-end scores include application, transport and budget failures;
+they do not establish isolated model capability or merchant readiness.
+
+An initial sealed preflight refused an annotation hash mismatch before credentials
+or provider calls. Only the external input location was corrected; the original
+question and approved annotation hashes were still mandatory and then matched.
+That failed preflight is preserved. No successful measured run was repeated and
+no prompt, scorer, application or forecast method was tuned on the outcomes.
+Future changes must be disclosed as post-run/post-test.
+
+**Frozen final forecast - 23 October 2026.** The
+[first final receipt](results/evaluation_forecast_test_FIRST.md) uses the unchanged
+recorded method/source freeze, cutoff 90 on the primary shop plus three previously
+unseen synthetic shops, 30 scored days each. All 120 forecast days were scored;
+the generated artifacts contain 480 prediction and 120 realized rows. No provider
+call was used, and no method was tuned on these outcomes. Amounts are integer IQD.
+
+| Scenario | Final MAE | Seven-day baseline MAE | Worst-day error |
+|---|---:|---:|---:|
+| Base | 978,995 | 666,064 | 2,697,237 |
+| Conservative | 965,616 | 666,064 | 2,697,237 |
+| Stress | 855,204 | 666,064 | 2,497,237 |
+
+All three scenarios are worse than the baseline. No realized shortfall occurred
+in these four synthetic cases, so first-shortfall timing and false-OK rates have
+zero denominators and are null. Scenario false-OK counts are 0/0 over four eligible
+invoice-cutoff observations each; J1/seven-day with-expected counts are also 0/0.
+This provides no measured safety evidence during actual shortfalls. The original
+development forecast report and freeze remain available. Any later forecast
+method change must be disclosed as post-test and cannot be tuned on this final set.
 
 ## Data and scope
 
@@ -770,8 +855,10 @@ display name; the exact provider model ID/settings remain unavailable and are
 not guessed. No model-provider API call was used for this dataset.
 Application integration is tested with recorded responses. Live development
 screening used the candidates above; Gemini 3.8 Flash is the selected primary.
-Both selected APIs now respond and both CSV previews pass. Primary-model routing
-acceptance remains pending. The 55 fixed backend Arabic messages
+Both selected APIs responded and CSV previews passed in earlier checks. The
+larger evaluations above include authentication, rate-limit, transport and
+application failures; broad routing and safe-answer targets are not met.
+The 55 fixed backend Arabic messages
 have user approval. All 277 frontend messages are also reviewed: the original
 248-message review is preserved, and the 29 additions have a separate approval
 with 15 Iraqi revisions and 14 retained texts, bound to exact text hashes.
