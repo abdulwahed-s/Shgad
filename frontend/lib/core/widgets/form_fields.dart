@@ -20,6 +20,9 @@ Widget ledgerTextField(
   required InputDecoration decoration,
   ValueChanged<String>? onChanged,
 }) => FieldLabel(
+  // Keep the field's complete semantics subtree when offline banners or sibling
+  // inputs are inserted. An inner TextFormField key cannot move its parent.
+  key: key == null ? null : ValueKey<Key>(key),
   label: decoration.labelText ?? '',
   child: TextFormField(
     key: key,

@@ -704,6 +704,8 @@ retained offline drafts, disabled writes, connection-required chat, and fake
 Gemini/OpenAI outage/fallback behavior. A positive source/build allowlist scan
 found zero secret-pattern matches. This is post-evaluation verification with fake
 provider responses; the original quality measurements below remain unchanged.
+Keyed form fields preserve their accessible identity and typed values when
+offline warnings or optional sibling inputs rebuild the form.
 
 [GitHub Actions](https://github.com/abdulwahed-s/Shgad/actions/workflows/test.yml)
 runs backend lint/format/tests and Flutter localization, formatting, analysis and tests
@@ -728,6 +730,15 @@ prints a plan without loading credentials or opening sealed questions:
 
 ```sh
 python scripts/run_evaluation.py --split dev --mode plan
+```
+
+The replay and development-forecast commands below require a separate clean
+checkout of the original frozen application, `4e13092` (evaluator source freeze
+`0b292e1`). The current hardened source intentionally refuses the preserved
+evaluator freeze with `EVALUATOR_CHANGED_SINCE_FREEZE`. Preserve the original
+freeze and reports; do not overwrite or refreeze them to make current code pass.
+
+```sh
 python scripts/run_evaluation.py --split dev --mode replay --output results/evaluation_replay.json
 python scripts/run_evaluation.py --split dev --mode forecast --forecast-split dev --output results/evaluation_forecast_dev.json
 ```
@@ -749,9 +760,10 @@ cases establish setup correctness, not general reconciliation quality. Original
 reports and freezes remain available; later scorer changes are disclosed.
 The [latest synthetic receipt](results/evaluation_replay_reviewed_requirements_2026-10-23.md)
 retains those counts after the reviewed historical-selector registry and public
-annotation import. It reproduces from an isolated checkout with no credentials, future
-outcomes or unseen shops present. All 882 offline backend tests pass; the live
-test is deselected. Lint, formatting and dependency checks also pass. These
+annotation import. It reproduces from that original frozen checkout with no
+credentials, future outcomes or unseen shops present. The original readiness
+check passed 882 offline backend tests with the live test deselected, plus lint,
+formatting and dependency checks. These
 checks establish infrastructure behavior; live development measurements follow below. Replay
 uses explicit synthetic-fixture requirements and does not replace independent
 annotations for live measurements.
