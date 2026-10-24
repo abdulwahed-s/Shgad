@@ -1,7 +1,9 @@
 """§14: fresh synthetic input reaches real ledger/tools/rendering, with no network."""
 
 import asyncio
+import csv
 import importlib.util
+import io
 from pathlib import Path
 
 import httpx
@@ -89,3 +91,27 @@ def test_fresh_csv_is_different_each_time_and_has_unfamiliar_order():
     assert (
         first[0].decode("utf-8-sig").splitlines()[0].startswith("Memo,IQD,At,Ref,Kind")
     )
+
+
+def test_valid_new_rows_flagged_as_similar_are_still_preserved(monkeypatch):
+    """A valid random amount can coincide; flagged is distinct from rejected."""
+    drill = module()
+    content, ids, _ = drill.fresh_csv()
+    rows = list(csv.DictReader(io.StringIO(content.decode("utf-8-sig"))))
+    stream = io.StringIO(newline="")
+    writer = csv.DictWriter(stream, fieldnames=drill.ALIASES)
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(row | {"IQD": "1237"})
+    monkeypatch.setattr(
+        drill, "fresh_csv", lambda: (stream.getvalue().encode(), ids, [1237, 1237])
+    )
+    result = asyncio.run(drill.run_drill(mode="recorded", request_cap=12))
+    assert "failure_type" not in result, result
+    assert all(result["checks"].values())
+    assert result["import_counts"] == {
+        "accepted": 1,
+        "flagged_for_review": 1,
+        "rejected": 0,
+        "exact_duplicates": 0,
+    }

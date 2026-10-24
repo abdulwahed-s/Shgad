@@ -621,10 +621,12 @@ fake provider wire responses. Its Arabic test question is pending language revie
 The plan command loads no credentials and makes no requests. Keep receipts local;
 existing receipt paths are never overwritten. These are integration checks, not
 answer-quality evaluations or human rehearsals.
-The driver-inclusive offline backend suite passed 918 tests with one live test
+The driver-inclusive offline backend suite passed 919 tests with one live test
 deselected. A release-Chrome run also verified fresh native CSV import through
 chat/evidence, five cached reports, scenario controls, simulated timeout/fallback
 and confirmed reset, with no unexpected runtime errors.
+Valid new rows flagged as similar remain visible and counted separately from
+accepted rows in the drill receipt; flags are never silently treated as rejection.
 
 A real-provider drill requires separate explicit run authorization, followed by
 `--mode live --request-cap 12 --authorize-paid --output demo-live-receipt.json`.

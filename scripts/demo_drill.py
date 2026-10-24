@@ -294,8 +294,19 @@ async def run_drill(*, mode, request_cap, authorize_paid=False):
                         "/api/imports/csv/mapping/" + preview["mapping_id"] + "/confirm"
                     )
                     receipt = await request("POST", path)
+                    result["import_counts"] = {
+                        key: receipt[key]
+                        for key in (
+                            "accepted",
+                            "flagged_for_review",
+                            "rejected",
+                            "exact_duplicates",
+                        )
+                    }
                     checks["confirmation"] = (
-                        receipt["accepted"] == 2 and receipt["rejected"] == 0
+                        receipt["accepted"] + receipt["flagged_for_review"] == len(ids)
+                        and receipt["rejected"] == 0
+                        and receipt["exact_duplicates"] == 0
                     )
                     checks["replay"] = (await request("POST", path))[
                         "exact_duplicates"
