@@ -92,6 +92,24 @@ development results and their limitations are recorded below.
 ## Development status
 
 The backend requires Python 3.11+ and was verified locally with Python 3.14.7.
+An isolated local-source clone of `b8a30119c4c2c404599acf353dc49e6ac303b07b`
+was installed in a new environment on 24 October 2026. Migrations, synthetic
+reset, HTTP health/API docs, Flutter startup, 914 backend tests, 358 Flutter
+tests and a release build passed. This verifies a local Git checkout; a fresh
+checkout from published GitHub has not been verified. Direct Python dependencies
+are pinned; transitive dependencies resolve at installation time. The tested
+environment included SQLite 3.50.4, Starlette 1.9.0, Flutter 3.44.9 and Dart 3.12.2.
+To make a disposable checkout of your exact local HEAD, start in this repository
+and use an unused destination (PowerShell):
+
+```powershell
+$verifiedCommit = git rev-parse HEAD
+$demoCheckout = Join-Path $env:TEMP 'shgad-demo-verified-20261024'
+git clone --no-hardlinks --no-checkout . $demoCheckout
+git -C $demoCheckout checkout --detach $verifiedCommit
+Set-Location $demoCheckout
+```
+
 From the repository root, create an environment and install the pinned dependencies:
 
 ```sh
@@ -537,13 +555,98 @@ flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=ht
 ```
 
 The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; Android builds
-and release signing have not been verified. Arabic copy is awaiting Iraqi Arabic review.
+and release signing have not been verified. Existing fixed Arabic copy is reviewed;
+new or edited copy requires Iraqi Arabic review.
 Open **More → Sample shop** to restore the clearly fictional observed shop, then
 open Today and Chat. Reset asks before replacing sample edits and clears old caches
 and chat. It is disabled in production. The web CSV picker supports manual column
 mapping, a server-validated preview of up to five rows and explicit confirmation;
 edits require a fresh immutable preview. All files must be synthetic. The complete
 HTTP interfaces are documented at `/docs`.
+
+For a provider-free setup check in PowerShell, use a disposable local checkout
+and database. These commands install the specified packages, migrate explicitly,
+then start one loopback worker. Run from the checkout root:
+
+```powershell
+python -m venv backend/.venv
+backend/.venv/Scripts/python.exe -m pip install -e 'backend[dev]'
+$env:APP_ENV = 'test' # disables repository secret-file loading
+Remove-Item Env:LLM_PROVIDER, Env:LLM_FALLBACK_PROVIDER -ErrorAction SilentlyContinue
+$env:BUSINESS_AS_OF = '2026-09-28'
+$env:DATABASE_URL = 'sqlite:///./demo.sqlite'
+Set-Location backend
+@'
+from app.db.connection import connect_database
+from app.db.migrations import apply_migrations
+with connect_database('demo.sqlite') as db:
+    apply_migrations(db)
+    print('migrations_applied', db.execute('PRAGMA user_version').fetchone()[0])
+'@ | .venv/Scripts/python.exe -
+.venv/Scripts/python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8154 --no-access-log
+```
+
+In another terminal, seed the six-file fictional observed snapshot and check it:
+
+```powershell
+Invoke-RestMethod -Method Post http://127.0.0.1:8154/api/demo/reset
+Invoke-RestMethod http://127.0.0.1:8154/health
+Invoke-WebRequest http://127.0.0.1:8154/docs -UseBasicParsing | Select-Object StatusCode
+Set-Location frontend
+flutter pub get --enforce-lockfile
+flutter gen-l10n
+flutter run -d web-server --web-hostname 127.0.0.1 --web-port 8155 --dart-define=API_BASE_URL=http://127.0.0.1:8154
+```
+
+Open `http://127.0.0.1:8155`. Seeded cash is 420,000 IQD, supplier dues are
+650,000 and expected collections are 150,000; the separate positions are
+−230,000 confirmed and −80,000 with expected collections. Sample reset replaces
+demo edits and clears browser reports/chat when performed through **More → Sample
+shop → Restore sample**. Use that confirmed interface reset before each rehearsal;
+an HTTP reset alone cannot clear another browser's cache. Generation/evaluation
+commands are unnecessary for seeding: the app reads only the six observed files.
+
+For a repeatable integration drill from the root:
+
+```powershell
+backend/.venv/Scripts/python.exe scripts/demo_drill.py --mode recorded --output demo-recorded-receipt.json
+backend/.venv/Scripts/python.exe scripts/demo_drill.py --mode live --request-cap 12 --plan
+```
+
+The recorded drill generates new fictional CSV IDs and amounts, exercises mapping,
+preview, confirmation, ledger, tools, rendered response and raw evidence, then
+checks weekly reports, all three scenarios, replay safety, malformed input,
+simulated timeout, fallback and sample reset. It uses a temporary database and
+fake provider wire responses. Its Arabic test question is pending language review.
+The plan command loads no credentials and makes no requests. Keep receipts local;
+existing receipt paths are never overwritten. These are integration checks, not
+answer-quality evaluations or human rehearsals.
+The driver-inclusive offline backend suite passed 918 tests with one live test
+deselected. A release-Chrome run also verified fresh native CSV import through
+chat/evidence, five cached reports, scenario controls, simulated timeout/fallback
+and confirmed reset, with no unexpected runtime errors.
+
+A real-provider drill requires separate explicit run authorization, followed by
+`--mode live --request-cap 12 --authorize-paid --output demo-live-receipt.json`.
+The cap covers every transmitted generation attempt, including failed requests,
+retries and fallback, across one fresh mapping and two chat actions. Controlled
+primary-outage injection happens locally before transmission. Configuration must
+match the selected Gemini/OpenAI models, 30-second deadline and 8,192-token cap;
+OpenAI uses the application's existing medium reasoning/store:false profile.
+Use development runtime settings with keys kept locally. No new paid calls were
+made for these demo preparations; key presence does not establish current access.
+The running browser demo has no session-wide billing cap, so its live use needs
+its own authorization. Recorded responses must always be identified as recorded.
+
+Keep both servers on `127.0.0.1`. Phone/LAN/tunnel/hosted use is not ready: it
+requires authenticated scoped access, HTTPS, explicit trusted CORS origins,
+server-side secret storage, request limits and verified recovery/cold starts.
+Offline reports require warming their caches while connected. Offline chat and
+writes remain unavailable, with retained drafts and no queued submissions.
+Two actual human rehearsals, venue connectivity and five developer-only daily-close
+timings remain unmeasured. The target is under two minutes per sample business day;
+automated test durations do not establish that target or merchant validation.
+
 `GET /api/daily-close/{date}` compares consecutive counts against recorded cash
 flows and shows the signed unexplained difference. Missing counts remain missing.
 `POST /api/daily-close/{date}/resolve` accepts a merchant-chosen explanation or
