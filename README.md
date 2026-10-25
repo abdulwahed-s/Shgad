@@ -673,9 +673,10 @@ errors and zero paid attempts; health and the weekly report returned HTTP 200
 (630,500 IQD for 26–28 September 2026) during and after the simulated timeout.
 This does not establish behavior during a real provider outage. The fake timeout
 switch was cleared; health and the weekly report returned HTTP 200 after recovery.
-No second chat was sent. Browser offline/reconnect was checked separately. Human
-elapsed time/pauses are pending, so this run is not counted as a completed
-seven-minute rehearsal. A second rehearsal and venue connectivity remain unverified.
+No second chat was sent. Browser offline/reconnect was checked separately. The user
+confirms this guided run was not timed; pauses were not measured. It is not counted
+as a completed seven-minute rehearsal. A second rehearsal and venue connectivity
+remain unverified.
 On 24 October 2026, one developer (the user) completed the fictional entry-and-review
 workflow for five consecutive sample business dates at `9c5f1bd`, using a stopwatch:
 
