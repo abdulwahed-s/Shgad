@@ -664,7 +664,15 @@ requires authenticated scoped access, HTTPS, explicit trusted CORS origins,
 server-side secret storage, request limits and verified recovery/cold starts.
 Offline reports require warming their caches while connected. Offline chat and
 writes remain unavailable, with retained drafts and no queued submissions.
-Two actual human demo rehearsals and venue connectivity remain unverified.
+In a guided human browser run on 25 October 2026, a recorded fake-provider timeout
+produced Chat’s generic connection-needed message; the user confirmed the saved
+weekly report remained visible. The isolated fake session recorded four transport
+errors and zero paid attempts; health and the weekly report returned HTTP 200
+(630,500 IQD for 26–28 September 2026) during and after the simulated timeout.
+This does not establish behavior during a real provider outage. Chat recovery
+recheck and the human elapsed time/pauses are pending, so this run is not counted as
+a completed seven-minute rehearsal. A second rehearsal and venue connectivity
+remain unverified.
 On 24 October 2026, one developer (the user) completed the fictional entry-and-review
 workflow for five consecutive sample business dates at `9c5f1bd`, using a stopwatch:
 
