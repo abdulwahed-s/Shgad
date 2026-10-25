@@ -696,9 +696,12 @@ and read-only SQLite confirms the post-run sample reset restored the 733-row
 baseline and removed the fresh IDs. The user confirms the live Chat answer appeared
 and all three forecast scenarios opened. These are user-attested UI outcomes, not a
 model-quality result or a measured seven-minute presentation. On 25 October, the
-user confirmed venue Wi-Fi; this laptop reached general HTTPS and the Gemini host
-over DNS/TCP/TLS, without credentials or a model request. This is network
-reachability only; projector/readability and backup connection remain unverified.
+user confirmed venue Wi-Fi and readable Arabic text on the venue display. Venue
+Wi-Fi and the approved backup connection both passed general HTTPS and Gemini-host
+DNS/TCP/TLS reachability checks; the laptop was returned to venue Wi-Fi and checks
+passed again. No credentials or model request were used, so this does not establish
+Gemini access. The display used a loopback-only recorded backend, never live model
+output.
 On 24 October 2026, one developer (the user) completed the fictional entry-and-review
 workflow for five consecutive sample business dates at `9c5f1bd`, using a stopwatch:
 
