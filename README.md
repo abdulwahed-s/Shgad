@@ -685,16 +685,17 @@ and neither demo port was listening; the provider receipt remained at one paid
 mapping attempt, with no agent run or tool call recorded. The chat request did not
 reach the backend or provider, so no live chat answer was produced. The user reports
 six minutes for this guided partial attempt; it did not complete or verify the
-seven-minute flow. This is not evidence of a Gemini outage. One complete additional
-rehearsal and venue connectivity check remain unverified.
+seven-minute flow. This is not evidence of a Gemini outage. A later timed run is
+documented below; actual venue connectivity remains unverified.
 In a later loopback session on 25 October, the capped receipt records three
 `gemini-3.8-flash` generation requests returning HTTP 200, with no OpenAI fallback
 or cap block. The user reports around two minutes for the guided run; exact
 stopwatch boundaries and pauses were not supplied. Health/meta returned HTTP 200,
 and read-only SQLite confirms the post-run sample reset restored the 733-row
-baseline and removed the fresh IDs. The user did not separately confirm the visible
-Chat answer or forecast screens, so this is not a model-quality or complete
-seven-minute-presentation result. Venue connectivity remains unverified.
+baseline and removed the fresh IDs. The user confirms the live Chat answer appeared
+and all three forecast scenarios opened. These are user-attested UI outcomes, not a
+model-quality result or a measured seven-minute presentation. Venue connectivity
+remains unverified.
 On 24 October 2026, one developer (the user) completed the fictional entry-and-review
 workflow for five consecutive sample business dates at `9c5f1bd`, using a stopwatch:
 
