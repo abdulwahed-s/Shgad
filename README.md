@@ -675,8 +675,18 @@ This does not establish behavior during a real provider outage. The fake timeout
 switch was cleared; health and the weekly report returned HTTP 200 after recovery.
 No second chat was sent. Browser offline/reconnect was checked separately. The user
 confirms this guided run was not timed; pauses were not measured. It is recorded as
-the first run-through, but does not verify a seven-minute duration. One more
-rehearsal and venue connectivity remain unverified.
+the first run-through, but does not verify a seven-minute duration. A second guided
+attempt on 25 October used the live Gemini configuration on backend commit
+`95f16a4c7fafd2b0f68f90b60d102a75edb946ea` and a fresh unfamiliar synthetic CSV.
+`gemini-3.8-flash` returned HTTP 200 for mapping in one request (1/8 cap); the user
+confirmed the import, and the local ledger records one completed batch with two
+accepted rows. At Chat, the user reported no internet. The local health check failed
+and neither demo port was listening; the provider receipt remained at one paid
+mapping attempt, with no agent run or tool call recorded. The chat request did not
+reach the backend or provider, so no live chat answer was produced. The user reports
+six minutes for this guided partial attempt; it did not complete or verify the
+seven-minute flow. This is not evidence of a Gemini outage. One complete additional
+rehearsal and venue connectivity check remain unverified.
 On 24 October 2026, one developer (the user) completed the fictional entry-and-review
 workflow for five consecutive sample business dates at `9c5f1bd`, using a stopwatch:
 
