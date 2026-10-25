@@ -92,13 +92,18 @@ development results and their limitations are recorded below.
 ## Development status
 
 The backend requires Python 3.11+ and was verified locally with Python 3.14.7.
-An isolated local-source clone of `b8a30119c4c2c404599acf353dc49e6ac303b07b`
-was installed in a new environment on 24 October 2026. Migrations, synthetic
-reset, HTTP health/API docs, Flutter startup, 914 backend tests, 358 Flutter
-tests and a release build passed. This verifies a local Git checkout; a fresh
-checkout from published GitHub has not been verified. Direct Python dependencies
-are pinned; transitive dependencies resolve at installation time. The tested
-environment included SQLite 3.50.4, Starlette 1.9.0, Flutter 3.44.9 and Dart 3.12.2.
+Earlier local-source setup checks are recorded below. On 25 October 2026, a fresh
+local-source checkout of application commit `587dad5a737b90c68e218ce34800757718bc7c2e`
+passed new-venv installation, schema-v4 migration and the six-file synthetic restore
+(733 transactions, one opening balance), health/docs/reports/reset, Flutter debug
+startup, a release build, browser smoke test and HTTP checks. It also passed 919
+backend tests (one skipped), 358 Flutter tests, Ruff, Dart format, Flutter analysis
+and `pip check`.
+The recorded current-source drill passed **16/16** with 9 fake attempts and 0 paid
+calls. This verifies a local Git checkout; a fresh checkout from published GitHub has not
+been verified. Direct Python dependencies are pinned; transitive dependencies
+resolve at installation time. The earlier tested environment included SQLite
+3.50.4, Starlette 1.9.0, Flutter 3.44.9 and Dart 3.12.2.
 To make a disposable checkout of your exact local HEAD, start in this repository
 and use an unused destination (PowerShell):
 
@@ -686,8 +691,8 @@ mapping attempt, with no agent run or tool call recorded. The chat request did n
 reach the backend or provider, so no live chat answer was produced. The user reports
 six minutes for this guided partial attempt; it did not complete or verify the
 seven-minute flow. This is not evidence of a Gemini outage. At the time, venue
-connectivity had not yet been checked; the later partial venue result is recorded
-below.
+connectivity had not yet been checked; the later venue Wi-Fi, backup and display
+check is recorded below.
 In a later loopback session on 25 October, the capped receipt records three
 `gemini-3.8-flash` generation requests returning HTTP 200, with no OpenAI fallback
 or cap block. The user reports around two minutes for the guided run; exact
