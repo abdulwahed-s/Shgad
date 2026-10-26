@@ -60,7 +60,11 @@ def _historical_request(value):
     return _has(
         r"مبيعات|المبيعات|بيع|البيع|بعت|بعنا|ربح|ربحت|الربح|هامش|الهامش|مصاريف|المصاريف|سحوبات",
         value,
-    ) and not _has(r"توقع|التوقع|توقعات|تنبؤ|استحقاق|المستحقه|التزامات", value)
+    ) and not _has(
+        r"توقع|التوقع|توقعات|تنبؤ|متوقع|المتوقع|متوقعه|المتوقعه|"
+        r"استحقاق|المستحقه|التزامات",
+        value,
+    )
 
 
 def _range_decision(clock, period, **arguments):
@@ -259,14 +263,13 @@ def after_selection(message, name, arguments, *, connection, clock, known_at):
         query = arguments["counterparty_query"]
         if normalize_name(query) not in normalize_name(message):
             return SafeDecision("clarify_customer")
-        if arguments.get("direction", "receivable") not in {
+        direction = arguments.get("direction", "receivable")
+        if not isinstance(direction, str) or direction not in {
             "receivable",
             "payable",
             "both",
         }:
             return None  # The closed tool schema retains ownership of invalid args.
         snapshot = QuerySnapshot(connection, clock=clock, known_at=known_at)
-        return _party_decision(
-            snapshot, query, arguments.get("direction", "receivable")
-        )
+        return _party_decision(snapshot, query, direction)
     return None

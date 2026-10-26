@@ -265,6 +265,8 @@ NORMAL_QUESTIONS = [
     "بعد ما عدلنا الحركة، اعرض المبيعات",
     "الزبون اللي دفع امس شكد دفع",
     "المجهز الرئيسي شنو اسمه",
+    "المبيعات المتوقعة باچر شكد",
+    "المصاريف المتوقعة باچر شكد",
 ]
 
 
@@ -298,3 +300,13 @@ def test_full_customer_qualifier_is_not_shortened_to_an_ambiguous_name(
     result = chat(api, "أبو حيدر الجديد شكد عليه")
     assert len(sent) == 2 and result.status == "answered"
     assert result.resolved_counterparty.id == "QUALIFIED"
+
+
+@pytest.mark.parametrize("direction", [{"unexpected": "receivable"}, ["receivable"]])
+def test_malformed_selected_direction_reaches_closed_schema_without_raw_error(
+    api, wire, direction
+):
+    sent = wire(call("get_debts", counterparty_query="قاسم", direction=direction))
+    result = chat(api, "باقي قاسم شكد")
+    assert len(sent) == 1 and result.status == "clarification"
+    assert result.reply_ar == text("clarify_request") and not result.figures
