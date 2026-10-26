@@ -102,6 +102,8 @@ void main() {
     testWidgets(
       'Known zero evidence displays period, empty rows and query in $locale',
       (tester) async {
+        await tester.binding.setSurfaceSize(const Size(320, 640));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
         final query = parseAmount(zeroJson()).queryEvidence!;
         await tester.pumpWidget(
           MaterialApp(

@@ -32,8 +32,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > 0/20 safe decisions and 12/60 joint selections, also below target; unavailable
 > cases remain failures. Both development and final forecast benchmarks perform
 > worse than the seven-day baseline. Measured receipts are linked below.
-> A newer seen-development check reached14/20 numeric and11/12 safe decisions;
-> weekly grading gaps and one numeric regression remain.
+> A newer seen-development check reached17/20 numeric and11/12 safe decisions.
+> Some questions still fail, and the legacy grader does not credit query-only zero evidence.
 > The 55 fixed backend and 277 frontend Arabic messages have human approval.
 > The developer manually accepted the current visuals; advisory layout findings remain.
 > New or edited wording requires review.
@@ -1108,6 +1108,38 @@ requests. Both chats answered, median6.103s/max7.888s, with one controlled fallb
 Total paid attempts:91 of108 authorized. Evaluation chat latencies are not retained.
 Further application changes stop pending resolution of the weekly contract/grading
 gaps; no expected answer or scoring workaround is included.
+
+**Calendar and empty-query evidence check - 26 October 2026.** This is a
+**development set, seen during building; not a held-out result**. One live run
+uses application commit `a0272d9`, frozen locally as `freeze-heldout-v2`, with low
+Gemini reasoning. Named months now use server-resolved calendar ranges; known
+empty historical event sums carry verified query evidence, also visible in Flutter.
+Prompts, model tool arguments, financial formulas and expected answers are unchanged.
+
+| Run | Numeric | Safe | Joint | Intent / tool / customer / period (each /32) | Supported claims | POST outcomes |
+|---|---:|---:|---:|---|---:|---|
+| [Calendar and zero evidence](results/evaluation_dev_live_POST_D55.md) | 17/20 | 11/12 | 24/32 | 28 / 27 / 31 / 26 | 81/94 | 84 Gemini: all HTTP200 |
+
+The new [method freeze](results/evaluation_method_freeze_post_d55.json) includes
+two missing claim-catalogue entries, `weekly.supplier_payments` and
+`weekly.capital_injections`. This is a disclosed method extension; no scoring
+rule or old result/freeze was changed, and old runs were not rescored. The legacy
+scorer still requires row IDs, so it can mark a query-proven zero unsupported
+while accepting its numeric value. Do not treat all uncredited claims as invented
+figures or silently award them credit.
+
+The named-month sales case now passes. No previously numeric-, safe- or
+joint-correct development case regressed relative to the tool-plan run. One
+weekly case and the indirect unsafe-description question still fail; exact
+response payloads are not retained by the evaluator. These observations do not
+establish performance on unseen questions.
+
+The live drill passed14/14. Both chats answered, median12.137s/max17.203s, with
+one controlled fallback. Its seven paid attempts include six HTTP200 responses
+and one OpenAI HTTP500 recovered by the existing retry. Total paid attempts:
+91 of108 authorized. Evaluation chat latency is not retained. Application behavior
+is frozen; the current evaluator CLI still requires a separate supported workflow
+to select a new sealed question/annotation package while preserving the original.
 
 **Sealed evaluation - 23 October 2026.** The
 [first aggregate receipt](results/evaluation_heldout_FIRST.md) uses the same
