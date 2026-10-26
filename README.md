@@ -26,7 +26,7 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > controlled fallback checks pass. A five-case application check matched four
 > expected tool sets and three full responses; weekly-summary and response-format
 > limitations remain.
-> The larger development evaluation scored 12/20 numeric answers and 6/12 safe
+> The original larger development evaluation scored 12/20 numeric answers and 6/12 safe
 > decisions, below target; request limits, transport failures and HTTP 401
 > responses are included. The sealed evaluation scored 8/40 numeric answers,
 > 0/20 safe decisions and 12/60 joint selections, also below target; unavailable
@@ -1043,6 +1043,37 @@ settings and results are preserved; no rerun selected a better score.
 The two seeded reconciliation fixtures retain duplicate TP1/FP0/FN0 and
 unmatched TP1/FP0/FN0, combined precision/recall 2/2; this tiny fixture check does
 not establish general reconciliation quality.
+
+**Development reasoning comparison - 26 October 2026.** These are
+**development set, seen during building; not held-out results**. Both runs use
+application `edd0071`, new method freezes, the original development inputs and
+unchanged scoring. They compare only Gemini's reasoning profile; OpenAI stays
+on medium reasoning. The original row is a reference from a different code version.
+
+| Application / Gemini profile | Numeric | Safe | Joint | Intent / tool / customer / period (each /32) | Supported claims | POST attempts / outcomes |
+|---|---:|---:|---:|---|---:|---|
+| Original `4e13092` | 12/20 | 6/12 | 14/32 | 23 / 23 / 29 / 25 | 66/67 | 96: 77 HTTP200, 6 HTTP401, 13 transport failures |
+| [Low](results/evaluation_dev_live_POST_D52_A.md) | 10/20 | 11/12 | 18/32 | 28 / 22 / 28 / 23 | 51/51 | 85: all HTTP200 |
+| [Model default](results/evaluation_dev_live_POST_D52_B.md) | 11/20 | 10/12 | 19/32 | 26 / 23 / 29 / 24 | 35/35 | 96: 80 HTTP200, 16 broad transport-failure entries |
+
+Low used 85 Gemini attempts; default used 77 Gemini and 19 OpenAI attempts.
+Default exhausted its budget before the last two questions; those remain failures.
+Each run retained one runtime failure whose cause is absent from the receipt.
+Neither run observed HTTP401/429/5xx. The evaluator does not retain chat latency
+percentiles or a provider/status cross-tab. Its ten-second pacing occurs within
+attempt deadlines, so the failure entries do not establish a provider hang cause.
+Intent is a separate blind probe; the other routing fields come from production.
+Supported-claim counts do not credit missing answers. One run per profile and
+the original version's provider failures limit comparisons and causal conclusions.
+
+After these comparisons, four failing fake cases led to two conservative safety
+corrections: explicit expected forecasts reach the model, and malformed direction
+enums reach closed-schema validation. Those source changes were verified offline
+and by the live drill, without another development evaluation. The table remains
+bound to `edd0071` and does not describe those later source changes. The original
+scores, freezes and receipts remain unchanged. The configured Gemini default
+remains `low`; `GEMINI_REASONING_EFFORT=default` omits its reasoning hint for an
+explicit development comparison. No unseen accuracy or quota claim follows.
 
 **Sealed evaluation - 23 October 2026.** The
 [first aggregate receipt](results/evaluation_heldout_FIRST.md) uses the same
