@@ -36,6 +36,14 @@ def normalized(message):
     return normalize_name(normalize_digits(message))
 
 
+def debt_list_request(message):
+    """J2 asks who owes: preserve each verified customer's outstanding value."""
+    value = normalized(message)
+    return _has(r"منو|اي\s+زبون|يا\s+زبون", value) and _has(
+        r"(?:ال)?مديون(?:ين|ون)?|(?:ال)?مدين(?:ين|ون)?|ديون|بذمته|بذمتهم", value
+    )
+
+
 def _has(pattern, message):
     return re.search(r"(?<!\w)(?:" + pattern + r")(?!\w)", message) is not None
 

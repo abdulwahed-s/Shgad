@@ -116,7 +116,7 @@ def _render_body(draft, *, figures, metrics, dates, used, user_message):
     return rendered
 
 
-def _server_context(outputs, contexts, *, figures, metrics, dates, used):
+def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_list):
     parts = []
     for index, context in enumerate(contexts):
         parts.append(
@@ -133,6 +133,29 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used):
             )
     assumptions = set()
     for index, output in enumerate(outputs):
+        if debt_list:
+            for direction in ("receivables", "payables"):
+                report = output.result.get(direction)
+                if report is None:
+                    continue
+                for party_index, party in enumerate(report["customers"]):
+                    key = (
+                        f"tool_{index}.{direction}.customers.{party_index}.outstanding"
+                    )
+                    # Names are verified server text, never draft instructions/slots.
+                    parts.append(text("customer").format(name=party["display_name"]))
+                    parts.append(
+                        text(direction)
+                        + ": "
+                        + _render_body(
+                            "{{fig:" + key + "}}",
+                            figures=figures,
+                            metrics=metrics,
+                            dates=dates,
+                            used=used,
+                            user_message="",
+                        )
+                    )
         scenarios = output.result.get("scenarios")
         if scenarios:
             parts.append(
@@ -170,7 +193,7 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used):
     return parts
 
 
-def render_draft(draft, *, outputs, user_message=""):
+def render_draft(draft, *, outputs, user_message="", debt_list=False):
     outputs = tuple(outputs)
     figures, metrics, dates, contexts = _slots(outputs)
     used = ({}, {}, {})
@@ -183,7 +206,13 @@ def render_draft(draft, *, outputs, user_message=""):
         user_message=user_message,
     )
     prefix = _server_context(
-        outputs, contexts, figures=figures, metrics=metrics, dates=dates, used=used
+        outputs,
+        contexts,
+        figures=figures,
+        metrics=metrics,
+        dates=dates,
+        used=used,
+        debt_list=debt_list,
     )
     ranges = tuple(dict.fromkeys((c.range.start, c.range.end) for c in contexts))
     parties = {
@@ -275,13 +304,15 @@ def _template(outputs):
     return " ".join(lines) or text("no_figures")
 
 
-def render_reply(draft, *, outputs, user_message="", retry=None):
+def render_reply(draft, *, outputs, user_message="", retry=None, debt_list=False):
     outputs = tuple(outputs)
     for output in outputs:
         require_verified(output)
     attempts = 1
     try:
-        return render_draft(draft, outputs=outputs, user_message=user_message)
+        return render_draft(
+            draft, outputs=outputs, user_message=user_message, debt_list=debt_list
+        )
     except DraftValidationError as exc:
         if retry is not None:
             try:
@@ -292,7 +323,10 @@ def render_reply(draft, *, outputs, user_message="", retry=None):
                 attempts += 1
                 try:
                     rendered = render_draft(
-                        revised, outputs=outputs, user_message=user_message
+                        revised,
+                        outputs=outputs,
+                        user_message=user_message,
+                        debt_list=debt_list,
                     )
                     return rendered.model_copy(
                         update={
@@ -303,7 +337,7 @@ def render_reply(draft, *, outputs, user_message="", retry=None):
                     )
                 except DraftValidationError:
                     pass
-    rendered = render_draft(_template(outputs), outputs=outputs)
+    rendered = render_draft(_template(outputs), outputs=outputs, debt_list=debt_list)
     return rendered.model_copy(
         update={
             "renderer": RendererStats(attempts=attempts, fell_back_to_template=True)

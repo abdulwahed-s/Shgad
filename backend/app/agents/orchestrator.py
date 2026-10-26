@@ -238,7 +238,12 @@ def quoted_output(output, index):
 def checked_draft(draft, outputs, user_message):
     if not isinstance(draft, str) or unsafe_narration(draft):
         raise DraftValidationError("UNSAFE_NARRATION")
-    return render_draft(draft, outputs=outputs, user_message=user_message)
+    return render_draft(
+        draft,
+        outputs=outputs,
+        user_message=user_message,
+        debt_list=answer_policy.debt_list_request(user_message),
+    )
 
 
 def response(rendered, outputs, used):
@@ -328,7 +333,15 @@ async def _converse(request, *, client, connection, clock, known_at):
                 reply = await client.complete(messages, tools=definitions())
             except LLMUnavailable as exc:
                 if outputs:
-                    return response(render_reply(None, outputs=outputs), outputs, used)
+                    return response(
+                        render_reply(
+                            None,
+                            outputs=outputs,
+                            debt_list=answer_policy.debt_list_request(request.message),
+                        ),
+                        outputs,
+                        used,
+                    )
                 key = {
                     "not_configured": "provider_unconfigured",
                     "needs_internet": "needs_internet",
@@ -459,12 +472,21 @@ async def _converse(request, *, client, connection, clock, known_at):
                         outputs=outputs,
                         user_message=request.message,
                         retry=lambda _: revised,
+                        debt_list=answer_policy.debt_list_request(request.message),
                     ),
                     outputs,
                     used,
                 )
         if outputs:
-            return response(render_reply(None, outputs=outputs), outputs, used)
+            return response(
+                render_reply(
+                    None,
+                    outputs=outputs,
+                    debt_list=answer_policy.debt_list_request(request.message),
+                ),
+                outputs,
+                used,
+            )
         return fixed("clarification", "clarify_request", used=used)
     except FinancialRuleError:
         return fixed("error", "chat_error", used=used)
