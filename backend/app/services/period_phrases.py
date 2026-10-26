@@ -5,6 +5,8 @@ Catalogue: اليوم→today; البارحة/امس→yesterday; هذا/هال 
 N ايام الجاية→next_n_days:1–30; named weekday→next_weekday; باچر→the
 next weekday name, using only an injected business weekday. BusinessClock alone
 calculates dates. Unsupported/conflicting spans are never clipped or guessed.
+D55 named calendar months return an explicit marker plus a month ordinal;
+BusinessClock alone binds that marker to a trusted range. Years clarify.
 No evaluation questions, labels, expected answers, or data files enter this module.
 """
 
@@ -37,12 +39,42 @@ _WEEKDAYS = {
     "الاحد": "sun",
 }
 _WEEKDAY_CODES = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
+_MONTHS = (
+    (r"كانون\s+الثاني|يناير", 1),
+    (r"شباط|فبراير", 2),
+    (r"اذار|مارس", 3),
+    (r"نيسان|ابريل", 4),
+    (r"ايار|مايس|مايو", 5),
+    (r"حزيران|يونيو", 6),
+    (r"تموز|يوليو", 7),
+    (r"اغسطس", 8),
+    (r"ايلول|سبتمبر", 9),
+    (r"تشرين\s+الاول|اكتوبر", 10),
+    (r"تشرين\s+الثاني|نوفمبر", 11),
+    (r"كانون\s+الاول|ديسمبر", 12),
+)
 
 
 @dataclass(frozen=True)
 class PeriodResolution:
     status: Literal["resolved", "none_found", "conflict"]
     period: Period | None = None
+    month: int | None = None
+
+    def resolve(self, clock):
+        return (
+            clock.named_month(self.month) if self.month else clock.resolve(self.period)
+        )
+
+    def arguments(self, clock):
+        if self.month is None:
+            return {"period": self.period}
+        resolved = self.resolve(clock)
+        return {
+            "period": "explicit",
+            "start_date": str(resolved.start),
+            "end_date": str(resolved.end),
+        }
 
 
 def _phrase(pattern, text):
@@ -62,6 +94,10 @@ def _days(raw, maximum):
 def resolve_period(message: str, *, weekday: int | None = None) -> PeriodResolution:
     """Pure text/weekday input; no ledger, wall clock, dates, or provider access."""
     text = normalize_name(normalize_digits(message))
+    if re.fullmatch(r"[0-9]{4}", text.strip()) or re.search(
+        r"(?:سنه|عام)\s+[0-9]{4}(?![0-9])", text
+    ):
+        return PeriodResolution("conflict")
     periods = {period for pattern, period in _NAMED if _phrase(pattern, text)}
     unsupported = _phrase(
         r"(?:الاسبوع|الشهر)\s+(?:الجاي|القادم|المقبل)|"
@@ -100,6 +136,29 @@ def resolve_period(message: str, *, weekday: int | None = None) -> PeriodResolut
                 continue
             return PeriodResolution("conflict")
         periods.add("next_weekday:" + code)
+    months = set()
+    # Hamza normalization makes بآب identical to باب (door); retain that raw
+    # distinction rather than treating ordinary words as a month request.
+    if _phrase(r"اب", text) or re.search(r"(?<!\w)(?:و)?بآب(?!\w)", message):
+        months.add(8)
+    for pattern, month in _MONTHS:
+        if re.search(r"(?<!\w)(?:و)?(?:ب)?(?:شهر\s+)?(?:" + pattern + r")(?!\w)", text):
+            months.add(month)
+    for match in re.finditer(r"(?<!\w)(?:و)?(?:ب)?شهر\s+([0-9.+-]+)(?!\w)", text):
+        month = _days(match[1], 12)
+        if month is None:
+            return PeriodResolution("conflict")
+        months.add(month)
+    if months:
+        if (
+            len(months) != 1
+            or periods
+            or re.search(r"(?<![0-9])[0-9]{4}(?![0-9])", text)
+        ):
+            return PeriodResolution("conflict")
+        return PeriodResolution("resolved", "explicit", months.pop())
+    if _phrase(r"كانون|تشرين", text):
+        return PeriodResolution("conflict")
     if len(periods) > 1:
         return PeriodResolution("conflict")
     return (

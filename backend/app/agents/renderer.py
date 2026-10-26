@@ -19,6 +19,13 @@ class DraftValidationError(ValueError):
     pass
 
 
+def has_evidence(entry):
+    """Called only after the exact envelope passes require_verified."""
+    return bool(
+        entry.formula and (entry.source_ids or getattr(entry, "query_evidence", None))
+    )
+
+
 def format_iqd(value, *, evidence=False):
     if type(value) is not int:
         raise TypeError("IQD must be an exact integer")
@@ -98,7 +105,7 @@ def _render_body(draft, *, figures, metrics, dates, used, user_message):
         entry = figure if figure is not None else metric
         if value is None:
             raise DraftValidationError("MISSING_FIGURE")
-        if not entry.source_ids or not entry.formula:
+        if not has_evidence(entry):
             raise DraftValidationError("MISSING_EVIDENCE")
         used[0 if figure is not None else 1][key] = entry.model_copy(
             update={"key": key}
@@ -122,7 +129,7 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
     def include(index, key, label):
         qualified = f"tool_{index}.{key}"
         entry = figures.get(qualified)
-        if entry is None or entry.kind == "missing" or not entry.source_ids:
+        if entry is None or entry.kind == "missing" or not has_evidence(entry):
             return
         parts.append(
             _render_body(
@@ -296,7 +303,7 @@ def _template(outputs):
 
         def add(key, label=None, suffix=""):
             entry = available.get(key)
-            if entry is None or entry.kind == "missing" or not entry.source_ids:
+            if entry is None or entry.kind == "missing" or not has_evidence(entry):
                 return
             label = label or text(entry.label_key)
             lines.append(

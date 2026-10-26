@@ -99,14 +99,15 @@ def test_retry_can_return_valid_slots_once(tool_history):
     )
 
 
-def test_missing_or_unsourced_figures_cannot_render(ledger):
+def test_missing_figures_cannot_render_but_known_zero_query_can(ledger):
     output = call(ledger, "get_sales", {"period": "today"})
-    for key in ("cash_sales", "unexplained_cash_difference"):
-        with pytest.raises(DraftValidationError):
-            render_draft("{{fig:" + key + "}}", outputs=[output])
+    # D55 explicitly replaces the old rejection of a proven empty event sum.
+    with pytest.raises(DraftValidationError):
+        render_draft("{{fig:unexplained_cash_difference}}", outputs=[output])
     rendered = render_reply("{{fig:cash_sales}}", outputs=[output])
-    assert not rendered.figures
-    assert "أرقام موثقة" in rendered.reply_ar
+    assert len(rendered.figures) == 1
+    assert rendered.figures[0].amount_iqd == 0
+    assert rendered.figures[0].query_evidence.matching_rows == 0
 
 
 def test_t31_customer_and_period_always_come_from_verified_context(

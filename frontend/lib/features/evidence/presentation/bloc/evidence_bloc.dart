@@ -131,6 +131,10 @@ class EvidenceBloc extends Bloc<EvidenceEvent, EvidenceState> {
     on<OpenEvidence>((event, emit) async {
       final view = state.view.copy(request: event.request);
       emit(EvidenceLoading(view));
+      if (event.request.queryEvidence != null) {
+        _show(emit, view.copy(records: const [], details: const {}));
+        return;
+      }
       switch (await load(event.request.sources)) {
         case Success<List<SourceRecord>>(:final value):
           _show(emit, view.copy(records: value));

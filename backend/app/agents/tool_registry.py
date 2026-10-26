@@ -24,7 +24,9 @@ from app.schemas.tools import (
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
 from app.services.financial_queries import QuerySnapshot, historical_range, sources
+from app.services.known_zero import query_evidence
 from app.services.margin import margin_metrics
+from app.services.period_phrases import resolve_period
 from app.services.tool_evidence import debt_metrics, forecast_figures, upcoming_figures
 from app.services.weekly_tool_views import weekly_tool_result
 from app.tools import forecast, get_debts, get_margin, get_sales, reconcile
@@ -103,8 +105,9 @@ def _invoke(
     user_message="",
     server_period_set=False,
     server_plan=None,
+    server_month=None,
 ):
-    """Only trusted server context can establish explicit user-supplied dates."""
+    """Explicit dates need user-text proof or an independently matched server month."""
     try:
         if server_plan not in {None, "weekly_summary", "cash_sufficiency"}:
             raise FinancialRuleError("VALIDATION_ERROR")
@@ -113,16 +116,35 @@ def _invoke(
             raise FinancialRuleError("VALIDATION_ERROR")
         model, service = TOOLS[name]
         args = model.model_validate(arguments)
+        trusted_range = None
+        if server_month is not None:
+            phrase = resolve_period(user_message, weekday=clock.today.weekday())
+            if (
+                name not in {"get_sales", "get_margin", "reconcile"}
+                or phrase.status != "resolved"
+                or phrase.month != server_month
+            ):
+                raise FinancialRuleError("VALIDATION_ERROR")
+            trusted_range = clock.named_month(server_month)
+            if args.period != "explicit" or (args.start_date, args.end_date) != (
+                trusted_range.start,
+                trusted_range.end,
+            ):
+                raise FinancialRuleError("VALIDATION_ERROR")
         explicit = any(
             getattr(args, key, None) == "explicit"
             for key in ("period", "due_period", "until")
         )
-        if explicit and (
-            args.start_date is None
-            or args.end_date is None
-            or not all(
-                day.isoformat() in user_message
-                for day in (args.start_date, args.end_date)
+        if (
+            explicit
+            and trusted_range is None
+            and (
+                args.start_date is None
+                or args.end_date is None
+                or not all(
+                    day.isoformat() in user_message
+                    for day in (args.start_date, args.end_date)
+                )
             )
         ):
             raise FinancialRuleError(
@@ -138,7 +160,11 @@ def _invoke(
             result, party = weekly_tool_result(snapshot, resolved, name), None
         else:
             result, resolved, party = service(
-                snapshot, clock=clock, arguments=args, dates_from_user=explicit
+                snapshot,
+                clock=clock,
+                arguments=args,
+                dates_from_user=explicit and trusted_range is None,
+                **({"trusted_range": trusted_range} if trusted_range else {}),
             )
         data = result.model_dump(mode="json")
         figures, dates = _metadata(result)
@@ -163,6 +189,20 @@ def _invoke(
                 "unexplained_difference_excluded",
             )
         resolved = resolved or DateRange(snapshot.day, snapshot.day)
+        figures = [
+            f.model_copy(
+                update={
+                    "query_evidence": query_evidence(
+                        f,
+                        snapshot=snapshot,
+                        tool_name=name,
+                        resolved=resolved,
+                        result=data,
+                    )
+                }
+            )
+            for f in figures
+        ]
         dates.update({"start": resolved.start, "end": resolved.end})
         envelope = ToolEnvelope(
             ok=True,
@@ -209,6 +249,7 @@ def invoke(
     user_message="",
     server_period_set=False,
     server_plan=None,
+    server_month=None,
 ):
     """Hold one consistent SQLite read snapshot through service and provenance."""
     deadline = monotonic() + TOOL_TIMEOUT_SECONDS
@@ -228,6 +269,7 @@ def invoke(
                     user_message=user_message,
                     server_period_set=server_period_set,
                     server_plan=server_plan,
+                    server_month=server_month,
                 )
             if monotonic() >= deadline:
                 raise sqlite3.OperationalError("TOOL_TIMEOUT")

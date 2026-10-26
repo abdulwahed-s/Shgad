@@ -9,7 +9,12 @@ from pydantic import ValidationError
 from app.agents import answer_policy
 from app.agents.llm_client import LLMUnavailable, strict_json
 from app.agents.messages_ar import text
-from app.agents.renderer import DraftValidationError, render_draft, render_reply
+from app.agents.renderer import (
+    DraftValidationError,
+    has_evidence,
+    render_draft,
+    render_reply,
+)
 from app.agents.system_instructions import SYSTEM_INSTRUCTIONS
 from app.agents.tool_plans import ToolPlan, select_plan
 from app.agents.tool_registry import TOOLS, definitions, invoke
@@ -177,7 +182,7 @@ def quoted_output(output, index):
     require_verified(output)
     selected = []
     for value in (*output.figures, *output.metrics):
-        if not value.source_ids or value.kind == "missing":
+        if not has_evidence(value) or value.kind == "missing":
             continue
         if "scenarios" in output.result and not (
             value.key.startswith("j1.") or value.key.endswith("lowest.closing_iqd")
@@ -449,9 +454,9 @@ async def _converse(request, *, client, connection, clock, known_at):
                         period.status == "resolved" and "period" in arguments
                     )
                     if server_period_set:
-                        arguments["period"] = period.period
                         arguments.pop("start_date", None)
                         arguments.pop("end_date", None)
+                        arguments.update(period.arguments(clock))
                     decision = answer_policy.after_selection(
                         request.message,
                         name,
@@ -470,6 +475,7 @@ async def _converse(request, *, client, connection, clock, known_at):
                         known_at=known_at,
                         user_message=request.message,
                         server_period_set=server_period_set,
+                        server_month=period.month if server_period_set else None,
                     )
                     used.append(name)
                     if not output.ok:

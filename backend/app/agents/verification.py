@@ -13,6 +13,7 @@ from app.schemas.tools import Figure, Metric, ToolEnvelope
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
 from app.services.financial_queries import payment_capacity, sale_totals, sources
+from app.services.known_zero import query_evidence
 from app.services.margin import margin_report
 from app.services.weekly_tool_views import weekly_tool_result
 
@@ -164,6 +165,11 @@ def verify_tool_output(envelope, *, snapshot, tool_name, weekly_plan=False):
         _reject()
     figure_map = {figure.key: figure for figure in envelope.figures}
     metric_map = {metric.key: metric for metric in envelope.metrics}
+    resolved = DateRange(
+        envelope.resolved_range.start,
+        envelope.resolved_range.end,
+        partial=envelope.result.get("range", {}).get("partial", False),
+    )
     if (
         len(figure_map) != len(envelope.figures)
         or len(metric_map) != len(envelope.metrics)
@@ -175,6 +181,14 @@ def verify_tool_output(envelope, *, snapshot, tool_name, weekly_plan=False):
     if snapshot.opening is not None:
         known[snapshot.opening.source_id] += 1
     for figure in (*envelope.figures, *envelope.metrics):
+        if isinstance(figure, Figure) and figure.query_evidence != query_evidence(
+            figure,
+            snapshot=snapshot,
+            tool_name=tool_name,
+            resolved=resolved,
+            result=envelope.result,
+        ):
+            _reject()
         if not figure.formula or any(known[key] != 1 for key in figure.source_ids):
             _reject()
         value = figure.amount_iqd if figure.key in figure_map else figure.value
@@ -184,7 +198,10 @@ def verify_tool_output(envelope, *, snapshot, tool_name, weekly_plan=False):
         if isinstance(original, dict):
             if not isinstance(figure, Figure):
                 _reject()
-            if figure.model_dump(mode="json", exclude={"key"}) != original:
+            if (
+                figure.model_dump(mode="json", exclude={"key", "query_evidence"})
+                != original
+            ):
                 _reject()
         elif original != value or (original is not None and type(original) is not int):
             _reject()
@@ -219,11 +236,6 @@ def verify_tool_output(envelope, *, snapshot, tool_name, weekly_plan=False):
         *(f.source_ids for f in (*envelope.figures, *envelope.metrics))
     ):
         _reject()
-    resolved = DateRange(
-        envelope.resolved_range.start,
-        envelope.resolved_range.end,
-        partial=envelope.result.get("range", {}).get("partial", False),
-    )
     if weekly_plan and tool_name in {"get_sales", "get_margin"}:
         if (
             weekly_tool_result(snapshot, resolved, tool_name).model_dump(mode="json")

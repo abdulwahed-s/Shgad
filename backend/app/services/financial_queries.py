@@ -173,13 +173,20 @@ class QuerySnapshot:
 
 
 def historical_range(
-    clock, period, *, start_date=None, end_date=None, dates_from_user=False
+    clock,
+    period,
+    *,
+    start_date=None,
+    end_date=None,
+    dates_from_user=False,
+    trusted_range=None,
 ):
     resolved = clock.resolve(
         period,
         start_date=start_date,
         end_date=end_date,
         dates_from_user=dates_from_user,
+        trusted_range=trusted_range,
     )
     if not OBSERVED_START <= resolved.start <= resolved.end <= observed_day(clock):
         raise FinancialRuleError(

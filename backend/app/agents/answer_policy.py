@@ -208,7 +208,7 @@ def before_provider(message, *, connection, clock, known_at, period):
         value,
     ):
         return SafeDecision("clarify_costs")
-    if _historical_request(value):
+    if _historical_request(value) or (profit and period.month is not None):
         dates = re.findall(r"(?<![0-9])[0-9]{4}-[0-9]{2}-[0-9]{2}(?![0-9])", value)
         if 1 <= len(dates) <= 2:
             try:
@@ -224,7 +224,14 @@ def before_provider(message, *, connection, clock, known_at, period):
             if decision:
                 return decision
         elif period.status == "resolved":
-            decision = _range_decision(clock, period.period)
+            resolved = period.resolve(clock)
+            decision = _range_decision(
+                clock,
+                "explicit",
+                start_date=resolved.start,
+                end_date=resolved.end,
+                trusted_range=resolved,
+            )
             if decision:
                 return decision
         if re.search(r"قبل\s+(?:بدايه\s+الدفتر|هالدفتر|الدفتر|السجلات)", value):
@@ -233,7 +240,14 @@ def before_provider(message, *, connection, clock, known_at, period):
         return None
     snapshot = QuerySnapshot(connection, clock=clock, known_at=known_at)
     if profit and period.status == "resolved":
-        resolved = historical_range(clock, period.period)
+        selected = period.resolve(clock)
+        resolved = historical_range(
+            clock,
+            "explicit",
+            start_date=selected.start,
+            end_date=selected.end,
+            trusted_range=selected,
+        )
         # Reuse the same eligible-sale filter as margin_report; never invent a zero.
         sales = recorded_sales(snapshot, resolved)
         if not any(

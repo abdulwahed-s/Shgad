@@ -8,6 +8,7 @@ import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/form_fields.dart';
 import '../../../../core/widgets/open_evidence.dart';
+import '../../../../core/widgets/known_zero_evidence.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../core/widgets/entry_type_text.dart';
 import '../../domain/entities/source_record.dart' as source;
@@ -57,7 +58,12 @@ class _EvidenceView extends StatelessWidget {
                         failure: state.failure,
                         onRetry: () => bloc.add(OpenEvidence(v.request)),
                       ),
-                    if (v.records.isEmpty && !busy && state is EvidenceLoaded)
+                    if (v.request.queryEvidence != null)
+                      KnownZeroEvidence(query: v.request.queryEvidence!),
+                    if (v.request.queryEvidence == null &&
+                        v.records.isEmpty &&
+                        !busy &&
+                        state is EvidenceLoaded)
                       InfoStrip(text: l.noEvidenceRows),
                     if (v.voided != null)
                       InfoStrip(

@@ -35,6 +35,23 @@ class BusinessClock:
     def today(self) -> date:
         return self.as_of
 
+    def named_month(self, month: int) -> DateRange:
+        """D55 most recent calendar month; current month is month-to-date."""
+        if type(month) is not int or not 1 <= month <= 12:
+            raise FinancialRuleError("VALIDATION_ERROR")
+        today = self.today
+        year = today.year - (month > today.month)
+        start = date(year, month, 1)
+        end = date(year, month, calendar.monthrange(year, month)[1])
+        partial = end > today
+        resolved = DateRange(start, min(end, today), partial)
+        return self.resolve(
+            "explicit",
+            start_date=resolved.start,
+            end_date=resolved.end,
+            trusted_range=resolved,
+        )
+
     def resolve(
         self,
         period: str,
@@ -42,19 +59,32 @@ class BusinessClock:
         start_date: date | None = None,
         end_date: date | None = None,
         dates_from_user: bool = False,
+        trusted_range: DateRange | None = None,
     ) -> DateRange:
         if not isinstance(period, str):
             raise FinancialRuleError("VALIDATION_ERROR")
         if period == "explicit":
             if (
-                dates_from_user is not True
+                (dates_from_user is not True and trusted_range is None)
                 or type(start_date) is not date
                 or type(end_date) is not date
                 or start_date > end_date
             ):
                 raise FinancialRuleError("VALIDATION_ERROR")
+            if trusted_range is not None:
+                if not isinstance(trusted_range, DateRange) or (
+                    start_date,
+                    end_date,
+                ) != (trusted_range.start, trusted_range.end):
+                    raise FinancialRuleError("VALIDATION_ERROR")
+                return trusted_range
             return DateRange(start_date, end_date)
-        if start_date is not None or end_date is not None or dates_from_user:
+        if (
+            start_date is not None
+            or end_date is not None
+            or dates_from_user
+            or trusted_range is not None
+        ):
             raise FinancialRuleError("VALIDATION_ERROR")
         today = self.today
         if period == "today":

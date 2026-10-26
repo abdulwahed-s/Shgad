@@ -13,7 +13,7 @@ from pydantic import (
 
 from app.schemas.evidence import CounterpartyView
 from app.schemas.forecast import Amount
-from app.schemas.ledger import BusinessDate, LedgerModel
+from app.schemas.ledger import BusinessDate, LedgerModel, Timestamp
 from app.schemas.queries import DateRangeView, Direction
 
 Period = Annotated[
@@ -75,8 +75,33 @@ class DebtsArguments(DateArguments):
     due_period: Period | None = None
 
 
+class EmptyQueryFilters(LedgerModel):
+    event_types: tuple[
+        Literal[
+            "CASH_SALE",
+            "CREDIT_SALE",
+            "CREDIT_COLLECTION",
+            "SUPPLIER_PAYMENT",
+            "OPERATING_EXPENSE",
+            "OWNER_DRAWING",
+            "CAPITAL_INJECTION",
+        ],
+        ...,
+    ]
+    active_only: Literal[True] = True
+    known_at: Timestamp
+
+
+class KnownZeroQuery(LedgerModel):
+    tool: Literal["get_sales"]
+    period: DateRangeView
+    filters: EmptyQueryFilters
+    matching_rows: Literal[0] = 0
+
+
 class Figure(Amount):
     key: str
+    query_evidence: KnownZeroQuery | None = None
 
 
 class Metric(LedgerModel):
