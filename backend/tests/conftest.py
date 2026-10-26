@@ -24,6 +24,7 @@ def offline_provider_environment(request, monkeypatch):
             "LLM_FALLBACK_MODEL_ID",
             "LLM_MAX_OUTPUT_TOKENS",
             "LLM_PRIMARY_TIMEOUT_SECONDS",
+            "GEMINI_REASONING_EFFORT",
             "GEMINI_API_KEY",
             "GROQ_API_KEY",
             "OPENAI_API_KEY",

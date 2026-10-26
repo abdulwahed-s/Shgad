@@ -286,7 +286,11 @@ class LLMClient:
                     "temperature": 0,
                     "max_tokens": self.settings.llm_max_output_tokens or 2048,
                 }
-                if provider == "gemini" and model == "gemini-3.8-flash":
+                if (
+                    provider == "gemini"
+                    and model == "gemini-3.8-flash"
+                    and self.settings.gemini_reasoning_effort == "low"
+                ):
                     payload["reasoning_effort"] = "low"
                 if tools:
                     payload |= {"tools": list(tools), "tool_choice": "auto"}

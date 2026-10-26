@@ -25,6 +25,7 @@ def local_config(tmp_path, monkeypatch):
         "DATABASE_URL",
         "LLM_TIMEOUT_SECONDS",
         "LLM_PRIMARY_TIMEOUT_SECONDS",
+        "GEMINI_REASONING_EFFORT",
     ):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("APP_ENV", "development")

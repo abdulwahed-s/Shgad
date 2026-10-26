@@ -5,6 +5,7 @@ import re
 from datetime import date
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, SecretStr, StrictInt, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -28,6 +29,7 @@ class Settings(BaseSettings):
     llm_primary_timeout_seconds: int = Field(default=15, ge=5, le=30)
     llm_timeout_seconds: int = Field(default=10, ge=1, le=30)
     llm_max_output_tokens: int | None = Field(default=None, ge=256, le=32768)
+    gemini_reasoning_effort: Literal["low", "default"] = "low"
     gemini_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
     groq_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)
     # Application fallback and optional development comparison credentials.
