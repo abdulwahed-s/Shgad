@@ -32,6 +32,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 > 0/20 safe decisions and 12/60 joint selections, also below target; unavailable
 > cases remain failures. Both development and final forecast benchmarks perform
 > worse than the seven-day baseline. Measured receipts are linked below.
+> A newer seen-development check reached14/20 numeric and11/12 safe decisions;
+> weekly grading gaps and one numeric regression remain.
 > The 55 fixed backend and 277 frontend Arabic messages have human approval.
 > The developer manually accepted the current visuals; advisory layout findings remain.
 > New or edited wording requires review.
@@ -1078,6 +1080,33 @@ bound to `edd0071` and does not describe those later source changes. The origina
 scores, freezes and receipts remain unchanged. The configured Gemini default
 remains `low`; `GEMINI_REASONING_EFFORT=default` omits its reasoning hint for an
 explicit development comparison. No unseen accuracy or quota claim follows.
+
+**Core tool-plan development check - 26 October 2026.** This is a
+**development set, seen during building; not a held-out result**. One live run
+at `ad8d951` includes the later safety corrections, complete debtor-list rendering
+and conservative weekly/supplier-payment plans. Gemini reasoning remains low;
+the prompts, model tool arguments, gold answers and scorer are unchanged.
+
+| Run | Numeric | Safe | Joint | Intent / tool / customer / period (each /32) | Supported claims | POST outcomes |
+|---|---:|---:|---:|---|---:|---|
+| [Verified tool plans](results/evaluation_dev_live_POST_D54.md) | 14/20 | 11/12 | 21/32 | 28 / 26 / 31 / 24 | 76/78 | 86 Gemini: all HTTP200 |
+
+The debtor-list and both supplier-sufficiency cases now pass numeric and joint
+checks. Drawings/expenses is numeric-correct but misses the separate intent probe.
+Both weekly cases route correctly yet fail numeric grading: offline reproduction
+finds a required unsourced zero that the renderer contract forbids displaying,
+and a sourced weekly supplier-payment field absent from the frozen catalogue.
+The existing grader retains both failures. One previously numeric-correct sales
+case regresses with no financial claims/wrong period; its exact wire cause is not
+retained. A new [method freeze](results/evaluation_method_freeze_post_d54.json)
+binds this run; original reports/freezes remain unchanged. A single comparison
+does not isolate the effects of each code change or establish unseen accuracy.
+
+The live integration drill passed14/14 with five additional HTTP200 provider
+requests. Both chats answered, median6.103s/max7.888s, with one controlled fallback.
+Total paid attempts:91 of108 authorized. Evaluation chat latencies are not retained.
+Further application changes stop pending resolution of the weekly contract/grading
+gaps; no expected answer or scoring workaround is included.
 
 **Sealed evaluation - 23 October 2026.** The
 [first aggregate receipt](results/evaluation_heldout_FIRST.md) uses the same
