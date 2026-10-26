@@ -172,14 +172,17 @@ LLM_MODEL_ID=gemini-3.8-flash
 LLM_FALLBACK_PROVIDER=openai
 LLM_FALLBACK_MODEL_ID=gpt-6-luna
 LLM_TIMEOUT_SECONDS=30
+LLM_PRIMARY_TIMEOUT_SECONDS=15
 LLM_MAX_OUTPUT_TOKENS=8192
 ```
 
 Selecting the model does not change an existing `.env` file or verify live chat
 and CSV mapping. The earlier 9/10 result measures development routing only.
 Keep `GEMINI_API_KEY` and `OPENAI_API_KEY` local. The selected setup uses a
-30-second request deadline. Paid access still has [rate limits](https://developers.openai.com/api/docs/guides/rate-limits);
-the client retains bounded retries and provider failover.
+15-second primary deadline and a 30-second fallback deadline. The primary setting
+accepts 5–30 seconds. Timeouts advance immediately to fallback; non-timeout transport
+errors and retriable HTTP statuses retain one retry and bounded Retry-After handling.
+Paid access still has [rate limits](https://developers.openai.com/api/docs/guides/rate-limits).
 `LLM_MAX_OUTPUT_TOKENS` optionally sets the output bound (256–32,768 tokens).
 The selected setup uses 8,192; when unset, compatible requests retain 2,048 and
 OpenAI Responses retains 8,192. Explicit truncated or filtered completions are
@@ -777,8 +780,27 @@ The same client uses compatible Chat Completions for Gemini/Groq and Responses
 for OpenAI. Luna requests use medium reasoning, an 8,192-token output bound,
 no temperature override and `store: false`. Encrypted continuation state stays
 in request memory. The five tool parameter schemas and server validation are
-shared. Each provider gets at most two attempts per completion; long
-`Retry-After` waits defer to fallback instead of retrying early.
+shared. Timeouts advance immediately; other retriable failures get at most two
+attempts per provider per completion. Long `Retry-After` waits defer to fallback
+instead of retrying early. Internal attempt receipts contain sanitized categories
+and elapsed milliseconds, without provider text or secrets.
+
+Gemini `gemini-3.8-flash` requests use
+[low reasoning](https://ai.google.dev/gemini-api/docs/openai#thinking); OpenAI's
+medium reasoning is unchanged. These client settings changed after the original
+published measurements, whose scores describe the earlier system.
+
+An opt-in reliability check repeats the approved synthetic demo question through
+the real chat route on a temporary demo ledger, with seven seconds between turns.
+It uses the configured Gemini/OpenAI pair, has a hard maximum of 55 provider
+attempts including failures, and stops after two consecutive unanswered turns.
+It retains categories, statuses, provenance checks and latency, without answer
+text or quality scoring. Inspect its free plan before authorizing paid calls:
+
+```powershell
+backend/.venv/Scripts/python.exe scripts/provider_load_check.py --plan --request-cap 55 --chat-turns 20
+backend/.venv/Scripts/python.exe scripts/provider_load_check.py --authorize-paid --request-cap 55 --chat-turns 20
+```
 
 `app.agents.renderer` fills `{{fig:key}}` and `{{date:key}}` only from verified
 tool output. Raw numeric characters, unknown keys and unsourced values are rejected.
