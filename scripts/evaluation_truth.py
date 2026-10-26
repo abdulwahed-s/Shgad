@@ -83,6 +83,8 @@ def _legacy_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None)
         ("owner_drawings", "OWNER_DRAWING"),
         ("operating_expenses", "OPERATING_EXPENSE"),
         ("collections", "CREDIT_COLLECTION"),
+        ("supplier_payments", "SUPPLIER_PAYMENT"),
+        ("capital_injections", "CAPITAL_INJECTION"),
     ):
         items = [r for r in selected if r["type"] == kind]
         add("weekly." + key, sum(r["amount_iqd"] for r in items), key, ids(items))
