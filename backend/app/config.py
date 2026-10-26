@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     llm_model_id: str | None = None
     llm_fallback_provider: str | None = None
     llm_fallback_model_id: str | None = None
+    llm_primary_timeout_seconds: int = Field(default=15, ge=5, le=30)
     llm_timeout_seconds: int = Field(default=10, ge=1, le=30)
     llm_max_output_tokens: int | None = Field(default=None, ge=256, le=32768)
     gemini_api_key: SecretStr | None = Field(default=None, repr=False, exclude=True)

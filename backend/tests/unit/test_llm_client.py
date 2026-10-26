@@ -215,7 +215,8 @@ def test_timeouts_are_bounded_and_sanitized():
 
     with pytest.raises(LLMUnavailable) as caught:
         run(respond)
-    assert len(attempts) == 2 and "synthetic-primary-secret" not in str(caught.value)
+    # D52 replaces the old two-timeout policy with immediate failover.
+    assert len(attempts) == 1 and "synthetic-primary-secret" not in str(caught.value)
 
 
 @pytest.mark.parametrize("status", [302, 400, 401, 403])
@@ -319,9 +320,11 @@ def test_total_timeout_bounds_a_provider_that_never_finishes_its_stream():
         attempts.append(request)
         return httpx.Response(200, stream=SlowStream())
 
-    with pytest.raises(LLMUnavailable):
-        run(respond, settings(llm_timeout_seconds=1))
-    assert len(attempts) == 2
+    config = settings().model_copy(update={"llm_primary_timeout_seconds": 0.01})
+    with pytest.raises(LLMUnavailable) as caught:
+        run(respond, config)
+    # D52: the total attempt deadline must not repeat the stalled provider.
+    assert len(attempts) == 1 and caught.value.reason == "needs_internet"
 
 
 def test_fallback_stays_selected_for_the_rest_of_the_request():

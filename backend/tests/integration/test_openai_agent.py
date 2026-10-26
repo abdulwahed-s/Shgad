@@ -53,8 +53,14 @@ def test_d39_primary_and_fallback_exhaustion_preserves_deterministic_screens(
     result = ChatResponse.model_validate_json(response.content)
     assert result.status == "llm_unavailable" and not result.figures
     assert result.reply_ar == text("needs_internet" if failure == "timeout" else "busy")
-    assert sent == ["generativelanguage.googleapis.com"] * 2 + ["api.openai.com"] * 2
-    assert delays == [1, 1]
+    # D52: timeout advances immediately; HTTP failures retain the single retry.
+    repeats = 1 if failure == "timeout" else 2
+    assert (
+        sent
+        == ["generativelanguage.googleapis.com"] * repeats
+        + ["api.openai.com"] * repeats
+    )
+    assert delays == ([] if failure == "timeout" else [1, 1])
     assert api.get("/health").json() == {"status": "ok", "version": "0.1.0"}
     assert api.get("/api/debts").status_code == 200
     assert api.get("/api/reports/weekly").status_code == 200

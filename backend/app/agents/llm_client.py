@@ -4,6 +4,7 @@ import asyncio
 import copy
 import json
 import re
+import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
@@ -190,10 +191,14 @@ def parse_reply(body, *, provider, model):
 
 
 class LLMClient:
-    def __init__(self, settings, *, transport=None, sleep=asyncio.sleep):
+    def __init__(
+        self, settings, *, transport=None, sleep=asyncio.sleep, attempt_observer=None
+    ):
         self.settings = settings
         self.transport = transport
         self.sleep = sleep
+        self.attempt_receipts = []
+        self.attempt_observer = attempt_observer
         self._client = None
         self._preferred = None
 
@@ -215,14 +220,21 @@ class LLMClient:
 
     async def _request(self, provider, payload, key):
         # A read timeout alone resets on each byte; enforce a total deadline too.
-        async with asyncio.timeout(self.settings.llm_timeout_seconds):
+        timeout = (
+            self.settings.llm_primary_timeout_seconds
+            if provider == self.settings.llm_provider
+            else self.settings.llm_timeout_seconds
+        )
+        async with asyncio.timeout(timeout):
             async with self._client.stream(
                 "POST",
                 ENDPOINTS[provider],
                 json=payload,
                 headers={"Authorization": f"Bearer {key}"},
+                timeout=timeout,
             ) as response:
                 status = response.status_code
+                self.attempt_receipts[-1]["status"] = status
                 retry_after = response.headers.get("retry-after", "")
                 if status != 200:
                     return status, retry_after, None
@@ -274,6 +286,8 @@ class LLMClient:
                     "temperature": 0,
                     "max_tokens": self.settings.llm_max_output_tokens or 2048,
                 }
+                if provider == "gemini" and model == "gemini-3.8-flash":
+                    payload["reasoning_effort"] = "low"
                 if tools:
                     payload |= {"tools": list(tools), "tool_choice": "auto"}
                 if json_mode:
@@ -282,9 +296,20 @@ class LLMClient:
                 raise LLMUnavailable("context_limit")
             for attempt in range(2):
                 delay = min(2, 2**attempt)
+                record = {
+                    "provider": provider,
+                    "model": model,
+                    "status": None,
+                    "category": "transport",
+                    "elapsed_ms": 0,
+                }
+                self.attempt_receipts.append(record)
+                started = time.monotonic()
                 try:
                     status, header, body = await self._request(provider, payload, key)
+                    record["status"] = status
                     if status != 200:
+                        record["category"] = f"http_{status}"
                         if status not in RETRIABLE or attempt == 1:
                             break
                         delay = retry_delay(header)
@@ -303,8 +328,14 @@ class LLMClient:
                         if replay is not None:
                             reply.message[REPLAY_ITEMS] = replay
                         self._preferred = (provider, model)
+                        record["category"] = "ok"
                         return reply
-                except (TimeoutError, httpx.TimeoutException, httpx.TransportError):
+                except (TimeoutError, httpx.TimeoutException):
+                    record["category"] = "timeout"
+                    reason = "needs_internet"
+                    break
+                except httpx.TransportError:
+                    record["category"] = "transport"
                     reason = "needs_internet"
                     if attempt == 1:
                         break
@@ -315,7 +346,17 @@ class LLMClient:
                     IndexError,
                     httpx.DecodingError,
                 ):
+                    record["category"] = "malformed"
                     reason = "invalid_response"
                     break
+                except asyncio.CancelledError:
+                    record["category"] = "timeout"
+                    raise
+                finally:
+                    record["elapsed_ms"] = max(
+                        0, round((time.monotonic() - started) * 1000)
+                    )
+                    if self.attempt_observer is not None:
+                        self.attempt_observer(dict(record))
                 await self.sleep(delay)
         raise LLMUnavailable(reason)
