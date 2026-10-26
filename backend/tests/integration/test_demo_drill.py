@@ -9,6 +9,8 @@ from pathlib import Path
 import httpx
 import pytest
 
+from app.agents.llm_client import LLMUnavailable
+
 
 def module():
     path = Path(__file__).resolve().parents[3] / "scripts" / "demo_drill.py"
@@ -48,6 +50,11 @@ def test_recorded_drill_uses_new_input_real_services_and_restores_sample():
     assert result["source_ids"] and result["csv_sha256"]
     assert result["human_rehearsals"] == 0
     assert result["human_daily_close_timings"] == []
+    assert len(result["chat_receipts"]) == 3
+    assert all(type(row["elapsed_ms"]) is int for row in result["chat_receipts"])
+    assert all(
+        row["category"] in {"ok", "timeout"} for row in result["provider_receipts"]
+    )
 
 
 def test_cap_counts_every_attempt_and_blocks_before_transmission():
@@ -115,3 +122,51 @@ def test_valid_new_rows_flagged_as_similar_are_still_preserved(monkeypatch):
         "rejected": 0,
         "exact_duplicates": 0,
     }
+
+
+@pytest.mark.parametrize(
+    "failure", ["http", "timeout", "transport", "malformed", "deadline"]
+)
+def test_drill_receipt_classifies_and_times_every_failed_attempt(failure):
+    drill = module()
+
+    async def send(request):
+        if failure == "timeout":
+            raise httpx.ReadTimeout("fictional private detail")
+        if failure == "transport":
+            raise httpx.ConnectError("fictional private detail")
+        if failure == "deadline":
+            await asyncio.sleep(1)
+        return (
+            httpx.Response(401)
+            if failure == "http"
+            else httpx.Response(200, content=b"private invalid JSON")
+        )
+
+    async def run():
+        settings = drill.Settings(
+            llm_provider="gemini",
+            llm_model_id="gemini-3.8-flash",
+            gemini_api_key="fictional",
+        ).model_copy(update={"llm_primary_timeout_seconds": 0.01})
+        transport = drill.CappedTransport(httpx.MockTransport(send), cap=2)
+        with pytest.raises(LLMUnavailable):
+            async with drill.LLMClient(
+                settings, transport=transport, attempt_observer=transport.record_attempt
+            ) as client:
+                await client.complete([{"role": "user", "content": "fictional"}])
+        return transport.receipts
+
+    receipts = asyncio.run(run())
+    expected = {
+        "http": "http_401",
+        "timeout": "timeout",
+        "transport": "transport",
+        "malformed": "malformed",
+        "deadline": "timeout",
+    }[failure]
+    assert receipts and all(row["category"] == expected for row in receipts)
+    assert all(
+        type(row["elapsed_ms"]) is int and row["elapsed_ms"] >= 0 for row in receipts
+    )
+    assert "private" not in str(receipts)

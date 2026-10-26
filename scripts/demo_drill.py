@@ -14,6 +14,7 @@ import json
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -76,11 +77,13 @@ class CappedTransport(httpx.AsyncBaseTransport):
         self.receipts = []
         self.force_fallback = False
         self.injected_faults = 0
+        self._pending_receipt = None
 
     async def aclose(self):
         await self.inner.aclose()
 
     async def handle_async_request(self, request):
+        self._pending_receipt = None
         provider = next(
             (p for p, url in ENDPOINTS.items() if str(request.url) == url), None
         )
@@ -93,15 +96,38 @@ class CappedTransport(httpx.AsyncBaseTransport):
             self.blocked += 1
             raise RequestCapReached("Demo request cap reached")
         self.attempts += 1
-        record = {"provider": provider, "model": MODELS[provider], "status": None}
+        record = {
+            "provider": provider,
+            "model": MODELS[provider],
+            "status": None,
+            "category": "transport",
+            "elapsed_ms": 0,
+        }
         self.receipts.append(record)
+        self._pending_receipt = record
+        started = time.monotonic()
         try:
             response = await self.inner.handle_async_request(request)
             record["status"] = response.status_code
+            record["category"] = (
+                "ok" if response.status_code == 200 else f"http_{response.status_code}"
+            )
             return response
-        except httpx.TransportError:
-            record["failure"] = "transport_error"
+        except (asyncio.CancelledError, TimeoutError, httpx.TimeoutException):
+            record["category"] = "timeout"
             raise
+        except httpx.TransportError:
+            record["category"] = "transport"
+            raise
+        finally:
+            record["elapsed_ms"] = max(0, round((time.monotonic() - started) * 1000))
+
+    def record_attempt(self, attempt):
+        # The client includes body parsing/streaming in the elapsed time/category.
+        # Locally injected faults and cap blocks have no paid transport receipt.
+        if self._pending_receipt is not None:
+            self._pending_receipt.update(attempt)
+            self._pending_receipt = None
 
 
 class RecordedWire:
@@ -219,6 +245,7 @@ async def run_drill(*, mode, request_cap, authorize_paid=False):
         "models": MODELS,
         "request_cap": request_cap,
         "checks": {},
+        "chat_receipts": [],
         "human_rehearsals": 0,
         "human_daily_close_timings": [],
         "question_copy_review": "approved user-supplied wording, 2026-10-24",
@@ -234,7 +261,9 @@ async def run_drill(*, mode, request_cap, authorize_paid=False):
             }
         )
         app.dependency_overrides[get_settings] = lambda: settings
-        async with LLMClient(settings, transport=transport) as provider:
+        async with LLMClient(
+            settings, transport=transport, attempt_observer=transport.record_attempt
+        ) as provider:
 
             async def client():
                 yield provider
@@ -252,7 +281,26 @@ async def run_drill(*, mode, request_cap, authorize_paid=False):
                             raise ValueError(
                                 "Previous demo check failed; stop this run"
                             )
+                        first_attempt = len(transport.receipts)
+                        started = time.monotonic()
                         response = await api.request(method, path, **kwargs)
+                        if path == "/api/chat":
+                            result["chat_receipts"].append(
+                                {
+                                    "http_status": response.status_code,
+                                    "outcome": response.json().get("status")
+                                    if response.status_code == 200
+                                    else "http_error",
+                                    "elapsed_ms": max(
+                                        0, round((time.monotonic() - started) * 1000)
+                                    ),
+                                    "fallback_used": any(
+                                        row["provider"]
+                                        == settings.llm_fallback_provider
+                                        for row in transport.receipts[first_attempt:]
+                                    ),
+                                }
+                            )
                         if response.status_code != 200:
                             raise ValueError(
                                 f"Demo route failed: {path} HTTP {response.status_code}"
