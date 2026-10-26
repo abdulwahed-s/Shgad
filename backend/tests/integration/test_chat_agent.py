@@ -98,10 +98,6 @@ def test_recorded_core_routes_use_real_tools_and_source_evidence(
 
 def test_j1_multi_tool_answer_has_both_shortfalls(api, scripted, tool_history):
     sent = scripted(
-        calls(
-            ("get_debts", {"direction": "both"}),
-            ("forecast", {"scenario": "all", "until": "next_weekday:thu"}),
-        ),
         draft(
             "النقص إذا صار التحصيل {{fig:tool_1.j1.shortfall_with_collection}}، "
             "وبدونه {{fig:tool_1.j1.shortfall_without_collection}}."
@@ -112,11 +108,18 @@ def test_j1_multi_tool_answer_has_both_shortfalls(api, scripted, tool_history):
         "get_debts",
         "forecast",
     }
-    assert {f.amount_iqd for f in result.figures} == {80000, 230000}
+    # D54 supplies the plan before narration and restates its verified inputs.
+    assert {f.amount_iqd for f in result.figures} == {
+        420000,
+        650000,
+        150000,
+        80000,
+        230000,
+    }
     assert "٨٠ ألف" in result.reply_ar and "٢٣٠ ألف" in result.reply_ar
     assert "تقدير" in result.reply_ar and "مو مضمون" in result.reply_ar
     assert str(result.resolved_range.end) == "2026-10-01"
-    assert not result.renderer.fell_back_to_template and len(sent) == 2
+    assert not result.renderer.fell_back_to_template and len(sent) == 1
     assert len(json.dumps(sent[-1], ensure_ascii=False).encode()) < 32_000
 
 

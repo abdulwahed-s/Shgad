@@ -252,13 +252,25 @@ def before_provider(message, *, connection, clock, known_at, period):
         else "both"
     )
     for query in sorted(_named_queries(value, snapshot)):
-        decision = _party_decision(snapshot, query, direction)
+        # A named customer paying in the if-clause is a receivable even when
+        # the main clause mentions a supplier. Other explicit roles stay intact.
+        conditional_collection = supplier and re.search(
+            r"(?:اذا|لو)\s+(?:(?:الزبون|العميل)\s+)?"
+            + re.escape(query)
+            + r"\s+(?:دفع|سدد)(?!\w)",
+            value,
+        )
+        decision = _party_decision(
+            snapshot, query, "receivable" if conditional_collection else direction
+        )
         if decision:
             return decision
     return None
 
 
-def after_selection(message, name, arguments, *, connection, clock, known_at):
+def after_selection(
+    message, name, arguments, *, connection, clock, known_at, trusted_party=None
+):
     if name in {"get_sales", "get_margin", "reconcile"} and isinstance(
         arguments.get("period"), str
     ):
@@ -269,7 +281,9 @@ def after_selection(message, name, arguments, *, connection, clock, known_at):
                 return decision
     if name == "get_debts" and isinstance(arguments.get("counterparty_query"), str):
         query = arguments["counterparty_query"]
-        if normalize_name(query) not in normalize_name(message):
+        if trusted_party is None and normalize_name(query) not in normalize_name(
+            message
+        ):
             return SafeDecision("clarify_customer")
         direction = arguments.get("direction", "receivable")
         if not isinstance(direction, str) or direction not in {
@@ -279,5 +293,9 @@ def after_selection(message, name, arguments, *, connection, clock, known_at):
         }:
             return None  # The closed tool schema retains ownership of invalid args.
         snapshot = QuerySnapshot(connection, clock=clock, known_at=known_at)
+        if trusted_party is not None:
+            party = snapshot.resolve_party(query, direction)
+            if party.id != trusted_party.id or query != trusted_party.display_name:
+                return SafeDecision("clarify_customer")
         return _party_decision(snapshot, query, direction)
     return None

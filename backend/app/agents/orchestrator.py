@@ -11,6 +11,7 @@ from app.agents.llm_client import LLMUnavailable, strict_json
 from app.agents.messages_ar import text
 from app.agents.renderer import DraftValidationError, render_draft, render_reply
 from app.agents.system_instructions import SYSTEM_INSTRUCTIONS
+from app.agents.tool_plans import ToolPlan, select_plan
 from app.agents.tool_registry import TOOLS, definitions, invoke
 from app.agents.verification import require_verified
 from app.schemas.chat import (
@@ -256,7 +257,11 @@ def response(rendered, outputs, used):
     fields = rendered.model_dump()
     if rendered.resolved_range is None:
         for output in reversed(outputs):
-            if output.result.get("j1") or output.result.get("upcoming"):
+            if (
+                output.result.get("j1")
+                or output.result.get("upcoming")
+                or output.result.get("weekly")
+            ):
                 fields["resolved_range"] = output.resolved_range
                 break
     if rendered.renderer.fell_back_to_template:
@@ -327,10 +332,76 @@ async def _converse(request, *, client, connection, clock, known_at):
         )
         if decision:
             return safe_response(decision)
+        plan = select_plan(
+            request.message,
+            period=period,
+            connection=connection,
+            clock=clock,
+            known_at=known_at,
+        )
+        if plan is not None and not isinstance(plan, ToolPlan):
+            return safe_response(plan)
+        if plan:
+            history = {
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [
+                    {
+                        "id": f"plan-{index}",
+                        "type": "function",
+                        "function": {
+                            "name": call.name,
+                            "arguments": json.dumps(call.arguments),
+                        },
+                    }
+                    for index, call in enumerate(plan.calls)
+                ],
+            }
+            # Google's documented marker for client-executed function history.
+            # The shared client removes this extension for other providers.
+            history["tool_calls"][0]["extra_content"] = {
+                "google": {"thought_signature": "skip_thought_signature_validator"}
+            }
+            messages.append(history)
+            for index, call in enumerate(plan.calls):
+                decision = answer_policy.after_selection(
+                    request.message,
+                    call.name,
+                    call.arguments,
+                    connection=connection,
+                    clock=call.clock,
+                    known_at=known_at,
+                    trusted_party=call.party,
+                )
+                if decision:
+                    return safe_response(decision, used)
+                output = invoke(
+                    call.name,
+                    call.arguments,
+                    connection=connection,
+                    clock=call.clock,
+                    known_at=known_at,
+                    user_message=request.message,
+                    server_period_set=True,
+                    server_plan=plan.kind,
+                )
+                used.append(call.name)
+                if not output.ok:
+                    return tool_failure(output, used)
+                outputs.append(output)
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": f"plan-{index}",
+                        "content": quoted_output(output, index),
+                    }
+                )
         # Reserve the fourth completion for the renderer's one draft retry.
         for _ in range(3):
             try:
-                reply = await client.complete(messages, tools=definitions())
+                reply = await client.complete(
+                    messages, tools=() if plan else definitions()
+                )
             except LLMUnavailable as exc:
                 if outputs:
                     return response(
@@ -349,6 +420,9 @@ async def _converse(request, *, client, connection, clock, known_at):
                 return fixed("llm_unavailable", key)
             messages.append(reply.message)
             if reply.tool_calls:
+                if plan:
+                    # A narration-only turn cannot replace/extend its server plan.
+                    break
                 if len(used) + len(reply.tool_calls) > 8:
                     break
                 for call in reply.tool_calls:

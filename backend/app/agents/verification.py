@@ -14,6 +14,7 @@ from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
 from app.services.financial_queries import payment_capacity, sale_totals, sources
 from app.services.margin import margin_report
+from app.services.weekly_tool_views import weekly_tool_result
 
 
 def _reject():
@@ -158,7 +159,7 @@ def _verify_forecast(data, snapshot):
         _reject()
 
 
-def verify_tool_output(envelope, *, snapshot, tool_name):
+def verify_tool_output(envelope, *, snapshot, tool_name, weekly_plan=False):
     if not envelope.ok or envelope.resolved_range is None:
         _reject()
     figure_map = {figure.key: figure for figure in envelope.figures}
@@ -223,7 +224,13 @@ def verify_tool_output(envelope, *, snapshot, tool_name):
         envelope.resolved_range.end,
         partial=envelope.result.get("range", {}).get("partial", False),
     )
-    if tool_name == "get_sales":
+    if weekly_plan and tool_name in {"get_sales", "get_margin"}:
+        if (
+            weekly_tool_result(snapshot, resolved, tool_name).model_dump(mode="json")
+            != envelope.result
+        ):
+            _reject()
+    elif tool_name == "get_sales":
         expected = sale_totals(snapshot, resolved, kind=envelope.result["kind"])
         if expected.model_dump(mode="json") != envelope.result:
             _reject()

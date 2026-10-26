@@ -3,6 +3,7 @@
 Imported notes are never used as templates or executable instructions.
 """
 
+import hashlib
 from dataclasses import dataclass
 from typing import Literal
 
@@ -95,5 +96,36 @@ MESSAGES = {
 }
 
 
+# Verbatim D45 frontend keys reused by D54, not a new approval or an extension
+# of D38/D44. Hashes are from FRONTEND_ARABIC_APPROVAL_2026-10-20.json.
+REUSED_FRONTEND_LABELS = {
+    "collection": (
+        "تحصيل دين",
+        "930c1a0ea40f2325b69c4eff7ae16f0dabbf8a5f494494dc21fda8f29102ade7",
+    ),
+    "operatingExpense": (
+        "مصروف المحل",
+        "acfbd0a4f9f317acf7b931885b07ec5792ae18d53c98a038b857642f05cb89ea",
+    ),
+    "ownerDrawing": (
+        "سحب صاحب المحل",
+        "c9f4022caaeee6e430ce3976bb2ae5e754cdac3995abd54b311541be272b6de3",
+    ),
+    "supplierPayment": (
+        "دفعة للمجهز",
+        "cadff17cd37c02b1aaff357aa6df157f218ccf179251dee60faef601f54fd80c",
+    ),
+    "capitalInjection": (
+        "إضافة رأس مال",
+        "fd4136b7751bcc9af05c3207681d113c721c6cbb63aee7d031b38cfd8b57ce4d",
+    ),
+}
+
+
 def text(key):
-    return MESSAGES[key].text
+    if key in MESSAGES:
+        return MESSAGES[key].text
+    value, approved = REUSED_FRONTEND_LABELS[key]
+    if hashlib.sha256(value.encode("utf-8")).hexdigest() != approved:
+        raise ValueError("Reused copy differs from its reviewed text")
+    return value

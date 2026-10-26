@@ -86,6 +86,10 @@ Financial calculations use integer IQD in Python. The tools and renderer work wi
 an LLM. The agent requests these tools and drafts explanations with symbolic slots;
 the backend fills figures and dates from verified results. Provider calls and API
 keys stay in the backend. Integration tests use recorded provider responses.
+Clear weekly overviews and supplier-payment sufficiency questions use server
+tool plans before model narration. Weekly summaries keep drawings separate from
+expenses and enforce priced-sales coverage; cash answers show both existing
+collection scenarios. Ambiguous identities or weekdays require clarification.
 The selected primary is `gemini-3.8-flash`, with OpenAI `gpt-6-luna` as the
 fallback. Paid API access is user-reported. Both APIs have successful live checks;
 primary/fallback CSV previews and controlled OpenAI fallback chat passed. The

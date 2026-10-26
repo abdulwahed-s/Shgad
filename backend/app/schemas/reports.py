@@ -6,7 +6,7 @@ from pydantic import StrictBool, StrictInt
 
 from app.schemas.forecast import Amount
 from app.schemas.ledger import LedgerModel
-from app.schemas.queries import FlagView, ReportRange
+from app.schemas.queries import FlagView, ReportRange, SalesReport
 
 
 class PriceBasis(LedgerModel):
@@ -33,6 +33,28 @@ class WeeklyMargin(LedgerModel):
     shown: StrictBool
     margin: Amount
     coverage_pct: StrictInt | None
+    note_key: str
+    unexplained_difference_excluded: Literal[True] = True
+
+
+class WeeklyMovements(LedgerModel):
+    collections: Amount
+    supplier_payments: Amount
+    operating_expenses: Amount
+    owner_drawings: Amount
+    capital_injections: Amount
+
+
+class WeeklySalesResult(SalesReport):
+    weekly: WeeklyMovements
+
+
+class WeeklyMarginResult(LedgerModel):
+    range: ReportRange
+    gross_margin: Amount
+    coverage_pct: StrictInt | None
+    unpriced_sales_count: StrictInt
+    shown: StrictBool
     note_key: str
     unexplained_difference_excluded: Literal[True] = True
 

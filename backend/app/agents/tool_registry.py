@@ -23,9 +23,10 @@ from app.schemas.tools import (
 )
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
-from app.services.financial_queries import QuerySnapshot, sources
+from app.services.financial_queries import QuerySnapshot, historical_range, sources
 from app.services.margin import margin_metrics
 from app.services.tool_evidence import debt_metrics, forecast_figures, upcoming_figures
+from app.services.weekly_tool_views import weekly_tool_result
 from app.tools import forecast, get_debts, get_margin, get_sales, reconcile
 
 TOOLS = {
@@ -101,9 +102,13 @@ def _invoke(
     known_at=None,
     user_message="",
     server_period_set=False,
+    server_plan=None,
 ):
     """Only trusted server context can establish explicit user-supplied dates."""
     try:
+        if server_plan not in {None, "weekly_summary", "cash_sufficiency"}:
+            raise FinancialRuleError("VALIDATION_ERROR")
+        weekly_plan = server_plan == "weekly_summary"
         if not isinstance(name, str) or name not in TOOLS:
             raise FinancialRuleError("VALIDATION_ERROR")
         model, service = TOOLS[name]
@@ -126,9 +131,15 @@ def _invoke(
         snapshot = QuerySnapshot(
             connection, clock=clock, known_at=None if name == "forecast" else known_at
         )
-        result, resolved, party = service(
-            snapshot, clock=clock, arguments=args, dates_from_user=explicit
-        )
+        if weekly_plan and name in {"get_sales", "get_margin"}:
+            if args.period not in {"this_week", "last_week"}:
+                raise FinancialRuleError("VALIDATION_ERROR")
+            resolved = historical_range(clock, args.period)
+            result, party = weekly_tool_result(snapshot, resolved, name), None
+        else:
+            result, resolved, party = service(
+                snapshot, clock=clock, arguments=args, dates_from_user=explicit
+            )
         data = result.model_dump(mode="json")
         figures, dates = _metadata(result)
         metrics = (
@@ -167,10 +178,13 @@ def _invoke(
                 sorted(
                     {f"missing_{f.label_key}" for f in figures if f.kind == "missing"}
                     | ({"period_set_by_server"} if server_period_set else set())
+                    | ({f"tool_plan_{server_plan}"} if server_plan else set())
                 )
             ),
         )
-        return verify_tool_output(envelope, snapshot=snapshot, tool_name=name)
+        return verify_tool_output(
+            envelope, snapshot=snapshot, tool_name=name, weekly_plan=weekly_plan
+        )
     except (ValidationError, FinancialRuleError) as exc:
         code = exc.code if isinstance(exc, FinancialRuleError) else "VALIDATION_ERROR"
         return ToolEnvelope(
@@ -194,6 +208,7 @@ def invoke(
     known_at=None,
     user_message="",
     server_period_set=False,
+    server_plan=None,
 ):
     """Hold one consistent SQLite read snapshot through service and provenance."""
     deadline = monotonic() + TOOL_TIMEOUT_SECONDS
@@ -212,6 +227,7 @@ def invoke(
                     known_at=known_at,
                     user_message=user_message,
                     server_period_set=server_period_set,
+                    server_plan=server_plan,
                 )
             if monotonic() >= deadline:
                 raise sqlite3.OperationalError("TOOL_TIMEOUT")

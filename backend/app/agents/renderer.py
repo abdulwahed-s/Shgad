@@ -118,6 +118,23 @@ def _render_body(draft, *, figures, metrics, dates, used, user_message):
 
 def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_list):
     parts = []
+
+    def include(index, key, label):
+        qualified = f"tool_{index}.{key}"
+        entry = figures.get(qualified)
+        if entry is None or entry.kind == "missing" or not entry.source_ids:
+            return
+        parts.append(
+            _render_body(
+                label + ": {{fig:" + qualified + "}}.",
+                figures=figures,
+                metrics=metrics,
+                dates=dates,
+                used=used,
+                user_message="",
+            )
+        )
+
     for index, context in enumerate(contexts):
         parts.append(
             text("period").format(
@@ -133,6 +150,41 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
             )
     assumptions = set()
     for index, output in enumerate(outputs):
+        if "weekly" in output.result:
+            for key in (
+                "cash_sales",
+                "credit_sales",
+                "total_sales",
+                "unexplained_cash_difference",
+            ):
+                include(index, key, text(figures[f"tool_{index}.{key}"].label_key))
+            if output.result["unexplained_cash_difference"]["amount_iqd"] not in (
+                None,
+                0,
+            ):
+                parts.append(text("difference_note"))
+            for key, label in (
+                ("collections", "collection"),
+                ("supplier_payments", "supplierPayment"),
+                ("operating_expenses", "operatingExpense"),
+                ("owner_drawings", "ownerDrawing"),
+                ("capital_injections", "capitalInjection"),
+            ):
+                include(index, f"weekly.{key}", text(label))
+        if "shown" in output.result:
+            if output.result["shown"]:
+                include(index, "gross_margin", text("estimated_gross_margin"))
+            else:
+                parts.append(text("margin_insufficient_priced_sales"))
+        if "tool_plan_cash_sufficiency" in output.warnings and output.result.get("j1"):
+            for key in (
+                "cash_on_hand",
+                "supplier_due",
+                "expected_collection",
+                "shortfall_with_collection",
+                "shortfall_without_collection",
+            ):
+                include(index, f"j1.{key}", text(key))
         if debt_list:
             for direction in ("receivables", "payables"):
                 report = output.result.get(direction)
@@ -167,17 +219,19 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
             coverage_key = (
                 "coverage_pct" if len(outputs) == 1 else f"tool_{index}.coverage_pct"
             )
+            metric = metrics.get(coverage_key)
             copy = text("coverage").format(value="{{fig:" + coverage_key + "}}")
-            parts.append(
-                _render_body(
-                    copy,
-                    figures=figures,
-                    metrics=metrics,
-                    dates=dates,
-                    used=used,
-                    user_message="",
+            if metric is not None and metric.value is not None and metric.source_ids:
+                parts.append(
+                    _render_body(
+                        copy,
+                        figures=figures,
+                        metrics=metrics,
+                        dates=dates,
+                        used=used,
+                        user_message="",
+                    )
                 )
-            )
         for key in output.assumptions:
             if (
                 key
