@@ -6,6 +6,7 @@ import re
 
 from pydantic import ValidationError
 
+from app.agents import answer_policy
 from app.agents.llm_client import LLMUnavailable, strict_json
 from app.agents.messages_ar import text
 from app.agents.renderer import DraftValidationError, render_draft, render_reply
@@ -20,6 +21,7 @@ from app.schemas.chat import (
 )
 from app.schemas.evidence import CounterpartyView
 from app.services.errors import FinancialRuleError
+from app.services.period_phrases import resolve_period
 from app.services.reconcile import normalize_name
 from app.services.validation import normalize_digits
 
@@ -152,6 +154,18 @@ def tool_failure(output, used):
     )
 
 
+def safe_response(decision, used=()):
+    return fixed(
+        decision.status,
+        decision.key,
+        used=used,
+        options=tuple(
+            ClarificationOption(label_ar=party.display_name, value=party.id)
+            for party in decision.options
+        ),
+    )
+
+
 def action(reply):
     return DraftAction.model_validate(strict_json(reply.content))
 
@@ -278,7 +292,8 @@ async def converse(request, *, client, connection, clock, known_at):
 
 
 async def _converse(request, *, client, connection, clock, known_at):
-    if ambiguous_weekday(request.message, clock):
+    period = resolve_period(request.message, weekday=clock.today.weekday())
+    if period.status == "conflict" or ambiguous_weekday(request.message, clock):
         return fixed("clarification", "clarify_period")
     messages = [
         {"role": "system", "content": SYSTEM_INSTRUCTIONS},
@@ -298,6 +313,15 @@ async def _converse(request, *, client, connection, clock, known_at):
     was_query_only = connection.execute("PRAGMA query_only").fetchone()[0]
     connection.execute("PRAGMA query_only=ON")
     try:
+        decision = answer_policy.before_provider(
+            request.message,
+            connection=connection,
+            clock=clock,
+            known_at=known_at,
+            period=period,
+        )
+        if decision:
+            return safe_response(decision)
         # Reserve the fourth completion for the renderer's one draft retry.
         for _ in range(3):
             try:
@@ -322,15 +346,45 @@ async def _converse(request, *, client, connection, clock, known_at):
                         query
                     ) not in normalize_name(request.message):
                         return fixed("clarification", "clarify_customer", used=used)
+                    name, arguments = call.name, dict(call.arguments)
+                    if answer_policy.margin_request(request.message):
+                        name = "get_margin"
+                        arguments = {
+                            key: value
+                            for key, value in arguments.items()
+                            if key in {"period", "start_date", "end_date"}
+                        }
+                        if "period" not in arguments and period.status == "resolved":
+                            arguments["period"] = period.period
+                        if "period" not in arguments:
+                            return fixed("clarification", "clarify_request", used=used)
+                    server_period_set = (
+                        period.status == "resolved" and "period" in arguments
+                    )
+                    if server_period_set:
+                        arguments["period"] = period.period
+                        arguments.pop("start_date", None)
+                        arguments.pop("end_date", None)
+                    decision = answer_policy.after_selection(
+                        request.message,
+                        name,
+                        arguments,
+                        connection=connection,
+                        clock=clock,
+                        known_at=known_at,
+                    )
+                    if decision:
+                        return safe_response(decision, used)
                     output = invoke(
-                        call.name,
-                        call.arguments,
+                        name,
+                        arguments,
                         connection=connection,
                         clock=clock,
                         known_at=known_at,
                         user_message=request.message,
+                        server_period_set=server_period_set,
                     )
-                    used.append(call.name)
+                    used.append(name)
                     if not output.ok:
                         return tool_failure(output, used)
                     upcoming = output.result.get("upcoming")

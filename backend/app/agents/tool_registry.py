@@ -92,7 +92,16 @@ def _metadata(value, path=""):
     return figures, dates
 
 
-def _invoke(name, arguments, *, connection, clock, known_at=None, user_message=""):
+def _invoke(
+    name,
+    arguments,
+    *,
+    connection,
+    clock,
+    known_at=None,
+    user_message="",
+    server_period_set=False,
+):
     """Only trusted server context can establish explicit user-supplied dates."""
     try:
         if not isinstance(name, str) or name not in TOOLS:
@@ -157,6 +166,7 @@ def _invoke(name, arguments, *, connection, clock, known_at=None, user_message="
             warnings=tuple(
                 sorted(
                     {f"missing_{f.label_key}" for f in figures if f.kind == "missing"}
+                    | ({"period_set_by_server"} if server_period_set else set())
                 )
             ),
         )
@@ -175,7 +185,16 @@ def _invoke(name, arguments, *, connection, clock, known_at=None, user_message="
         )
 
 
-def invoke(name, arguments, *, connection, clock, known_at=None, user_message=""):
+def invoke(
+    name,
+    arguments,
+    *,
+    connection,
+    clock,
+    known_at=None,
+    user_message="",
+    server_period_set=False,
+):
     """Hold one consistent SQLite read snapshot through service and provenance."""
     deadline = monotonic() + TOOL_TIMEOUT_SECONDS
     query_only = connection.execute("PRAGMA query_only").fetchone()[0]
@@ -192,6 +211,7 @@ def invoke(name, arguments, *, connection, clock, known_at=None, user_message=""
                     clock=clock,
                     known_at=known_at,
                     user_message=user_message,
+                    server_period_set=server_period_set,
                 )
             if monotonic() >= deadline:
                 raise sqlite3.OperationalError("TOOL_TIMEOUT")

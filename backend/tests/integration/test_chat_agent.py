@@ -173,7 +173,8 @@ def test_profit_question_without_buy_prices_clarifies_instead_of_guessing(
     from app.agents.messages_ar import text
 
     assert result.reply_ar == text("clarify_costs")
-    assert result.used_tools == ("get_margin",) and len(sent) == 1
+    # D53 detects unavailable costs before spending a provider/tool turn.
+    assert result.used_tools == () and len(sent) == 0
 
 
 def test_seven_day_obligations_use_debts_and_separate_expected_cash(

@@ -52,6 +52,8 @@ Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
 - Seed/reset the fictional sample through the interface; pick synthetic CSVs, edit mappings, preview and confirm imports.
 - Keep last-synced reports available offline while retaining form input and disabling writes without a queue.
 - Answer chat requests through a bounded, read-only agent with verified figures and source evidence.
+- Resolve supported Iraqi period phrases in code and clarify conflicting periods before model calls.
+- Check direct ledger-write commands, unavailable history or margin costs, and unresolved named customers with deterministic safeguards and approved messages.
 - Grade historical responses with independent integer-IQD calculations, exact customer/period checks and source-row validation; keep sealed questions separate from development inputs.
 
 ## Merchant questions
