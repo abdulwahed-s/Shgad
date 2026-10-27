@@ -127,6 +127,16 @@ class FlagsReport(LedgerModel):
     items: tuple[FlagView, ...]
 
 
+class ReconcileCollections(LedgerModel):
+    collections: Amount
+
+
+class ReconcileResult(FlagsReport):
+    """D58 tool view: flags plus the period's collections total for audits."""
+
+    weekly: ReconcileCollections
+
+
 class PaymentCapacity(LedgerModel):
     due_date: BusinessDate
     cash_on_hand: Amount

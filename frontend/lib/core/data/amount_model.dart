@@ -35,11 +35,14 @@ Amount parseAmount(dynamic json) {
 KnownZeroQuery? _parseQuery(Map<String, dynamic> amount, int? value) {
   if (amount['query_evidence'] == null) return null;
   final query = Map<String, dynamic>.from(amount['query_evidence'] as Map);
+  if (query['tool'] == 'get_debts') {
+    return _parseDebtQuery(amount, value, query);
+  }
   final period = Map<String, dynamic>.from(query['period'] as Map);
   final filters = Map<String, dynamic>.from(query['filters'] as Map);
   if (value != 0 ||
       (amount['source_ids'] as List).isNotEmpty ||
-      query['tool'] != 'get_sales' ||
+      !const {'get_sales', 'reconcile'}.contains(query['tool']) ||
       query['matching_rows'] != 0 ||
       filters['active_only'] != true ||
       filters['event_types'] is! List ||
@@ -54,6 +57,31 @@ KnownZeroQuery? _parseQuery(Map<String, dynamic> amount, int? value) {
     start: period['start'] as String,
     end: period['end'] as String,
     matchingRows: query['matching_rows'] as int,
+    originalQuery: jsonEncode(query),
+  );
+}
+
+/// D58: a zero debt total whose exact filters select no balance at `as_of`.
+KnownZeroQuery _parseDebtQuery(
+  Map<String, dynamic> amount,
+  int? value,
+  Map<String, dynamic> query,
+) {
+  final asOf = query['as_of'];
+  if (value != 0 ||
+      (amount['source_ids'] as List).isNotEmpty ||
+      query['matching_obligations'] != 0 ||
+      query['filters'] is! Map ||
+      asOf is! String ||
+      DateTime.tryParse(asOf) == null ||
+      DateTime.tryParse(query['known_at'] as String) == null) {
+    throw const FormatException('Invalid known-zero proof');
+  }
+  return KnownZeroQuery(
+    tool: 'get_debts',
+    start: asOf,
+    end: asOf,
+    matchingRows: 0,
     originalQuery: jsonEncode(query),
   );
 }

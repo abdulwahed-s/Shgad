@@ -205,6 +205,11 @@ def _invoke(
                 arguments=args,
                 dates_from_user=explicit and trusted_range is None,
                 **({"trusted_range": trusted_range} if trusted_range else {}),
+                **(
+                    {"with_collections": True}
+                    if name == "reconcile" and server_plan == "interpretation"
+                    else {}
+                ),
             )
         data = result.model_dump(mode="json")
         figures, dates = _metadata(result)

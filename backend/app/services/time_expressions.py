@@ -29,6 +29,7 @@ _PAST_ONLY = {
     "last_n_days",
     "since_day",
     "day_range",
+    "date_range",
     "weekday_past",
 }
 _FORWARD_LIMIT_DAYS = 30
@@ -105,6 +106,13 @@ def _historical(expression, today, *, default):
             _fail("VALIDATION_ERROR")
         start = _past_day(expression, today)
         end = _day(start.year, start.month, expression.day_end)
+        return DateRange(start, end)
+    if kind == "date_range":
+        year = _year(expression, today)
+        start = _day(year, expression.month, expression.day)
+        end = _day(year, expression.month_end, expression.day_end)
+        if end < start:
+            _fail("VALIDATION_ERROR")
         return DateRange(start, end)
     if kind == "weekday_past":
         offset = (today.weekday() - _WEEKDAYS[expression.weekday]) % 7

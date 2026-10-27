@@ -160,3 +160,22 @@ def test_expression_schema_is_closed_and_bounded():
         TimeExpression(type="day", day=5, unexpected=1)
     with pytest.raises(ValueError):
         TimeExpression(type="last_n_days")
+
+
+def test_cross_month_ranges():
+    assert span(
+        MONDAY, "historical", type="date_range", day=25, month=8, day_end=5, month_end=9
+    ) == (
+        "2026-08-25",
+        "2026-09-05",
+    )
+    early = {"type": "date_range", "day": 28, "month": 6, "day_end": 2, "month_end": 7}
+    assert code(MONDAY, "historical", **early) == "NO_HISTORICAL_DATA"
+    backwards = {
+        "type": "date_range",
+        "day": 5,
+        "month": 9,
+        "day_end": 25,
+        "month_end": 8,
+    }
+    assert code(MONDAY, "historical", **backwards) == "VALIDATION_ERROR"

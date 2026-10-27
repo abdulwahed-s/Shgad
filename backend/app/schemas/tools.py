@@ -93,7 +93,7 @@ class EmptyQueryFilters(LedgerModel):
 
 
 class KnownZeroQuery(LedgerModel):
-    tool: Literal["get_sales"]
+    tool: Literal["get_sales", "reconcile"]
     period: DateRangeView
     filters: EmptyQueryFilters
     matching_rows: Literal[0] = 0

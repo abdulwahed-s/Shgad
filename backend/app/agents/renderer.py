@@ -157,7 +157,7 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
             )
     assumptions = set()
     for index, output in enumerate(outputs):
-        if "weekly" in output.result:
+        if "weekly" in output.result and "cash_sales" in output.result:
             for key in (
                 "cash_sales",
                 "credit_sales",
@@ -360,6 +360,7 @@ def _template(outputs):
                     + ".lowest.date}}",
                 )
         elif "items" in data:
+            add("weekly.collections", text("collection"))
             for item_index in range(min(5, len(data["items"]))):
                 add(f"items.{item_index}.amount")
     return " ".join(lines) or text("no_figures")

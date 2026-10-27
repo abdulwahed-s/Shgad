@@ -98,6 +98,39 @@ void main() {
     expect(() => parseAmount(forged), throwsFormatException);
   });
 
+  test('Reconcile and debt zero proofs parse; forged debt proofs do not', () {
+    final audit = zeroJson();
+    (audit['query_evidence'] as Map)['tool'] = 'reconcile';
+    expect(parseAmount(audit).queryEvidence!.tool, 'reconcile');
+    Map<String, dynamic> debt() => {
+      ...zeroJson(),
+      'label_key': 'total_outstanding',
+      'query_evidence': {
+        'tool': 'get_debts',
+        'as_of': '2026-09-28',
+        'filters': {
+          'direction': 'receivable',
+          'overdue_only': true,
+          'counterparty_id': null,
+          'due_start': null,
+          'due_end': null,
+        },
+        'known_at': '2026-09-28T20:59:59+00:00',
+        'matching_obligations': 0,
+      },
+    };
+    final proof = parseAmount(debt()).queryEvidence!;
+    expect(proof.tool, 'get_debts');
+    expect(proof.start, '2026-09-28');
+    expect(proof.end, '2026-09-28');
+    final forged = debt();
+    (forged['query_evidence'] as Map)['matching_obligations'] = 2;
+    expect(() => parseAmount(forged), throwsFormatException);
+    final unknown = zeroJson();
+    (unknown['query_evidence'] as Map)['tool'] = 'forecast';
+    expect(() => parseAmount(unknown), throwsFormatException);
+  });
+
   for (final locale in ['ar', 'en']) {
     testWidgets(
       'Known zero evidence displays period, empty rows and query in $locale',

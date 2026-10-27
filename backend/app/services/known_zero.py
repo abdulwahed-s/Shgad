@@ -67,8 +67,10 @@ def debt_evidence(figure, *, snapshot, result):
 def query_evidence(figure, *, snapshot, tool_name, resolved, result):
     if tool_name == "get_debts":
         return debt_evidence(figure, snapshot=snapshot, result=result)
+    if tool_name == "reconcile" and figure.key != "weekly.collections":
+        return None
     if (
-        tool_name != "get_sales"
+        tool_name not in {"get_sales", "reconcile"}
         or figure.amount_iqd != 0
         or figure.source_ids
         or figure.kind == "missing"
@@ -89,7 +91,7 @@ def query_evidence(figure, *, snapshot, tool_name, resolved, result):
     ):
         return None
     return KnownZeroQuery(
-        tool="get_sales",
+        tool=tool_name,
         period=DateRangeView(start=resolved.start, end=resolved.end),
         filters=EmptyQueryFilters(event_types=events, known_at=snapshot.known),
     )

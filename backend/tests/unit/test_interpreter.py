@@ -128,3 +128,25 @@ def test_interpret_retries_once_then_fails_closed():
     client = Client("oops", "still bad")
     assert asyncio.run(interpret("شكد", client=client, clock=CLOCK)) is None
     assert len(client.calls) == 2
+
+
+def test_fenced_json_and_clitic_prefixes_are_accepted():
+    fenced = (
+        "```json\n"
+        + obj(
+            intent="upcoming_obligations",
+            days=2,
+            time={"type": "next_n_days", "n": 2, "evidence": "بهاليومين"},
+        )
+        + "\n```"
+    )
+    assert parse(fenced, "شكد مطلوب ندفع بهاليومين") is not None
+    month_range = {
+        "type": "date_range",
+        "day": 28,
+        "month": 6,
+        "day_end": 2,
+        "month_end": 7,
+        "evidence": "من ٢٨ حزيران لحد ٢ تموز",
+    }
+    assert parse(obj(time=month_range), "من ٢٨ حزيران لحد ٢ تموز شكد بعنا") is not None

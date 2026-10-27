@@ -5,6 +5,7 @@ owns every date, the ledger owns every identity, and the existing services own
 every figure. The plan performs no arithmetic on money.
 """
 
+import re
 from dataclasses import dataclass, field
 from datetime import timedelta
 
@@ -93,6 +94,7 @@ class Plan:
     period: DateRange
     calls: tuple[Call, ...]
     parties: tuple[str, ...] = ()
+    per_day: bool = False
 
 
 @dataclass(frozen=True)
@@ -109,25 +111,34 @@ def clarify(reason, options=()):
     return Stop(reason, REASON_KEYS.get(reason, "clarify_request"), options=options)
 
 
+def _words(value):
+    return re.findall(r"[^\W_]+", normalize_name(value))
+
+
 def _candidates(snapshot, mention, allowed):
-    """Exact name, then substring, then the mention without role words."""
-    forms = [normalize_name(mention)]
-    kept = [t for t in forms[0].split() if t not in _ROLE_WORDS]
-    if kept and " ".join(kept) != forms[0]:
-        forms.append(" ".join(kept))
-    for form in forms:
-        named = {
-            key: normalize_name(name)
-            for key, (name, kind) in snapshot.parties.items()
-            if kind in allowed
-        }
-        exact = [key for key, name in named.items() if name == form]
-        if exact:
-            return exact
-        partial = [key for key, name in named.items() if form and form in name]
-        if partial:
-            return partial
-    return []
+    """Exact name, then substring, then every non-role word of the mention."""
+    named = {
+        key: normalize_name(name)
+        for key, (name, kind) in snapshot.parties.items()
+        if kind in allowed
+    }
+    form = normalize_name(mention)
+    exact = [key for key, name in named.items() if name == form]
+    if exact:
+        return exact
+    partial = [key for key, name in named.items() if form and form in name]
+    if partial:
+        return partial
+    kept = [word for word in _words(mention) if word not in _ROLE_WORDS]
+    if not kept:
+        return []
+    # Word containment, so "ابو علي دفتر ب" names only "ابو علي - دفتر ب".
+    return [
+        key
+        for key, name in named.items()
+        if " ".join(kept) in " ".join(_words(name))
+        or all(word in _words(name) for word in kept)
+    ]
 
 
 def _generic(mention):
@@ -200,7 +211,13 @@ def plan(interpretation, *, connection, clock, known_at):
     if isinstance(result, Stop):
         return result
     calls, named = result
-    return Plan(intent, period, tuple(calls), tuple(sorted({p.id for p in named})))
+    return Plan(
+        intent,
+        period,
+        tuple(calls),
+        tuple(sorted({p.id for p in named})),
+        per_day=interpretation.per_day and intent == "upcoming_obligations",
+    )
 
 
 def _sales(interpretation, snapshot, clock, period, parties, collectors):
@@ -314,14 +331,17 @@ def _sufficiency(interpretation, snapshot, clock, period, parties, collectors):
 
 
 def _summary(interpretation, snapshot, clock, period, parties, collectors):
+    # Weeks reuse the D54 weekly views; other ranges use the same movement sums.
+    # Balances are current (today), never a reconstructed earlier closing.
     week = _is_week(period, snapshot.day)
-    plan_name = "weekly_summary" if week else "interpretation"
+    sales_plan = "weekly_summary" if week else "period_movements"
+    margin_plan = "weekly_summary" if week else "interpretation"
     return [
         Call(
-            "get_sales", _explicit(period) | {"kind": "all"}, clock, period, plan_name
+            "get_sales", _explicit(period) | {"kind": "all"}, clock, period, sales_plan
         ),
-        Call("get_debts", {"direction": "both"}, BusinessClock(period.end)),
-        Call("get_margin", _explicit(period), clock, period, plan_name),
+        Call("get_debts", {"direction": "both"}, clock),
+        Call("get_margin", _explicit(period), clock, period, margin_plan),
         Call("reconcile", _explicit(period), clock, period),
     ], ()
 

@@ -48,6 +48,16 @@ class LLMUnavailable(Exception):
         super().__init__("LLM_UNAVAILABLE")
 
 
+def unfenced(text):
+    """Remove one surrounding Markdown code fence (```json ... ```), nothing else."""
+    if not isinstance(text, str):
+        return text
+    match = re.fullmatch(
+        r"\s*```(?:json)?[ \t]*\r?\n(.*?)\r?\n?[ \t]*```\s*", text, re.S
+    )
+    return match[1] if match else text
+
+
 def strict_json(text):
     # Bound object depth before decoding/copying/serializing provider structures.
     value = text.decode("utf-8") if isinstance(text, bytes) else text

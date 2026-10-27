@@ -54,6 +54,7 @@ TimeType = Literal[
     "since_day",
     "day",
     "day_range",
+    "date_range",
     "weekday_past",
     "weekday_next",
 ]
@@ -74,6 +75,7 @@ _NEEDS = {
     "since_day": {"day"},
     "day": {"day"},
     "day_range": {"day", "day_end"},
+    "date_range": {"day", "month", "day_end", "month_end"},
     "weekday_past": {"weekday"},
     "weekday_next": {"weekday"},
 }
@@ -81,6 +83,7 @@ _ALLOWED = {
     "month": {"month", "year"},
     "day": {"day", "month", "year"},
     "day_range": {"day", "day_end", "month", "year"},
+    "date_range": {"day", "month", "day_end", "month_end", "year"},
 }
 
 
@@ -91,6 +94,7 @@ class TimeExpression(LedgerModel):
     day: Annotated[int, Field(strict=True, ge=1, le=31)] | None = None
     day_end: Annotated[int, Field(strict=True, ge=1, le=31)] | None = None
     month: Annotated[int, Field(strict=True, ge=1, le=12)] | None = None
+    month_end: Annotated[int, Field(strict=True, ge=1, le=12)] | None = None
     year: Annotated[int, Field(strict=True, ge=1900, le=2100)] | None = None
     weekday: Weekday | None = None
 
@@ -98,7 +102,7 @@ class TimeExpression(LedgerModel):
     def fields_match_type(self):
         present = {
             key
-            for key in ("n", "day", "day_end", "month", "year", "weekday")
+            for key in ("n", "day", "day_end", "month", "month_end", "year", "weekday")
             if getattr(self, key) is not None
         }
         needed = _NEEDS.get(self.type, set())
@@ -120,6 +124,7 @@ class Interpretation(LedgerModel):
     party_mentions: tuple[Verbatim, ...] = Field(default=(), max_length=4)
     collection_party_mentions: tuple[Verbatim, ...] = Field(default=(), max_length=2)
     without_collection: StrictBool = False
+    per_day: StrictBool = False
     time: TimeExpression = TimeExpression(type="none")
 
     @model_validator(mode="after")

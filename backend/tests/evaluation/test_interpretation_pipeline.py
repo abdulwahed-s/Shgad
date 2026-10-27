@@ -270,3 +270,36 @@ def test_role_words_alone_are_not_names():
     )
     assert totals.status == "answered"
     assert totals.interpretation.counterparty_ids == ()
+
+
+def test_qualified_similar_names_resolve_to_one_party():
+    response = ask(
+        "اريد الباقي على ابو علي دفتر ب",
+        understood(intent="debts", party_mentions=["ابو علي دفتر ب"]),
+    )
+    assert response.interpretation.counterparty_ids == ("CUST-03",)
+
+
+def test_month_summary_includes_movements_and_current_balances():
+    response = ask(
+        "شغل آب شلون جان",
+        understood(
+            intent="weekly_summary",
+            time={"type": "month", "month": 8, "evidence": "آب"},
+        ),
+    )
+    keys = {f.key.split(".", 1)[1] for f in response.figures}
+    assert {"total_sales", "weekly.owner_drawings", "weekly.operating_expenses"} <= keys
+    debts = [c for c in response.contexts if c.range.start == c.range.end]
+    assert all(c.range.end.isoformat() == "2026-09-28" for c in debts)
+
+
+def test_collections_audit_answers_even_without_flags():
+    response = ask(
+        "دقق تحصيلات امس",
+        understood(
+            intent="reconciliation", time={"type": "yesterday", "evidence": "امس"}
+        ),
+    )
+    assert response.status == "answered"
+    assert any(f.key.endswith("weekly.collections") for f in response.figures)

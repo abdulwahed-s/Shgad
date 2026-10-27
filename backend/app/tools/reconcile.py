@@ -1,11 +1,20 @@
 """Read-only period/type projection of the existing reconciliation service."""
 
-from app.schemas.queries import FlagsReport
+from app.schemas.queries import FlagsReport, ReconcileCollections, ReconcileResult
 from app.services.financial_queries import historical_range
 from app.services.reconcile import reconciliation_report
+from app.services.weekly_tool_views import movement_result
 
 
-def run(snapshot, *, clock, arguments, dates_from_user=False, trusted_range=None):
+def run(
+    snapshot,
+    *,
+    clock,
+    arguments,
+    dates_from_user=False,
+    trusted_range=None,
+    with_collections=False,
+):
     resolved = historical_range(
         clock,
         arguments.period,
@@ -22,14 +31,23 @@ def run(snapshot, *, clock, arguments, dates_from_user=False, trusted_range=None
     flags = reconciliation_report(
         snapshot.connection, clock=clock, known_at=snapshot.known
     ).flags
+    report = FlagsReport(
+        items=tuple(
+            f
+            for f in flags
+            if selected.intersection(f.source_ids)
+            and (arguments.types is None or f.type in arguments.types)
+        )
+    )
     return (
-        FlagsReport(
-            items=tuple(
-                f
-                for f in flags
-                if selected.intersection(f.source_ids)
-                and (arguments.types is None or f.type in arguments.types)
-            )
+        report
+        if not with_collections
+        else ReconcileResult(
+            items=report.items,
+            # D58 audits also state the period's collections total.
+            weekly=ReconcileCollections(
+                collections=movement_result(snapshot, resolved).weekly.collections
+            ),
         ),
         resolved,
         None,

@@ -8,7 +8,7 @@ import hashlib
 from collections import Counter
 from datetime import timedelta
 
-from app.schemas.queries import DebtsResult, FlagsReport
+from app.schemas.queries import DebtsResult, FlagsReport, ReconcileResult
 from app.schemas.tools import Figure, Metric, ToolEnvelope
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
@@ -281,7 +281,13 @@ def verify_tool_output(
     elif tool_name == "forecast":
         _verify_forecast(envelope.result, snapshot)
     elif tool_name == "reconcile":
-        FlagsReport.model_validate(envelope.result)
+        if "weekly" in envelope.result:
+            parsed = ReconcileResult.model_validate(envelope.result)
+            expected = movement_result(snapshot, resolved).weekly.collections
+            if parsed.weekly.collections != expected:
+                _reject()
+        else:
+            FlagsReport.model_validate(envelope.result)
     else:
         _reject()
     envelope._verified_fingerprint = _fingerprint(envelope)

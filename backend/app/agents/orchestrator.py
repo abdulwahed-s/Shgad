@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from app.agents import answer_policy, planner
 from app.agents.interpreter import interpret
-from app.agents.llm_client import LLMUnavailable, strict_json
+from app.agents.llm_client import LLMUnavailable, strict_json, unfenced
 from app.agents.messages_ar import text
 from app.agents.renderer import (
     DraftValidationError,
@@ -175,10 +175,10 @@ def safe_response(decision, used=()):
 
 
 def action(reply):
-    return DraftAction.model_validate(strict_json(reply.content))
+    return DraftAction.model_validate(strict_json(unfenced(reply.content)))
 
 
-def quoted_output(output, index):
+def quoted_output(output, index, *, per_day=False):
     # Retain full provenance on the server. Send bounded facts/slot names, not
     # every repeated historical source ID and every daily projection scalar.
     require_verified(output)
@@ -190,10 +190,12 @@ def quoted_output(output, index):
             value.key.startswith("j1.") or value.key.endswith("lowest.closing_iqd")
         ):
             continue
-        if ".days." in value.key:
+        if ".days." in value.key and not (
+            per_day and value.key.rsplit(".", 1)[-1] in {"dues_iqd", "expected_iqd"}
+        ):
             continue
         selected.append(value)
-    selected = selected[:64]
+    selected = selected[: 128 if per_day else 64]
     dates = {
         key: str(value)
         for key, value in output.dates.items()
@@ -406,7 +408,7 @@ async def _interpreted(request, *, client, connection, clock, known_at):
                 {
                     "role": "tool",
                     "tool_call_id": f"plan-{index}",
-                    "content": quoted_output(output, index),
+                    "content": quoted_output(output, index, per_day=decided.per_day),
                 }
             )
         history["tool_calls"][0]["extra_content"] = {
@@ -477,7 +479,7 @@ async def _narrate(conversation, outputs, used, message, client, debt_list):
         )
 
     try:
-        reply = await client.complete(conversation, tools=())
+        reply = await client.complete(conversation, tools=(), json_mode=True)
     except LLMUnavailable:
         return template()
     try:
@@ -512,6 +514,7 @@ async def _narrate(conversation, outputs, used, message, client, debt_list):
                 },
             ],
             tools=(),
+            json_mode=True,
         )
         candidate = action(retry)
         if not retry.tool_calls and candidate.status == "answered":
