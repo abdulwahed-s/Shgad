@@ -87,10 +87,18 @@ def strict_json(raw):
     return json.loads(raw, object_pairs_hook=pairs, parse_constant=constant)
 
 
-def status(split, question_sha256, *, data_root=ROOT / "data"):
+def status(split, question_sha256, *, data_root=ROOT / "data", manifest_path=None):
     if split not in {"dev", "heldout"}:
         raise RequirementsError("INVALID_SPLIT")
-    path = Path(data_root) / "evaluation" / (split + "_requirements_manifest.json")
+    path = (
+        Path(manifest_path)
+        if manifest_path is not None
+        else Path(data_root) / "evaluation" / (split + "_requirements_manifest.json")
+    )
+    if manifest_path is not None and (
+        split != "heldout" or path.resolve().is_relative_to(ROOT)
+    ):
+        raise RequirementsError("V2_MANIFESTS_MUST_BE_EXTERNAL")
     if path.resolve() != path.absolute():
         raise RequirementsError("INVALID_REQUIREMENTS_MANIFEST")
     if not path.exists():
@@ -158,11 +166,19 @@ def status(split, question_sha256, *, data_root=ROOT / "data"):
 
 
 def load(
-    split, questions, question_sha256, *, authorized=False, data_root=ROOT / "data"
+    split,
+    questions,
+    question_sha256,
+    *,
+    authorized=False,
+    data_root=ROOT / "data",
+    manifest_path=None,
 ):
     if split == "heldout" and not authorized:
         raise RequirementsError("HELDOUT_NOT_AUTHORIZED")
-    receipt = status(split, question_sha256, data_root=data_root)
+    receipt = status(
+        split, question_sha256, data_root=data_root, manifest_path=manifest_path
+    )
     if receipt["status"] != "sealed":
         raise RequirementsError("REQUIREMENTS_SEAL_REQUIRED")
     if split == "heldout":

@@ -12,7 +12,16 @@ from scripts.evaluation_historical import historical_catalogue
 from scripts.make_ground_truth import SALES, TruthError, cutoff
 
 
-def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
+def claim_catalogue(
+    ledger,
+    as_of,
+    start,
+    end,
+    *,
+    parties=(),
+    parameters=None,
+    method="row_provenance_v1",
+):
     catalogue = historical_catalogue(
         ledger, as_of, start, end, parties=parties, parameters=parameters
     )
@@ -26,6 +35,18 @@ def claim_catalogue(ledger, as_of, start, end, *, parties=(), parameters=None):
         # An unavailable legacy view never invents zero, or suppresses a
         # separately available historical fact with different prerequisites.
         pass
+    from scripts.evaluation_evidence import (
+        METHOD_V1,
+        METHOD_V2,
+        add_independent_evidence,
+    )
+
+    if method == METHOD_V2:
+        add_independent_evidence(
+            catalogue, ledger, as_of, start, end, parameters=parameters or {}
+        )
+    elif method != METHOD_V1:
+        raise ValueError("UNKNOWN_EVALUATION_METHOD")
     return catalogue
 
 

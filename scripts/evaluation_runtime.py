@@ -48,6 +48,9 @@ def observed_history(dataset, as_of, data_root):
     if ledger.opening:
         dates.append(date.fromisoformat(ledger.opening["business_date"]))
     history.evaluation_coverage = (min(dates), as_of) if dates else None
+    history.evaluation_zero_coverage = (
+        (min(dates), min(as_of, max(dates))) if dates else None
+    )
     history.evaluation_opening_baseline = True
     return history
 
@@ -234,6 +237,21 @@ async def observe(prompt, *, client, connection):
                 projection=key.startswith("scenarios.") or key == "horizon_days",
             )
         )
+        proof = getattr(figure, "query_evidence", None)
+        if proof is not None:
+            claims[-1]["query_evidence"] = proof.model_dump(mode="json")
+        # Index/context come from captured real tool envelopes, never model text.
+        if key.startswith("items.") and key.endswith(".amount"):
+            index = int(key.split(".")[1])
+            for name, _, output in calls:
+                items = (output.result or {}).get("items", [])
+                if name == "reconcile" and index < len(items):
+                    item = items[index]
+                    if item["amount"]["source_ids"] == list(figure.source_ids):
+                        claims[-1].update(
+                            evidence_tool="reconcile",
+                            reconciliation_flag_id=item["flag_id"],
+                        )
     parties = {c.counterparty.id for c in response.contexts if c.counterparty}
     if response.resolved_counterparty:
         parties.add(response.resolved_counterparty.id)

@@ -249,6 +249,14 @@ def verify_freeze(path, current):
         "dataset_sha256",
         "input_hashes",
     )
+    if current.get("schema_version") == "shgad-evaluation-freeze-heldout-v2":
+        keys += (
+            "application_commit",
+            "application_tag",
+            "method_change",
+            "dataset_disclosure",
+            "primary_seed",
+        )
     if any(frozen.get(key) != current.get(key) for key in keys):
         raise ValueError("EVALUATOR_CHANGED_SINCE_FREEZE")
     commit = frozen.get("code_commit", "")
@@ -383,6 +391,25 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
             "independent_requirement_annotations_required_for_live_measurement",
         ],
     )
+    if (
+        metadata.get("settings", {}).get("evidence_method")
+        == "observed_query_evidence_v2_D56"
+    ):
+        # Fixed public method metadata only; no private paths/IDs/rows/selectors.
+        from scripts.evaluation_v2 import APPLICATION_COMMIT
+
+        report.update(
+            application_commit=APPLICATION_COMMIT,
+            application_tag="freeze-heldout-v2",
+            dataset_disclosure="questions unseen, ledger previously used "
+            "in development",
+            primary_seed=20260701,
+            method_change=dict(
+                decision="D56",
+                original_results_preserved=True,
+                scope="evaluator_only_independent_zero_and_sourced_reconciliation_mapping",
+            ),
+        )
     if split == "dev":
         report["cases"] = rows
     return report
@@ -412,9 +439,21 @@ def markdown(report):
             "no tuning on held-out results."
         ),
         "",
-        "| Metric | Correct / eligible | Rate |",
-        "|---|---:|---:|",
     ]
+    if "dataset_disclosure" in report:
+        lines.extend(
+            [
+                "",
+                "Dataset disclosure: " + report["dataset_disclosure"] + ".",
+                "Application freeze: `" + report["application_commit"] + "`.",
+                "Evaluator method change (D56), decided before v2 questions: "
+                "independent observed zero queries and sourced partial/overdue "
+                "reconciliation mapping. "
+                "Original results are preserved.",
+                "",
+            ]
+        )
+    lines.extend(["| Metric | Correct / eligible | Rate |", "|---|---:|---:|"])
     for key in (
         "historical_accuracy",
         "safe_handling",

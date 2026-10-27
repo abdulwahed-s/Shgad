@@ -1138,8 +1138,30 @@ The live drill passed14/14. Both chats answered, median12.137s/max17.203s, with
 one controlled fallback. Its seven paid attempts include six HTTP200 responses
 and one OpenAI HTTP500 recovered by the existing retry. Total paid attempts:
 91 of108 authorized. Evaluation chat latency is not retained. Application behavior
-is frozen; the current evaluator CLI still requires a separate supported workflow
-to select a new sealed question/annotation package while preserving the original.
+is frozen. A separate evaluator method now supports selecting new external
+question/annotation seals while preserving the original artifacts.
+
+**Independent query-evidence grading - 27 October 2026.** The new method accepts
+an empty historical event sum only after its own observed-ledger query verifies
+the tool, period, closed filters and zero matching rows. It also maps sourced
+partial/overdue reconciliation balances independently. The original row-ID method
+and results remain unchanged. Six public development fake-provider reproductions
+match the earlier trace counts and improve from 38/51 to 51/51 supported claims.
+This is a re-graded replay, not a new measurement. Original provider outputs were
+not retained, so matching counts do not recover the original 13 claim identities
+or change the original 81/94 result.
+
+For a separately authorized new sealed run, `scripts/run_evaluation.py` accepts
+`--heldout-seal` (question seal), `--heldout-requirements` (annotation seal) and
+`--freeze-manifest`, all outside the repository. Annotations stay beside the
+question file with `.requirements.jsonl` appended. Omitted options retain the
+original paths. `--mode plan --max-requests 180 --output <new.json>` prints the
+full selected command/caps/checks without credentials, private content or requests.
+The live runner requires exact question/annotation hashes and binding, reviewed
+independent selectors, the frozen application source, a clean tree, a matching
+method freeze and new JSON/Markdown output. Reports are aggregate-only. The
+original synthetic primary ledger is reused: **questions unseen, ledger previously
+used in development**. No new sealed measurement has been run.
 
 **Sealed evaluation - 23 October 2026.** The
 [first aggregate receipt](results/evaluation_heldout_FIRST.md) uses the same

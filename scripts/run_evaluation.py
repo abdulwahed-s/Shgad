@@ -41,9 +41,15 @@ def strict_json(raw):
     return json.loads(raw, object_pairs_hook=pairs, parse_constant=constant)
 
 
-def seal_metadata(data_root=ROOT / "data"):
+def seal_metadata(data_root=ROOT / "data", *, heldout_seal=None):
     try:
-        path = Path(data_root) / "evaluation/heldout_60_manifest.json"
+        path = (
+            Path(heldout_seal)
+            if heldout_seal is not None
+            else Path(data_root) / "evaluation/heldout_60_manifest.json"
+        )
+        if heldout_seal is not None and path.resolve().is_relative_to(ROOT):
+            raise ValueError()
         if path.resolve() != path.absolute():
             raise ValueError()
         manifest = strict_json(path.read_bytes())
@@ -84,7 +90,9 @@ def seal_metadata(data_root=ROOT / "data"):
     return manifest
 
 
-def load_questions(split, *, authorized=False, data_root=ROOT / "data"):
+def load_questions(
+    split, *, authorized=False, data_root=ROOT / "data", heldout_seal=None
+):
     """Read and hash the same bytes; verify the seal BEFORE decoding private input."""
     data_root = Path(data_root)
     if split not in {"dev", "heldout"}:
@@ -99,7 +107,7 @@ def load_questions(split, *, authorized=False, data_root=ROOT / "data"):
         path = Path(value).resolve()
         if path.is_relative_to(ROOT):
             raise EvaluationError("HELDOUT_MUST_BE_EXTERNAL")
-        manifest = seal_metadata(data_root)
+        manifest = seal_metadata(data_root, heldout_seal=heldout_seal)
     else:
         path = data_root / "evaluation/development_questions.jsonl"
         if path.resolve() != path.absolute():
@@ -136,18 +144,54 @@ def load_questions(split, *, authorized=False, data_root=ROOT / "data"):
     return rows, digest
 
 
-def plan(split, *, max_requests=None, require_clean=False):
+def plan(
+    split,
+    *,
+    max_requests=None,
+    require_clean=False,
+    data_root=ROOT / "data",
+    heldout_seal=None,
+    heldout_requirements=None,
+    freeze_manifest=None,
+    output=None,
+):
     from scripts.evaluation_reports import frozen_snapshot
     from scripts.evaluation_requirements import status
 
-    snapshot = frozen_snapshot(require_clean=require_clean)
+    selected_v2 = heldout_seal is not None or heldout_requirements is not None
+    if selected_v2:
+        from scripts import evaluation_v2 as v2
+        from scripts.evaluation_reports import verify_freeze
+
+        if split != "heldout" or not (
+            heldout_seal and heldout_requirements and freeze_manifest
+        ):
+            raise EvaluationError("V2_REQUIRES_BOTH_HELDOUT_MANIFESTS")
+        if not all(
+            v2.external(p)
+            for p in (heldout_seal, heldout_requirements, freeze_manifest)
+        ):
+            raise EvaluationError("V2_MANIFESTS_MUST_BE_EXTERNAL")
+        v2.check_application()
+        v2.check_output(output)
+        snapshot = v2.snapshot(require_clean=require_clean)
+        if v2.method_from_freeze(freeze_manifest) != v2.METHOD_V2:
+            raise EvaluationError("V2_METHOD_FREEZE_REQUIRED")
+        verify_freeze(freeze_manifest, snapshot)
+    else:
+        snapshot = frozen_snapshot(require_clean=require_clean)
     if split == "heldout":
-        seal = seal_metadata()
+        seal = seal_metadata(data_root, heldout_seal=heldout_seal)
         count, digest = seal["total_count"], seal["sha256"]
     else:
-        questions, digest = load_questions("dev")
+        questions, digest = load_questions("dev", data_root=data_root)
         count = len(questions)
-    requirements = status(split, digest)
+    requirements = status(
+        split,
+        digest,
+        data_root=data_root,
+        **({"manifest_path": heldout_requirements} if selected_v2 else {}),
+    )
     if requirements["status"] == "sealed" and requirements["total_count"] != count:
         from scripts.evaluation_requirements import RequirementsError
 
@@ -168,7 +212,7 @@ def plan(split, *, max_requests=None, require_clean=False):
     limit = max_requests if max_requests is not None else cap
     if type(limit) is not int or not 1 <= limit <= min(count * 6, cap):
         raise EvaluationError("INVALID_REQUEST_LIMIT")
-    return snapshot | dict(
+    prepared = snapshot | dict(
         split=split,
         question_count=count,
         question_sha256=digest,
@@ -188,9 +232,30 @@ def plan(split, *, max_requests=None, require_clean=False):
         if requirements["status"] == "missing"
         else [],
     )
+    if selected_v2:
+        prepared.update(
+            live_command=v2.command(
+                seal=heldout_seal,
+                requirements=heldout_requirements,
+                freeze=freeze_manifest,
+                output=output,
+                max_requests=limit,
+            ),
+            checks=[
+                "application_matches_freeze_tag",
+                "application_tree_clean",
+                "method_sources_settings_inputs_match_freeze",
+                "output_is_new",
+                "requirements_manifest_bound_to_question_seal",
+                "question_and_annotation_bytes_hash_checked_inside_authorized_run",
+            ],
+        )
+    return prepared
 
 
-def prepare_references(questions, requirements, *, data_root=ROOT / "data"):
+def prepare_references(
+    questions, requirements, *, data_root=ROOT / "data", method="row_provenance_v1"
+):
     """Validate ALL sealed requirements against independent truth before paid I/O."""
     from datetime import date
 
@@ -217,6 +282,7 @@ def prepare_references(questions, requirements, *, data_root=ROOT / "data"):
                 date.fromisoformat(period["end"]),
                 parties=spec["counterparty_ids"],
                 parameters=spec["parameters"],
+                method=method,
             )
             if bool(required) != (spec["expected_behavior"] == "answer"):
                 raise ValueError()
@@ -239,6 +305,7 @@ async def evaluate_questions(
     replay=None,
     requirements=None,
     references=None,
+    method="row_provenance_v1",
 ):
     """Specs/truth stay in this scorer; the runtime receives only PromptInput."""
     from datetime import date
@@ -257,7 +324,9 @@ async def evaluate_questions(
     if requirements is None and replay is None:
         raise EvaluationError("REQUIREMENTS_SEAL_REQUIRED")
     if requirements is not None and references is None:
-        references = prepare_references(questions, requirements, data_root=data_root)
+        references = prepare_references(
+            questions, requirements, data_root=data_root, method=method
+        )
     rows = []
     parties = reference_parties(data_root)
     stopped = False
@@ -286,6 +355,7 @@ async def evaluate_questions(
                         date.fromisoformat(period["end"]),
                         parties=spec["counterparty_ids"],
                         parameters=spec["parameters"],
+                        method=method,
                     )
                     required = required_fields(spec, catalogue)
                     reference = answer_question(question, data_root)
@@ -311,7 +381,7 @@ async def evaluate_questions(
             except Exception:
                 # Never serialize private specs, provider text or exception values.
                 observed["failure"] = "runtime_failure"
-        result = grade_question(spec, catalogue, required, observed)
+        result = grade_question(spec, catalogue, required, observed, method=method)
         rows.append(
             dict(
                 id=question["id"],
@@ -333,6 +403,16 @@ def parser():
     result.add_argument("--authorize-final-forecast", action="store_true")
     result.add_argument("--max-requests", type=int)
     result.add_argument("--output", type=Path)
+    result.add_argument(
+        "--heldout-seal",
+        type=Path,
+        help="External v2 question seal; omitted preserves v1",
+    )
+    result.add_argument(
+        "--heldout-requirements",
+        type=Path,
+        help="External v2 annotation seal; annotations stay beside external questions",
+    )
     result.add_argument(
         "--replay-file",
         type=Path,
@@ -371,6 +451,9 @@ def main(argv=None):
     from scripts.evaluation_requirements import RequirementsError
 
     try:
+        from scripts import evaluation_v2 as v2
+
+        selected_v2 = v2.validate_selection(args)
         if args.mode == "replay":
             expected = ROOT / "backend/tests/evaluation/fixtures/evaluation_replay.json"
             if (
@@ -378,7 +461,7 @@ def main(argv=None):
                 or args.replay_file.resolve() != expected
             ):
                 raise EvaluationError("PUBLIC_REPLAY_PATH_REQUIRED")
-        if args.mode in {"replay", "live"} or args.write_freeze:
+        if not selected_v2 and (args.mode in {"replay", "live"} or args.write_freeze):
             path = args.freeze_manifest.absolute()
             if (
                 path.parent != ROOT / "results"
@@ -431,11 +514,22 @@ def main(argv=None):
             if args.split == "dev" and dev_path.resolve() != dev_path.absolute():
                 raise EvaluationError("PUBLIC_INPUT_PATH_REQUIRED")
             question_sha = (
-                seal_metadata()["sha256"]
+                seal_metadata(heldout_seal=args.heldout_seal)["sha256"]
                 if args.split == "heldout"
                 else sha256(dev_path)
             )
-            if status(args.split, question_sha)["status"] != "sealed":
+            if (
+                status(
+                    args.split,
+                    question_sha,
+                    **(
+                        {"manifest_path": args.heldout_requirements}
+                        if selected_v2
+                        else {}
+                    ),
+                )["status"]
+                != "sealed"
+            ):
                 raise EvaluationError("REQUIREMENTS_SEAL_REQUIRED")
         if args.write_freeze and args.mode != "plan":
             raise EvaluationError("FREEZE_REQUIRES_PLAN_MODE")
@@ -443,6 +537,16 @@ def main(argv=None):
             args.split,
             max_requests=args.max_requests,
             require_clean=args.mode != "plan" or args.write_freeze,
+            **(
+                dict(
+                    heldout_seal=args.heldout_seal,
+                    heldout_requirements=args.heldout_requirements,
+                    freeze_manifest=args.freeze_manifest,
+                    output=args.output,
+                )
+                if selected_v2
+                else {}
+            ),
         )
         if args.mode == "plan":
             from scripts.evaluation_reports import forecast_archive
@@ -484,8 +588,13 @@ def main(argv=None):
         ):
             raise EvaluationError("RESULT_ALREADY_EXISTS_OR_INVALID_PATH")
         frozen = verify_freeze(args.freeze_manifest, prepared)
+        method = v2.method_from_freeze(args.freeze_manifest)
+        if method == v2.METHOD_V2 and not selected_v2:
+            raise EvaluationError("V2_REQUIRES_BOTH_HELDOUT_MANIFESTS")
         questions, question_hash = load_questions(
-            args.split, authorized=args.authorize_heldout
+            args.split,
+            authorized=args.authorize_heldout,
+            heldout_seal=args.heldout_seal,
         )
         started = now()
         from scripts.evaluation_reconciliation import evaluate
@@ -520,8 +629,9 @@ def main(argv=None):
                 questions,
                 question_hash,
                 authorized=args.authorize_heldout,
+                **({"manifest_path": args.heldout_requirements} if selected_v2 else {}),
             )
-            references = prepare_references(questions, requirements)
+            references = prepare_references(questions, requirements, method=method)
             from app.config import runtime_settings
             from scripts.evaluation_clients import BudgetedClient
 
@@ -537,6 +647,8 @@ def main(argv=None):
                     llm_max_output_tokens=8192,
                 )
             )
+            if selected_v2:
+                v2.check_runtime_settings(live_settings)
             client = BudgetedClient(
                 live_settings, max_requests=prepared["max_requests"]
             )
@@ -550,6 +662,7 @@ def main(argv=None):
                         client=client,
                         requirements=requirements,
                         references=references,
+                        method=method,
                     )
 
             rows = asyncio.run(live())

@@ -23,7 +23,7 @@ def integer_value(value):
     return int(text.replace(",", "").replace("٬", "")) * multiplier
 
 
-def compare_claim(expected, claim):
+def compare_claim(expected, claim, *, method="row_provenance_v1"):
     if expected is None:
         return False, False
     try:
@@ -42,6 +42,8 @@ def compare_claim(expected, claim):
                     "strict_daily_comparison_available",
                     "strict_daily_comparison_note",
                     "baseline_source_id",
+                    "evidence_tool",
+                    "reconciliation_flag_id",
                 )
                 if key in expected
             )
@@ -49,9 +51,13 @@ def compare_claim(expected, claim):
     except (TypeError, ValueError):
         correct = False
     cited = claim.get("source_ids", [])
+    from scripts.evaluation_evidence import METHOD_V1, METHOD_V2, zero_supported
+
+    if method not in {METHOD_V1, METHOD_V2}:
+        raise ValueError("UNKNOWN_EVALUATION_METHOD")
     supported = (
         correct
-        and bool(cited)
+        and (bool(cited) or (method == METHOD_V2 and zero_supported(expected, claim)))
         and len(cited) == len(set(cited))
         and set(cited) == set(expected["source_ids"])
         and bool(claim.get("formula", "").strip())
@@ -137,7 +143,7 @@ def proven_aliases(key, catalogue, spec):
     return result
 
 
-def grade_question(spec, catalogue, required, observed):
+def grade_question(spec, catalogue, required, observed, *, method="row_provenance_v1"):
     """Full question denominator; a missing/failed answer cannot disappear."""
     fields = {
         "intent": observed.get("intent") == spec["intent"],
@@ -150,7 +156,7 @@ def grade_question(spec, catalogue, required, observed):
     matched, correct, traced = set(), [], []
     for claim in claims:
         key = claim.get("field")
-        numeric, evidence = compare_claim(catalogue.get(key), claim)
+        numeric, evidence = compare_claim(catalogue.get(key), claim, method=method)
         correct.append(numeric)
         traced.append(evidence)
         if numeric:
