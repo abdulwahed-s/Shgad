@@ -184,7 +184,13 @@ def answers(intent, key, *, per_day=False):
     if intent == "cash_on_hand":
         return key == "upcoming.cash_on_hand"
     if intent == "upcoming_obligations":
-        return key.startswith("upcoming.") and (per_day or ".days." not in key)
+        # Window totals, positions and (when asked) per-day figures; not invoices.
+        parts = key.split(".")
+        return (
+            parts[0] == "upcoming"
+            and parts[1] not in {"dues", "expected", "overdue_receivables"}
+            and (per_day or parts[1] != "days")
+        )
     return True
 
 

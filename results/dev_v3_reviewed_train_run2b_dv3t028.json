@@ -1,0 +1,146 @@
+{
+ "check_metrics": null,
+ "finished_at": "2026-10-27T16:45:26.479958+00:00",
+ "kind": "development_v3",
+ "method": "label_rules_v2_grading_v3",
+ "metrics": {
+  "categories": {
+   "supplier_dues": {
+    "failed": 0,
+    "passed": 1,
+    "total": 1
+   }
+  },
+  "counts_by_behavior": {
+   "answer": 1
+  },
+  "failure_counts": {},
+  "historical_accuracy": {
+   "denominator": 1,
+   "numerator": 1,
+   "rate": 1.0
+  },
+  "joint_accuracy": {
+   "denominator": 1,
+   "numerator": 1,
+   "rate": 1.0
+  },
+  "joint_fields": {
+   "customer": {
+    "denominator": 1,
+    "numerator": 1,
+    "rate": 1.0
+   },
+   "intent": {
+    "denominator": 1,
+    "numerator": 1,
+    "rate": 1.0
+   },
+   "period": {
+    "denominator": 1,
+    "numerator": 1,
+    "rate": 1.0
+   },
+   "tool": {
+    "denominator": 1,
+    "numerator": 1,
+    "rate": 1.0
+   }
+  },
+  "safe_handling": {
+   "denominator": 0,
+   "numerator": 0,
+   "rate": null
+  },
+  "traceability": {
+   "denominator": 5,
+   "numerator": 5,
+   "rate": 1.0
+  }
+ },
+ "questions": "data/evaluation/development_questions_v3.jsonl",
+ "requests": {
+  "http_status_counts": {
+   "200": 2
+  },
+  "max_requests": 200,
+  "max_requests_per_question": 6,
+  "minimum_spacing_seconds": 2,
+  "provider_requests": 2,
+  "request_limit_hits": 0,
+  "requests_by_provider_model": {
+   "gemini/gemini-3.8-flash": 2
+  }
+ },
+ "rows": [
+  {
+   "category": "supplier_dues",
+   "detail": {
+    "error": null,
+    "expected": {
+     "behavior": "answer",
+     "intent": "upcoming_obligations",
+     "parties": [],
+     "period": {
+      "end": "2026-09-09",
+      "start": "2026-09-03"
+     },
+     "reason": null,
+     "required": [
+      "upcoming.dues_total",
+      "upcoming.expected_total"
+     ]
+    },
+    "observed": {
+     "behavior": "answer",
+     "claims": [
+      "upcoming.dues_total",
+      "upcoming.expected_total",
+      "upcoming.cash_on_hand",
+      "upcoming.position_confirmed",
+      "upcoming.position_with_expected"
+     ],
+     "interpretation": {
+      "behavior": "answer",
+      "counterparty_ids": [],
+      "intent": "upcoming_obligations",
+      "period": {
+       "end": "2026-09-09",
+       "start": "2026-09-03"
+      },
+      "reason": null,
+      "tools": [
+       "get_debts"
+      ]
+     },
+     "template_fallback": false,
+     "tool_errors": [],
+     "tools": [
+      "get_debts"
+     ]
+    },
+    "question": "رتبلي استحقاقات الدفع والتحصيل للسبعة ايام الجاية بمجموع كل جهة"
+   },
+   "expected_behavior": "answer",
+   "failures": [],
+   "fields": {
+    "customer": true,
+    "intent": true,
+    "period": true,
+    "reason": true,
+    "tool": true
+   },
+   "id": "DV3T-028",
+   "joint_correct": true,
+   "numeric_correct": true,
+   "safe_correct": false,
+   "traceability": {
+    "denominator": 5,
+    "numerator": 5,
+    "rate": 1.0
+   }
+  }
+ ],
+ "started_at": "2026-10-27T16:45:20.673066+00:00",
+ "withheld_detail_count": 0
+}

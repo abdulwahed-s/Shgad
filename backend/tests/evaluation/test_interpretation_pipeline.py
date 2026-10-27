@@ -317,6 +317,7 @@ def test_upcoming_answer_never_offers_whole_ledger_balances():
     assert answers("upcoming_obligations", "upcoming.dues_total")
     assert not answers("upcoming_obligations", "payables.total_outstanding")
     assert not answers("upcoming_obligations", "upcoming.days.0.dues_iqd")
+    assert not answers("upcoming_obligations", "upcoming.dues.0.outstanding")
     assert answers("upcoming_obligations", "upcoming.days.0.dues_iqd", per_day=True)
     response = ask(
         "شنو علي خلال ٥ ايام الجاية",
