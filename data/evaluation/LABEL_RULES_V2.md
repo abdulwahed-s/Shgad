@@ -93,7 +93,7 @@ reconciliation, weekly_summary):
 | الشهر الماضي | the previous calendar month |
 | a named month (آب, شهر 8, أيلول…) | that month in 2026; the current month runs to A |
 | آخر N يوم | `A-N+1..A` |
-| من يوم D (لليوم) | day D of A's month `..A` |
+| من يوم D (لليوم) | day D `..A` (same month rule as the next row) |
 | يوم D / يوم D من شهر M | that single day (current month if D ≤ A's day, else the previous month) |
 | من D لـ E (شهر M) | `D..E`, same month rule |
 | a weekday with a past-tense verb ("الخميس شكد بعت") | the most recent such weekday **before** A |

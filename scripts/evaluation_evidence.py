@@ -48,8 +48,11 @@ def zero_supported(expected, claim):
         return False
 
 
-def add_independent_evidence(catalogue, ledger, as_of, start, end, *, parameters):
+def add_independent_evidence(
+    catalogue, ledger, as_of, start, end, *, parameters, parties=()
+):
     """Query evaluator-owned rows; never derive expected facts from app proof."""
+    add_debt_zero_evidence(catalogue, ledger, as_of, parameters, parties)
     coverage = getattr(ledger, "evaluation_zero_coverage", None)
     if coverage is not None and coverage[0] <= start <= end <= coverage[1] <= as_of:
         rows = ledger.visible(as_of, known_at=cutoff(as_of))
@@ -86,6 +89,50 @@ def add_independent_evidence(catalogue, ledger, as_of, start, end, *, parameters
                 independent_zero=IndependentZero(canonical(query))
             )
     catalogue.update(reconciliation_catalogue(ledger, as_of, start, end))
+
+
+def add_debt_zero_evidence(catalogue, ledger, as_of, parameters, parties):
+    """D58: an empty debt selection at the cutoff, from evaluator-owned debts.
+
+    Only unambiguous filters qualify: no party or exactly one, no due window.
+    """
+    if len(parties) > 1:
+        return
+    party = parties[0] if parties else None
+    try:
+        balances = ledger.debts(as_of, known_at=cutoff(as_of))
+    except TruthError:
+        return
+    overdue = bool(parameters.get("overdue_only", False))
+    for group, kind in (("receivables", "receivable"), ("payables", "payable")):
+        key = group + ".total_outstanding"
+        expected = catalogue.get(key)
+        if expected is None or expected["value"] != 0 or expected["source_ids"]:
+            continue
+        if any(
+            row["kind"] == kind
+            and row["outstanding_iqd"] > 0
+            and (party is None or row["counterparty_id"] == party)
+            and (not overdue or row["days_overdue"] > 0)
+            for row in balances
+        ):
+            continue
+        query = dict(
+            tool="get_debts",
+            as_of=str(as_of),
+            filters=dict(
+                direction=kind,
+                overdue_only=overdue,
+                counterparty_id=party,
+                due_start=None,
+                due_end=None,
+            ),
+            known_at=cutoff(as_of).astimezone(UTC).isoformat(),
+            matching_obligations=0,
+        )
+        catalogue[key] = expected | dict(
+            independent_zero=IndependentZero(canonical(query))
+        )
 
 
 def reconciliation_catalogue(ledger, as_of, start, end):

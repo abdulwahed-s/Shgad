@@ -43,7 +43,13 @@ def claim_catalogue(
 
     if method == METHOD_V2:
         add_independent_evidence(
-            catalogue, ledger, as_of, start, end, parameters=parameters or {}
+            catalogue,
+            ledger,
+            as_of,
+            start,
+            end,
+            parameters=parameters or {},
+            parties=parties,
         )
     elif method != METHOD_V1:
         raise ValueError("UNKNOWN_EVALUATION_METHOD")

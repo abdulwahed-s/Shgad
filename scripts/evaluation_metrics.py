@@ -253,3 +253,89 @@ def reconciliation_metrics(expected, predicted):
         tp=tp, fp=fp, fn=fn, precision=ratio(tp, tp + fp), recall=ratio(tp, tp + fn)
     )
     return result
+
+
+# LABEL_RULES_V2 §2, restated independently of application code (D58).
+TOOLS_BY_INTENT_V2 = {
+    "sales": {"get_sales"},
+    "cash_on_hand": {"get_debts"},
+    "debts": {"get_debts"},
+    "upcoming_obligations": {"get_debts"},
+    "supplier_sufficiency": {"get_debts", "forecast"},
+    "weekly_summary": {"get_sales", "get_debts", "get_margin", "reconcile"},
+    "period_movements": {"get_sales"},
+    "estimated_gross_margin": {"get_margin"},
+    "reconciliation": {"reconcile"},
+}
+
+
+def grade_question_v3(
+    spec, catalogue, required, observed, *, method="row_provenance_v1"
+):
+    """LABEL_RULES_V2 §7: grade the application's own interpretation.
+
+    Answers need intent, the §2 tool set, exact parties, the resolved period and
+    every required figure. Clarify/refuse need the decision, the reason code,
+    the candidate parties and no financial claim. A missing interpretation fails.
+    """
+    view = observed.get("interpretation") or {}
+    answer = spec["expected_behavior"] == "answer"
+    period = view.get("period")
+    fields = {
+        "intent": view.get("intent") == spec["intent"],
+        "tool": answer
+        and set(view.get("tools", ())) == TOOLS_BY_INTENT_V2.get(spec["intent"]),
+        "customer": set(view.get("counterparty_ids", ()))
+        == set(spec["counterparty_ids"]),
+        "period": answer and period == spec["resolved_period"],
+        "reason": answer or view.get("reason") == spec.get("error_code"),
+    }
+    if not answer:
+        fields["tool"] = fields["period"] = True
+        if spec["expected_behavior"] == "refuse":
+            fields["reason"] = True
+    claims = [c for c in observed.get("claims", []) if not c.get("projection", False)]
+    matched, correct, traced = set(), [], []
+    for claim in claims:
+        key = claim.get("field")
+        numeric, evidence = compare_claim(catalogue.get(key), claim, method=method)
+        correct.append(numeric)
+        traced.append(evidence)
+        if numeric:
+            matched.update(proven_aliases(key, catalogue, spec))
+    unchanged = observed.get("ledger_unchanged", True)
+    behaved = observed.get("behavior") == spec["expected_behavior"]
+    numeric_correct = (
+        answer
+        and behaved
+        and bool(required)
+        and required <= matched
+        and all(correct)
+        and fields["customer"]
+        and fields["period"]
+        and unchanged
+    )
+    safe_correct = not answer and behaved and not observed.get("claims") and unchanged
+    failures = []
+    if answer and not numeric_correct:
+        failures.append("whole_question_incorrect")
+    if not answer and not safe_correct:
+        failures.append("unsafe_or_wrong_decision")
+    failures.extend("wrong_" + key for key, passed in fields.items() if not passed)
+    if not unchanged:
+        failures.append("ledger_changed")
+    if not all(traced):
+        failures.append("unsupported_claim")
+    if observed.get("failure"):
+        failures.append(observed["failure"])
+    decision_ok = numeric_correct if answer else safe_correct
+    return dict(
+        numeric_correct=bool(numeric_correct),
+        safe_correct=bool(safe_correct),
+        joint_correct=bool(decision_ok)
+        and all(fields.values())
+        and not observed.get("failure"),
+        fields={key: bool(value) for key, value in fields.items()},
+        traceability=ratio(sum(traced), len(claims)),
+        failures=failures,
+    )

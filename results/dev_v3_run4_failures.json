@@ -1,0 +1,222 @@
+{
+ "finished_at": "2026-10-27T13:48:15.086280+00:00",
+ "kind": "development_v3",
+ "method": "label_rules_v2_grading_v3",
+ "metrics": {
+  "categories": {
+   "cash_sufficiency": {
+    "failed": 0,
+    "passed": 1,
+    "total": 1
+   },
+   "debt_balance": {
+    "failed": 0,
+    "passed": 1,
+    "total": 1
+   }
+  },
+  "counts_by_behavior": {
+   "answer": 2
+  },
+  "failure_counts": {},
+  "historical_accuracy": {
+   "denominator": 2,
+   "numerator": 2,
+   "rate": 1.0
+  },
+  "joint_accuracy": {
+   "denominator": 2,
+   "numerator": 2,
+   "rate": 1.0
+  },
+  "joint_fields": {
+   "customer": {
+    "denominator": 2,
+    "numerator": 2,
+    "rate": 1.0
+   },
+   "intent": {
+    "denominator": 2,
+    "numerator": 2,
+    "rate": 1.0
+   },
+   "period": {
+    "denominator": 2,
+    "numerator": 2,
+    "rate": 1.0
+   },
+   "tool": {
+    "denominator": 2,
+    "numerator": 2,
+    "rate": 1.0
+   }
+  },
+  "safe_handling": {
+   "denominator": 0,
+   "numerator": 0,
+   "rate": null
+  },
+  "traceability": {
+   "denominator": 9,
+   "numerator": 9,
+   "rate": 1.0
+  }
+ },
+ "questions": "data/evaluation/development_questions_v2.jsonl",
+ "requests": {
+  "http_status_counts": {
+   "200": 4
+  },
+  "max_requests": 200,
+  "max_requests_per_question": 6,
+  "minimum_spacing_seconds": 2,
+  "provider_requests": 4,
+  "request_limit_hits": 0,
+  "requests_by_provider_model": {
+   "gemini/gemini-3.8-flash": 4
+  }
+ },
+ "rows": [
+  {
+   "category": "cash_sufficiency",
+   "detail": {
+    "error": null,
+    "expected": {
+     "behavior": "answer",
+     "intent": "supplier_sufficiency",
+     "parties": [
+      "CUST-01",
+      "SUP-01"
+     ],
+     "period": {
+      "end": "2026-10-01",
+      "start": "2026-09-28"
+     },
+     "reason": null,
+     "required": [
+      "j1.shortfall_with_collection"
+     ]
+    },
+    "observed": {
+     "behavior": "answer",
+     "claims": [
+      "payables.total_outstanding",
+      "receivables.total_outstanding",
+      "j1.cash_on_hand",
+      "j1.supplier_due",
+      "j1.expected_collection",
+      "j1.shortfall_with_collection",
+      "j1.shortfall_without_collection"
+     ],
+     "interpretation": {
+      "behavior": "answer",
+      "counterparty_ids": [
+       "CUST-01",
+       "SUP-01"
+      ],
+      "intent": "supplier_sufficiency",
+      "period": {
+       "end": "2026-10-01",
+       "start": "2026-09-28"
+      },
+      "reason": null,
+      "tools": [
+       "get_debts",
+       "forecast"
+      ]
+     },
+     "template_fallback": true,
+     "tool_errors": [],
+     "tools": [
+      "get_debts",
+      "forecast"
+     ]
+    },
+    "question": "إذا أبو حيدر دفع أكدر أوفي المجهز الخميس؟"
+   },
+   "expected_behavior": "answer",
+   "failures": [],
+   "fields": {
+    "customer": true,
+    "intent": true,
+    "period": true,
+    "reason": true,
+    "tool": true
+   },
+   "id": "DEV-010",
+   "joint_correct": true,
+   "numeric_correct": true,
+   "safe_correct": false,
+   "traceability": {
+    "denominator": 7,
+    "numerator": 7,
+    "rate": 1.0
+   }
+  },
+  {
+   "category": "debt_balance",
+   "detail": {
+    "error": null,
+    "expected": {
+     "behavior": "answer",
+     "intent": "debts",
+     "parties": [],
+     "period": {
+      "end": "2026-09-28",
+      "start": "2026-09-28"
+     },
+     "reason": null,
+     "required": [
+      "receivables.total_outstanding"
+     ]
+    },
+    "observed": {
+     "behavior": "answer",
+     "claims": [
+      "receivables.total_outstanding",
+      "receivables.customers.0.outstanding"
+     ],
+     "interpretation": {
+      "behavior": "answer",
+      "counterparty_ids": [],
+      "intent": "debts",
+      "period": {
+       "end": "2026-09-28",
+       "start": "2026-09-28"
+      },
+      "reason": null,
+      "tools": [
+       "get_debts"
+      ]
+     },
+     "template_fallback": true,
+     "tool_errors": [],
+     "tools": [
+      "get_debts"
+     ]
+    },
+    "question": "بالدفعات الثلاث والتصحيح، شكد بقي على الزبون؟"
+   },
+   "expected_behavior": "answer",
+   "failures": [],
+   "fields": {
+    "customer": true,
+    "intent": true,
+    "period": true,
+    "reason": true,
+    "tool": true
+   },
+   "id": "DEV-020",
+   "joint_correct": true,
+   "numeric_correct": true,
+   "safe_correct": false,
+   "traceability": {
+    "denominator": 2,
+    "numerator": 2,
+    "rate": 1.0
+   }
+  }
+ ],
+ "started_at": "2026-10-27T13:48:02.158151+00:00",
+ "withheld_detail_count": 0
+}

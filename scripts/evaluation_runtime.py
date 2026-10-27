@@ -83,16 +83,26 @@ def production_database(history, parties, *, as_of):
 
     try:
         apply_migrations(db)
-        insert_record(
-            db,
-            ImportBatch(
-                import_batch_id="HISTORICAL-EVAL",
-                source_system="synthetic_csv",
-                file_sha256="0" * 64,
-                imported_at=cutoff(as_of),
-                row_count=len(history.rows) + bool(history.opening),
-            ),
-        )
+        # One batch per source system: provenance triggers bind each row to a
+        # batch of its own system (e.g. a re-entered synthetic_entry correction).
+        systems = sorted({"synthetic_csv", *(r["source_system"] for r in history.rows)})
+        batches = {
+            system: "HISTORICAL-EVAL"
+            if system == "synthetic_csv"
+            else f"HISTORICAL-EVAL-{i}"
+            for i, system in enumerate(systems)
+        }
+        for system, batch in batches.items():
+            insert_record(
+                db,
+                ImportBatch(
+                    import_batch_id=batch,
+                    source_system=system,
+                    file_sha256="0" * 64,
+                    imported_at=cutoff(as_of),
+                    row_count=len(history.rows) + bool(history.opening),
+                ),
+            )
         for model, table, values in (
             (Counterparty, "counterparties", parties),
             (Category, "categories", history.categories.values()),
@@ -110,7 +120,7 @@ def production_database(history, parties, *, as_of):
                 db,
                 RawImportRow(
                     raw_row_id=f"HISTORY-{index}",
-                    import_batch_id="HISTORICAL-EVAL",
+                    import_batch_id=batches[raw["source_system"]],
                     source_row=index,
                     row_json=json.dumps(raw),
                     status="accepted",
@@ -119,7 +129,7 @@ def production_database(history, parties, *, as_of):
             row = Transaction.model_validate(
                 raw
                 | {
-                    "import_batch_id": "HISTORICAL-EVAL",
+                    "import_batch_id": batches[raw["source_system"]],
                     "source_row": index,
                 }
             )
@@ -168,7 +178,7 @@ def production_database(history, parties, *, as_of):
         db.close()
 
 
-async def observe(prompt, *, client, connection):
+async def observe(prompt, *, client, connection, intent_probe=True):
     """One blind intent probe; actual production tools/response for the other fields.
 
     The separate intent probe is disclosed: the application has no public intent
@@ -183,19 +193,21 @@ async def observe(prompt, *, client, connection):
     day = date.fromisoformat(prompt.business_as_of)
     public = {"question": prompt.question, "BUSINESS_AS_OF": prompt.business_as_of}
     intent, probe_failure = None, None
+    # D58: without the probe, grading reads the application's own interpretation.
     try:
-        reply = await client.complete(
-            [
-                {"role": "system", "content": INTENT_INSTRUCTIONS},
-                {"role": "user", "content": json.dumps(public, ensure_ascii=False)},
-            ],
-            tools=(),
-            json_mode=True,
-        )
-        value = strict_json(reply.content)
-        if set(value) != {"intent"} or value["intent"] not in INTENTS:
-            raise ValueError()
-        intent = value["intent"]
+        if intent_probe:
+            reply = await client.complete(
+                [
+                    {"role": "system", "content": INTENT_INSTRUCTIONS},
+                    {"role": "user", "content": json.dumps(public, ensure_ascii=False)},
+                ],
+                tools=(),
+                json_mode=True,
+            )
+            value = strict_json(reply.content)
+            if set(value) != {"intent"} or value["intent"] not in INTENTS:
+                raise ValueError()
+            intent = value["intent"]
     except (LLMUnavailable, ValueError, TypeError, KeyError):
         probe_failure = "intent_probe_failed"
     if hasattr(client, "reset_routing"):
@@ -278,6 +290,9 @@ async def observe(prompt, *, client, connection):
         "response": response.model_dump(mode="json"),
         "tool_errors": errors,
         "tool_output_count": len(outputs),
+        "interpretation": response.interpretation.model_dump(mode="json")
+        if response.interpretation
+        else None,
     }
 
 
