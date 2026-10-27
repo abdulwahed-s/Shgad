@@ -33,6 +33,17 @@ def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
 
 
+def _sales_tool(evidence, expected):
+    """D58: the reconcile audit view runs the identical collections event query."""
+    if (
+        isinstance(evidence, dict)
+        and evidence.get("tool") == "reconcile"
+        and expected.get("label") == "collections"
+    ):
+        return evidence | {"tool": "get_sales"}
+    return evidence
+
+
 def zero_supported(expected, claim):
     proof = expected.get("independent_zero")
     if type(proof) is not IndependentZero:
@@ -42,7 +53,8 @@ def zero_supported(expected, claim):
             type(claim.get("value")) is int
             and claim["value"] == expected["value"] == 0
             and claim.get("source_ids") == expected["source_ids"] == []
-            and canonical(claim.get("query_evidence")) == proof.query_json
+            and canonical(_sales_tool(claim.get("query_evidence"), expected))
+            == proof.query_json
         )
     except (ValueError, TypeError):
         return False
