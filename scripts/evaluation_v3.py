@@ -14,7 +14,7 @@ from scripts.evaluation_evidence import METHOD_V2
 from scripts.evaluation_reports import ROOT, frozen_snapshot, git
 
 APPLICATION_TAG = "freeze-heldout-v3"
-APPLICATION_COMMIT = None  # Set to the tagged commit when the application freezes.
+APPLICATION_COMMIT = "c72e5d8fe07f4306d319bf3cf5632a393af5c120"  # freeze-heldout-v3
 APPLICATION_PATHS = ("backend/app", "frontend", ":(exclude)frontend/test/**")
 GRADING = "label_rules_v2_interpretation_grading_v3_D58"
 QUESTION_SCHEMA = "shgad-question-v2"
