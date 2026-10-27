@@ -14,7 +14,7 @@ from pydantic import (
 from app.schemas.evidence import CounterpartyView
 from app.schemas.forecast import Amount
 from app.schemas.ledger import BusinessDate, LedgerModel, Timestamp
-from app.schemas.queries import DateRangeView, Direction
+from app.schemas.queries import DateRangeView, DebtFilters, Direction
 
 Period = Annotated[
     str,
@@ -99,9 +99,19 @@ class KnownZeroQuery(LedgerModel):
     matching_rows: Literal[0] = 0
 
 
+class KnownZeroDebtQuery(LedgerModel):
+    """D58: no positive balance matches these exact filters at the cutoff."""
+
+    tool: Literal["get_debts"]
+    as_of: BusinessDate
+    filters: DebtFilters
+    known_at: Timestamp
+    matching_obligations: Literal[0] = 0
+
+
 class Figure(Amount):
     key: str
-    query_evidence: KnownZeroQuery | None = None
+    query_evidence: KnownZeroQuery | KnownZeroDebtQuery | None = None
 
 
 class Metric(LedgerModel):

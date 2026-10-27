@@ -177,7 +177,8 @@ def _party_decision(snapshot, query, direction):
     return None
 
 
-def before_provider(message, *, connection, clock, known_at, period):
+def refusal(message):
+    """Deterministic backstop: explicit overrides and leading write commands."""
     value = normalized(message)
     if re.search(r"(?:تجاهل|اترك|انس)\s+(?:القواعد|التعليمات|القوانين)", value):
         return SafeDecision("unsafe_instruction", "refused")
@@ -194,6 +195,14 @@ def before_provider(message, *, connection, clock, known_at, period):
     )
     if write and not register_question:
         return SafeDecision("unsupported_write", "refused")
+    return None
+
+
+def before_provider(message, *, connection, clock, known_at, period):
+    value = normalized(message)
+    decision = refusal(message)
+    if decision:
+        return decision
     if re.search(
         r"(?:جهز|قدم|سو|اكتب|احسب).*الاقرار\s+الضريبي|"
         r"(?:صمم|اكتب|انشئ|سوي).*برنامج\s+محاسبه|"

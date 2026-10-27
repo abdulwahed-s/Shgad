@@ -36,6 +36,17 @@ class Clarification(LedgerModel):
     options: tuple[ClarificationOption, ...] = ()
 
 
+class InterpretationView(LedgerModel):
+    """D58: what the assistant understood, also on clarify/refuse (no figures)."""
+
+    behavior: Literal["answer", "clarify", "refuse", "help"]
+    intent: str
+    reason: str | None = None
+    tools: tuple[ToolName, ...] = ()
+    counterparty_ids: tuple[str, ...] = ()
+    period: DateRangeView | None = None
+
+
 class ChatResponse(LedgerModel):
     status: Literal["answered", "clarification", "refused", "llm_unavailable", "error"]
     reply_ar: str
@@ -49,6 +60,7 @@ class ChatResponse(LedgerModel):
     assumptions_ar: tuple[str, ...] = ()
     used_tools: tuple[ToolName, ...] = ()
     renderer: RendererStats = RendererStats(attempts=1, fell_back_to_template=False)
+    interpretation: InterpretationView | None = None
 
 
 class DraftAction(LedgerModel):

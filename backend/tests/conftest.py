@@ -35,6 +35,17 @@ def offline_provider_environment(request, monkeypatch):
     get_settings.cache_clear()
 
 
+@pytest.fixture(autouse=True)
+def agent_pipeline(request, monkeypatch):
+    """D58: existing suites script the legacy D53-D55 flow; opt in to the new one."""
+    from app.agents import orchestrator
+
+    marker = request.node.get_closest_marker("pipeline")
+    monkeypatch.setattr(
+        orchestrator, "DEFAULT_PIPELINE", marker.args[0] if marker else "legacy"
+    )
+
+
 @pytest.fixture
 def transaction_factory():
     def make(source_id="TX-001", **overrides):

@@ -14,6 +14,7 @@ from app.schemas.ledger import Category, Obligation, OpeningBalance
 from app.schemas.queries import (
     Aging,
     DateRangeView,
+    DebtFilters,
     DebtObligation,
     DebtParty,
     DebtReport,
@@ -351,6 +352,13 @@ def debt_report(
         }
     return DebtReport(
         as_of=snapshot.day,
+        filters=DebtFilters(
+            direction=direction,
+            overdue_only=overdue_only,
+            counterparty_id=party_id,
+            due_start=due_range.start if due_range else None,
+            due_end=due_range.end if due_range else None,
+        ),
         total_outstanding=subtotal(selected, "total_outstanding"),
         aging=Aging(**aging),
         customers=tuple(

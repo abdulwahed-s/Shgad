@@ -57,8 +57,19 @@ class DebtParty(LedgerModel):
     obligations: tuple[DebtObligation, ...]
 
 
+class DebtFilters(LedgerModel):
+    """The exact selection behind a debt report (D58 completeness/zero proof)."""
+
+    direction: Literal["receivable", "payable"]
+    overdue_only: StrictBool
+    counterparty_id: str | None
+    due_start: BusinessDate | None
+    due_end: BusinessDate | None
+
+
 class DebtReport(LedgerModel):
     as_of: BusinessDate
+    filters: DebtFilters
     total_outstanding: Amount
     aging: Aging
     customers: tuple[DebtParty, ...]

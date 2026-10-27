@@ -6,7 +6,8 @@ import re
 
 from pydantic import ValidationError
 
-from app.agents import answer_policy
+from app.agents import answer_policy, planner
+from app.agents.interpreter import interpret
 from app.agents.llm_client import LLMUnavailable, strict_json
 from app.agents.messages_ar import text
 from app.agents.renderer import (
@@ -24,6 +25,7 @@ from app.schemas.chat import (
     Clarification,
     ClarificationOption,
     DraftAction,
+    InterpretationView,
 )
 from app.schemas.evidence import CounterpartyView
 from app.services.errors import FinancialRuleError
@@ -290,12 +292,27 @@ def response(rendered, outputs, used):
 
 
 CONVERSATION_TIMEOUT_SECONDS = 120
+# D58 interpretation-first pipeline; "legacy" keeps the D53-D55 flow for comparison.
+DEFAULT_PIPELINE = "interpretation"
+TOOL_ERROR_REASONS = {
+    "AMBIGUOUS_COUNTERPARTY": "AMBIGUOUS_COUNTERPARTY",
+    "NOT_FOUND": "NO_HISTORICAL_DATA",
+    "MISSING_OPENING_BALANCE": "MISSING_OPENING_BALANCE",
+    "MISSING_COSTS": "MISSING_COSTS",
+    "MISSING_DUE_DATE": "MISSING_DUE_DATE",
+    "AMBIGUOUS_DATE": "AMBIGUOUS_DATE",
+}
 
 
-async def converse(request, *, client, connection, clock, known_at):
+async def converse(request, *, client, connection, clock, known_at, pipeline=None):
+    run = (
+        _interpreted
+        if (pipeline or DEFAULT_PIPELINE) == "interpretation"
+        else _converse
+    )
     try:
         async with asyncio.timeout(CONVERSATION_TIMEOUT_SECONDS):
-            return await _converse(
+            return await run(
                 request,
                 client=client,
                 connection=connection,
@@ -304,6 +321,214 @@ async def converse(request, *, client, connection, clock, known_at):
             )
     except TimeoutError:
         return fixed("llm_unavailable", "busy")
+
+
+def _with_view(reply, **view):
+    return reply.model_copy(update={"interpretation": InterpretationView(**view)})
+
+
+def _unavailable(exc):
+    key = {
+        "not_configured": "provider_unconfigured",
+        "needs_internet": "needs_internet",
+    }.get(exc.reason, "busy")
+    return fixed("llm_unavailable", key)
+
+
+async def _interpreted(request, *, client, connection, clock, known_at):
+    """interpret -> resolve/plan -> fixed read-only tools -> slot draft (D58)."""
+    backstop = answer_policy.refusal(request.message)
+    if backstop:
+        return _with_view(
+            safe_response(backstop), behavior="refuse", intent=backstop.key
+        )
+    try:
+        understood = await interpret(request.message, client=client, clock=clock)
+    except LLMUnavailable as exc:
+        return _unavailable(exc)
+    if understood is None:
+        return _with_view(
+            fixed("clarification", "clarify_request"),
+            behavior="clarify",
+            intent="out_of_scope",
+            reason="OUT_OF_SCOPE",
+        )
+    was_query_only = connection.execute("PRAGMA query_only").fetchone()[0]
+    connection.execute("PRAGMA query_only=ON")
+    used, outputs = [], []
+    try:
+        decided = planner.plan(
+            understood, connection=connection, clock=clock, known_at=known_at
+        )
+        if isinstance(decided, planner.Stop):
+            return _stop_response(decided, understood)
+        history = {"role": "assistant", "content": None, "tool_calls": []}
+        results = []
+        for index, call in enumerate(decided.calls):
+            output = invoke(
+                call.name,
+                call.arguments,
+                connection=connection,
+                clock=call.clock,
+                known_at=known_at,
+                user_message=request.message,
+                server_period_set=True,
+                server_plan=call.plan,
+                server_range=call.server_range,
+            )
+            used.append(call.name)
+            if not output.ok:
+                reason = TOOL_ERROR_REASONS.get(output.error.code)
+                failed = tool_failure(output, used)
+                if failed.status != "clarification":
+                    return failed
+                return _with_view(
+                    failed,
+                    behavior="clarify",
+                    intent=understood.intent,
+                    reason=reason or "VALIDATION_ERROR",
+                    counterparty_ids=tuple(
+                        o.value for o in failed.clarification.options
+                    ),
+                )
+            outputs.append(output)
+            history["tool_calls"].append(
+                {
+                    "id": f"plan-{index}",
+                    "type": "function",
+                    "function": {
+                        "name": call.name,
+                        "arguments": json.dumps(call.arguments),
+                    },
+                }
+            )
+            results.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": f"plan-{index}",
+                    "content": quoted_output(output, index),
+                }
+            )
+        history["tool_calls"][0]["extra_content"] = {
+            "google": {"thought_signature": "skip_thought_signature_validator"}
+        }
+        conversation = [
+            {"role": "system", "content": SYSTEM_INSTRUCTIONS},
+            {
+                "role": "user",
+                "content": json.dumps(
+                    {
+                        "BUSINESS_AS_OF": str(clock.today),
+                        "question": request.message,
+                        "trust": "quoted_user_data",
+                    },
+                    ensure_ascii=False,
+                ),
+            },
+            history,
+            *results,
+        ]
+        debt_list = understood.intent == "debts" and (
+            not decided.parties or answer_policy.debt_list_request(request.message)
+        )
+        answered = await _narrate(
+            conversation, outputs, used, request.message, client, debt_list
+        )
+        return _with_view(
+            answered,
+            behavior="answer",
+            intent=understood.intent,
+            tools=planner.TOOLS_BY_INTENT[understood.intent],
+            counterparty_ids=decided.parties,
+            period={"start": decided.period.start, "end": decided.period.end},
+        )
+    except FinancialRuleError:
+        return fixed("error", "chat_error", used=used)
+    finally:
+        connection.execute(f"PRAGMA query_only={int(was_query_only)}")
+
+
+def _stop_response(stop, understood):
+    view = {"intent": understood.intent, "reason": stop.reason}
+    if stop.status == "refused":
+        return _with_view(
+            fixed("refused", stop.key), behavior="refuse", intent=understood.intent
+        )
+    if stop.status == "answered":
+        return _with_view(fixed("answered", "help"), behavior="help", intent="help")
+    options = tuple(
+        ClarificationOption(label_ar=party.display_name, value=party.id)
+        for party in stop.options
+    )
+    return _with_view(
+        fixed("clarification", stop.key, options=options),
+        behavior="clarify",
+        counterparty_ids=tuple(party.id for party in stop.options),
+        **view,
+    )
+
+
+async def _narrate(conversation, outputs, used, message, client, debt_list):
+    """One slot draft, one renderer-owned retry, then the deterministic template."""
+
+    def template():
+        return response(
+            render_reply(None, outputs=outputs, debt_list=debt_list), outputs, used
+        )
+
+    try:
+        reply = await client.complete(conversation, tools=())
+    except LLMUnavailable:
+        return template()
+    try:
+        final = action(reply) if not reply.tool_calls else None
+    except (ValidationError, ValueError, TypeError):
+        final = None
+    if final is None or final.status != "answered":
+        return template()
+    try:
+        drafted = response(
+            checked_draft(final.draft_ar, outputs, message), outputs, used
+        )
+        # A draft that shows no verified figure answers nothing; use the template.
+        return drafted if drafted.figures or drafted.metrics else template()
+    except DraftValidationError:
+        pass
+    revised = None
+    try:
+        retry = await client.complete(
+            [
+                *conversation,
+                reply.message,
+                {
+                    "role": "user",
+                    "content": json.dumps(
+                        {
+                            "render_error": "REJECTED_DRAFT",
+                            "instruction": "Retry DraftAction once. Only catalog "
+                            "fig/date slots for numbers; no guessed text.",
+                        }
+                    ),
+                },
+            ],
+            tools=(),
+        )
+        candidate = action(retry)
+        if not retry.tool_calls and candidate.status == "answered":
+            revised = "" if unsafe_narration(candidate.draft_ar) else candidate.draft_ar
+    except (LLMUnavailable, ValidationError, ValueError, TypeError):
+        pass
+    return response(
+        render_reply(
+            None,
+            outputs=outputs,
+            user_message=message,
+            retry=lambda _: revised,
+            debt_list=debt_list,
+        ),
+        outputs,
+        used,
+    )
 
 
 async def _converse(request, *, client, connection, clock, known_at):

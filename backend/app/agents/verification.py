@@ -12,10 +12,15 @@ from app.schemas.queries import DebtsResult, FlagsReport
 from app.schemas.tools import Figure, Metric, ToolEnvelope
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
-from app.services.financial_queries import payment_capacity, sale_totals, sources
+from app.services.financial_queries import (
+    debt_report,
+    payment_capacity,
+    sale_totals,
+    sources,
+)
 from app.services.known_zero import query_evidence
 from app.services.margin import margin_report
-from app.services.weekly_tool_views import weekly_tool_result
+from app.services.weekly_tool_views import movement_result, weekly_tool_result
 
 
 def _reject():
@@ -66,6 +71,19 @@ def _verify_debts(data, snapshot):
     for report in (parsed.receivables, parsed.payables):
         if report is None:
             continue
+        # D58 completeness: the stated filters must reproduce this exact report.
+        chosen = report.filters
+        due_range = (
+            DateRange(chosen.due_start, chosen.due_end) if chosen.due_start else None
+        )
+        if (chosen.due_start is None) != (chosen.due_end is None) or debt_report(
+            snapshot,
+            direction=chosen.direction,
+            overdue_only=chosen.overdue_only,
+            due_range=due_range,
+            party_id=chosen.counterparty_id,
+        ) != report:
+            _reject()
         total = 0
         seen = set()
         for party in report.customers:
@@ -160,7 +178,9 @@ def _verify_forecast(data, snapshot):
         _reject()
 
 
-def verify_tool_output(envelope, *, snapshot, tool_name, weekly_plan=False):
+def verify_tool_output(
+    envelope, *, snapshot, tool_name, weekly_plan=False, movements_plan=False
+):
     if not envelope.ok or envelope.resolved_range is None:
         _reject()
     figure_map = {figure.key: figure for figure in envelope.figures}
@@ -239,6 +259,13 @@ def verify_tool_output(envelope, *, snapshot, tool_name, weekly_plan=False):
     if weekly_plan and tool_name in {"get_sales", "get_margin"}:
         if (
             weekly_tool_result(snapshot, resolved, tool_name).model_dump(mode="json")
+            != envelope.result
+        ):
+            _reject()
+    elif movements_plan:
+        if (
+            tool_name != "get_sales"
+            or movement_result(snapshot, resolved).model_dump(mode="json")
             != envelope.result
         ):
             _reject()

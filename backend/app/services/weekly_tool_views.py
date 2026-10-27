@@ -3,9 +3,37 @@
 from app.schemas.reports import WeeklyMarginResult, WeeklyMovements, WeeklySalesResult
 from app.services.business_clock import BusinessClock
 from app.services.errors import FinancialRuleError
-from app.services.financial_queries import QuerySnapshot, sale_totals
+from app.services.financial_queries import QuerySnapshot, amount, sale_totals
 from app.services.margin import margin_report
 from app.services.summary import weekly_report
+
+
+def movement_result(snapshot, resolved):
+    """D58 period movements: the weekly event sums over any resolved range."""
+
+    def total(kind, label):
+        rows = tuple(
+            r
+            for r in snapshot.rows
+            if r.type == kind and resolved.start <= r.business_date <= resolved.end
+        )
+        return amount(
+            sum(r.amount_iqd for r in rows),
+            label,
+            (r.source_id for r in rows),
+            f"sum recorded {kind} in resolved range",
+        )
+
+    return WeeklySalesResult(
+        **sale_totals(snapshot, resolved).model_dump(),
+        weekly=WeeklyMovements(
+            collections=total("CREDIT_COLLECTION", "collections"),
+            supplier_payments=total("SUPPLIER_PAYMENT", "supplier_payments"),
+            operating_expenses=total("OPERATING_EXPENSE", "operating_expenses"),
+            owner_drawings=total("OWNER_DRAWING", "owner_drawings"),
+            capital_injections=total("CAPITAL_INJECTION", "capital_injections"),
+        ),
+    )
 
 
 def weekly_tool_result(snapshot, resolved, name):

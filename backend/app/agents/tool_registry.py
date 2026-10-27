@@ -28,7 +28,7 @@ from app.services.known_zero import query_evidence
 from app.services.margin import margin_metrics
 from app.services.period_phrases import resolve_period
 from app.services.tool_evidence import debt_metrics, forecast_figures, upcoming_figures
-from app.services.weekly_tool_views import weekly_tool_result
+from app.services.weekly_tool_views import movement_result, weekly_tool_result
 from app.tools import forecast, get_debts, get_margin, get_sales, reconcile
 
 TOOLS = {
@@ -39,6 +39,13 @@ TOOLS = {
     "forecast": (ForecastArguments, forecast.run),
 }
 TOOL_TIMEOUT_SECONDS = 10
+PLANS = {
+    None,
+    "weekly_summary",
+    "cash_sufficiency",
+    "period_movements",
+    "interpretation",
+}
 
 
 class _ToolTimeout(Exception):
@@ -106,12 +113,15 @@ def _invoke(
     server_period_set=False,
     server_plan=None,
     server_month=None,
+    server_range=None,
 ):
-    """Explicit dates need user-text proof or an independently matched server month."""
+    """Explicit dates need user-text proof, a matched server month, or a D58
+    server range that BusinessClock resolved from a verified interpretation."""
     try:
-        if server_plan not in {None, "weekly_summary", "cash_sufficiency"}:
+        if server_plan not in PLANS:
             raise FinancialRuleError("VALIDATION_ERROR")
         weekly_plan = server_plan == "weekly_summary"
+        movements_plan = server_plan == "period_movements"
         if not isinstance(name, str) or name not in TOOLS:
             raise FinancialRuleError("VALIDATION_ERROR")
         model, service = TOOLS[name]
@@ -126,6 +136,15 @@ def _invoke(
             ):
                 raise FinancialRuleError("VALIDATION_ERROR")
             trusted_range = clock.named_month(server_month)
+        if server_range is not None:
+            if server_month is not None or name not in {
+                "get_sales",
+                "get_margin",
+                "reconcile",
+            }:
+                raise FinancialRuleError("VALIDATION_ERROR")
+            trusted_range = server_range
+        if trusted_range is not None:
             if args.period != "explicit" or (args.start_date, args.end_date) != (
                 trusted_range.start,
                 trusted_range.end,
@@ -154,10 +173,31 @@ def _invoke(
             connection, clock=clock, known_at=None if name == "forecast" else known_at
         )
         if weekly_plan and name in {"get_sales", "get_margin"}:
-            if args.period not in {"this_week", "last_week"}:
+            if trusted_range is not None:
+                # weekly_tool_result rejects any range that is not that week.
+                resolved = historical_range(
+                    clock,
+                    "explicit",
+                    start_date=trusted_range.start,
+                    end_date=trusted_range.end,
+                    trusted_range=trusted_range,
+                )
+            elif args.period in {"this_week", "last_week"}:
+                resolved = historical_range(clock, args.period)
+            else:
                 raise FinancialRuleError("VALIDATION_ERROR")
-            resolved = historical_range(clock, args.period)
             result, party = weekly_tool_result(snapshot, resolved, name), None
+        elif movements_plan:
+            if name != "get_sales" or trusted_range is None:
+                raise FinancialRuleError("VALIDATION_ERROR")
+            resolved = historical_range(
+                clock,
+                "explicit",
+                start_date=trusted_range.start,
+                end_date=trusted_range.end,
+                trusted_range=trusted_range,
+            )
+            result, party = movement_result(snapshot, resolved), None
         else:
             result, resolved, party = service(
                 snapshot,
@@ -223,7 +263,11 @@ def _invoke(
             ),
         )
         return verify_tool_output(
-            envelope, snapshot=snapshot, tool_name=name, weekly_plan=weekly_plan
+            envelope,
+            snapshot=snapshot,
+            tool_name=name,
+            weekly_plan=weekly_plan,
+            movements_plan=movements_plan,
         )
     except (ValidationError, FinancialRuleError) as exc:
         code = exc.code if isinstance(exc, FinancialRuleError) else "VALIDATION_ERROR"
@@ -250,6 +294,7 @@ def invoke(
     server_period_set=False,
     server_plan=None,
     server_month=None,
+    server_range=None,
 ):
     """Hold one consistent SQLite read snapshot through service and provenance."""
     deadline = monotonic() + TOOL_TIMEOUT_SECONDS
@@ -270,6 +315,7 @@ def invoke(
                     server_period_set=server_period_set,
                     server_plan=server_plan,
                     server_month=server_month,
+                    server_range=server_range,
                 )
             if monotonic() >= deadline:
                 raise sqlite3.OperationalError("TOOL_TIMEOUT")
