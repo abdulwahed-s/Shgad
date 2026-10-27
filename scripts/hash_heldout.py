@@ -12,14 +12,23 @@ from collections import Counter
 from pathlib import Path
 
 if __package__ in {None, ""}:
-    from data_contract import validate_question
+    from data_contract import (
+        QUESTION_SCHEMA_V2,
+        validate_question,
+        validate_question_v2,
+    )
 else:
-    from .data_contract import validate_question
+    from .data_contract import (
+        QUESTION_SCHEMA_V2,
+        validate_question,
+        validate_question_v2,
+    )
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def seal_manifest(path):
+def seal_manifest(path, *, schema=None):
+    """schema "v2" seals LABEL_RULES_V2 questions (D58) and records it."""
     path = Path(path).resolve()
     if path.is_relative_to(ROOT):
         raise ValueError("Sealed input must be outside the repository")
@@ -30,7 +39,7 @@ def seal_manifest(path):
         question = json.loads(
             line, parse_constant=lambda _: (_ for _ in ()).throw(ValueError())
         )
-        validate_question(question)
+        (validate_question_v2 if schema == "v2" else validate_question)(question)
         questions.append(question)
     if len(questions) != 60 or len({q["id"] for q in questions}) != 60:
         raise ValueError("Invalid sealed counts")
@@ -39,7 +48,8 @@ def seal_manifest(path):
         raise ValueError("Invalid sealed split")
     if any(q["arabic_review"] != "approved" for q in questions):
         raise ValueError("Arabic review is pending")
-    return {
+    extra = {"question_schema": QUESTION_SCHEMA_V2} if schema == "v2" else {}
+    return extra | {
         "sha256": hashlib.sha256(raw).hexdigest(),
         "total_count": len(questions),
         "counts_by_category": dict(Counter(q["category"] for q in questions)),
@@ -52,7 +62,10 @@ def main():
         path = os.environ.get("HELDOUT_PATH")
         if not path:
             raise ValueError()
-        result = seal_manifest(path)
+        schema = sys.argv[1].removeprefix("--schema=") if len(sys.argv) > 1 else None
+        if schema not in {None, "v2"}:
+            raise ValueError()
+        result = seal_manifest(path, schema=schema)
     except (ValueError, TypeError, KeyError, UnicodeError, OSError):
         # No traceback, file path, failed row or exception text can expose content.
         print(

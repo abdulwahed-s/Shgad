@@ -48,6 +48,7 @@ FAILURES = {
     "wrong_tool",
     "wrong_customer",
     "wrong_period",
+    "wrong_reason",
     "ledger_changed",
     "unsupported_claim",
     "intent_probe_failed",
@@ -249,7 +250,10 @@ def verify_freeze(path, current):
         "dataset_sha256",
         "input_hashes",
     )
-    if current.get("schema_version") == "shgad-evaluation-freeze-heldout-v2":
+    if current.get("schema_version") in {
+        "shgad-evaluation-freeze-heldout-v2",
+        "shgad-evaluation-freeze-heldout-v3",
+    }:
         keys += (
             "application_commit",
             "application_tag",
@@ -300,9 +304,13 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
     # Rebuild the public object from fixed keys. Never remove a few private fields
     # from a copy of a held-out row: no row, response, ID, party, date or text leaves.
     for row in rows:
-        if not set(row["failures"]) <= FAILURES:
-            raise ValueError("INVALID_PUBLIC_FAILURE_CODE")
+        for grade in (row, row.get("v1_method", row)):
+            if not set(grade["failures"]) <= FAILURES:
+                raise ValueError("INVALID_PUBLIC_FAILURE_CODE")
     summary = aggregate_questions(rows)
+    v3 = metadata.get("settings", {}).get("grading") == (
+        "label_rules_v2_interpretation_grading_v3_D58"
+    )
     targets = {}
     for key, target in (
         ("historical_accuracy", 0.95),
@@ -380,6 +388,8 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
             "synthetic_data_only_no_merchant_validation",
             "synthetic_replay_is_protocol_testing_not_model_quality"
             if mode == "replay"
+            else "intent_is_the_application_interpretation_field"
+            if v3
             else "intent_probe_is_separate_from_production_routing",
             "customer_period_and_tools_are_actual_production_fields",
             "all_required_figures_and_units_categories_and_context_must_match",
@@ -391,7 +401,27 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
             "independent_requirement_annotations_required_for_live_measurement",
         ],
     )
-    if (
+    if v3:
+        # Fixed public method metadata only; no private paths/IDs/rows/selectors.
+        from scripts.evaluation_v3 import APPLICATION_COMMIT, APPLICATION_TAG
+
+        report.update(
+            application_commit=APPLICATION_COMMIT,
+            application_tag=APPLICATION_TAG,
+            dataset_disclosure="questions unseen, ledger previously used "
+            "in development",
+            primary_seed=20260701,
+            method_change=dict(
+                decision="D58",
+                original_results_preserved=True,
+                scope="interpretation_pipeline_and_label_rules_v2_grading",
+            ),
+            # The same observations under the earlier (v1) grading rules.
+            v1_method_metrics=aggregate_questions([row["v1_method"] for row in rows])
+            if rows
+            else None,
+        )
+    elif (
         metadata.get("settings", {}).get("evidence_method")
         == "observed_query_evidence_v2_D56"
     ):
@@ -411,7 +441,10 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
             ),
         )
     if split == "dev":
-        report["cases"] = rows
+        report["cases"] = [
+            {key: value for key, value in row.items() if key != "v1_method"}
+            for row in rows
+        ]
     return report
 
 
@@ -440,7 +473,19 @@ def markdown(report):
         ),
         "",
     ]
-    if "dataset_disclosure" in report:
+    if "dataset_disclosure" in report and "v1_method_metrics" in report:
+        lines.extend(
+            [
+                "",
+                "Dataset disclosure: " + report["dataset_disclosure"] + ".",
+                "Application freeze: `" + report["application_commit"] + "`.",
+                "Evaluator method (D58), frozen before v3 questions existed: "
+                "LABEL_RULES_V2 grading of the application's own interpretation; "
+                "D56 independent evidence. Earlier results are preserved.",
+                "",
+            ]
+        )
+    elif "dataset_disclosure" in report:
         lines.extend(
             [
                 "",
@@ -465,6 +510,20 @@ def markdown(report):
             f"| {key} | {value['numerator']} / {value['denominator']} "
             f"| {value['rate']} |"
         )
+    if report.get("v1_method_metrics"):
+        lines += [
+            "",
+            "Same observations under the earlier v1 grading rules:",
+            "",
+            "| Metric (v1 method) | Correct / eligible | Rate |",
+            "|---|---:|---:|",
+        ]
+        for key in ("historical_accuracy", "safe_handling", "joint_accuracy"):
+            value = report["v1_method_metrics"][key]
+            lines.append(
+                f"| {key} | {value['numerator']} / {value['denominator']} "
+                f"| {value['rate']} |"
+            )
     lines += ["", "| Category | Total | Passed | Failed |", "|---|---:|---:|---:|"]
     for key, value in report["metrics"]["categories"].items():
         lines.append(

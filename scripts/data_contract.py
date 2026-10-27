@@ -304,3 +304,164 @@ def validate_question(question):
     if "error_code" in spec:
         check(isinstance(spec["error_code"], str) and bool(spec["error_code"]))
     return question
+
+
+QUESTION_SCHEMA_V2 = "shgad-question-v2"
+INTENTS_V2 = INTENTS | {"cash_on_hand", "period_movements", "out_of_scope"}
+# LABEL_RULES_V2 §2: the tool set each answer intent implies.
+TOOLS_BY_INTENT_V2 = {
+    "sales": {"get_sales"},
+    "cash_on_hand": {"get_debts"},
+    "debts": {"get_debts"},
+    "upcoming_obligations": {"get_debts"},
+    "supplier_sufficiency": {"get_debts", "forecast"},
+    "weekly_summary": {"get_sales", "get_debts", "get_margin", "reconcile"},
+    "period_movements": {"get_sales"},
+    "estimated_gross_margin": {"get_margin"},
+    "reconciliation": {"reconcile"},
+}
+CALCULATION_BY_INTENT_V2 = {
+    "sales": "sales",
+    "cash_on_hand": "cash",
+    "debts": "debts",
+    "upcoming_obligations": "upcoming",
+    "supplier_sufficiency": "j1",
+    "weekly_summary": "weekly_summary",
+    "period_movements": "sales",
+    "estimated_gross_margin": "margin",
+    "reconciliation": "none",
+}
+ERROR_CODES_V2 = {
+    "AMBIGUOUS_COUNTERPARTY",
+    "UNKNOWN_COUNTERPARTY",
+    "AMBIGUOUS_DATE",
+    "VALIDATION_ERROR",
+    "NO_HISTORICAL_DATA",
+    "MISSING_OPENING_BALANCE",
+    "MISSING_COSTS",
+    "REVIEW_REQUIRED",
+    "OUT_OF_SCOPE",
+}
+MOVEMENTS_V2 = {
+    "owner_drawings",
+    "operating_expenses",
+    "supplier_payments",
+    "collections",
+    "capital_injections",
+    "drawings_and_expenses",
+}
+FLAG_TYPES_V2 = {
+    "unmatched",
+    "suspected_duplicate",
+    "partially_paid",
+    "overdue",
+    "ambiguous",
+}
+
+
+def validate_question_v2(question):
+    """LABEL_RULES_V2 format (D58). Errors never include question content."""
+
+    def check(condition):
+        if not condition:
+            raise ValueError("Invalid question format")
+
+    def business_date(value):
+        check(isinstance(value, str))
+        parsed = date.fromisoformat(value)
+        check(str(parsed) == value)
+        return parsed
+
+    check(
+        isinstance(question, dict)
+        and set(question)
+        == {
+            "id",
+            "category",
+            "question_ar",
+            "business_as_of",
+            "dataset",
+            "arabic_review",
+            "spec",
+        }
+    )
+    check(isinstance(question["id"], str) and bool(question["id"].strip()))
+    check(
+        isinstance(question["question_ar"], str)
+        and bool(question["question_ar"].strip())
+    )
+    check(question["category"] in CATEGORIES)
+    check(question["dataset"] in {"primary"} | FIXTURES)
+    check(question["arabic_review"] in {"pending", "approved"})
+    as_of = business_date(question["business_as_of"])
+    check(date(2026, 7, 1) <= as_of <= date(2026, 9, 28))
+    spec = question["spec"]
+    required = {
+        "intent",
+        "expected_tools",
+        "counterparty_ids",
+        "resolved_period",
+        "expected_behavior",
+        "calculation",
+        "parameters",
+    }
+    check(
+        isinstance(spec, dict) and required <= spec.keys() <= required | {"error_code"}
+    )
+    intent, behavior = spec["intent"], spec["expected_behavior"]
+    check(intent in INTENTS_V2 and behavior in {"answer", "clarify", "refuse"})
+    for key in ("expected_tools", "counterparty_ids"):
+        values = spec[key]
+        check(isinstance(values, list) and all(isinstance(v, str) for v in values))
+        check(len(values) == len(set(values)))
+    parties = {f"CUST-{i:02}" for i in range(1, 7)} | {"SUP-01", "SUP-02"}
+    check(set(spec["counterparty_ids"]) <= parties)
+    refusal = intent in {"unsupported_write", "unsafe_instruction"}
+    check(refusal == (behavior == "refuse"))
+    check((behavior == "clarify") == ("error_code" in spec))
+    if behavior == "clarify":
+        check(spec["error_code"] in ERROR_CODES_V2)
+    params = spec["parameters"]
+    check(isinstance(params, dict))
+    if "kind" in params:
+        check(params["kind"] in {"cash", "credit", "all"})
+    if "direction" in params:
+        check(params["direction"] in {"receivable", "payable", "both"})
+    if "overdue_only" in params:
+        check(type(params["overdue_only"]) is bool)
+    if "movement" in params:
+        check(params["movement"] in MOVEMENTS_V2)
+    if "types" in params:
+        types = params["types"]
+        check(isinstance(types, list) and set(types) <= FLAG_TYPES_V2)
+    days = params.get("days", 7)
+    check(type(days) is int and 1 <= days <= 30)
+    check(
+        params.keys()
+        <= {"kind", "direction", "overdue_only", "movement", "types", "days"}
+    )
+    if behavior != "answer":
+        # LABEL_RULES_V2 §5: decisions carry no tools or period.
+        check(spec["expected_tools"] == [] and spec["resolved_period"] is None)
+        check(spec["calculation"] == "none")
+        if behavior == "refuse" or spec["error_code"] != "AMBIGUOUS_COUNTERPARTY":
+            check(spec["counterparty_ids"] == [])
+        return question
+    check(intent in TOOLS_BY_INTENT_V2)
+    check(set(spec["expected_tools"]) == TOOLS_BY_INTENT_V2[intent])
+    check(spec["calculation"] == CALCULATION_BY_INTENT_V2[intent])
+    if intent == "period_movements":
+        check("movement" in params)
+    period = spec["resolved_period"]
+    check(isinstance(period, dict) and set(period) == {"start", "end"})
+    start, end = business_date(period["start"]), business_date(period["end"])
+    check(date(2026, 7, 1) <= start <= end)
+    if intent in {"cash_on_hand", "debts"}:
+        check(start == end == as_of)
+    elif intent == "upcoming_obligations":
+        check(start == as_of and end == as_of + timedelta(days=days - 1))
+    elif intent == "supplier_sufficiency":
+        check(start == as_of < end <= as_of + timedelta(days=29))
+    else:
+        check(end <= as_of)
+    return question

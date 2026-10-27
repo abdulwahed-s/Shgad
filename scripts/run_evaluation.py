@@ -19,7 +19,12 @@ for source in (ROOT, ROOT / "backend"):
     if str(source) not in sys.path:
         sys.path.insert(0, str(source))
 
-from scripts.data_contract import CATEGORIES, validate_question  # noqa: E402
+from scripts.data_contract import (  # noqa: E402
+    CATEGORIES,
+    QUESTION_SCHEMA_V2,
+    validate_question,
+    validate_question_v2,
+)
 
 
 class EvaluationError(ValueError):
@@ -53,12 +58,14 @@ def seal_metadata(data_root=ROOT / "data", *, heldout_seal=None):
         if path.resolve() != path.absolute():
             raise ValueError()
         manifest = strict_json(path.read_bytes())
-        if not isinstance(manifest, dict) or set(manifest) != {
-            "sha256",
-            "total_count",
-            "counts_by_category",
-            "counts_by_behavior",
-        }:
+        base = {"sha256", "total_count", "counts_by_category", "counts_by_behavior"}
+        if not isinstance(manifest, dict) or set(manifest) not in (
+            base,
+            base | {"question_schema"},
+        ):
+            raise ValueError()
+        # D58: a v2-format seal names its schema; v1 seals have no such key.
+        if manifest.get("question_schema", QUESTION_SCHEMA_V2) != QUESTION_SCHEMA_V2:
             raise ValueError()
         if (
             not isinstance(manifest["sha256"], str)
@@ -125,8 +132,13 @@ def load_questions(
         rows = [strict_json(line) for line in raw.decode("utf-8-sig").splitlines()]
         if not rows or len({q["id"] for q in rows}) != len(rows):
             raise ValueError()
+        validator = (
+            validate_question_v2
+            if manifest is not None and "question_schema" in manifest
+            else validate_question
+        )
         for row in rows:
-            validate_question(row)
+            validator(row)
             if row["arabic_review"] != "approved":
                 raise ValueError()
         if split == "heldout" and (
@@ -172,9 +184,12 @@ def plan(
             for p in (heldout_seal, heldout_requirements, freeze_manifest)
         ):
             raise EvaluationError("V2_MANIFESTS_MUST_BE_EXTERNAL")
-        v2.check_application()
+        from scripts import evaluation_v3 as v3
+
+        frozen_method = v3 if v3.is_v3(freeze_manifest) else v2
+        frozen_method.check_application()
         v2.check_output(output)
-        snapshot = v2.snapshot(require_clean=require_clean)
+        snapshot = frozen_method.snapshot(require_clean=require_clean)
         if v2.method_from_freeze(freeze_manifest) != v2.METHOD_V2:
             raise EvaluationError("V2_METHOD_FREEZE_REQUIRED")
         verify_freeze(freeze_manifest, snapshot)
@@ -306,11 +321,16 @@ async def evaluate_questions(
     requirements=None,
     references=None,
     method="row_provenance_v1",
+    grading="v1",
 ):
-    """Specs/truth stay in this scorer; the runtime receives only PromptInput."""
+    """Specs/truth stay in this scorer; the runtime receives only PromptInput.
+
+    D58 grading "v3" reads the application's own interpretation (no intent
+    probe) and also records the v1-method grade of the same observation.
+    """
     from datetime import date
 
-    from scripts.evaluation_metrics import grade_question
+    from scripts.evaluation_metrics import grade_question, grade_question_v3
     from scripts.evaluation_runtime import (
         PromptInput,
         observe,
@@ -374,6 +394,7 @@ async def evaluate_questions(
                         ),
                         client=client,
                         connection=connection,
+                        intent_probe=grading != "v3",
                     )
             except KeyboardInterrupt:
                 stopped = True
@@ -382,12 +403,19 @@ async def evaluate_questions(
                 # Never serialize private specs, provider text or exception values.
                 observed["failure"] = "runtime_failure"
         result = grade_question(spec, catalogue, required, observed, method=method)
+        extra = {}
+        if grading == "v3":
+            extra["v1_method"] = result
+            result = grade_question_v3(
+                spec, catalogue, required, observed, method=method
+            )
         rows.append(
             dict(
                 id=question["id"],
                 category=question["category"],
                 expected_behavior=spec["expected_behavior"],
                 **result,
+                **extra,
             )
         )
     return rows
@@ -589,6 +617,9 @@ def main(argv=None):
             raise EvaluationError("RESULT_ALREADY_EXISTS_OR_INVALID_PATH")
         frozen = verify_freeze(args.freeze_manifest, prepared)
         method = v2.method_from_freeze(args.freeze_manifest)
+        from scripts import evaluation_v3 as v3
+
+        grading = "v3" if selected_v2 and v3.is_v3(args.freeze_manifest) else "v1"
         if method == v2.METHOD_V2 and not selected_v2:
             raise EvaluationError("V2_REQUIRES_BOTH_HELDOUT_MANIFESTS")
         questions, question_hash = load_questions(
@@ -663,6 +694,7 @@ def main(argv=None):
                         requirements=requirements,
                         references=references,
                         method=method,
+                        grading=grading,
                     )
 
             rows = asyncio.run(live())
