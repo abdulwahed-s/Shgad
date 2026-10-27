@@ -55,8 +55,14 @@ SCALAR_FIELDS = HISTORICAL_FIELDS | {
     "cost_of_goods",
     "after_recorded_expenses",
 }
+# Seals made under an earlier registry revision stay valid: each later
+# revision only adds selector names (D58 added two period-movement totals).
+EARLIER_SPEC_REVISIONS = {
+    "cdf840db3adab966e71021f9b6d103f4e845f07a4cb4b0aa498ae4aea20b73af",
+}
 PATTERNS = (
-    r"weekly\.(?:owner_drawings|operating_expenses|collections)",
+    r"weekly\.(?:owner_drawings|operating_expenses|collections"
+    r"|supplier_payments|capital_injections)",
     r"(?:receivables|payables)\.total_outstanding",
     r"(?:receivables|payables)\.aging\.(?:not_due|d1_7|d8_30|d31_60|d60_plus)",
     r"(?:receivables|payables)\.customers\.[0-9]+\.(?:outstanding|days_overdue)",
@@ -150,10 +156,8 @@ def status(split, question_sha256, *, data_root=ROOT / "data", manifest_path=Non
         spec = Path(data_root) / "evaluation/REQUIREMENTS_SPEC.md"
         if spec.resolve() != spec.absolute():
             raise ValueError()
-        if (
-            hashlib.sha256(spec.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
-            != (manifest["selector_spec_sha256"])
-        ):
+        current = hashlib.sha256(spec.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        if manifest["selector_spec_sha256"] not in {current} | EARLIER_SPEC_REVISIONS:
             raise ValueError()
     except (OSError, ValueError, TypeError, KeyError):
         raise RequirementsError("INVALID_REQUIREMENTS_MANIFEST") from None

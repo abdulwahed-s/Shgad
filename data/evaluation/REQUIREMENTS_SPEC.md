@@ -7,7 +7,9 @@ Builders may define this contract and handmade format fixtures only. Do not infe
 selectors from model answers or evaluation outcomes. Original question files and
 their seals remain unchanged.
 
-Registry revision: `2026-10-23-cash-on-hand`. The JSONL/manifest schema is unchanged;
+Registry revision: `2026-10-28-period-movements` (D58 adds `weekly.supplier_payments`
+and `weekly.capital_injections`, already computed by the independent catalogue since
+D55; earlier revision `2026-10-23-cash-on-hand`). The JSONL/manifest schema is unchanged;
 the refreshed contract hash binds this additive selector revision.
 
 Each UTF-8 JSONL line has exactly two fields:
@@ -62,7 +64,7 @@ specification. `after_recorded_expenses` never means net profit.
 
 | Allowed selector family | Meaning |
 |---|---|
-| `weekly.owner_drawings`, `weekly.operating_expenses`, `weekly.collections` | Separate totals for the resolved historical period; drawings are not business expenses and collections are not new sales. |
+| `weekly.owner_drawings`, `weekly.operating_expenses`, `weekly.collections`, `weekly.supplier_payments`, `weekly.capital_injections` | Separate totals for the resolved historical period; drawings are not business expenses, collections are not new sales, supplier payments settle payables, and capital injections add cash but are not revenue. |
 | `receivables.total_outstanding`, `payables.total_outstanding` | Positive remaining balances at the business cutoff after original customer/direction/overdue filters. |
 | `<direction>.aging.<bucket>` | Outstanding balances in `not_due`, `d1_7`, `d8_30`, `d31_60`, `d60_plus`; direction is receivables/payables. Missing due dates do not become zero overdue days. |
 | `<direction>.customers.<i>.outstanding` | A customer's/supplier's subtotal in that filtered direction. Zero-based groups sort by descending maximum days overdue, descending outstanding amount, then exact counterparty ID. Never merge similar names. |
