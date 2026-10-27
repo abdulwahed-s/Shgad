@@ -1141,13 +1141,15 @@ and one OpenAI HTTP500 recovered by the existing retry. Total paid attempts:
 is frozen. A separate evaluator method now supports selecting new external
 question/annotation seals while preserving the original artifacts.
 
-**Independent query-evidence grading - 27 October 2026.** The new method accepts
+**Independent query-evidence grading - 27 October 2026.** The
+[new method freeze](results/evaluation_method_freeze_heldout_v2.json) accepts
 an empty historical event sum only after its own observed-ledger query verifies
 the tool, period, closed filters and zero matching rows. It also maps sourced
 partial/overdue reconciliation balances independently. The original row-ID method
 and results remain unchanged. Six public development fake-provider reproductions
 match the earlier trace counts and improve from 38/51 to 51/51 supported claims.
-This is a re-graded replay, not a new measurement. Original provider outputs were
+The [replay receipt](results/evaluation_dev_d55_tooling_replay_2026-10-27.json)
+is a re-graded replay, not a new measurement. Original provider outputs were
 not retained, so matching counts do not recover the original 13 claim identities
 or change the original 81/94 result.
 

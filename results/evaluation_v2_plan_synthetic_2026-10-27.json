@@ -1,0 +1,26 @@
+{
+  "application_commit": "a0272d99387db5ed0e6444cf229796a9daa1296d",
+  "checks": [
+    "application_matches_freeze_tag",
+    "application_tree_clean",
+    "method_sources_settings_inputs_match_freeze",
+    "output_is_new",
+    "requirements_manifest_bound_to_question_seal",
+    "question_and_annotation_bytes_hash_checked_inside_authorized_run"
+  ],
+  "code_commit": "fcc3ca95802d055f2cec5d3c9fc5d352e77de6cc",
+  "credential_and_provider_guards": "loader and provider constructor raise if called",
+  "credentials_loaded": false,
+  "executed_at": "2026-10-27T04:29:20.213962+00:00",
+  "heldout_opened": false,
+  "kind": "fabricated v2 CLI plan, not a measurement",
+  "live_command": "& 'C:\\Users\\robix\\OneDrive\\Documents\\shgad\\backend\\.venv\\Scripts\\python.exe' 'C:\\Users\\robix\\OneDrive\\Documents\\shgad\\scripts\\run_evaluation.py' --split heldout --mode live --max-requests 180 --heldout-seal 'C:\\Users\\robix\\AppData\\Local\\Temp\\shgad-fabricated-v2-plan-5yj2qkrn\\FORMAT_SEAL.json' --heldout-requirements 'C:\\Users\\robix\\AppData\\Local\\Temp\\shgad-fabricated-v2-plan-5yj2qkrn\\FORMAT_REQUIREMENTS_SEAL.json' --freeze-manifest 'C:\\Users\\robix\\AppData\\Local\\Temp\\shgad-fabricated-v2-plan-5yj2qkrn\\evaluation_method_freeze_heldout_v2.json' --output 'C:\\Users\\robix\\AppData\\Local\\Temp\\shgad-fabricated-v2-plan-5yj2qkrn\\NEW_FORMAT_RESULT.json' --authorize-paid --authorize-heldout",
+  "max_requests": 180,
+  "max_requests_per_question": 6,
+  "method_freeze_sha256": "4d2c0a4631abf4f1a57fa8c00d175910da13f84ae693bb53561cef1325b7a356",
+  "minimum_spacing_seconds": 10,
+  "private_input_read_guard": "only fabricated seals and public method manifest allowed",
+  "provider_requests": 0,
+  "question_count": 60,
+  "started_at": "2026-10-27T04:29:06.719858+00:00"
+}
