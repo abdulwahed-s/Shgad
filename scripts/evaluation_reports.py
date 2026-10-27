@@ -417,7 +417,13 @@ def public_report(*, split, mode, rows, metadata, reconciliation, forecast):
                 scope="interpretation_pipeline_and_label_rules_v2_grading",
             ),
             # The same observations under the earlier (v1) grading rules.
-            v1_method_metrics=aggregate_questions([row["v1_method"] for row in rows])
+            v1_method_metrics=aggregate_questions(
+                [
+                    row["v1_method"]
+                    | {key: row[key] for key in ("category", "expected_behavior")}
+                    for row in rows
+                ]
+            )
             if rows
             else None,
         )

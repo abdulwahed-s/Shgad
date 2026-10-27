@@ -172,7 +172,12 @@ def test_v3_report_is_aggregate_only_with_the_v1_method_beside_it():
         "traceability": {"numerator": 1, "denominator": 1, "rate": 1.0},
         "failures": [],
     }
-    row["v1_method"] = row | {"joint_correct": False, "failures": ["wrong_intent"]}
+    # The measured loop stores the bare v1 grade, without category/behavior.
+    row["v1_method"] = {
+        key: value
+        for key, value in row.items()
+        if key not in {"id", "category", "expected_behavior"}
+    } | {"joint_correct": False, "failures": ["wrong_intent"]}
     metadata = {
         key: "x"
         for key in (
