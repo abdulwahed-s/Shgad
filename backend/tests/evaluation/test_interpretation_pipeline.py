@@ -303,3 +303,75 @@ def test_collections_audit_answers_even_without_flags():
     )
     assert response.status == "answered"
     assert any(f.key.endswith("weekly.collections") for f in response.figures)
+
+
+def test_cash_answer_offers_and_templates_only_the_cash_figure():
+    response = ask("شكد الكاش بالدرج هسه", understood(intent="cash_on_hand"))
+    assert [f.key for f in response.figures] == ["tool_0.upcoming.cash_on_hand"]
+    assert response.renderer.fell_back_to_template
+
+
+def test_upcoming_answer_never_offers_whole_ledger_balances():
+    from app.agents.orchestrator import answers
+
+    assert answers("upcoming_obligations", "upcoming.dues_total")
+    assert not answers("upcoming_obligations", "payables.total_outstanding")
+    assert not answers("upcoming_obligations", "upcoming.days.0.dues_iqd")
+    assert answers("upcoming_obligations", "upcoming.days.0.dues_iqd", per_day=True)
+    response = ask(
+        "شنو علي خلال ٥ ايام الجاية",
+        understood(
+            intent="upcoming_obligations",
+            days=5,
+            time={"type": "next_n_days", "n": 5, "evidence": "خلال ٥ ايام الجاية"},
+        ),
+    )
+    assert response.figures
+    assert all(f.key.startswith("tool_0.upcoming.") for f in response.figures)
+
+
+def test_empty_schedule_zero_is_shown_and_independently_supported():
+    from scripts.evaluation_evidence import METHOD_V2
+    from scripts.evaluation_metrics import compare_claim
+    from scripts.evaluation_truth import claim_catalogue
+
+    as_of = date(2026, 9, 28)
+    response = ask(
+        "شكد مطلوب ندفع بهاليومين",
+        understood(
+            intent="upcoming_obligations",
+            days=2,
+            time={"type": "next_n_days", "n": 2, "evidence": "بهاليومين"},
+        ),
+        json.dumps(
+            {
+                "status": "answered",
+                "draft_ar": "المطلوب {{fig:tool_0.upcoming.dues_total}}، باليوم الأول "
+                "{{fig:tool_0.upcoming.days.0.dues_iqd}}",
+            }
+        ),
+    )
+    figures = {f.key.split(".", 1)[1]: f for f in response.figures}
+    for key in ("upcoming.dues_total", "upcoming.days.0.dues_iqd"):
+        assert figures[key].amount_iqd == 0 and figures[key].query_evidence
+    history = observed_history("primary", as_of, ROOT / "data")
+    catalogue = claim_catalogue(
+        history,
+        as_of,
+        as_of,
+        date(2026, 9, 29),
+        parameters={"days": 2},
+        method=METHOD_V2,
+    )
+    for key in ("upcoming.dues_total", "upcoming.days.0.dues_iqd"):
+        figure = figures[key]
+        claim = dict(
+            field=key,
+            value=0,
+            unit="IQD",
+            label=figure.label_key,
+            source_ids=[],
+            formula=figure.formula,
+            query_evidence=figure.query_evidence.model_dump(mode="json"),
+        )
+        assert compare_claim(catalogue[key], claim, method=METHOD_V2) == (True, True)

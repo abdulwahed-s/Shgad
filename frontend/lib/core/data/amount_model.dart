@@ -35,6 +35,9 @@ Amount parseAmount(dynamic json) {
 KnownZeroQuery? _parseQuery(Map<String, dynamic> amount, int? value) {
   if (amount['query_evidence'] == null) return null;
   final query = Map<String, dynamic>.from(amount['query_evidence'] as Map);
+  if (query['tool'] == 'get_debts' && query.containsKey('schedule')) {
+    return _parseScheduleQuery(amount, value, query);
+  }
   if (query['tool'] == 'get_debts') {
     return _parseDebtQuery(amount, value, query);
   }
@@ -81,6 +84,34 @@ KnownZeroQuery _parseDebtQuery(
     tool: 'get_debts',
     start: asOf,
     end: asOf,
+    matchingRows: 0,
+    originalQuery: jsonEncode(query),
+  );
+}
+
+/// D58: no obligation is scheduled in this upcoming window or day.
+KnownZeroQuery _parseScheduleQuery(
+  Map<String, dynamic> amount,
+  int? value,
+  Map<String, dynamic> query,
+) {
+  final start = query['start'];
+  final end = query['end'];
+  if (value != 0 ||
+      (amount['source_ids'] as List).isNotEmpty ||
+      query['matching_obligations'] != 0 ||
+      !const {'dues', 'expected'}.contains(query['schedule']) ||
+      start is! String ||
+      end is! String ||
+      DateTime.tryParse(start) == null ||
+      DateTime.tryParse(end) == null ||
+      DateTime.tryParse(query['known_at'] as String) == null) {
+    throw const FormatException('Invalid known-zero proof');
+  }
+  return KnownZeroQuery(
+    tool: 'get_debts',
+    start: start,
+    end: end,
     matchingRows: 0,
     originalQuery: jsonEncode(query),
   );

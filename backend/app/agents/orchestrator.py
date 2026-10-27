@@ -9,7 +9,8 @@ from pydantic import ValidationError
 from app.agents import answer_policy, planner
 from app.agents.interpreter import interpret
 from app.agents.llm_client import LLMUnavailable, strict_json, unfenced
-from app.agents.messages_ar import text
+from app.agents.messages_ar import MESSAGES, text
+from app.agents.messages_ar import REUSED_FRONTEND_LABELS as REUSED
 from app.agents.renderer import (
     DraftValidationError,
     has_evidence,
@@ -178,7 +179,16 @@ def action(reply):
     return DraftAction.model_validate(strict_json(unfenced(reply.content)))
 
 
-def quoted_output(output, index, *, per_day=False):
+def answers(intent, key, *, per_day=False):
+    """Figures that answer an intent whose tool view carries more than was asked."""
+    if intent == "cash_on_hand":
+        return key == "upcoming.cash_on_hand"
+    if intent == "upcoming_obligations":
+        return key.startswith("upcoming.") and (per_day or ".days." not in key)
+    return True
+
+
+def quoted_output(output, index, *, per_day=False, intent=None):
     # Retain full provenance on the server. Send bounded facts/slot names, not
     # every repeated historical source ID and every daily projection scalar.
     require_verified(output)
@@ -189,6 +199,8 @@ def quoted_output(output, index, *, per_day=False):
         if "scenarios" in output.result and not (
             value.key.startswith("j1.") or value.key.endswith("lowest.closing_iqd")
         ):
+            continue
+        if intent is not None and not answers(intent, value.key, per_day=per_day):
             continue
         if ".days." in value.key and not (
             per_day and value.key.rsplit(".", 1)[-1] in {"dues_iqd", "expected_iqd"}
@@ -408,7 +420,12 @@ async def _interpreted(request, *, client, connection, clock, known_at):
                 {
                     "role": "tool",
                     "tool_call_id": f"plan-{index}",
-                    "content": quoted_output(output, index, per_day=decided.per_day),
+                    "content": quoted_output(
+                        output,
+                        index,
+                        per_day=decided.per_day,
+                        intent=understood.intent,
+                    ),
                 }
             )
         history["tool_calls"][0]["extra_content"] = {
@@ -434,7 +451,13 @@ async def _interpreted(request, *, client, connection, clock, known_at):
             not decided.parties or answer_policy.debt_list_request(request.message)
         )
         answered = await _narrate(
-            conversation, outputs, used, request.message, client, debt_list
+            conversation,
+            outputs,
+            used,
+            request.message,
+            client,
+            debt_list,
+            focus=_focused_template(understood.intent, outputs, decided.per_day),
         )
         return _with_view(
             answered,
@@ -470,10 +493,39 @@ def _stop_response(stop, understood):
     )
 
 
-async def _narrate(conversation, outputs, used, message, client, debt_list):
+def _focused_template(intent, outputs, per_day):
+    """A server-written slot draft limited to the figures that answer the intent."""
+    if intent not in {"cash_on_hand", "upcoming_obligations"}:
+        return None
+    lines = []
+    for index, output in enumerate(outputs):
+        for figure in (*output.figures, *output.metrics):
+            # Only figures with approved label copy; others stay for the model draft.
+            if (
+                answers(intent, figure.key, per_day=per_day)
+                and figure.kind != "missing"
+                and has_evidence(figure)
+                and (figure.label_key in MESSAGES or figure.label_key in REUSED)
+            ):
+                lines.append(
+                    text(figure.label_key)
+                    + ": {{fig:tool_"
+                    + f"{index}.{figure.key}"
+                    + "}}."
+                )
+    return " ".join(lines) or None
+
+
+async def _narrate(conversation, outputs, used, message, client, debt_list, focus=None):
     """One slot draft, one renderer-owned retry, then the deterministic template."""
 
     def template():
+        if focus is not None:
+            rendered = render_draft(focus, outputs=outputs, debt_list=debt_list)
+            stats = rendered.renderer.model_copy(update={"fell_back_to_template": True})
+            return response(
+                rendered.model_copy(update={"renderer": stats}), outputs, used
+            )
         return response(
             render_reply(None, outputs=outputs, debt_list=debt_list), outputs, used
         )
@@ -521,17 +573,15 @@ async def _narrate(conversation, outputs, used, message, client, debt_list):
             revised = "" if unsafe_narration(candidate.draft_ar) else candidate.draft_ar
     except (LLMUnavailable, ValidationError, ValueError, TypeError):
         pass
-    return response(
-        render_reply(
-            None,
-            outputs=outputs,
-            user_message=message,
-            retry=lambda _: revised,
-            debt_list=debt_list,
-        ),
-        outputs,
-        used,
-    )
+    if revised:
+        try:
+            drafted = response(checked_draft(revised, outputs, message), outputs, used)
+            if drafted.figures or drafted.metrics:
+                stats = drafted.renderer.model_copy(update={"attempts": 2})
+                return drafted.model_copy(update={"renderer": stats})
+        except DraftValidationError:
+            pass
+    return template()
 
 
 async def _converse(request, *, client, connection, clock, known_at):

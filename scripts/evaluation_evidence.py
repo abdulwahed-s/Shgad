@@ -6,7 +6,7 @@ selecting active rows from its own truth ledger and checking package coverage.
 
 import json
 from dataclasses import dataclass
-from datetime import UTC
+from datetime import UTC, date, timedelta
 
 from scripts.make_ground_truth import TruthError, cutoff, stamp
 
@@ -65,6 +65,7 @@ def add_independent_evidence(
 ):
     """Query evaluator-owned rows; never derive expected facts from app proof."""
     add_debt_zero_evidence(catalogue, ledger, as_of, parameters, parties)
+    add_schedule_zero_evidence(catalogue, ledger, as_of, end, parties)
     coverage = getattr(ledger, "evaluation_zero_coverage", None)
     if coverage is not None and coverage[0] <= start <= end <= coverage[1] <= as_of:
         rows = ledger.visible(as_of, known_at=cutoff(as_of))
@@ -139,6 +140,70 @@ def add_debt_zero_evidence(catalogue, ledger, as_of, parameters, parties):
                 due_start=None,
                 due_end=None,
             ),
+            known_at=cutoff(as_of).astimezone(UTC).isoformat(),
+            matching_obligations=0,
+        )
+        catalogue[key] = expected | dict(
+            independent_zero=IndependentZero(canonical(query))
+        )
+
+
+def add_schedule_zero_evidence(catalogue, ledger, as_of, end, parties):
+    """D58: nothing scheduled in an upcoming window/day, from evaluator-owned debts.
+
+    Dues count on max(as_of, due date); expected collections exclude overdue.
+    """
+    if (
+        len(parties) > 1
+        or end < as_of
+        or not any(k.startswith("upcoming.") for k in catalogue)
+    ):
+        return
+    party = parties[0] if parties else None
+    try:
+        balances = [
+            row
+            for row in ledger.debts(as_of, known_at=cutoff(as_of))
+            if row["outstanding_iqd"] > 0
+            and (party is None or row["counterparty_id"] == party)
+        ]
+    except TruthError:
+        return
+    if any(row["due_date"] is None for row in balances):
+        return
+
+    def matches(schedule, first, last):
+        for row in balances:
+            due = date.fromisoformat(row["due_date"])
+            if schedule == "dues" and row["kind"] == "payable":
+                if first <= max(as_of, due) <= last:
+                    return True
+            if schedule == "expected" and row["kind"] == "receivable":
+                if as_of <= due and first <= due <= last:
+                    return True
+        return False
+
+    windows = {
+        "upcoming.dues_total": ("dues", as_of, end),
+        "upcoming.expected_total": ("expected", as_of, end),
+    }
+    for offset in range((end - as_of).days + 1):
+        day = as_of + timedelta(days=offset)
+        windows[f"upcoming.days.{offset}.dues_iqd"] = ("dues", day, day)
+        windows[f"upcoming.days.{offset}.expected_iqd"] = ("expected", day, day)
+    for key, (schedule, first, last) in windows.items():
+        expected = catalogue.get(key)
+        if expected is None or expected["value"] != 0 or expected["source_ids"]:
+            continue
+        if matches(schedule, first, last):
+            continue
+        query = dict(
+            tool="get_debts",
+            as_of=str(as_of),
+            schedule=schedule,
+            start=str(first),
+            end=str(last),
+            counterparty_id=party,
             known_at=cutoff(as_of).astimezone(UTC).isoformat(),
             matching_obligations=0,
         )

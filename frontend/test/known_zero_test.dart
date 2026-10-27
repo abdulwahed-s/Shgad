@@ -126,6 +126,25 @@ void main() {
     final forged = debt();
     (forged['query_evidence'] as Map)['matching_obligations'] = 2;
     expect(() => parseAmount(forged), throwsFormatException);
+    final schedule = {
+      ...zeroJson(),
+      'label_key': 'supplier_dues',
+      'query_evidence': {
+        'tool': 'get_debts',
+        'as_of': '2026-09-28',
+        'schedule': 'dues',
+        'start': '2026-09-28',
+        'end': '2026-09-29',
+        'counterparty_id': null,
+        'known_at': '2026-09-28T20:59:59+00:00',
+        'matching_obligations': 0,
+      },
+    };
+    final window = parseAmount(schedule).queryEvidence!;
+    expect(window.start, '2026-09-28');
+    expect(window.end, '2026-09-29');
+    (schedule['query_evidence'] as Map)['schedule'] = 'forecast';
+    expect(() => parseAmount(schedule), throwsFormatException);
     final unknown = zeroJson();
     (unknown['query_evidence'] as Map)['tool'] = 'forecast';
     expect(() => parseAmount(unknown), throwsFormatException);

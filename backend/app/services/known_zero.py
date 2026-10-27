@@ -5,10 +5,15 @@ balances, margins, count gaps and future estimates keep their existing evidence.
 The registry creates the proof; verification recomputes it from the read snapshot.
 """
 
-from datetime import timedelta, timezone
+from datetime import date, timedelta, timezone
 
 from app.schemas.queries import DateRangeView, DebtFilters
-from app.schemas.tools import EmptyQueryFilters, KnownZeroDebtQuery, KnownZeroQuery
+from app.schemas.tools import (
+    EmptyQueryFilters,
+    KnownZeroDebtQuery,
+    KnownZeroQuery,
+    KnownZeroScheduleQuery,
+)
 from app.services.business_clock import DateRange
 from app.services.observed import OBSERVED_START
 
@@ -64,8 +69,75 @@ def debt_evidence(figure, *, snapshot, result):
     )
 
 
+def scheduled(snapshot, schedule, start, end, party_id):
+    """Positive balances in a schedule window, counted as upcoming_obligations does."""
+    return [
+        b
+        for b in snapshot.balances
+        if (party_id is None or b.obligation.counterparty_id == party_id)
+        and b.obligation.due_date is not None
+        and (
+            start <= max(snapshot.day, b.obligation.due_date) <= end
+            if schedule == "dues"
+            else start <= b.obligation.due_date <= end
+            and b.obligation.due_date >= snapshot.day
+        )
+        and b.obligation.kind == ("payable" if schedule == "dues" else "receivable")
+    ]
+
+
+def schedule_evidence(figure, *, snapshot, result):
+    """A zero upcoming total or day figure is shown only when nothing is scheduled."""
+    view = (result or {}).get("upcoming")
+    parts = figure.key.split(".")
+    same_day = snapshot.known.astimezone(_BAGHDAD).date() == snapshot.day
+    if (
+        not same_day
+        or not isinstance(view, dict)
+        or figure.amount_iqd != 0
+        or figure.source_ids
+        or figure.kind == "missing"
+    ):
+        return None
+    if parts[1:] in (["dues_total"], ["expected_total"]):
+        schedule = "dues" if parts[1] == "dues_total" else "expected"
+        start = snapshot.day
+        end = DateRangeView.model_validate(view["range"]).end
+    elif (
+        len(parts) == 4
+        and parts[1] == "days"
+        and parts[3]
+        in {
+            "dues_iqd",
+            "expected_iqd",
+        }
+    ):
+        schedule = "dues" if parts[3] == "dues_iqd" else "expected"
+        start = end = date.fromisoformat(view["days"][int(parts[2])]["date"])
+    else:
+        return None
+    reports = [result.get(name) for name in ("payables", "receivables")]
+    parties = {r["filters"]["counterparty_id"] for r in reports if isinstance(r, dict)}
+    if len(parties) != 1:
+        return None
+    party = parties.pop()
+    if scheduled(snapshot, schedule, start, end, party):
+        return None
+    return KnownZeroScheduleQuery(
+        tool="get_debts",
+        as_of=snapshot.day,
+        schedule=schedule,
+        start=start,
+        end=end,
+        counterparty_id=party,
+        known_at=snapshot.known,
+    )
+
+
 def query_evidence(figure, *, snapshot, tool_name, resolved, result):
     if tool_name == "get_debts":
+        if figure.key.startswith("upcoming."):
+            return schedule_evidence(figure, snapshot=snapshot, result=result)
         return debt_evidence(figure, snapshot=snapshot, result=result)
     if tool_name == "reconcile" and figure.key != "weekly.collections":
         return None

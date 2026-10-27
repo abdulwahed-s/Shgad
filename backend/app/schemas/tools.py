@@ -109,9 +109,28 @@ class KnownZeroDebtQuery(LedgerModel):
     matching_obligations: Literal[0] = 0
 
 
+class KnownZeroScheduleQuery(LedgerModel):
+    """D58: no positive obligation is scheduled in this window at the cutoff.
+
+    dues: payables counted on max(as_of, due date), so overdue dues fall on
+    as_of; expected: receivables due inside the window and not yet overdue.
+    """
+
+    tool: Literal["get_debts"]
+    as_of: BusinessDate
+    schedule: Literal["dues", "expected"]
+    start: BusinessDate
+    end: BusinessDate
+    counterparty_id: str | None
+    known_at: Timestamp
+    matching_obligations: Literal[0] = 0
+
+
 class Figure(Amount):
     key: str
-    query_evidence: KnownZeroQuery | KnownZeroDebtQuery | None = None
+    query_evidence: (
+        KnownZeroQuery | KnownZeroDebtQuery | KnownZeroScheduleQuery | None
+    ) = None
 
 
 class Metric(LedgerModel):

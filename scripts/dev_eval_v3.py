@@ -58,7 +58,7 @@ def references(question, requirements, data_root):
     return as_of, history, catalogue, required
 
 
-async def run(questions, requirements, client, data_root):
+async def run(questions, requirements, client, data_root, withheld="DV3C-"):
     parties = reference_parties(data_root)
     rows = []
     for question in questions:
@@ -112,8 +112,9 @@ async def run(questions, requirements, client, data_root):
                 ),
             )
         )
-        mark = "PASS" if rows[-1]["joint_correct"] else "FAIL"
-        print(f"{question['id']} {mark}", flush=True)
+        if not question["id"].startswith(withheld):
+            mark = "PASS" if rows[-1]["joint_correct"] else "FAIL"
+            print(f"{question['id']} {mark}", flush=True)
     return rows
 
 
@@ -163,20 +164,27 @@ def main(argv=None):
 
     async def live():
         async with client:
-            return await run(questions, requirements, client, ROOT / "data")
+            return await run(
+                questions,
+                requirements,
+                client,
+                ROOT / "data",
+                withheld=args.aggregate_only_prefix,
+            )
 
     started = datetime.now(UTC).isoformat()
     rows = asyncio.run(live())
+    # Check questions contribute aggregate counts only; no per-question rows.
     withheld = [r for r in rows if r["id"].startswith(args.aggregate_only_prefix)]
-    for row in withheld:
-        row.pop("detail")
+    rows = [r for r in rows if not r["id"].startswith(args.aggregate_only_prefix)]
     report = dict(
         kind="development_v3",
         method="label_rules_v2_grading_v3",
         started_at=started,
         finished_at=datetime.now(UTC).isoformat(),
         questions=args.questions.as_posix(),
-        metrics=aggregate_questions(rows),
+        metrics=aggregate_questions(rows) if rows else None,
+        check_metrics=aggregate_questions(withheld) if withheld else None,
         requests=client.receipt(),
         withheld_detail_count=len(withheld),
         rows=rows,
@@ -184,22 +192,18 @@ def main(argv=None):
     args.output.write_text(
         json.dumps(report, ensure_ascii=False, indent=1, sort_keys=True) + "\n", "utf-8"
     )
-    metrics = report["metrics"]
-    print(
-        json.dumps(
-            {
-                key: metrics[key]
-                for key in (
-                    "historical_accuracy",
-                    "safe_handling",
-                    "joint_accuracy",
-                    "joint_fields",
-                    "failure_counts",
-                )
-            },
-            ensure_ascii=False,
+    for name in ("metrics", "check_metrics"):
+        metrics = report[name]
+        if metrics is None:
+            continue
+        keys = (
+            "historical_accuracy",
+            "safe_handling",
+            "joint_accuracy",
+            "joint_fields",
+            "failure_counts",
         )
-    )
+        print(name, json.dumps({key: metrics[key] for key in keys}, ensure_ascii=False))
     print(
         json.dumps(dict(Counter(r["category"] for r in rows if not r["joint_correct"])))
     )

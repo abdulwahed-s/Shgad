@@ -1,0 +1,200 @@
+{"id": "DV3T-001", "required_fields": ["total_sales"]}
+{"id": "DV3T-002", "required_fields": ["cash_on_hand"]}
+{"id": "DV3T-003", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-004", "required_fields": ["upcoming.dues_total"]}
+{"id": "DV3T-005", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.shortfall_without_collection"]}
+{"id": "DV3T-006", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-007", "required_fields": ["weekly.owner_drawings"]}
+{"id": "DV3T-008", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-009", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-010", "required_fields": []}
+{"id": "DV3T-011", "required_fields": []}
+{"id": "DV3T-012", "required_fields": []}
+{"id": "DV3T-013", "required_fields": ["cash_sales"]}
+{"id": "DV3T-014", "required_fields": ["cash_on_hand"]}
+{"id": "DV3T-015", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-016", "required_fields": ["upcoming.expected_total"]}
+{"id": "DV3T-017", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.expected_collection", "j1.shortfall_with_collection"]}
+{"id": "DV3T-018", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-019", "required_fields": ["weekly.operating_expenses"]}
+{"id": "DV3T-020", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-021", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-022", "required_fields": []}
+{"id": "DV3T-023", "required_fields": []}
+{"id": "DV3T-024", "required_fields": []}
+{"id": "DV3T-025", "required_fields": ["credit_sales"]}
+{"id": "DV3T-026", "required_fields": ["cash_on_hand"]}
+{"id": "DV3T-027", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-028", "required_fields": ["upcoming.dues_total", "upcoming.expected_total"]}
+{"id": "DV3T-029", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.shortfall_without_collection"]}
+{"id": "DV3T-030", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-031", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-032", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-033", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-034", "required_fields": []}
+{"id": "DV3T-035", "required_fields": []}
+{"id": "DV3T-036", "required_fields": []}
+{"id": "DV3T-037", "required_fields": ["cash_sales"]}
+{"id": "DV3T-038", "required_fields": ["cash_on_hand"]}
+{"id": "DV3T-039", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-040", "required_fields": ["upcoming.position_confirmed"]}
+{"id": "DV3T-041", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.shortfall_without_collection"]}
+{"id": "DV3T-042", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-043", "required_fields": ["weekly.capital_injections"]}
+{"id": "DV3T-044", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-045", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-046", "required_fields": []}
+{"id": "DV3T-047", "required_fields": []}
+{"id": "DV3T-048", "required_fields": []}
+{"id": "DV3T-049", "required_fields": ["credit_sales"]}
+{"id": "DV3T-050", "required_fields": ["cash_on_hand"]}
+{"id": "DV3T-051", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-052", "required_fields": ["upcoming.dues_total"]}
+{"id": "DV3T-053", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.expected_collection", "j1.shortfall_with_collection"]}
+{"id": "DV3T-054", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-055", "required_fields": ["weekly.owner_drawings", "weekly.operating_expenses"]}
+{"id": "DV3T-056", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-057", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-058", "required_fields": []}
+{"id": "DV3T-059", "required_fields": []}
+{"id": "DV3T-060", "required_fields": []}
+{"id": "DV3T-061", "required_fields": ["total_sales"]}
+{"id": "DV3T-062", "required_fields": ["cash_on_hand"]}
+{"id": "DV3T-063", "required_fields": ["payables.total_outstanding"]}
+{"id": "DV3T-064", "required_fields": ["upcoming.expected_total"]}
+{"id": "DV3T-065", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.shortfall_without_collection"]}
+{"id": "DV3T-066", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-067", "required_fields": ["weekly.operating_expenses"]}
+{"id": "DV3T-068", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-069", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-070", "required_fields": []}
+{"id": "DV3T-071", "required_fields": []}
+{"id": "DV3T-072", "required_fields": ["credit_sales"]}
+{"id": "DV3T-073", "required_fields": []}
+{"id": "DV3T-074", "required_fields": ["receivables.customers.0.outstanding", "receivables.customers.1.outstanding", "receivables.customers.2.outstanding", "receivables.customers.3.outstanding"]}
+{"id": "DV3T-075", "required_fields": ["upcoming.position_with_expected"]}
+{"id": "DV3T-076", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.shortfall_without_collection"]}
+{"id": "DV3T-077", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-078", "required_fields": ["weekly.supplier_payments"]}
+{"id": "DV3T-079", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-080", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-081", "required_fields": ["total_sales"]}
+{"id": "DV3T-082", "required_fields": []}
+{"id": "DV3T-083", "required_fields": ["receivables.customers.0.outstanding", "receivables.customers.1.outstanding"]}
+{"id": "DV3T-084", "required_fields": ["upcoming.days.0.dues_iqd", "upcoming.days.1.dues_iqd", "upcoming.days.2.dues_iqd", "upcoming.days.3.dues_iqd"]}
+{"id": "DV3T-085", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.expected_collection", "j1.shortfall_with_collection"]}
+{"id": "DV3T-086", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-087", "required_fields": ["weekly.capital_injections"]}
+{"id": "DV3T-088", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-089", "required_fields": []}
+{"id": "DV3T-090", "required_fields": ["cash_sales"]}
+{"id": "DV3T-091", "required_fields": ["receivables.customers.0.outstanding"]}
+{"id": "DV3T-092", "required_fields": ["upcoming.days.0.expected_iqd", "upcoming.days.1.expected_iqd", "upcoming.days.2.expected_iqd"]}
+{"id": "DV3T-093", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.expected_collection", "j1.shortfall_with_collection"]}
+{"id": "DV3T-094", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3T-095", "required_fields": ["weekly.owner_drawings", "weekly.operating_expenses"]}
+{"id": "DV3T-096", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-097", "required_fields": []}
+{"id": "DV3T-098", "required_fields": ["credit_sales"]}
+{"id": "DV3T-099", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-100", "required_fields": ["weekly.collections"]}
+{"id": "DV3T-101", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-102", "required_fields": []}
+{"id": "DV3T-103", "required_fields": ["cash_sales"]}
+{"id": "DV3T-104", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-105", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-106", "required_fields": ["credit_sales"]}
+{"id": "DV3T-107", "required_fields": ["payables.total_outstanding"]}
+{"id": "DV3T-108", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3T-109", "required_fields": ["total_sales"]}
+{"id": "DV3T-110", "required_fields": ["payables.total_outstanding"]}
+{"id": "DV3T-111", "required_fields": []}
+{"id": "DV3T-112", "required_fields": ["total_sales"]}
+{"id": "DV3T-113", "required_fields": ["payables.total_outstanding"]}
+{"id": "DV3T-114", "required_fields": []}
+{"id": "DV3T-115", "required_fields": ["credit_sales"]}
+{"id": "DV3T-116", "required_fields": ["receivables.total_outstanding", "payables.total_outstanding"]}
+{"id": "DV3T-117", "required_fields": []}
+{"id": "DV3T-118", "required_fields": ["total_sales"]}
+{"id": "DV3T-119", "required_fields": ["receivables.total_outstanding", "payables.total_outstanding"]}
+{"id": "DV3T-120", "required_fields": []}
+{"id": "DV3T-121", "required_fields": ["credit_sales"]}
+{"id": "DV3T-122", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-123", "required_fields": ["total_sales"]}
+{"id": "DV3T-124", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-125", "required_fields": ["cash_sales"]}
+{"id": "DV3T-126", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3T-127", "required_fields": ["total_sales"]}
+{"id": "DV3T-128", "required_fields": []}
+{"id": "DV3T-129", "required_fields": []}
+{"id": "DV3T-130", "required_fields": []}
+{"id": "DV3T-131", "required_fields": []}
+{"id": "DV3T-132", "required_fields": []}
+{"id": "DV3T-133", "required_fields": []}
+{"id": "DV3T-134", "required_fields": []}
+{"id": "DV3T-135", "required_fields": []}
+{"id": "DV3T-136", "required_fields": []}
+{"id": "DV3T-137", "required_fields": []}
+{"id": "DV3T-138", "required_fields": []}
+{"id": "DV3T-139", "required_fields": []}
+{"id": "DV3T-140", "required_fields": []}
+{"id": "DV3T-141", "required_fields": []}
+{"id": "DV3T-142", "required_fields": []}
+{"id": "DV3T-143", "required_fields": []}
+{"id": "DV3T-144", "required_fields": []}
+{"id": "DV3T-145", "required_fields": []}
+{"id": "DV3T-146", "required_fields": []}
+{"id": "DV3T-147", "required_fields": []}
+{"id": "DV3T-148", "required_fields": []}
+{"id": "DV3T-149", "required_fields": []}
+{"id": "DV3T-150", "required_fields": []}
+{"id": "DV3C-001", "required_fields": ["total_sales"]}
+{"id": "DV3C-002", "required_fields": ["cash_on_hand"]}
+{"id": "DV3C-003", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3C-004", "required_fields": ["upcoming.dues_total", "upcoming.expected_total"]}
+{"id": "DV3C-005", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.expected_collection", "j1.shortfall_with_collection"]}
+{"id": "DV3C-006", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3C-007", "required_fields": ["weekly.supplier_payments"]}
+{"id": "DV3C-008", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3C-009", "required_fields": ["weekly.collections"]}
+{"id": "DV3C-010", "required_fields": []}
+{"id": "DV3C-011", "required_fields": []}
+{"id": "DV3C-012", "required_fields": []}
+{"id": "DV3C-013", "required_fields": ["cash_sales"]}
+{"id": "DV3C-014", "required_fields": ["cash_on_hand"]}
+{"id": "DV3C-015", "required_fields": ["payables.total_outstanding"]}
+{"id": "DV3C-016", "required_fields": ["upcoming.dues_total"]}
+{"id": "DV3C-017", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.shortfall_without_collection"]}
+{"id": "DV3C-018", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3C-019", "required_fields": ["weekly.owner_drawings"]}
+{"id": "DV3C-020", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3C-021", "required_fields": ["weekly.collections"]}
+{"id": "DV3C-022", "required_fields": []}
+{"id": "DV3C-023", "required_fields": []}
+{"id": "DV3C-024", "required_fields": ["total_sales"]}
+{"id": "DV3C-025", "required_fields": []}
+{"id": "DV3C-026", "required_fields": ["receivables.total_outstanding"]}
+{"id": "DV3C-027", "required_fields": ["upcoming.dues_total"]}
+{"id": "DV3C-028", "required_fields": ["j1.cash_on_hand", "j1.supplier_due", "j1.expected_collection", "j1.shortfall_with_collection"]}
+{"id": "DV3C-029", "required_fields": ["total_sales", "weekly.operating_expenses", "weekly.owner_drawings", "weekly.collections"]}
+{"id": "DV3C-030", "required_fields": ["weekly.collections"]}
+{"id": "DV3C-031", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3C-032", "required_fields": ["weekly.collections"]}
+{"id": "DV3C-033", "required_fields": []}
+{"id": "DV3C-034", "required_fields": ["cash_sales"]}
+{"id": "DV3C-035", "required_fields": ["payables.total_outstanding"]}
+{"id": "DV3C-036", "required_fields": ["weekly.operating_expenses"]}
+{"id": "DV3C-037", "required_fields": ["gross_margin", "coverage_pct"]}
+{"id": "DV3C-038", "required_fields": []}
+{"id": "DV3C-039", "required_fields": ["cash_sales"]}
+{"id": "DV3C-040", "required_fields": ["receivables.total_outstanding", "payables.total_outstanding"]}
+{"id": "DV3C-041", "required_fields": []}
+{"id": "DV3C-042", "required_fields": ["credit_sales"]}
+{"id": "DV3C-043", "required_fields": ["payables.total_outstanding"]}
+{"id": "DV3C-044", "required_fields": []}
+{"id": "DV3C-045", "required_fields": []}
+{"id": "DV3C-046", "required_fields": []}
+{"id": "DV3C-047", "required_fields": []}
+{"id": "DV3C-048", "required_fields": []}
+{"id": "DV3C-049", "required_fields": []}
+{"id": "DV3C-050", "required_fields": []}
