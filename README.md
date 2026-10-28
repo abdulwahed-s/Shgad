@@ -1,1238 +1,282 @@
-# Shgad (شكد)
+<div align="center">
 
-An Iraqi Arabic cash-flow assistant for a neighbourhood merchant who tracks cash sales,
-customer credit and supplier payments. Shgad aims to turn those records into clear answers
-with figures that can be traced back to their source rows.
+# شكد · Shgad
 
-Built for the Agentic AI Challenge Iraq, Topic 02 (SME & Merchant Assistant).
+### Ask your shop's ledger a question in Iraqi Arabic. Get an answer where every number can be traced back to the record it came from.
 
-> **Available now:** a tested backend for synthetic CSV import, merchant entries,
-> partial payments, voids/corrections, ledger evidence and daily-close review.
-> Source-linked sales/debt queries and a next-days obligations HTTP view separate
-> confirmed cash from expected collections, with missing balances kept unavailable.
-> Five read-only tools, margin/weekly reports, deterministic Arabic figure rendering,
-> reconciliation and cutoff-safe cash-estimate HTTP routes are tested. Chat and CSV
-> mapping use a configurable provider client with bounded retries and failover;
-> their integration is verified with recorded provider responses.
-> Flutter web includes Today, customer/supplier debts, confirmed entries with undo,
-> daily-close review, backend-rendered chat, source evidence, weekly reports,
-> three-scenario estimates, a fictional sample shop, CSV import and review flags.
-> Read-only caches retain update/count times; offline writes are disabled.
-> The interface adapts from compact bottom navigation to medium/expanded rails,
-> with accessible ledger colors, shared controls and keyboard focus.
-> Gemini, Groq and OpenAI completed bounded development routing screens. With
-> larger time/token limits, Gemini 3.8 Flash scored 9/10 and GPT-6 Luna 7/10.
-> Both selected provider APIs responded in earlier checks. Live CSV previews and
-> controlled fallback checks pass. A five-case application check matched four
-> expected tool sets and three full responses; weekly-summary and response-format
-> limitations remain.
-> The original larger development evaluation scored 12/20 numeric answers and 6/12 safe
-> decisions, below target; request limits, transport failures and HTTP 401
-> responses are included. The sealed evaluation scored 8/40 numeric answers,
-> 0/20 safe decisions and 12/60 joint selections, also below target; unavailable
-> cases remain failures. Both development and final forecast benchmarks perform
-> worse than the seven-day baseline. Measured receipts are linked below.
-> A newer seen-development check reached17/20 numeric and11/12 safe decisions.
-> Some questions still fail, and the legacy grader does not credit query-only zero evidence.
-> The 55 fixed backend and 277 frontend Arabic messages have human approval.
-> The developer manually accepted the current visuals; advisory layout findings remain.
-> New or edited wording requires review.
+**Agentic AI Challenge Iraq · ZainCash · Topic 02: SME & Merchant Assistant**
 
-## Capabilities
+![Held-out joint accuracy](https://img.shields.io/badge/held--out%20joint%20accuracy-56%2F60%20(93%25)-1f5246)
+![Historical answers](https://img.shields.io/badge/historical%20answers-39%2F40-1f5246)
+![Safe handling](https://img.shields.io/badge/safe%20handling-20%2F20-1f5246)
+![Traceable figures](https://img.shields.io/badge/traceable%20figures-170%2F170-1f5246)
 
-- Import fictional CSVs into a validated SQLite ledger with replay-safe batch receipts.
-- Record debts, partial payments, expenses, drawings, capital and cash counts through HTTP endpoints.
-- Keep recorded cash sales separate from signed unexplained cash differences.
-- Preserve immutable evidence through merchant voids and explicit corrections.
-- Identify unmatched/candidate payments, partial balances, overdue debts and suspected duplicates.
-- Query sales, debts, reconciliation, estimated gross margin and cash estimates through five validated tools.
-- Return deterministic weekly totals and a secondary cash estimate with base, conservative and stress scenarios.
-- Render sourced figures and dates in Arabic, with validation and deterministic template fallback.
-- Flutter web opens on today's cash and seven-day obligations, with Arabic/English layouts and Cairo typography.
-- Responsive navigation and ledger layouts cover phones, tablets and desktops; controls support keyboard focus and reduced motion.
-- Review entries before saving, retain source IDs and undo through immutable void evidence; daily-close values refresh after saves and undos.
-- Seed/reset the fictional sample through the interface; pick synthetic CSVs, edit mappings, preview and confirm imports.
-- Keep last-synced reports available offline while retaining form input and disabling writes without a queue.
-- Answer chat requests through a bounded, read-only agent with verified figures and source evidence.
-- Resolve Iraqi period phrases and calendar month names in code; clarify conflicting periods before model calls.
-- Show known empty historical totals with verified query evidence, while missing balances and unavailable history stay unavailable.
-- Check direct ledger-write commands, unavailable history or margin costs, and unresolved named customers with deterministic safeguards and approved messages.
-- Grade historical responses with independent integer-IQD calculations, exact customer/period checks and source-row validation; keep sealed questions separate from development inputs.
+<img src="assets/readme/hero.png" alt="Shgad on a phone: Today's cash, an Iraqi Arabic chat answer, and the source rows behind a figure" width="100%">
 
-## Merchant questions
+</div>
 
-These examples describe the intended experience:
+---
 
-| Question | Intended answer |
-|---|---|
-| عندي فلوس تكفي أدفع للمجهز الخميس؟ | Cash available for a supplier payment, separating confirmed cash from expected collections. |
-| منو بعده بذمته فلوس؟ | Outstanding customer debts and their due dates. |
-| أكو دفعات ما تطابقت؟ | Unmatched payments and possible duplicates, with explanations. |
-| شلون كان شغلنا هالأسبوع؟ | A week-to-date summary of sales, collections, spending and estimated gross margin coverage. |
-| الشهر الجاي أكدر أوفي التزاماتي؟ | A secondary cash estimate with base, conservative and stress scenarios. |
+## The problem
+
+A neighbourhood shopkeeper in Iraq sells for cash, gives customers credit ("على الحساب"),
+and owes suppliers who come to collect on a fixed day. The records exist (a notebook, a
+spreadsheet, a POS export), but the question the merchant actually has is simple and
+urgent:
+
+> **عندي فلوس تكفي أدفع للمجهز الخميس؟**
+> *Do I have enough money to pay the supplier on Thursday?*
+
+General chatbots answer this confidently and wrongly: they invent figures, add credit sales
+to cash, or count a collection as a new sale. For a merchant, a wrong number is worse than
+no answer.
+
+## What Shgad does
+
+Shgad is an assistant for **one fictional neighbourhood shop** running on **synthetic data**.
+It imports records into a verified ledger and answers questions in Iraqi Arabic. It follows
+three rules:
+
+| | Rule | How it is enforced |
+|---|---|---|
+| 🔢 | **The AI never types a number** | The model writes slots like `{{fig:cash_on_hand}}`. The server fills them from verified tool output. A draft containing a raw digit is rejected. |
+| 🔒 | **The AI never writes to the ledger** | Five read-only, allowlisted tools with validated arguments and no SQL. Entries, voids and corrections go through the merchant's own confirmed actions. |
+| 🧾 | **Every figure has a receipt** | Tap any figure to see its formula and the exact source rows, including the original imported CSV cells. |
+
+If a question can't be answered honestly (it is missing data, names two customers who
+could match, gives an impossible date, or asks the AI to change records), Shgad **asks a
+clarifying question or refuses**. It never guesses.
+
+## See it working
+
+These screenshots come from the running app: the Flutter web build, a local backend
+with the fictional sample shop, and live Gemini answers. They were taken on 28 October 2026.
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**Supplier question → a verified answer**
+
+The model works out what is being asked. Code works out *Thursday* from the shop's
+business clock and the amounts from the ledger. Confirmed cash and *expected*
+collections stay separate: expected money is labelled expected, never guaranteed.
+
+</td>
+<td width="50%"><img src="assets/readme/chat-answer.png" alt="Chat answer about paying the supplier on Thursday" width="100%"></td>
+</tr>
+<tr>
+<td valign="top">
+
+**Unsafe requests are refused; failures stay safe**
+
+*"Delete Abu Haider's debt from the ledger"* is refused: the assistant reads records
+and does not change them.
+
+When the model's wording can't be used, the answer falls back to a fixed template built
+from the same verified figures, and says so. The unexplained cash difference is flagged
+for review, never called theft or a mistake.
+
+</td>
+<td><img src="assets/readme/chat-refusal-and-fallback.png" alt="A refused write request and a template answer with a flagged cash difference" width="100%"></td>
+</tr>
+<tr>
+<td valign="top">
+
+**Tap a figure → see where it came from**
+
+A figure from the Thursday answer opens its inputs: the end-of-day cash count (`DEMO-01-CNT-090`) and
+the supplier invoice (`DEMO-01-J1-INVOICE`). Each has its business date, its source ID
+and a link to the original imported row.
+
+</td>
+<td><img src="assets/readme/evidence.png" alt="Evidence sheet listing the source rows behind a figure" width="100%"></td>
+</tr>
+</table>
+
+<details>
+<summary><b>Weekly summary and the cash estimate (desktop layout)</b></summary>
+
+<br>
+
+**Weekly summary:**
+- recorded cash sales;
+- the unexplained cash difference, flagged for review;
+- oldest debts;
+- *estimated* gross margin with its cost coverage. It is never called "profit".
+
+<img src="assets/readme/weekly.png" alt="Weekly summary screen" width="100%">
+
+**Cash estimate:**
+- a secondary 30-day estimate with base, conservative and stress scenarios;
+- clearly labelled as an estimate.
+
+<img src="assets/readme/forecast.png" alt="Cash estimate screen with three scenarios" width="100%">
+
+</details>
+
+## How well it works
+
+All figures come from **60 held-out questions** that the builders never saw. The run
+happened **once**, on a frozen version of the app.
+
+| Held-out run | Historical answers | Safe handling | Traceable figures | **Joint accuracy** |
+|---|---:|---:|---:|---:|
+| v1 (original agent) | 8 / 40 | 0 / 20 | 38 / 39 | 12 / 60 |
+| v2 | 6 / 40 | 14 / 20 | 22 / 58 | 10 / 60 |
+| **v3 (current agent)** | **39 / 40** | **20 / 20** | **170 / 170** | **56 / 60 (93%)** |
+| Target | ≥ 95% | ≥ 95% | 100% | ≥ 90% |
+
+- **Historical answers:** every required figure, period, customer and tool was correct.
+- **Safe handling:** it clarified or refused when it should have.
+- **Joint:** the whole response was right, including the intent and the stated reason.
+
+**Results by category in v3.** Every category passed in full except supplier dues
+(3 of 4). The 16 categories are:
+- **Cash and money flow:** cash sufficiency, debt balances, sales, margin, reconciliation, weekly summaries, drawings and expenses.
+- **Unclear questions:** relative dates, ambiguous customers and dates, invalid dates.
+- **Bad or incomplete data:** missing data, contradictory records.
+- **Unsafe requests:** prompt injection, unsupported requests.
+
+<details>
+<summary><b>What changed between v2 and v3</b></summary>
+
+<br>
+
+v1 and v2 scored poorly. Most of the problem was not the model; it was the design around it:
+
+- **Clarifications could never pass.** The grading counted any clarification as a failed answer.
+- **A blind intent probe.** The evaluator guessed intent with a second, separate model call instead of reading what the app actually decided.
+- **Regex routing.** Questions were routed by hand-written patterns fitted to 32 development questions.
+- **Unclear labels.** The rules for what counts as a correct label were underspecified.
+
+The v3 agent is **interpretation-first**:
+
+1. **Interpret.** The model returns a strict JSON reading of the question: intent, parties and time expression. The server checks that every quoted name, date and number really appears in the question.
+2. **Resolve.** Code turns time into exact dates using the shop's business clock (Saturday–Friday weeks). It matches names to ledger parties and never merges two similar names.
+3. **Plan.** A fixed, reviewed plan per intent picks the tools. The model does not choose them freely.
+4. **Execute and verify.** Read-only tools compute integer IQD figures. A verifier recomputes them independently.
+5. **Write.** The model writes the Arabic answer with figure slots; the server fills in the numbers.
+
+The labelling rules were written down
+([`data/evaluation/LABEL_RULES_V2.md`](data/evaluation/LABEL_RULES_V2.md)). The agent was
+then developed on 200 new questions written by a separate, memory-off AI session and
+reviewed by an Iraqi Arabic speaker:
+- **150 train questions:** 149/150;
+- **49 check questions:** 47/49, reported in aggregate only.
+
+</details>
+
+<details>
+<summary><b>How the held-out test was kept honest</b></summary>
+
+<br>
+
+- **Independent questions.** A fresh Codex session wrote the questions, with memory off and no access to this project. It is the same tool family as one of the coding assistants, but a separate session. An Iraqi Arabic speaker then reviewed them.
+- **Independent answer keys.** A *second* separate session wrote the answer keys (which figures must appear). They were reviewed too.
+- **Sealed before the run.**
+  - Questions: SHA-256 `378b3613…`.
+  - Answer keys: SHA-256 `fce35f5e…`.
+  - Evaluation method, frozen before any v3 question existed: SHA-256 `87483534…`.
+  - The app was frozen at tag `freeze-heldout-v3` (`c72e5d8`).
+- **One run, aggregate only.** 101 Gemini requests, all HTTP 200, on 27 Oct 2026, 18:17–18:34 UTC. No per-question output was printed, and nothing was tuned on the results.
+- **Disclosed:**
+  - The questions were new, but the synthetic ledger had been used during development.
+  - The method freeze was redone once (revision 2), before any v3 question existed, after a dry run found a bug in the report step.
+  - The text of one development check question was seen by accident.
+- **About the v1 column.** The receipt also re-grades v3 with the v1 method. That method reads intent from the separate probe, which v3 does not run, so its joint score is 0/60 by construction. Its historical (39/40) and safe-handling (20/20) scores match.
+
+The full receipt is
+[`results/evaluation_heldout_v3_FIRST.md`](results/evaluation_heldout_v3_FIRST.md).
+Earlier receipts are kept unchanged beside it.
+
+</details>
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    CSV[Synthetic CSV] --> API[Python / FastAPI]
-    UI[Flutter interface] <--> API
-    API <--> Ledger[(SQLite ledger)]
-    API <--> Agent[Single LLM agent]
-    Agent --> Tools[Read-only financial tools]
-    Tools --> Ledger
-    Tools --> Renderer[Verified figure rendering]
-    Renderer --> API
+    Q["🗣️ Iraqi Arabic question"] --> I["Interpret<br/><sub>LLM → strict JSON<br/>checked against the question</sub>"]
+    I -->|unclear / unsafe| C["Clarify or refuse<br/><sub>approved Arabic messages</sub>"]
+    I --> R["Resolve<br/><sub>business clock · party matching</sub>"]
+    R --> P["Fixed plan<br/><sub>per intent</sub>"]
+    P --> T["Read-only tools<br/><sub>get_sales · get_debts · get_margin<br/>reconcile · forecast</sub>"]
+    L[("SQLite ledger<br/>integer IQD")] --> T
+    T --> V["Verifier<br/><sub>recompute every figure</sub>"]
+    V --> N["Write answer<br/><sub>LLM writes {{fig:…}} slots</sub>"]
+    N --> F["Server fills numbers<br/><sub>raw digit → retry → template</sub>"]
+    F --> A["📱 Answer + evidence"]
+    CSV["📄 CSV import<br/><sub>map → preview → confirm</sub>"] --> L
 ```
 
-Financial calculations use integer IQD in Python. The tools and renderer work without
-an LLM. The agent requests these tools and drafts explanations with symbolic slots;
-the backend fills figures and dates from verified results. Provider calls and API
-keys stay in the backend. Integration tests use recorded provider responses.
-Clear weekly overviews and supplier-payment sufficiency questions use server
-tool plans before model narration. Weekly summaries keep drawings separate from
-expenses and enforce priced-sales coverage; cash answers show both existing
-collection scenarios. Ambiguous identities or weekdays require clarification.
-The selected primary is `gemini-3.8-flash`, with OpenAI `gpt-6-luna` as the
-fallback. Paid API access is user-reported. Both APIs have successful live checks;
-primary/fallback CSV previews and controlled OpenAI fallback chat passed. The
-development results and their limitations are recorded below.
+| Layer | Built with |
+|---|---|
+| App | Flutter web (Android scaffolded): Arabic RTL first, Cairo font, BLoC + Clean Architecture, offline read-only cache |
+| Backend | Python, FastAPI, SQLite; money is **integer IQD only**, never floats |
+| Models | Google **`gemini-3.8-flash`** (primary), OpenAI **`gpt-6-luna`** (fallback), called only from the backend |
+| Data | Fully **synthetic**: one fictional shop with 90 observed days and 733 transactions, plus 4 synthetic shops for forecast testing |
 
-## Development status
+**What the app does beyond chat:**
+- **Today screen:** counted cash and the next 7 days of supplier dues against expected collections.
+- **Debts:** customer and supplier debts, including partial payments.
+- **Quick entry:** with a confirmation step and undo, implemented as an immutable void.
+- **Daily close:** the end-of-day cash count, with an unexplained difference flagged for review.
+- **CSV import:** maps the columns, shows a preview and waits for an explicit confirmation.
+- **Review queue:** suspected duplicates and unmatched payments are flagged, never deleted.
+- **Weekly summary and cash estimate.**
+- **Offline reads:** the last synced reports, with their timestamps.
 
-The backend requires Python 3.11+ and was verified locally with Python 3.14.7.
-Earlier local-source setup checks are recorded below. On 25 October 2026, a fresh
-local-source checkout of application commit `587dad5a737b90c68e218ce34800757718bc7c2e`
-passed new-venv installation, schema-v4 migration and the six-file synthetic restore
-(733 transactions, one opening balance), health/docs/reports/reset, Flutter debug
-startup, a release build, browser smoke test and HTTP checks. It also passed 919
-backend tests (one skipped), 358 Flutter tests, Ruff, Dart format, Flutter analysis
-and `pip check`.
-The recorded current-source drill passed **16/16** with 9 fake attempts and 0 paid
-calls. This verifies a local Git checkout; a fresh checkout from published GitHub has not
-been verified. Direct Python dependencies are pinned; transitive dependencies
-resolve at installation time. The earlier tested environment included SQLite
-3.50.4, Starlette 1.9.0, Flutter 3.44.9 and Dart 3.12.2.
-To make a disposable checkout of your exact local HEAD, start in this repository
-and use an unused destination (PowerShell):
+## Run it locally
+
+Requires Python 3.11+, Flutter 3.x and Chrome. Everything runs on `127.0.0.1`.
 
 ```powershell
-$verifiedCommit = git rev-parse HEAD
-$demoCheckout = Join-Path $env:TEMP 'shgad-demo-verified-20261024'
-git clone --no-hardlinks --no-checkout . $demoCheckout
-git -C $demoCheckout checkout --detach $verifiedCommit
-Set-Location $demoCheckout
-```
-
-From the repository root, create an environment and install the pinned dependencies:
-
-```sh
-python -m venv backend/.venv
-# Windows PowerShell:
-backend/.venv/Scripts/python -m pip install -e 'backend[dev]'
-# macOS / Linux: use backend/.venv/bin/python in place of the Windows path.
-```
-
-Then, from `backend/`, use that environment's Python:
-
-```sh
-python -m pytest -q
-python -m ruff check .
-python -m ruff format --check .
-python -m uvicorn app.main:app --host 127.0.0.1 --no-access-log --reload
-```
-
-Activate the environment first (`.venv/Scripts/Activate.ps1` in PowerShell or
-`source .venv/bin/activate` on macOS/Linux). `GET http://127.0.0.1:8000/health`
-returns `{"status":"ok","version":"0.1.0"}` without configuration values.
-The supported server mode is one local worker for the fictional merchant. Remote
-socket peers, non-loopback hosts and unrelated browser origins are rejected;
-forwarded headers do not grant access. Bodies, receive time and per-peer request
-rates are bounded. Handler and request-limit responses carry a server-generated
-request ID (CORS preflights are handled separately); application
-logs contain only the ID, status and elapsed time. Keep access logging disabled as
-shown above. Network/public hosting requires a separate authentication and origin
-configuration before deployment.
-
-CSV uploads check extension, media type, UTF-8 and content, with limits of 5 MiB,
-10,000 rows and ten seconds of deterministic processing. Imports roll back on
-timeout; replay/entry keys prevent duplicate writes. Read-only tools have ten-second
-SQL/Python deadlines and chat has a 120-second total budget. Provider failures use
-bounded retries and the configured Gemini/OpenAI fallback; malformed responses fail
-closed. There is no CSV/spreadsheet export endpoint.
-
-These security changes were made after the published measurements. They do not
-replace the original scores or establish improved answer/forecast quality; no paid,
-sealed or final evaluation was repeated for this work.
-For local development, copy `.env.example` to a repository-root `.env` if it does
-not already exist, then edit it locally. The backend loads that exact file from
-either the root or `backend/` working directory. Non-empty process environment
-variables override file values; blank optional values use defaults. Keep `.env`
-out of Git and chat. Set `APP_ENV=test` or `APP_ENV=production` in the launching
-process to use environment variables without reading the local file. Restart the
-backend after changing configuration.
-
-The setup template selects Gemini 3.8 Flash and the OpenAI fallback. For an existing
-local configuration, set these non-secret fields while keeping keys local:
-
-```dotenv
-LLM_PROVIDER=gemini
-LLM_MODEL_ID=gemini-3.8-flash
-LLM_FALLBACK_PROVIDER=openai
-LLM_FALLBACK_MODEL_ID=gpt-6-luna
-LLM_TIMEOUT_SECONDS=30
-LLM_PRIMARY_TIMEOUT_SECONDS=15
-LLM_MAX_OUTPUT_TOKENS=8192
-```
-
-Selecting the model does not change an existing `.env` file or verify live chat
-and CSV mapping. The earlier 9/10 result measures development routing only.
-Keep `GEMINI_API_KEY` and `OPENAI_API_KEY` local. The selected setup uses a
-15-second primary deadline and a 30-second fallback deadline. The primary setting
-accepts 5–30 seconds. Timeouts advance immediately to fallback; non-timeout transport
-errors and retriable HTTP statuses retain one retry and bounded Retry-After handling.
-Paid access still has [rate limits](https://developers.openai.com/api/docs/guides/rate-limits).
-`LLM_MAX_OUTPUT_TOKENS` optionally sets the output bound (256–32,768 tokens).
-The selected setup uses 8,192; when unset, compatible requests retain 2,048 and
-OpenAI Responses retains 8,192. Explicit truncated or filtered completions are
-rejected before use, with the existing failover/template handling.
-If the single draft retry returns a valid clarification or refusal, chat uses
-that fixed response instead of replacing it with a financial template.
-An empty fallback template asks for clarification rather than claiming to have
-answered the ledger question.
-
-No `.env` file or provider credentials are needed for health checks. `BUSINESS_AS_OF`
-stays unset in raw settings until configured. The domain `BusinessClock.from_settings`
-uses the configured date, or **2026-09-28** (synthetic day 90) when absent; it never
-uses the server date. Weeks run Saturday–Friday, and naming today's weekday requires
-clarification. Baghdad business dates are derived from offset-aware timestamps;
-storage uses UTC.
-
-The backend foundation includes strict integer-IQD records, digit/IQD parsing,
-and deterministic cash, sales and settlement primitives. Recorded cash sales stay
-separate from signed unexplained differences; missing consecutive counts remain
-unavailable. Capital injections add cash without sales, revenue or collections.
-Drawings remain separate from business expenses.
-
-SQLite schema version 4 has sixteen STRICT tables, with foreign keys, unique
-idempotency keys, guarded partial-payment allocations and immutable source evidence.
-`POST /api/entries/{source_id}/void` supports merchant undo with client idempotency
-and cutoff-aware calculations. Voiding a collection restores outstanding
-debt while retaining original transactions, raw rows and linked reason/timestamp audits.
-For a correction, void the original and send its ID as `correction_of_source_id`
-on the replacement entry. It retains the original event time and an immutable link,
-so correcting a pre-count payment does not add cash again. New entries follow the
-last known event on their supplied business date. `GET /api/ledger/transactions` supports
-date/type/customer/source-ID filters and cursor pagination; its source-ID detail
-route returns raw cells, flags and the original amount with any linked void audit.
-Versioned migrations preserve earlier ledger/mapping records and roll back atomically. Unknown opening cash
-raises a typed error.
-
-Migrations use the standard-library SQLite driver and require SQLite **3.37+**
-(STRICT tables); local verification used SQLite 3.50.4. To create an empty schema,
-run this Python from `backend/` with its environment activated:
-
-```python
-from contextlib import closing
-from app.db.connection import connect_database
-from app.db.migrations import apply_migrations
-
-with closing(connect_database("shgad.db")) as connection:
-    apply_migrations(connection)
-```
-
-This creates the schema only. Preload fictional reference and opening records
-before importing or recording debts, or explicitly restore the fictional sample
-through the sample-shop screen. Reset is disabled in production mode.
-
-`POST /api/entries` records cash/credit sales, supplier invoices, explicit partial
-collections/payments, expenses, drawings, capital and daily cash counts. Amounts
-are strict positive integer IQD; invalid references and overpayments are rejected
-atomically. Retry with the same `client_entry_id` and payload to receive the saved
-source ID without another financial effect. A changed payload under that key fails.
-
-The Python service `app.services.ingest.import_csv` imports explicitly fictional
-canonical CSV files into a migrated SQLite connection. Preload verified categories,
-counterparties and opening records separately. It validates UTF-8/BOM files up to
-5 MiB / 10,000 rows, normalizes Arabic-Indic amounts, preserves raw cells and errors,
-and commits validated rows and quarantine evidence atomically. Explicit compatible
-obligation references and unique strong matches create payment allocations. Strong
-matches require the exact party, a sufficient outstanding balance and a due date
-within 30 days. Candidate/unmatched payments and suspected
-duplicates remain flagged for review. Exact file replay adds no transactions,
-cash, revenue, obligations or allocations; receipts distinguish accepted, rejected,
-exact-duplicate and flagged rows. `POST /api/imports/csv` accepts a multipart `file`;
-`GET /api/imports/{batch_id}` retrieves its receipt and row errors. Files must be
-fictional. No reference data is created automatically.
-Uploads retain real audit times; late knowledge stays excluded from earlier cutoffs.
-
-Unfamiliar CSV layouts have mapping preview and confirmation endpoints at
-`POST /api/imports/csv/mapping` and `POST /api/imports/csv/mapping/{mapping_id}/confirm`.
-The proposer interface receives only the header and three sample rows. Code validates
-its mapping and previews up to five parsed rows without financial writes. Confirmation
-uses saved immutable input/mapping metadata and the normal importer; retries are safe.
-The proposer uses the same configurable client as chat. An unconfigured client
-returns `LLM_UNAVAILABLE`. Recorded-response integration tests cover the HTTP
-proposal, preview and explicit confirmation flow. One live OpenAI fallback preview
-produced five parsed rows without errors or ledger writes. After the paid-access
-update, both Gemini and OpenAI passed this same bounded preview check.
-
-`app.services.reconcile.reconciliation_report` reads cutoff-bounded SQLite and
-returns definite/strong/candidate/unmatched status, reasons, source IDs and current
-partial/overdue flags. It creates no links. Similar names and ambiguous obligations
-remain candidates for merchant review. Ledger detail includes these flags.
-
-`app.services.forecast.forecast` reads only a cutoff-filtered SQLite snapshot and
-returns 30 integer-IQD daily estimates for base, conservative and stress scenarios.
-Recorded sales and signed unexplained differences remain separate drivers; conservative
-collections use observed settlement lateness, stress collections are zero, and overdue
-receivables are excluded. Unknown starting cash, essential history or due dates produce
-typed clarification errors. Later entries, payment links and voids cannot change an
-earlier forecast. The service enforces the observed calendar boundary and loads no
-files or evaluation answers. `GET /api/reports/forecast` exposes the service;
-the web workflow shows these secondary estimates. Development and frozen final
-accuracy measurements are reported below; all three scenarios underperform the baseline.
-
-Seeded fictional data and offline development truth are available. From the
-repository root (standard library only):
-
-```sh
-python scripts/generate_synthetic_data.py --seed 20260701
-python scripts/make_ground_truth.py
-```
-
-The generator writes 90 observed days and 30 separate future days for one
-fictional shop, plus three shops reserved for frozen final forecast testing.
-It constructs daily counts, recorded sales, signed unexplained differences,
-capital, credit and supplier settlements, and isolated review/void fixtures.
-The independent calculator imports no backend financial services. Its
-development expectations include sales, debts, estimated gross margin,
-seven-day positions and three forecast scenarios at historical cutoffs.
-These are offline reference values; the separate production forecast service uses
-the financial specification and SQLite history. The five read-only tools query
-that ledger without a provider. Development score windows stop at day 90.
-
-With the backend environment installed, the offline benchmark is available from
-the repository root:
-
-```sh
-python scripts/run_forecast_eval.py --split dev --output results/forecast_dev.json
-```
-
-Commit verified source first; the benchmark records its Git commit, source and
-input hashes, settings and exact scored-day counts. Both development cutoffs
-generate 30 predictions: cutoff 60 grades days 61–90 and cutoff 75 grades only
-76–90. It reports integer-IQD MAE against the seven-day baseline, worst-day error,
-shortfall timing and false-OK numerator/realized-shortfall denominator/rate per
-scenario and for the J1/seven-day with-expected views. A zero denominator has a
-null rate. Aggregates weight MAE by scored days and count invoice-cutoff observations.
-The baseline rounds `(cutoff count − count seven days earlier) / 7` half up to
-whole IQD once, then adds each day's multiple of that change to cutoff cash.
-Missing or ambiguous anchor counts give typed errors. Existing result files
-are never overwritten.
-The final-test path requires a separate explicit run flag and a matching frozen
-method/settings/source-commit receipt before opening final outcomes or extra shops.
-The frozen final test has run on the primary shop and three previously unseen
-synthetic shops; its receipt is linked below. Conservative collection dates round the exact median
-lateness half up once to whole days before adding it to the due date.
-**Forecast development results — 20 October 2026.** The actual offline run at
-source `1dc2179ab1fe80ba799b11c518f1838fb10a523d` used method
-`recorded-weekday-cash-v1` and model ID `deterministic-no-llm`.
-All amounts in this table are integer IQD.
-
-| Cutoff day | Scored forecast-days | Baseline MAE | Base MAE | Conservative MAE | Stress MAE |
-|---|---:|---:|---:|---:|---:|
-| 60 | 30 | 246,560 | 688,086 | 699,245 | 604,901 |
-| 75 | 15 | 200,923 | 330,233 | 330,233 | 330,233 |
-| Combined | 45 | 231,348 | 568,802 | 576,241 | 513,345 |
-
-Both cutoffs generated all 30 predictions; grading used days 61–90 and 76–90.
-The combined MAE weights 45 forecast-day observations across the two cutoffs;
-their calendar dates overlap. **All three scenarios performed worse than the
-baseline at both cutoffs.** Aggregate worst-day errors were
-2,096,402 IQD for base/conservative
-and 1,894,402 IQD for stress.
-
-There were no realized shortfalls in the scored windows. For each scenario,
-shortfall-timing hits were 0/0 (null/N/A), with two forecasts evaluated and no
-predicted shortfall date inside either scored window. The baseline predicted
-1 September at cutoff 60 and no shortfall at cutoff 75; neither window had a
-realized shortfall to match.
-
-| View | False-OK count | Realized-short invoice denominator | Rate | Eligible invoice-cutoff observations |
-|---|---:|---:|---|---:|
-| base | 0 | 0 | null / N/A | 2 |
-| conservative | 0 | 0 | null / N/A | 2 |
-| stress | 0 | 0 | null / N/A | 2 |
-| Seven-day with expected | 0 | 0 | null / N/A | 2 |
-| J1 with expected | 0 | 0 | null / N/A | 0 |
-
-Each cutoff contributed one eligible invoice to each scenario and the seven-day
-view, with no realized-short invoice; J1 had no eligible invoices at either cutoff.
-These null rates provide no measured evidence about behavior during actual
-shortfalls. The T32 synthetic regression separately checks a positive false-OK case.
-
-The [complete development report](results/forecast_dev_2026-10-20.json) records
-per-cutoff errors, dates, counts, source/input hashes and all 30 prediction rows.
-The [method freeze](results/forecast_method_freeze.json) predates this run and
-pins the same code/settings and observed inputs. Independent calculations match
-all six complete prediction series; separate error-sum checks agree.
-Only the primary fictional shop's observed data was used in that development run.
-Final outcomes and the three reserved shops stayed unseen until the separately
-authorized final benchmark below. No real-world accuracy is established, and
-the original method and development report remain unchanged.
-
-See [data/README.md](data/README.md) for file boundaries and generation
-metadata. Same-seed regeneration was byte-identical in a fresh process,
-including the manifest. The development questions and generation mechanics have
-recorded human review, including all twelve note phrases and four scenarios.
-The historical test set has 60 human-reviewed questions and a
-[hash/count manifest](data/evaluation/heldout_60_manifest.json); the questions
-remain outside the repository. Generation used a separate session of the same
-tool used during development. Memory controls were requested; isolation was not
-independently verified and the exact generator model ID was not exposed.
-The first aggregate-only sealed result below misses all four answer/selection/
-traceability targets.
-
-`scripts/model_smoke_test.py` prepares a provider comparison using ten fixed,
-reviewed development questions and the existing five read-only tool schemas.
-With the backend development environment installed, run from the repository root:
-
-```sh
-python scripts/model_smoke_test.py
-python scripts/model_smoke_test.py --help
-```
-
-The default is a dry run with no provider requests. Live use requires `--live`,
-exact provider model IDs through `--gemini-model` and `--groq-model`, their
-`--model-ids-checked-on` date, and the selected provider keys in local `.env` or
-process environment variables. `--provider gemini` or `--provider groq` runs one
-candidate and requires only its key; the default compares Gemini and Groq.
-An explicit `--provider openai --openai-model gpt-6-luna` comparison uses a local
-`OPENAI_API_KEY`. This comparison-only path uses Responses with medium reasoning,
-no temperature override and optional response storage disabled. It preserves the
-same logical prompts, tool parameter schemas and scoring. API/reasoning differences
-limit comparisons with the compatible-chat providers. The application also supports
-OpenAI as the configured fallback; these comparison results do not measure fallback
-behavior.
-Only an explicit live run loads credentials; the default
-dry run leaves `.env` untouched. Never paste keys into chat. It compares interpretation
-and native tool selection against development labels, including customer and period.
-It executes no proposed tools and measures no financial-answer accuracy. The hard
-cap is 40 requests, with no retries and at least ten seconds between a provider's
-requests. Provider errors stop that candidate. The default HTTP timeout is 20s
-and output limit is 768 tokens; explicit `--timeout-seconds` (1–300) and
-`--max-tokens` (1–32,768) support slower reasoning models. Reports record these
-limits, known finish reasons and available token-usage counters, without retaining
-model prose or tool arguments. Per-request elapsed times include pacing waits.
-Scores from different limit settings are not controlled model comparisons.
-Full application quality remains unverified.
-
-`--minimum-interval-seconds` selects 10-60 seconds between a provider's requests
-(default 10); `--progress` prints aggregate case/request counts to stderr.
-For `qwen/qwen3.8-27b` on Groq, the comparator defaults to medium reasoning;
-`--qwen-reasoning-effort none|low|medium|high` selects an explicit profile.
-Hidden reasoning format, temperature 1 and top_p 0.95 preserve the same prompts
-and tool parameter schemas. Its documented output cap of 16,384 tokens is checked
-before loading credentials or sending requests. Model-specific overrides and
-actual pacing are recorded in the report; this profile does not change the app.
-Quota failures retain only recognized error codes and bounded numeric limit,
-remaining-token, requested-token and retry/reset counters. Provider messages,
-organization names and secret values are not retained.
-Distinct quota counters from headers and provider messages are preserved separately,
-along with an allowlisted metric label when the provider identifies one unambiguously.
-
-NVIDIA-hosted candidates are available explicitly through `--provider nvidia
---nvidia-model ...`, using the optional local `BUILD_NVIDIA_API_KEY`. Supported
-comparison IDs are `z-ai/glm-5.3`, `moonshotai/kimi-k3`,
-`stepfun-ai/step-5-preview` and `z-ai/glm-5.3-flash`. GLM and Kimi profiles request
-Max reasoning; Step keeps native reasoning enabled. Reports record their sampling
-and chat-template options. Optional `--nvidia-stream` assembles native SSE content
-and function-call fragments, discards separate reasoning, and rejects incomplete
-or truncated responses. NVIDIA comparisons allow up to 900s HTTP timeouts;
-other providers retain the 300s ceiling. Streams bound decoded bytes and retained
-output, including unterminated lines, with no automatic retries. The default comparison remains Gemini/Groq;
-the application uses the separately configured Gemini/OpenAI roles above. NVIDIA model access and quality
-must be measured separately; a catalog listing alone is not an inference result.
-
-On 19 October, NVIDIA screens used the same ten development questions,
-logical prompts, five schemas and scorer. Complete Flash/Step runs used clean
-source `b72908f`; the later partial GLM streaming run used clean `019de2b`:
-
-| Candidate | Jointly correct | Correct native tool set |
-|---|---|---|
-| `z-ai/glm-5.3-flash` (Max) | 6/10 | 10/10 |
-| `stepfun-ai/step-5-preview` | 0/10 | 10/10 |
-| `z-ai/glm-5.3` (Max) | Partial: 1 passed, 9 unscored | 1/1 completed |
-| `moonshotai/kimi-k3` (Max) | Unscored: HTTP 410 | Unscored |
-
-Flash and Step each completed 20 requests without provider errors, retries or
-reported truncation, with 32,768-token output limits, 300s HTTP timeouts and 30s pacing.
-Flash reported 37,479 total tokens; Step reported 41,622. Step failed every
-separate interpretation check while passing every native tool/context check.
-One additional unscored format probe returned separate reasoning without final
-text; it does not establish the cause of every original failure or change scores.
-These are strict routing/format screens, not application or Arabic-language
-quality scores. Their reasoning and resource profiles differ from earlier runs.
-
-`moonshotai/kimi-k3` returned HTTP 410 on its first attempt; NVIDIA's
-[deployment page](https://build.nvidia.com/moonshotai/kimi-k3?section=deploy)
-marks its free endpoint deprecated. All ten cases remain unscored.
-GLM's initial nonstreaming runs produced two unpaired interpretations, one
-300s timeout and one HTTP 504 despite a 900s client timeout. A separate unscored
-streaming probe returned a well-formed native call after 405s. The fresh fixed
-streaming screen then completed and passed one question before another upstream
-HTTP 504 stopped the second question: four attempts, three responses and nine
-unscored questions. Its successful responses reported 4,930 total tokens.
-There is insufficient data for a ten-question GLM score; no further retry ran.
-
-Across these NVIDIA checks, **51 generation attempts** used the original
-80-attempt budget: 47 decoded responses and four failures, plus one catalog GET.
-Known reported usage totals **91,287 tokens**; failed-request usage is unknown.
-Failures and unpaired answers are retained without adding scored questions.
-
-Measured locally on 18 October 2026 at source commit `ca62b01`: both candidates
-completed the ten-question development screen using 40 requests total, with no
-provider errors or retries. Joint correctness requires intent, behavior, tool
-choice, customer and period to agree with the development labels.
-
-| Candidate | Jointly correct | Correct tool set |
-|---|---|---|
-| `gemini-3.1-flash-lite` | 6/10 | 9/10 |
-| `openai/gpt-oss-120b` on Groq | 4/10 | 5/10 |
-
-This first comparison requested temperature 0, a 768-token output limit and a
-20s HTTP timeout. This small development screen uses a separate routing
-prompt; it does not measure application answers, financial accuracy or held-out
-performance. Development tuning and human acceptance remain pending.
-
-An additional check on 18 October at clean source `54a7382` used the same ten
-questions, prompts, gold labels and tool schemas with `gemini-3.8-flash`:
-**9/10 jointly correct and 9/10 correct tool sets**, with intent, behavior,
-customer and period each correct on all ten. All 20 requests completed with no
-provider errors, retries or reported truncation. This run allowed 180s per HTTP
-request and 32,768 output tokens, with at least ten seconds between requests.
-The API reported 34,829 total tokens across the run. Its larger time/token limits
-differ from the first comparison, so the score difference cannot be attributed
-solely to model choice. Gemini 3.8 Flash was subsequently selected as primary;
-live application answer quality remains pending.
-
-A further check on 18 October at clean source `937d180` used `gpt-6-luna`:
-**7/10 jointly correct and 9/10 correct tool sets**, with all 20 requests
-completed and no provider errors, retries or truncation. This screen used the
-same ten questions, logical prompts, tool parameter schemas and scorer, with
-180s HTTP timeouts and 32,768 output tokens. Luna used Responses with medium
-reasoning, no temperature override and optional response storage disabled.
-The API reported **23,919 total tokens**, including **2,095 reasoning tokens**.
-The failed checks concerned one interpreted period, the reconciliation tool set
-for conflicting records, and one unsupported-write interpretation. These are
-single development screens with different API/reasoning profiles, not controlled
-model rankings or live application/financial-answer accuracy.
-
-The `qwen/qwen3.8-27b` screen on Groq completed on 19 October at clean source
-`7da09ec` with a recorded local operational adapter: **2/10 jointly correct,
-8/10 correct tool sets and 9/10 valid tool selections**. All 20 requests completed
-without provider errors, retries or reported truncation, using 29,937 reported
-tokens. The profile used **reasoning none**, hidden format, temperature 1/top_p
-0.95, 768 output tokens, 180s HTTP timeouts and at least 65s actual spacing
-(60s CLI setting). No separate reasoning-token counters were reported.
-
-Sanitized provider metadata identified a separate 1,000 output-token-per-minute
-limit alongside the 8,000 combined-token limit. Earlier setup/diagnostics are
-retained separately: 12 attempts, six successful responses, five HTTP 429
-rejections and one HTTP 400; interrupted answers are not extra scored questions.
-The complete Qwen check therefore used 32 generation attempts within its 40-attempt
-recovery cap. Logical prompts, development questions, schemas and scoring stayed
-unchanged. Different reasoning/resource profiles prevent a controlled model
-ranking; Gemini 3.8 Flash is the selected primary and live answer quality remains pending.
-
-The Flutter web app uses Arabic RTL by default, supports English labels, and bundles
-Cairo with its license. Today, debts, confirmed entries/undo, daily close, source
-evidence, backend-rendered chat, weekly reports and secondary cash estimates use
-the verified backend APIs through one Dio client. Chat replies remain server-rendered
-Arabic. Read-only screens cache responses with update times; offline writes are
-disabled and typed form values stay in place. No write queue or frontend provider key.
-The local SDK is Flutter3.44.9 stable/Dart3.12.2.
-
-From `frontend/`:
-
-```sh
-flutter pub get --enforce-lockfile
-flutter gen-l10n
-dart format --output=none --set-exit-if-changed lib test
-flutter analyze
-flutter test
-flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8000
-```
-
-To build the web app with runtime assets served locally:
-
-```sh
-flutter build web --release --no-web-resources-cdn --dart-define=API_BASE_URL=http://127.0.0.1:8000
-```
-
-The Android target is scaffolded as `com.aw.shgad`, display name «شكد»; Android builds
-and release signing have not been verified. Existing fixed Arabic copy is reviewed;
-new or edited copy requires Iraqi Arabic review.
-Open **More → Sample shop** to restore the clearly fictional observed shop, then
-open Today and Chat. Reset asks before replacing sample edits and clears old caches
-and chat. It is disabled in production. The web CSV picker supports manual column
-mapping, a server-validated preview of up to five rows and explicit confirmation;
-edits require a fresh immutable preview. All files must be synthetic. The complete
-HTTP interfaces are documented at `/docs`.
-
-For a provider-free setup check in PowerShell, use a disposable local checkout
-and database. These commands install the specified packages, migrate explicitly,
-then start one loopback worker. Run from the checkout root:
-
-```powershell
+# 1. Backend
 python -m venv backend/.venv
 backend/.venv/Scripts/python.exe -m pip install -e 'backend[dev]'
-$env:APP_ENV = 'test' # disables repository secret-file loading
-Remove-Item Env:LLM_PROVIDER, Env:LLM_FALLBACK_PROVIDER -ErrorAction SilentlyContinue
+copy .env.example .env        # then add your own GEMINI_API_KEY / OPENAI_API_KEY locally
+
+cd backend
 $env:BUSINESS_AS_OF = '2026-09-28'
-$env:DATABASE_URL = 'sqlite:///./demo.sqlite'
-Set-Location backend
-@'
-from app.db.connection import connect_database
-from app.db.migrations import apply_migrations
-with connect_database('demo.sqlite') as db:
-    apply_migrations(db)
-    print('migrations_applied', db.execute('PRAGMA user_version').fetchone()[0])
-'@ | .venv/Scripts/python.exe -
+$env:DATABASE_URL   = 'sqlite:///./demo.sqlite'
+.venv/Scripts/python.exe -c "from app.db.connection import connect_database; from app.db.migrations import apply_migrations; db = connect_database('demo.sqlite'); apply_migrations(db)"
 .venv/Scripts/python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8154 --no-access-log
 ```
 
-In another terminal, seed the six-file fictional observed snapshot and check it:
-
 ```powershell
+# 2. Load the fictional sample shop (second terminal)
 Invoke-RestMethod -Method Post http://127.0.0.1:8154/api/demo/reset
-Invoke-RestMethod http://127.0.0.1:8154/health
-Invoke-WebRequest http://127.0.0.1:8154/docs -UseBasicParsing | Select-Object StatusCode
-Set-Location frontend
+
+# 3. App
+cd frontend
 flutter pub get --enforce-lockfile
-flutter gen-l10n
-flutter run -d web-server --web-hostname 127.0.0.1 --web-port 8155 --dart-define=API_BASE_URL=http://127.0.0.1:8154
+flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8154
 ```
 
-Open `http://127.0.0.1:8155`. Seeded cash is 420,000 IQD, supplier dues are
-650,000 and expected collections are 150,000; the separate positions are
-−230,000 confirmed and −80,000 with expected collections. Sample reset replaces
-demo edits and clears browser reports/chat when performed through **More → Sample
-shop → Restore sample**. Use that confirmed interface reset before each rehearsal;
-an HTTP reset alone cannot clear another browser's cache. Generation/evaluation
-commands are unnecessary for seeding: the app reads only the six observed files.
-
-For a repeatable integration drill from the root:
-
-```powershell
-backend/.venv/Scripts/python.exe scripts/demo_drill.py --mode recorded --output demo-recorded-receipt.json
-backend/.venv/Scripts/python.exe scripts/demo_drill.py --mode live --request-cap 12 --plan
-```
-
-The recorded drill generates new fictional CSV IDs and amounts, exercises mapping,
-preview, confirmation, ledger, tools, rendered response and raw evidence, then
-checks weekly reports, all three scenarios, replay safety, malformed input,
-simulated timeout, fallback and sample reset. It uses a temporary database and
-fake provider wire responses. Its Arabic test question uses the exact wording
-supplied by the user during language review on 24 October 2026.
-The plan command loads no credentials and makes no requests. Keep receipts local;
-existing receipt paths are never overwritten. These are integration checks, not
-answer-quality evaluations or human rehearsals.
-The driver-inclusive offline backend suite passed 919 tests with one live test
-deselected. A release-Chrome run also verified fresh native CSV import through
-chat/evidence, five cached reports, scenario controls, simulated timeout/fallback
-and confirmed reset, with no unexpected runtime errors.
-Valid new rows flagged as similar remain visible and counted separately from
-accepted rows in the drill receipt; flags are never silently treated as rejection.
-
-A real-provider drill requires separate explicit run authorization, followed by
-`--mode live --request-cap 12 --authorize-paid --output demo-live-receipt.json`.
-The cap covers every transmitted generation attempt, including failed requests,
-retries and fallback, across one fresh mapping and two chat actions. Controlled
-primary-outage injection happens locally before transmission. Configuration must
-match the selected Gemini/OpenAI models, 30-second deadline and 8,192-token cap;
-OpenAI uses the application's existing medium reasoning/store:false profile.
-Use development runtime settings with keys kept locally. One explicitly authorized
-live drill on 24 October 2026 at `c37b31d` stopped at CSV mapping: Gemini
-`gemini-3.8-flash` returned HTTP 429 twice and OpenAI `gpt-6-luna` returned HTTP
-401 once. Three provider attempts were made within the 12-attempt cap, with no
-successful provider response. Deterministic health, weekly and scenario checks
-passed; live import confirmation, chat/evidence and controlled fallback were not
-reached. No automatic rerun occurred. Response bodies were not retained, so the
-specific limit/authentication causes and actual billing are unverified.
-
-After the user reported replenishing both balances and explicitly requested a
-retry, one fresh run at `f825b8f` passed all **14 integration checks** on
-24 October 2026. It used six of the 12 allowed provider attempts: four Gemini
-responses and two OpenAI responses, all HTTP 200. Fresh CSV mapping, explicit
-confirmation, replay protection, ledger/report updates, grounded chat/source
-evidence, controlled OpenAI fallback, malformed-input rejection and sample reset
-passed. Two primary-outage faults were injected locally without Gemini network
-calls. The earlier failed receipt remains preserved. These are two separate
-integration runs, not new answer-quality benchmarks; original evaluation scores,
-missed targets and denominators remain unchanged. Actual monetary cost was not
-measured, and no further provider run is automatically authorized.
-The standard backend has no session-wide billing cap, so its live use needs
-its own authorization. Recorded responses must always be identified as recorded.
-
-Keep both servers on `127.0.0.1`. Phone/LAN/tunnel/hosted use is not ready: it
-requires authenticated scoped access, HTTPS, explicit trusted CORS origins,
-server-side secret storage, request limits and verified recovery/cold starts.
-Offline reports require warming their caches while connected. Offline chat and
-writes remain unavailable, with retained drafts and no queued submissions.
-In a guided human browser run on 25 October 2026, a recorded fake-provider timeout
-produced Chat’s translated `llm_unavailable` reply; the user confirmed the saved
-weekly report remained visible. The screenshot shows no retry button because the
-server returned a normal unavailable response rather than the app’s offline state.
-The isolated fake session recorded four transport
-errors and zero paid attempts; health and the weekly report returned HTTP 200
-(630,500 IQD for 26–28 September 2026) during and after the simulated timeout.
-This does not establish behavior during a real provider outage. The fake timeout
-switch was cleared; health and the weekly report returned HTTP 200 after recovery.
-No second chat was sent. Browser offline/reconnect was checked separately. The user
-confirms this guided run was not timed; pauses were not measured. It is recorded as
-the first run-through, but does not verify a seven-minute duration. A second guided
-attempt on 25 October used the live Gemini configuration on backend commit
-`95f16a4c7fafd2b0f68f90b60d102a75edb946ea` and a fresh unfamiliar synthetic CSV.
-`gemini-3.8-flash` returned HTTP 200 for mapping in one request (1/8 cap); the user
-confirmed the import, and the local ledger records one completed batch with two
-accepted rows. At Chat, the user reported no internet. The local health check failed
-and neither demo port was listening; the provider receipt remained at one paid
-mapping attempt, with no agent run or tool call recorded. The chat request did not
-reach the backend or provider, so no live chat answer was produced. The user reports
-six minutes for this guided partial attempt; it did not complete or verify the
-seven-minute flow. This is not evidence of a Gemini outage. At the time, venue
-connectivity had not yet been checked; the later venue Wi-Fi, backup and display
-check is recorded below.
-In a later loopback session on 25 October, the capped receipt records three
-`gemini-3.8-flash` generation requests returning HTTP 200, with no OpenAI fallback
-or cap block. The user reports around two minutes for the guided run; exact
-stopwatch boundaries and pauses were not supplied. Health/meta returned HTTP 200,
-and read-only SQLite confirms the post-run sample reset restored the 733-row
-baseline and removed the fresh IDs. The user confirms the live Chat answer appeared
-and all three forecast scenarios opened. These are user-attested UI outcomes, not a
-model-quality result or a measured seven-minute presentation. On 25 October, the
-user confirmed venue Wi-Fi and readable Arabic text on the venue display. Venue
-Wi-Fi and the approved backup connection both passed general HTTPS and Gemini-host
-DNS/TCP/TLS reachability checks; the laptop was returned to venue Wi-Fi and checks
-passed again. No credentials or model request were used, so this does not establish
-Gemini access. The display used a loopback-only recorded backend, never live model
-output.
-On 24 October 2026, one developer (the user) completed the fictional entry-and-review
-workflow for five consecutive sample business dates at `9c5f1bd`, using a stopwatch:
-
-| Sample business date | User-reported elapsed time |
-|---|---|
-| 24 September 2026 | Approximately 60 seconds |
-| 25 September 2026 | 43 seconds |
-| 26 September 2026 | 40 seconds |
-| 27 September 2026 | 37 seconds |
-| 28 September 2026 | 25 seconds |
-
-All five reported times are below the 120-second target. Each trial used a fresh
-observed-data prefix through the preceding sample date; seeding and an initial
-untimed walkthrough were outside the timed intervals. Read-only HTTP checks
-verified the saved cash count, owner drawing, credit sale and difference review.
-The user reported no errors, failed saves or corrections. The first trial used
-smaller drawing/credit amounts than suggested and saved two leave-unexplained
-reviews; the second used a due date one day earlier than suggested. The third
-used different amounts, explicitly confirmed intentional; the last two permitted
-user-chosen fictional integer IQD amounts. Those variations and original records
-are retained. Exact human start/end times were not supplied, and the first reading
-was rounded. These are developer-entered synthetic records, not physical cash-counting
-measurements or merchant validation; automated test durations are excluded.
-
-`GET /api/daily-close/{date}` compares consecutive counts against recorded cash
-flows and shows the signed unexplained difference. Missing counts remain missing.
-`POST /api/daily-close/{date}/resolve` accepts a merchant-chosen explanation or
-`leave_unexplained`. Sign/amount guards and client idempotency prevent a second
-financial effect; a voided explanation stays in review history. No cause is inferred.
-`GET /api/obligations/upcoming?days=7` lists supplier dues, non-overdue expected
-collections and separate overdue receivables. It returns signed confirmed-only
-and with-expected positions, daily running balances and first negative dates,
-without projected sales. The window accepts 1–30 days; missing cash retains known
-obligations with unavailable positions. `GET /api/debts` provides receivable totals,
-aging and exact-party evidence. The read-only sales/debts tool wrappers validate
-arguments and resolve symbolic periods on the server. `GET /api/reports/margin`
-returns estimated gross margin, recorded-sales coverage, unpriced-sale count,
-buy-price evidence and an after-recorded-expenses figure with excluded-cost notes.
-`GET /api/reports/weekly` returns deterministic weekly totals and shows estimated
-margin only at the configured coverage threshold (80% by default;
-`MARGIN_MIN_COVERAGE_PCT`). Voided sales and expenses are excluded using the query's
-audit knowledge. All five tools validate arguments and verify source references,
-integer units and arithmetic before a protected renderer handoff.
-`GET /api/flags` exposes reconciliation flags; `GET /api/reports/forecast`
-exposes the existing cutoff-safe scenarios. `/api/meta` reports whether a provider,
-model ID and local key are configured; this does not probe network availability.
-The weekly report includes the actual warning items with amounts, source IDs,
-reasons, matching logic and safe review steps. Duplicate-only and overdue-supplier
-warnings suggest review. Recorded cash sales, signed unexplained differences, credit sales,
-collections, expenses, drawings and capital stay separate. Debt aging is oldest
-first; insufficient price coverage hides the estimated margin and retains coverage.
-
-`POST /api/chat` accepts `message` and a correlation `conversation_id`. Each request
-starts a fresh tool context. The agent can use only the existing five read-only
-tools, with validated arguments, at most four completion turns and eight tool
-calls. Responses include the resolved customer and period, sourced figures and
-dates, verification evidence and renderer status. Missing balances and ambiguous
-names or periods produce fixed clarification messages. Provider failure after a
-verified result can return the deterministic template with a fallback notice.
-
-Configure `LLM_PROVIDER` (`gemini`, `groq` or `openai`), `LLM_MODEL_ID` and that provider's
-API key in the root `.env` or process environment. `.env.example` lists optional
-fallback and timeout settings. `GEMINI_API_KEY`, `GROQ_API_KEY` and `OPENAI_API_KEY` authenticate
-provider access; model IDs select models separately. Use exact console model IDs;
-keep keys local and never paste them into chat. Without configuration, chat
-returns the typed `llm_unavailable` response without a provider request.
-The same client uses compatible Chat Completions for Gemini/Groq and Responses
-for OpenAI. Luna requests use medium reasoning, an 8,192-token output bound,
-no temperature override and `store: false`. Encrypted continuation state stays
-in request memory. The five tool parameter schemas and server validation are
-shared. Timeouts advance immediately; other retriable failures get at most two
-attempts per provider per completion. Long `Retry-After` waits defer to fallback
-instead of retrying early. Internal attempt receipts contain sanitized categories
-and elapsed milliseconds, without provider text or secrets.
-
-Gemini `gemini-3.8-flash` requests use
-[low reasoning](https://ai.google.dev/gemini-api/docs/openai#thinking); OpenAI's
-medium reasoning is unchanged. These client settings changed after the original
-published measurements, whose scores describe the earlier system.
-
-An opt-in reliability check repeats the approved synthetic demo question through
-the real chat route on a temporary demo ledger, with seven seconds between turns.
-It uses the configured Gemini/OpenAI pair, has a hard maximum of 55 provider
-attempts including failures, and stops after two consecutive unanswered turns.
-It retains categories, statuses, provenance checks and latency, without answer
-text or quality scoring. Inspect its free plan before authorizing paid calls:
-
-```powershell
-backend/.venv/Scripts/python.exe scripts/provider_load_check.py --plan --request-cap 55 --chat-turns 20
-backend/.venv/Scripts/python.exe scripts/provider_load_check.py --authorize-paid --request-cap 55 --chat-turns 20
-```
-
-`app.agents.renderer` fills `{{fig:key}}` and `{{date:key}}` only from verified
-tool output. Raw numeric characters, unknown keys and unsourced values are rejected.
-It supports one retry callback and then deterministic templates, with server-resolved
-customer/period context, margin coverage and estimate assumptions. Exact user-typed
-quotes stay quoted data. Money uses Arabic-Indic digits and exact abbreviations;
-evidence retains full integers. The original 50 fixed backend Arabic messages were
-approved by the user on 19 October 2026; five weekly suggestion/insufficient-margin
-messages were approved on 20 October. Separate per-key hashes bind the exact texts
-and their approval dates. Any new or edited copy still needs Iraqi Arabic review.
-The agent retries an invalid draft once before using these templates. Imported
-text remains quoted data and gives the agent no ledger-write capability.
-
-On 19 October, an opt-in application check at source `a3dd418` used five reviewed
-development questions and a temporary observed synthetic ledger. Gemini returned
-HTTP 503 on all ten attempts; its five cases remain unscored. Automatic failover
-to `gpt-6-luna` produced four grounded answers and one clarification. Three of
-five cases matched the expected tools, customer and period. The weekly summary
-selected two of four expected tools, and the duplicate-record question clarified
-without calling `reconcile`. These are limits of this development check, not
-held-out accuracy or a replacement for the earlier routing-screen scores.
-
-A separate OpenAI fallback CSV check passed with one request, five preview rows,
-no parsing errors and no financial writes. Across both checks there were
-21 actual requests: ten Gemini failures and eleven OpenAI responses, within
-the documented 22-attempt combined ceiling. Those original reports remain
-unchanged; later development work is recorded below. No held-out run took place.
-
-After the user reported paid access was active, a fresh check at `abaed05` used
-15 of its 20 allowed requests: twelve Gemini and three OpenAI responses, all HTTP
-200. Both CSV previews and controlled OpenAI fallback passed. Gemini matched
-three of five expected tool/customer/period cases; the weekly-summary and
-duplicate-record tool-set misses remained. Two answers used deterministic
-templates. These development application checks predate the sealed result below.
-
-The versioned agent policy now clarifies that possible duplicate-payment
-comparisons inspect read-only reconciliation flags before asking for record
-identities. It still cannot combine entries or resolve flags. A frozen application
-check at `d67667d` matched four of five expected native tool sets: sales, debt,
-margin and reconciliation. Three cases also matched behavior, customer and period.
-The weekly summary omitted debts/reconciliation. The duplicate-payment case read
-reconciliation flags but fell back to an empty answer instead of clarification.
-This pass used all 16 allowed requests: thirteen Gemini responses, two Gemini
-timeouts and one OpenAI response. The primary CSV preview passed.
-
-A separate duplicate-case diagnostic at `f84f2ee` used three Gemini responses;
-both final drafts failed the strict response schema. A local check-script fixture
-lookup then failed before its fallback checks. These failures remain recorded.
-General fixes now preserve valid clarification/refusal actions on draft retry
-and make empty templates ask for clarification. Four regression cases first
-failed, then passed. The primary application score was not rerun after these fixes.
-The remaining controlled fallback chat and CSV check at `b33618e` passed with
-three actual OpenAI responses: correct tool/customer/period/source evidence,
-five CSV preview rows, zero errors and no financial writes. That diagnostic and
-continuation used six of their combined eight allowed requests.
-
-The paid retry and subsequent development/integration work used 41 of 48
-documented generation attempts: 38 decoded successful responses and three failed
-requests, with 119,722 known reported tokens. Failed-request usage is unknown.
-These small development checks do not establish held-out or general financial
-answer accuracy. Original reports and earlier routing-screen scores are preserved.
-The first paid retry also recorded two Gemini drafts ending at the old output
-cap. The output budget is now configurable; the selected setup uses 8,192 while
-retaining its request deadline and response-size bounds.
-
-Verified locally: **730 backend tests passed, one opt-in live test skipped**,
-including real HTTP/SQLite financial, mapping, reconciliation, immutable-correction
-and cutoff regressions, recorded provider integration, and offline synthetic-data
-and model-comparison harness checks. Ruff lint/format and Python 3.11 grammar
-checks pass for **131 backend/script files**; dependency checks pass.
-An earlier running-server smoke passed **20 check groups across 19 OpenAPI paths**,
-using a temporary fictional database. Browser checks also cover sample reset,
-bulk evidence, editable CSV previews and merchant entry/void requests.
-Every implemented endpoint has a response-model contract test, including daily close,
-voids and standard error responses. Financial-rule
-regressions were observed failing before their implementation or fix.
-To include offline scripts in lint/format checks from backend/, run
-`python -m ruff check --config pyproject.toml . ../scripts` and
-`python -m ruff format --check --config pyproject.toml . ../scripts`.
-Checks include recorded sales and signed differences, capital, review validation,
-void-adjusted balances and knowledge cutoffs, v1 upgrades, replay and atomic rollback.
-Concurrent review requests cannot explain the same cash twice. The live routing
-screen above does not validate complete chat/mapping answers or failover behavior.
-
-The default suite makes no live provider requests. A single development routing
-probe requires both `SHGAD_RUN_LIVE=1` and `python -m pytest -m live`; it has a
-four-request transport cap. The separate development comparison above retains
-its forty-request cap. Neither check accesses held-out questions.
-
-Earlier Flutter workflow verification: **176 tests passed**, including BLoC/repository checks,
-96 screen cases across Arabic/English, 320/360 px and 1.0/1.3 text scales,
-confirmation/undo, source evidence and T33 cache/input retention. Localization,
-formatting, analysis and a release web build pass. The SDK integration flow also
-passes in Chrome with recorded API responses. Actual release screenshots for
-every screen were inspected in Arabic RTL at 360×800 and both text scales.
-A separate browser run used real HTTP/SQLite/tools/rendering with a fake provider
-transport for sample → J1 chat → evidence → three scenarios → reset. Native CSV
-selection/preview/import and offline/write checks use only fictional data.
-These checks establish application behavior, not live-model answer quality or
-merchant usability. Android, iOS and an independent human usability test have not
-been verified. Browser IQD values outside the exact integer range are rejected;
-figures and financial calculations stay in the backend.
-
-Fresh offline security/reliability verification on 24 October 2026 passed **914
-backend tests** with one live test deselected and **358 Flutter tests**. Backend
-lint/format checks cover 153 files; Dart formatting covers 184 files, analysis is
-clean, pinned dependency checks pass, and the release web build succeeds. Local
-Chrome drills confirm exact cache timestamps on all five read-only screens,
-retained offline drafts, disabled writes, connection-required chat, and fake
-Gemini/OpenAI outage/fallback behavior. A positive source/build allowlist scan
-found zero secret-pattern matches. This is post-evaluation verification with fake
-provider responses; the original quality measurements below remain unchanged.
-Keyed form fields preserve their accessible identity and typed values when
-offline warnings or optional sibling inputs rebuild the form.
-
-[GitHub Actions](https://github.com/abdulwahed-s/Shgad/actions/workflows/test.yml)
-runs backend lint/format/tests and Flutter localization, formatting, analysis and tests
-on pushes and pull requests. Its linked run history shows the measured CI results.
-Development, sealed Q&A and frozen final forecast benchmarks have run. Their
-actual counts and limitations are reported below; answer and routing targets
-are not met.
-
-Synthetic CSV generation, ledger import, financial tools, deterministic reports
-and the merchant Flutter web workflow are available. Current frontend Arabic
-wording is reviewed; merchant usability validation remains pending. The forecast
-development results above cover one fictional shop and do not meet the baseline comparison target.
-The final four-shop benchmark below also misses that target.
-The separate model-routing/application checks retain their reported limitations.
-Held-out accuracy is measured below; general financial-answer quality and merchant
-readiness are not established.
-
-## Reproducible evaluation
-
-The historical harness separates development and sealed runs. Its default command
-prints a plan without loading credentials or opening sealed questions:
-
-```sh
-python scripts/run_evaluation.py --split dev --mode plan
-```
-
-The replay and development-forecast commands below require a separate clean
-checkout of the original frozen application, `4e13092` (evaluator source freeze
-`0b292e1`). The current hardened source intentionally refuses the preserved
-evaluator freeze with `EVALUATOR_CHANGED_SINCE_FREEZE`. Preserve the original
-freeze and reports; do not overwrite or refreeze them to make current code pass.
-
-```sh
-python scripts/run_evaluation.py --split dev --mode replay --output results/evaluation_replay.json
-python scripts/run_evaluation.py --split dev --mode forecast --forecast-split dev --output results/evaluation_forecast_dev.json
-```
-
-The checked-in freeze binds evaluator sources, observed input hashes, prompts,
-tool schemas and settings. Reports use actual UTC execution times and code commits,
-keep exact counts and preserve existing receipts. Forecast reporting adds separate
-prediction and realized CSVs; cutoff75 realized rows stop at day90.
-
-The [four-case synthetic replay](results/evaluation_replay_2026-10-23.md), executed
-23 October at source `15abb817`, checks3/3 numeric answers,1/1 clarification,
-4/4 joint selections and7/7 evidenced claims using12 fabricated completions and
-zero provider requests. It is a protocol test, not a model-quality measurement.
-Its initial raw-export reconciliation setup reported precision2/4 and recall2/2.
-The [post-run setup receipt](results/evaluation_replay_context_2026-10-23.md)
-imports the export's missing parent ledger through the real importer, with labels
-unchanged: duplicateTP1/FP0/FN0 and unmatchedTP1/FP0/FN0. These two tiny fixture
-cases establish setup correctness, not general reconciliation quality. Original
-reports and freezes remain available; later scorer changes are disclosed.
-The [latest synthetic receipt](results/evaluation_replay_reviewed_requirements_2026-10-23.md)
-retains those counts after the reviewed historical-selector registry and public
-annotation import. It reproduces from that original frozen checkout with no
-credentials, future outcomes or unseen shops present. The original readiness
-check passed 882 offline backend tests with the live test deselected, plus lint,
-formatting and dependency checks. These
-checks establish infrastructure behavior; live development measurements follow below. Replay
-uses explicit synthetic-fixture requirements and does not replace independent
-annotations for live measurements.
-The [development forecast receipt](results/evaluation_forecast_dev_2026-10-23.md)
-reproduces the earlier below-baseline results with240 prediction and45 realized
-rows, and no realized outcome after28 September. Zero realized-shortfall
-denominators still give null timing/safety rates.
-
-**Independent requirement annotations have been supplied and public inputs validated.**
-The policy uses separately sealed figure selectors to distinguish total-only,
-cash/credit-breakdown and debt-list requests. Original question bytes and seals
-stay unchanged. The [selector contract](data/evaluation/REQUIREMENTS_SPEC.md)
-defines the exact fields, ordering, review/provenance and hash bindings.
-The standalone `cash_on_hand` selector represents confirmed cutoff cash; missing
-cash stays unavailable and equivalent views require matching evidence. Ten added
-historical/closing selectors separate economic dates from knowledge cutoffs and
-strict daily differences from book comparisons. All32 public development
-annotations preflight against independent calculations. Public seals attest full
-human review of 32/60. Private annotations stay outside builder context; the
-authorized sealed evaluator verified their bytes/schema before provider calls.
-Builders authored the contract/calculators and fabricated tests; the supplied
-annotation records are unchanged. Missing or invalid seals block live evaluation
-before credentials; authorization flags cannot bypass them.
-All selectors and independent reference calculations are preflighted before calls
-and stay outside the model's context. Independent numeric calculations,
-context/evidence checks, exact aliases and synthetic replay remain tested.
-Historical facts require their actual economic target, knowledge cutoff, labels,
-comparison prerequisites and audit evidence. Current production cannot emit all
-new historical fields; those requirements remain scoring failures. The
-[frozen evaluation configuration](results/evaluation_method_freeze_reviewed_requirements.json)
-binds the reviewed inputs and method. Original receipts are preserved.
-
-Live runs require explicit paid-call authorization,
-a matching freeze and bounded actual requests:96 development or180 sealed,
-at most6 per question including
-retries/fallback, at least10 seconds apart,30-second deadlines and8192 output
-tokens. A separate blind probe records intent; tool/customer/period are taken from
-the production response. All four must match jointly. Every required figure,
-unit/category and customer/period must match for whole-question numeric credit.
-Unsupported historical evidence shapes fail closed. Safe handling and source-row
-coverage are separate metrics. Sealed access uses only `HELDOUT_PATH`, verifies
-its committed SHA-256 before parsing and requires separate authorization. Its
-JSON/Markdown/stdout remain aggregate-only. Paid development, sealed scoring and
-the frozen final forecast test have run as recorded below.
-
-**Measured development evaluation - 23 October 2026.** The
-[first live receipt](results/evaluation_dev_live_FIRST.md) at code `4e13092`
-uses the reviewed freeze and original 32 development questions. These are
-end-to-end results on fictional data, including unavailable/budget-limited cases.
-
-| Metric | Correct / eligible | Rate | Target |
-|---|---:|---:|---:|
-| Whole-question numeric accuracy | 12 / 20 | 60.00% | 95% |
-| Safe clarification/refusal | 6 / 12 | 50.00% | 95% |
-| Joint intent/tool/customer/period | 14 / 32 | 43.75% | 90% |
-| Correctly evidenced historical claims | 66 / 67 | 98.51% | 100% |
-
-Each rate is below the corresponding held-out target; development scores are
-reported separately. All 96 allowed requests were used: 90 Gemini 3.8 Flash,
-6 GPT-6 Luna fallback; 77 HTTP 200 responses, 6 HTTP 401 responses and 13 transport
-failures. Five questions were unserved after the budget was exhausted; they
-remain in the full denominators. Authentication and transport failures are
-retained. These figures do not isolate model skill from application
-limitations, transport availability or request limits. Original prompts, method,
-settings and results are preserved; no rerun selected a better score.
-The two seeded reconciliation fixtures retain duplicate TP1/FP0/FN0 and
-unmatched TP1/FP0/FN0, combined precision/recall 2/2; this tiny fixture check does
-not establish general reconciliation quality.
-
-**Development reasoning comparison - 26 October 2026.** These are
-**development set, seen during building; not held-out results**. Both runs use
-application `edd0071`, new method freezes, the original development inputs and
-unchanged scoring. They compare only Gemini's reasoning profile; OpenAI stays
-on medium reasoning. The original row is a reference from a different code version.
-
-| Application / Gemini profile | Numeric | Safe | Joint | Intent / tool / customer / period (each /32) | Supported claims | POST attempts / outcomes |
-|---|---:|---:|---:|---|---:|---|
-| Original `4e13092` | 12/20 | 6/12 | 14/32 | 23 / 23 / 29 / 25 | 66/67 | 96: 77 HTTP200, 6 HTTP401, 13 transport failures |
-| [Low](results/evaluation_dev_live_POST_D52_A.md) | 10/20 | 11/12 | 18/32 | 28 / 22 / 28 / 23 | 51/51 | 85: all HTTP200 |
-| [Model default](results/evaluation_dev_live_POST_D52_B.md) | 11/20 | 10/12 | 19/32 | 26 / 23 / 29 / 24 | 35/35 | 96: 80 HTTP200, 16 broad transport-failure entries |
-
-Low used 85 Gemini attempts; default used 77 Gemini and 19 OpenAI attempts.
-Default exhausted its budget before the last two questions; those remain failures.
-Each run retained one runtime failure whose cause is absent from the receipt.
-Neither run observed HTTP401/429/5xx. The evaluator does not retain chat latency
-percentiles or a provider/status cross-tab. Its ten-second pacing occurs within
-attempt deadlines, so the failure entries do not establish a provider hang cause.
-Intent is a separate blind probe; the other routing fields come from production.
-Supported-claim counts do not credit missing answers. One run per profile and
-the original version's provider failures limit comparisons and causal conclusions.
-
-After these comparisons, four failing fake cases led to two conservative safety
-corrections: explicit expected forecasts reach the model, and malformed direction
-enums reach closed-schema validation. Those source changes were verified offline
-and by the live drill, without another development evaluation. The table remains
-bound to `edd0071` and does not describe those later source changes. The original
-scores, freezes and receipts remain unchanged. The configured Gemini default
-remains `low`; `GEMINI_REASONING_EFFORT=default` omits its reasoning hint for an
-explicit development comparison. No unseen accuracy or quota claim follows.
-
-**Core tool-plan development check - 26 October 2026.** This is a
-**development set, seen during building; not a held-out result**. One live run
-at `ad8d951` includes the later safety corrections, complete debtor-list rendering
-and conservative weekly/supplier-payment plans. Gemini reasoning remains low;
-the prompts, model tool arguments, gold answers and scorer are unchanged.
-
-| Run | Numeric | Safe | Joint | Intent / tool / customer / period (each /32) | Supported claims | POST outcomes |
-|---|---:|---:|---:|---|---:|---|
-| [Verified tool plans](results/evaluation_dev_live_POST_D54.md) | 14/20 | 11/12 | 21/32 | 28 / 26 / 31 / 24 | 76/78 | 86 Gemini: all HTTP200 |
-
-The debtor-list and both supplier-sufficiency cases now pass numeric and joint
-checks. Drawings/expenses is numeric-correct but misses the separate intent probe.
-Both weekly cases route correctly yet fail numeric grading: offline reproduction
-finds a required unsourced zero that the renderer contract forbids displaying,
-and a sourced weekly supplier-payment field absent from the frozen catalogue.
-The existing grader retains both failures. One previously numeric-correct sales
-case regresses with no financial claims/wrong period; its exact wire cause is not
-retained. A new [method freeze](results/evaluation_method_freeze_post_d54.json)
-binds this run; original reports/freezes remain unchanged. A single comparison
-does not isolate the effects of each code change or establish unseen accuracy.
-
-The live integration drill passed14/14 with five additional HTTP200 provider
-requests. Both chats answered, median6.103s/max7.888s, with one controlled fallback.
-Total paid attempts:91 of108 authorized. Evaluation chat latencies are not retained.
-Further application changes stop pending resolution of the weekly contract/grading
-gaps; no expected answer or scoring workaround is included.
-
-**Calendar and empty-query evidence check - 26 October 2026.** This is a
-**development set, seen during building; not a held-out result**. One live run
-uses application commit `a0272d9`, frozen locally as `freeze-heldout-v2`, with low
-Gemini reasoning. Named months now use server-resolved calendar ranges; known
-empty historical event sums carry verified query evidence, also visible in Flutter.
-Prompts, model tool arguments, financial formulas and expected answers are unchanged.
-
-| Run | Numeric | Safe | Joint | Intent / tool / customer / period (each /32) | Supported claims | POST outcomes |
-|---|---:|---:|---:|---|---:|---|
-| [Calendar and zero evidence](results/evaluation_dev_live_POST_D55.md) | 17/20 | 11/12 | 24/32 | 28 / 27 / 31 / 26 | 81/94 | 84 Gemini: all HTTP200 |
-
-The new [method freeze](results/evaluation_method_freeze_post_d55.json) includes
-two missing claim-catalogue entries, `weekly.supplier_payments` and
-`weekly.capital_injections`. This is a disclosed method extension; no scoring
-rule or old result/freeze was changed, and old runs were not rescored. The legacy
-scorer still requires row IDs, so it can mark a query-proven zero unsupported
-while accepting its numeric value. Do not treat all uncredited claims as invented
-figures or silently award them credit.
-
-The named-month sales case now passes. No previously numeric-, safe- or
-joint-correct development case regressed relative to the tool-plan run. One
-weekly case and the indirect unsafe-description question still fail; exact
-response payloads are not retained by the evaluator. These observations do not
-establish performance on unseen questions.
-
-The live drill passed14/14. Both chats answered, median12.137s/max17.203s, with
-one controlled fallback. Its seven paid attempts include six HTTP200 responses
-and one OpenAI HTTP500 recovered by the existing retry. Total paid attempts:
-91 of108 authorized. Evaluation chat latency is not retained. Application behavior
-is frozen. A separate evaluator method now supports selecting new external
-question/annotation seals while preserving the original artifacts.
-
-**Independent query-evidence grading - 27 October 2026.** The
-[new method freeze](results/evaluation_method_freeze_heldout_v2.json) accepts
-an empty historical event sum only after its own observed-ledger query verifies
-the tool, period, closed filters and zero matching rows. It also maps sourced
-partial/overdue reconciliation balances independently. The original row-ID method
-and results remain unchanged. Six public development fake-provider reproductions
-match the earlier trace counts and improve from 38/51 to 51/51 supported claims.
-The [replay receipt](results/evaluation_dev_d55_tooling_replay_2026-10-27.json)
-is a re-graded replay, not a new measurement. Original provider outputs were
-not retained, so matching counts do not recover the original 13 claim identities
-or change the original 81/94 result.
-
-For a separately authorized new sealed run, `scripts/run_evaluation.py` accepts
-`--heldout-seal` (question seal), `--heldout-requirements` (annotation seal) and
-`--freeze-manifest`, all outside the repository. Annotations stay beside the
-question file with `.requirements.jsonl` appended. Omitted options retain the
-original paths. `--mode plan --max-requests 180 --output <new.json>` prints the
-full selected command/caps/checks without credentials, private content or requests.
-The live runner requires exact question/annotation hashes and binding, reviewed
-independent selectors, the frozen application source, a clean tree, a matching
-method freeze and new JSON/Markdown output. Reports are aggregate-only. The
-original synthetic primary ledger is reused: **questions unseen, ledger previously
-used in development**. No new sealed measurement has been run.
-
-**Sealed evaluation - 23 October 2026.** The
-[first aggregate receipt](results/evaluation_heldout_FIRST.md) uses the same
-code `4e13092`, reviewed freeze and original question seal: 60 questions,
-40 answerable, 11 clarify and 9 refuse. No question, private annotation, expected
-answer, source snippet or per-question result is included in its reports.
-
-| Metric | Correct / eligible | Rate | Target |
-|---|---:|---:|---:|
-| Whole-question numeric accuracy | 8 / 40 | 20.00% | 95% |
-| Safe clarification/refusal | 0 / 20 | 0.00% | 95% |
-| Joint intent/tool/customer/period | 12 / 60 | 20.00% | 90% |
-| Correctly evidenced historical claims | 38 / 39 | 97.44% | 100% |
-
-All four targets are missed. The run used 180 actual requests: 145 Gemini 3.8 Flash
-and 35 GPT-6 Luna fallback attempts. Status totals are 68 HTTP 200, 35 HTTP 401,
-57 HTTP 429 and 20 transport failures. Twenty questions were unserved when the
-request cap was reached; all 60 questions remain in the denominators. Per-field
-selection counts are intent 26/60, tool 38/60, customer 47/60 and period 22/60. Claim
-coverage concerns emitted historical claims and does not credit missing answers.
-These end-to-end scores include application, transport and budget failures;
-they do not establish isolated model capability or merchant readiness.
-
-An initial sealed preflight refused an annotation hash mismatch before credentials
-or provider calls. Only the external input location was corrected; the original
-question and approved annotation hashes were still mandatory and then matched.
-That failed preflight is preserved. No successful measured run was repeated and
-no prompt, scorer, application or forecast method was tuned on the outcomes.
-Future changes must be disclosed as post-run/post-test.
-
-**Frozen final forecast - 23 October 2026.** The
-[first final receipt](results/evaluation_forecast_test_FIRST.md) uses the unchanged
-recorded method/source freeze, cutoff 90 on the primary shop plus three previously
-unseen synthetic shops, 30 scored days each. All 120 forecast days were scored;
-the generated artifacts contain 480 prediction and 120 realized rows. No provider
-call was used, and no method was tuned on these outcomes. Amounts are integer IQD.
-
-| Scenario | Final MAE | Seven-day baseline MAE | Worst-day error |
-|---|---:|---:|---:|
-| Base | 978,995 | 666,064 | 2,697,237 |
-| Conservative | 965,616 | 666,064 | 2,697,237 |
-| Stress | 855,204 | 666,064 | 2,497,237 |
-
-All three scenarios are worse than the baseline. No realized shortfall occurred
-in these four synthetic cases, so first-shortfall timing and false-OK rates have
-zero denominators and are null. Scenario false-OK counts are 0/0 over four eligible
-invoice-cutoff observations each; J1/seven-day with-expected counts are also 0/0.
-This provides no measured safety evidence during actual shortfalls. The original
-development forecast report and freeze remain available. Any later forecast
-method change must be disclosed as post-test and cannot be tuned on this final set.
-
-## Data and scope
-
-All datasets must be fictional. Real customer and transaction records are outside the scope
-of this project. The demo will cover one merchant; payment execution and formal tax/accounting
-services are outside the planned MVP.
-
-GPT-6.1 Sol drafted the fictional scenario templates. Deterministic seeded Python
-generated all numeric records.
-The scenario manifest records the drafting brief and the user-confirmed model
-display name; the exact provider model ID/settings remain unavailable and are
-not guessed. No model-provider API call was used for this dataset.
-Application integration is tested with recorded responses. Live development
-screening used the candidates above; Gemini 3.8 Flash is the selected primary.
-Both selected APIs responded and CSV previews passed in earlier checks. The
-larger evaluations above include authentication, rate-limit, transport and
-application failures; broad routing and safe-answer targets are not met.
-The 55 fixed backend Arabic messages
-have user approval. All 277 frontend messages are also reviewed: the original
-248-message review is preserved, and the 29 additions have a separate approval
-with 15 Iraqi revisions and 14 retained texts, bound to exact text hashes.
-Future additions and edits need a new review.
+Try these questions:
+- `عندي فلوس تكفي أدفع للمجهز الخميس؟`
+- `منو بعده بذمته فلوس؟`
+- `شكد بعنا كاش من أول هالأسبوع لهسه؟`
+
+The API is documented at `http://127.0.0.1:8154/docs`.
+
+**Checks:**
+- `pytest` in `backend/`: 1468 passed, 1 skipped.
+- `flutter test` in `frontend/`: 364 passed.
+- `ruff` and `flutter analyze` are clean.
+
+## Honest limits
+
+- **Synthetic data only.** It has not been validated with real merchants yet. Merchant interviews are next.
+- **The forecast is weak.** On the final test across 4 synthetic shops, all three scenarios had a larger error than a simple seven-day baseline (base MAE 978,995 IQD vs. baseline 666,064). That is why it is a secondary, labelled *estimate* and not on the home screen.
+- **Answers can sound robotic.** When the model's wording fails validation, Shgad uses a fixed template from the same verified figures. It is correct but less natural.
+- **4 of 60 held-out responses missed the joint bar.** The aggregate failure tags are: wrong intent 3, wrong clarification reason 3, wrong period 1, wrong tool 1, whole answer 1. One response can carry several tags.
+- **Local only.** The app accepts connections from this computer only. Phone, LAN or hosted use needs authentication, HTTPS and secret storage first.
+- **Not built:** OCR, voice and live WhatsApp/POS integration. The Android build has not been verified.
+
+## Disclosure
+
+- **Models:** Google `gemini-3.8-flash` and OpenAI `gpt-6-luna`, through their APIs. Only synthetic data is sent.
+- **AI coding assistants:** Claude Code and OpenAI Codex helped write this code. Separate memory-off Codex sessions with no build context wrote the current development questions, the held-out questions and the held-out answer keys.
+- **Human review:** an Iraqi Arabic speaker reviewed the evaluation questions and answer keys.
+- **Data:** all synthetic, generated by scripts in `scripts/` and stored under `data/`. No real customer or transaction data is used anywhere.
