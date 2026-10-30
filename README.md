@@ -47,6 +47,8 @@ worse than no answer.
 - **Every figure has a receipt.** Tap a figure to see its formula and source rows, down to the original CSV cells.
 - **No guessing.** It asks when a name, date or data is unclear, and refuses requests to change records.
 
+Ten ways it can fail, what it does instead, and the tests that prove it: [`FAILURE_MODES.md`](FAILURE_MODES.md).
+
 ## Results
 
 60 held-out questions that the builders never saw, run **once** on a frozen version of the app.
@@ -164,7 +166,7 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8154
 
 Try asking `منو بعده بذمته فلوس؟` or `شكد بعنا كاش من أول هالأسبوع لهسه؟`.
 
-The tests pass: backend 1468 (1 skipped) and Flutter 364.
+The tests pass: backend 1478 (1 skipped) and Flutter 364.
 
 ## Limits
 
