@@ -139,6 +139,15 @@ void main() {
           child: ShgadApp(textScale: scale),
         ),
       );
+      await tester.runAsync(() async {
+        final context = tester.element(find.byType(ShgadApp));
+        for (final asset in [
+          'assets/branding/shgad_symbol.png',
+          'assets/branding/shgad_wordmark.png',
+        ]) {
+          await precacheImage(AssetImage(asset), context);
+        }
+      });
       await tester.pumpAndSettle();
       await expectLater(
         find.byKey(const ValueKey('app_golden')),

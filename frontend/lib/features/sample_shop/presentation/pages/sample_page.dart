@@ -9,6 +9,7 @@ import '../../../../core/widgets/failure_view.dart';
 import '../../../../core/widgets/ledger_widgets.dart';
 import '../../../../core/widgets/merchant_page.dart';
 import '../../../../core/widgets/page_header.dart';
+import '../../../../core/widgets/shgad_brand.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../bloc/sample_bloc.dart';
 
@@ -104,6 +105,13 @@ class _SampleView extends StatelessWidget {
         return MerchantPage(
           title: l.sampleTitle,
           children: [
+            const Align(
+              child: ShgadBrand(
+                wordmark: true,
+                height: AppDimens.welcomeBrandHeight,
+              ),
+            ),
+            const SizedBox(height: AppDimens.xl),
             if (v.shop != null)
               PageMeta(
                 date: l.businessDate(formatDate(v.shop!.date, l.localeName)),

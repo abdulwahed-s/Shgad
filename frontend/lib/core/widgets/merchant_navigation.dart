@@ -4,6 +4,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../constants/app_dimens.dart';
 import '../theme/app_motion.dart';
 import 'focus_outline.dart';
+import 'shgad_brand.dart';
 
 class MerchantNavigation extends StatelessWidget {
   const MerchantNavigation({
@@ -105,7 +106,9 @@ class MerchantNavigation extends StatelessWidget {
     final minimum =
         MediaQuery.textScalerOf(context).scale(AppDimens.navigationHeight) *
             routes.length +
-        (extended ? AppDimens.toolbarHeight + AppDimens.xl : AppDimens.lg);
+        (extended ? AppDimens.brandWordmarkHeight : AppDimens.brandSymbolSize) +
+        AppDimens.lg * 2 +
+        AppDimens.xl;
     return DecoratedBox(
       decoration: BoxDecoration(
         border: BorderDirectional(
@@ -124,15 +127,10 @@ class MerchantNavigation extends StatelessWidget {
             labelType: extended
                 ? NavigationRailLabelType.none
                 : NavigationRailLabelType.all,
-            leading: extended
-                ? Padding(
-                    padding: const EdgeInsets.all(AppDimens.lg),
-                    child: Text(
-                      l.appTitle,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  )
-                : null,
+            leading: Padding(
+              padding: const EdgeInsets.all(AppDimens.lg),
+              child: ShgadBrand(wordmark: extended),
+            ),
             selectedIndex: selected,
             onDestinationSelected: choose,
             destinations: [

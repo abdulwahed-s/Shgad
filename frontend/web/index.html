@@ -19,20 +19,40 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Shgad synthetic merchant cash-flow assistant.">
+  <meta name="theme-color" content="#1F5246">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="شكد">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
   <title>شكد</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html, body { margin: 0; background: #F6F2ED; }
+    #shgad-loading {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #F6F2ED;
+    }
+    #shgad-loading img { height: 160px; width: auto; }
+  </style>
 </head>
 <body>
+  <div id="shgad-loading">
+    <img src="icons/shgad-wordmark.png" alt="شكد" width="118" height="160">
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      document.getElementById('shgad-loading')?.remove();
+    }, { once: true });
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

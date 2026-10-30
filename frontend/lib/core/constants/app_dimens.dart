@@ -12,6 +12,9 @@ abstract final class AppDimens {
   static const radiusLg = 14.0;
   static const borderWidth = 1.0;
   static const toolbarHeight = 56.0;
+  static const brandSymbolSize = 32.0;
+  static const brandWordmarkHeight = 96.0;
+  static const welcomeBrandHeight = 120.0;
   static const navigationHeight = 64.0;
   static const chartHeight = 200.0;
   static const numberBadgeSize = 22.0;

@@ -40,7 +40,7 @@ class MerchantScaffold extends StatelessWidget {
               maxWidth:
                   (bounds.maxWidth -
                           AppDimens.lg * 2 -
-                          (pushed ? AppDimens.minTarget : 0))
+                          (pushed || compact ? AppDimens.minTarget : 0))
                       .clamp(AppDimens.minTarget, double.infinity),
             );
         final minimum = MediaQuery.textScalerOf(

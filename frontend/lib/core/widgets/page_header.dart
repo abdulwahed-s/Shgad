@@ -3,6 +3,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../constants/app_dimens.dart';
 import 'balanced_text.dart';
 import 'ledger_widgets.dart';
+import 'shgad_brand.dart';
 
 class PageHeader extends StatelessWidget implements PreferredSizeWidget {
   const PageHeader({
@@ -31,7 +32,14 @@ class PageHeader extends StatelessWidget implements PreferredSizeWidget {
     ),
     toolbarHeight: height,
     automaticallyImplyLeading: false,
-    leading: onBack == null ? null : BackButton(onPressed: onBack),
+    leading: onBack != null
+        ? BackButton(onPressed: onBack)
+        : MediaQuery.sizeOf(context).width < AppDimens.compactBreakpoint
+        ? const Padding(
+            padding: EdgeInsets.all(AppDimens.md),
+            child: ShgadBrand(),
+          )
+        : null,
     actions: [?action],
   );
 }
