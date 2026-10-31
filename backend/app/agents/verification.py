@@ -203,7 +203,13 @@ def _verify_forecast(data, snapshot):
 
 
 def verify_tool_output(
-    envelope, *, snapshot, tool_name, weekly_plan=False, movements_plan=False
+    envelope,
+    *,
+    snapshot,
+    tool_name,
+    weekly_plan=False,
+    movements_plan=False,
+    reconciliation_plan=False,
 ):
     if not envelope.ok or envelope.resolved_range is None:
         _reject()
@@ -309,15 +315,19 @@ def verify_tool_output(
     elif tool_name == "forecast":
         _verify_forecast(envelope.result, snapshot)
     elif tool_name == "reconcile":
+        if reconciliation_plan and (
+            "weekly" not in envelope.result or "cash_differences" not in envelope.result
+        ):
+            _reject()
         if "weekly" in envelope.result:
             parsed = ReconcileResult.model_validate(envelope.result)
             expected = movement_result(snapshot, resolved).weekly.collections
             if parsed.weekly.collections != expected:
                 _reject()
             if (
-                parsed.cash_differences
-                and parsed.cash_differences
-                != reconciliation_differences(snapshot, resolved)
+                reconciliation_plan or parsed.cash_differences
+            ) and parsed.cash_differences != reconciliation_differences(
+                snapshot, resolved
             ):
                 _reject()
         else:

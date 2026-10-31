@@ -47,3 +47,50 @@ def test_d59_unspecified_reconciliation_lists_every_week_flag_and_cash_differenc
     assert any("cash_differences." in f.key for f in response.figures)
     assert all(f.source_ids or f.query_evidence for f in response.figures)
     assert "سرق" not in response.reply_ar
+
+
+def test_d59_verifier_rejects_omission_of_every_known_cash_difference():
+    from app.agents.tool_registry import invoke
+    from app.agents.verification import verify_tool_output
+    from app.services.errors import FinancialRuleError
+    from app.services.financial_queries import QuerySnapshot, sources
+
+    as_of = date(2026, 9, 28)
+    history = observed_history("primary", as_of, ROOT / "data")
+    with production_database(
+        history, reference_parties(ROOT / "data"), as_of=as_of
+    ) as db:
+        output = invoke(
+            "reconcile",
+            {"period": "this_week"},
+            connection=db,
+            clock=BusinessClock(as_of),
+            known_at=cutoff(as_of),
+            server_plan="reconciliation_summary",
+        )
+        assert len(output.result["cash_differences"]) == 3
+        result = output.result | {"cash_differences": []}
+        figures = tuple(
+            f for f in output.figures if not f.key.startswith("cash_differences.")
+        )
+        dates = {
+            k: v
+            for k, v in output.dates.items()
+            if not k.startswith("cash_differences.")
+        }
+        stripped = output.model_copy(
+            update={
+                "result": result,
+                "figures": figures,
+                "dates": dates,
+                "evidence_source_ids": sources(*(f.source_ids for f in figures)),
+            }
+        )
+        snapshot = QuerySnapshot(db, clock=BusinessClock(as_of), known_at=cutoff(as_of))
+        with pytest.raises(FinancialRuleError):
+            verify_tool_output(
+                stripped,
+                snapshot=snapshot,
+                tool_name="reconcile",
+                reconciliation_plan=True,
+            )

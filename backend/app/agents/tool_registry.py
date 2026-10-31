@@ -309,6 +309,7 @@ def _invoke(
             tool_name=name,
             weekly_plan=weekly_plan,
             movements_plan=movements_plan,
+            reconciliation_plan=server_plan == "reconciliation_summary",
         )
     except (ValidationError, FinancialRuleError) as exc:
         code = exc.code if isinstance(exc, FinancialRuleError) else "VALIDATION_ERROR"

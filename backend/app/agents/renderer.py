@@ -131,7 +131,9 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
         entry = figures.get(qualified)
         if entry is None or entry.kind == "missing" or not has_evidence(entry):
             return
-        if qualified in used[0] or (key in used[0] and figures.get(key) == entry):
+        if "tool_plan_period_movements" in outputs[index].warnings and (
+            qualified in used[0] or (key in used[0] and figures.get(key) == entry)
+        ):
             return
         parts.append(
             _render_body(
