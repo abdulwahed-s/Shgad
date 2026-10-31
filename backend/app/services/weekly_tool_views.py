@@ -1,6 +1,12 @@
 """D54 transport projections of existing weekly facts; no new calculations."""
 
-from app.schemas.reports import WeeklyMarginResult, WeeklyMovements, WeeklySalesResult
+from app.schemas.reports import (
+    ExpenseMovement,
+    ExpenseTotalResult,
+    WeeklyMarginResult,
+    WeeklyMovements,
+    WeeklySalesResult,
+)
 from app.services.business_clock import BusinessClock
 from app.services.errors import FinancialRuleError
 from app.services.financial_queries import QuerySnapshot, amount, sale_totals
@@ -33,6 +39,17 @@ def movement_result(snapshot, resolved):
             owner_drawings=total("OWNER_DRAWING", "owner_drawings"),
             capital_injections=total("CAPITAL_INJECTION", "capital_injections"),
         ),
+    )
+
+
+def expense_total_result(snapshot, resolved):
+    """D59: recorded operating expenses only; never inspect description text."""
+    return ExpenseTotalResult(
+        weekly=ExpenseMovement(
+            operating_expenses=movement_result(
+                snapshot, resolved
+            ).weekly.operating_expenses
+        )
     )
 
 

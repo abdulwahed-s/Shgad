@@ -131,6 +131,8 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
         entry = figures.get(qualified)
         if entry is None or entry.kind == "missing" or not has_evidence(entry):
             return
+        if qualified in used[0] or (key in used[0] and figures.get(key) == entry):
+            return
         parts.append(
             _render_body(
                 label + ": {{fig:" + qualified + "}}.",
@@ -157,6 +159,8 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
             )
     assumptions = set()
     for index, output in enumerate(outputs):
+        if output.result.get("note_key") == "expense_kind_unrecorded":
+            parts.append(text("expense_kind_unrecorded"))
         if "weekly" in output.result and "cash_sales" in output.result:
             for key in (
                 "cash_sales",
@@ -366,6 +370,8 @@ def _template(outputs):
                 "unpriced_sales_count",
             ):
                 add(key)
+        elif data.get("note_key") == "expense_kind_unrecorded":
+            add("weekly.operating_expenses", text("operatingExpense"))
         elif "kind" in data:
             if data["kind"] in {"cash", "all"}:
                 add("cash_sales")

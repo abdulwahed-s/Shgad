@@ -227,7 +227,10 @@ def _sales(interpretation, snapshot, clock, period, parties, collectors):
 
 def _movements(interpretation, snapshot, clock, period, parties, collectors):
     arguments = _explicit(period) | {"kind": "all"}
-    return [Call("get_sales", arguments, clock, period, "period_movements")], ()
+    kind = (
+        "expense_total" if interpretation.expense_kind_mention else "period_movements"
+    )
+    return [Call("get_sales", arguments, clock, period, kind)], ()
 
 
 def _margin(interpretation, snapshot, clock, period, parties, collectors):

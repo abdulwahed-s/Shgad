@@ -377,6 +377,42 @@ def test_cash_answer_offers_and_templates_only_the_cash_figure():
     assert response.renderer.fell_back_to_template
 
 
+def test_d59_expense_kind_shows_only_recorded_expenses_and_fixed_note():
+    from app.agents.messages_ar import text
+
+    response = ask(
+        "شكد صرفت على الكهرباء",
+        understood(
+            intent="period_movements",
+            movement="operating_expenses",
+            expense_kind_mention="الكهرباء",
+        ),
+    )
+    assert response.status == "answered"
+    assert period(response) == ("2026-09-28", "2026-09-28")
+    assert [f.key for f in response.figures] == ["tool_0.weekly.operating_expenses"]
+    assert response.figures[0].amount_iqd == 10000
+    assert response.figures[0].source_ids and response.figures[0].formula
+    assert text("expense_kind_unrecorded") in response.reply_ar
+
+
+def test_d59_plain_expenses_keep_the_movement_view_without_repeated_lines():
+    from app.agents.messages_ar import text
+
+    response = ask(
+        "شكد صرفت هالاسبوع؟",
+        understood(
+            intent="period_movements",
+            movement="operating_expenses",
+            time={"type": "this_week", "evidence": "هالاسبوع"},
+        ),
+    )
+    assert response.status == "answered"
+    assert any(f.key.endswith("weekly.operating_expenses") for f in response.figures)
+    assert response.reply_ar.count(text("recorded_cash_sales") + ":") == 1
+    assert response.reply_ar.count(text("operatingExpense") + ":") == 1
+
+
 def test_upcoming_answer_never_offers_whole_ledger_balances():
     from app.agents.orchestrator import answers
 

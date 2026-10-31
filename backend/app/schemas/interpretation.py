@@ -120,6 +120,7 @@ class Interpretation(LedgerModel):
     direction: Literal["receivable", "payable", "both"] = "receivable"
     overdue_only: StrictBool = False
     movement: Movement | None = None
+    expense_kind_mention: Verbatim | None = None
     days: Annotated[int, Field(strict=True, ge=1, le=30)] | None = None
     party_mentions: tuple[Verbatim, ...] = Field(default=(), max_length=4)
     collection_party_mentions: tuple[Verbatim, ...] = Field(default=(), max_length=2)
@@ -129,6 +130,10 @@ class Interpretation(LedgerModel):
 
     @model_validator(mode="after")
     def consistent(self):
+        if self.expense_kind_mention is not None and (
+            self.intent != "period_movements" or self.movement != "operating_expenses"
+        ):
+            raise ValueError("Expense kinds require an operating-expense question")
         if self.behavior == "refuse" and self.intent not in {
             "unsupported_write",
             "unsafe_instruction",

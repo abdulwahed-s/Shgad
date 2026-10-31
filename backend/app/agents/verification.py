@@ -27,7 +27,11 @@ from app.services.financial_queries import (
 )
 from app.services.known_zero import query_evidence
 from app.services.margin import margin_report
-from app.services.weekly_tool_views import movement_result, weekly_tool_result
+from app.services.weekly_tool_views import (
+    expense_total_result,
+    movement_result,
+    weekly_tool_result,
+)
 
 
 def _reject():
@@ -283,10 +287,14 @@ def verify_tool_output(
         ):
             _reject()
     elif movements_plan:
+        expected = (
+            expense_total_result
+            if envelope.result.get("note_key") == "expense_kind_unrecorded"
+            else movement_result
+        )
         if (
             tool_name != "get_sales"
-            or movement_result(snapshot, resolved).model_dump(mode="json")
-            != envelope.result
+            or expected(snapshot, resolved).model_dump(mode="json") != envelope.result
         ):
             _reject()
     elif tool_name == "get_sales":

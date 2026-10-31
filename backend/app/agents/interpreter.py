@@ -31,6 +31,7 @@ Return exactly these keys (omit none):
  "direction": "receivable|payable|both",
  "overdue_only": true|false,
  "movement": null or "<movement>",
+ "expense_kind_mention": null or "<exact expense-kind words from the question>",
  "days": null or <int copied from the text>,
  "party_mentions": ["<exact words naming a customer or supplier>"],
  "collection_party_mentions": ["<exact words naming the customer in an 'if X pays'
@@ -60,6 +61,10 @@ INTENTS
   collections from customers (التحصيلات، سددوا), or capital injections (حطيت فلوس
   من جيبي/رأس مال). movement: owner_drawings | operating_expenses |
   supplier_payments | collections | capital_injections | drawings_and_expenses.
+  When a specific expense kind is requested (electricity, rent, generator, etc.),
+  copy its exact words into expense_kind_mention, e.g. الكهرباء. Otherwise null.
+  This is a mention only; the ledger has no expense categories. Never infer a
+  category or read descriptions to assign one.
 - estimated_gross_margin: profit or margin (ربح، هامش، فايدة).
 - reconciliation: unmatched payments, possible duplicate entries, partial or overdue
   flags, "anything wrong in the records", and auditing/checking collections or
@@ -271,6 +276,11 @@ def _months(evidence):
 
 def verify(interpretation, message):
     """Return the interpretation only if every copied fragment and integer is proven."""
+    if (
+        interpretation.expense_kind_mention is not None
+        and interpretation.expense_kind_mention not in message
+    ):
+        return None
     for mention in (
         *interpretation.party_mentions,
         *interpretation.collection_party_mentions,

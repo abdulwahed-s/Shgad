@@ -49,6 +49,15 @@ class WeeklySalesResult(SalesReport):
     weekly: WeeklyMovements
 
 
+class ExpenseMovement(LedgerModel):
+    operating_expenses: Amount
+
+
+class ExpenseTotalResult(LedgerModel):
+    weekly: ExpenseMovement
+    note_key: Literal["expense_kind_unrecorded"] = "expense_kind_unrecorded"
+
+
 class WeeklyMarginResult(LedgerModel):
     range: ReportRange
     gross_margin: Amount

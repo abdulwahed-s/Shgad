@@ -33,7 +33,11 @@ from app.services.known_zero import query_evidence
 from app.services.margin import margin_metrics
 from app.services.period_phrases import resolve_period
 from app.services.tool_evidence import debt_metrics, forecast_figures, upcoming_figures
-from app.services.weekly_tool_views import movement_result, weekly_tool_result
+from app.services.weekly_tool_views import (
+    expense_total_result,
+    movement_result,
+    weekly_tool_result,
+)
 from app.tools import forecast, get_debts, get_margin, get_sales, reconcile
 
 TOOLS = {
@@ -52,6 +56,7 @@ PLANS = {
     "interpretation",
     "payment_now",
     "reconciliation_summary",
+    "expense_total",
 }
 
 
@@ -128,7 +133,7 @@ def _invoke(
         if server_plan not in PLANS:
             raise FinancialRuleError("VALIDATION_ERROR")
         weekly_plan = server_plan == "weekly_summary"
-        movements_plan = server_plan == "period_movements"
+        movements_plan = server_plan in {"period_movements", "expense_total"}
         if not isinstance(name, str) or name not in TOOLS:
             raise FinancialRuleError("VALIDATION_ERROR")
         model, service = TOOLS[name]
@@ -204,7 +209,14 @@ def _invoke(
                 end_date=trusted_range.end,
                 trusted_range=trusted_range,
             )
-            result, party = movement_result(snapshot, resolved), None
+            result, party = (
+                (
+                    expense_total_result
+                    if server_plan == "expense_total"
+                    else movement_result
+                )(snapshot, resolved),
+                None,
+            )
         else:
             result, resolved, party = service(
                 snapshot,

@@ -79,6 +79,21 @@ def test_days_must_appear_in_the_question():
     )
 
 
+def test_d59_expense_kind_must_be_verbatim_and_expense_scoped():
+    fields = dict(
+        intent="period_movements",
+        movement="operating_expenses",
+        expense_kind_mention="الكهرباء",
+    )
+    assert parse(obj(**fields), "شكد صرفت على الكهرباء") is not None
+    assert parse(obj(**fields), "شكد صرفت على الايجار") is None
+    assert parse(obj(**fields, sales_kind="cash"), "شكد صرفت على الكهرباء") is not None
+    assert (
+        parse(obj(intent="sales", expense_kind_mention="الكهرباء"), "بيع الكهرباء")
+        is None
+    )
+
+
 @pytest.mark.parametrize(
     "bad",
     [
