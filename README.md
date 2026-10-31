@@ -170,7 +170,7 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8154
 
 Try asking `منو بعده بذمته فلوس؟` or `شكد بعنا كاش من أول هالأسبوع لهسه؟`.
 
-Latest checks: backend 1,535 passed, 1 skipped; Flutter 369 passed.
+Latest checks: backend 1,541 passed, 1 skipped; Flutter 369 passed.
 Backend lint/format and Flutter format/analysis pass. The 34 strict canonical-import
 tests remain unchanged and passing.
 
@@ -179,6 +179,7 @@ tests remain unchanged and passing.
 - **The forecast is weak.** It does worse than a simple seven-day baseline: MAE 978,995 vs 666,064 IQD on the final test. It is a labelled, secondary estimate.
 - **Some answers sound robotic.** When the model's wording fails validation, a fixed template with the same verified figures is used instead.
 - **Expense kinds are not recorded.** Questions about electricity or rent show the period's total recorded operating expenses with an explicit note. Imports require existing accounts and explicit due dates for credit sales and supplier invoices.
+- **Record checks depend on the requested period.** With no period, they show this week's flags and daily cash differences with sources. Dated audits show collections and flags for that period.
 - **No real merchant has used it yet.** It has been tested on synthetic data only.
 - **It runs locally only.** There is no authentication or hosting. The Android build is unverified. OCR, voice and WhatsApp are not built.
 
