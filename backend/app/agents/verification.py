@@ -21,6 +21,7 @@ from app.services.financial_queries import (
     debt_report,
     immediate_payment_capacity,
     payment_capacity,
+    reconciliation_differences,
     sale_totals,
     sources,
 )
@@ -304,6 +305,12 @@ def verify_tool_output(
             parsed = ReconcileResult.model_validate(envelope.result)
             expected = movement_result(snapshot, resolved).weekly.collections
             if parsed.weekly.collections != expected:
+                _reject()
+            if (
+                parsed.cash_differences
+                and parsed.cash_differences
+                != reconciliation_differences(snapshot, resolved)
+            ):
                 _reject()
         else:
             FlagsReport.model_validate(envelope.result)

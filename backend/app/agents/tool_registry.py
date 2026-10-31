@@ -51,6 +51,7 @@ PLANS = {
     "period_movements",
     "interpretation",
     "payment_now",
+    "reconciliation_summary",
 }
 
 
@@ -212,8 +213,12 @@ def _invoke(
                 dates_from_user=explicit and trusted_range is None,
                 **({"trusted_range": trusted_range} if trusted_range else {}),
                 **(
-                    {"with_collections": True}
-                    if name == "reconcile" and server_plan == "interpretation"
+                    {
+                        "with_collections": True,
+                        "with_differences": server_plan == "reconciliation_summary",
+                    }
+                    if name == "reconcile"
+                    and server_plan in {"interpretation", "reconciliation_summary"}
                     else {}
                 ),
             )

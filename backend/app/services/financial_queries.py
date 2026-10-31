@@ -13,6 +13,7 @@ from app.schemas.forecast import Amount
 from app.schemas.ledger import Category, Obligation, OpeningBalance
 from app.schemas.queries import (
     Aging,
+    CashDifferenceView,
     DateRangeView,
     DebtFilters,
     DebtObligation,
@@ -35,6 +36,7 @@ from app.services.ledger_rules import (
     active_transactions,
     cash_difference_in_range,
     cash_on_hand,
+    daily_close,
     knowledge_cutoff,
     outstanding_balance,
 )
@@ -495,6 +497,30 @@ def upcoming_obligations(snapshot, *, days=7, party_id=None):
             None,
         ),
     )
+
+
+def reconciliation_differences(snapshot, resolved):
+    """Known nonzero daily gaps only; incomplete counts never become zero."""
+    result = []
+    for offset in range((resolved.end - resolved.start).days + 1):
+        day = resolved.start + timedelta(days=offset)
+        close = daily_close(snapshot.rows, business_date=day, known_at=snapshot.known)
+        if close.unexplained_difference_iqd in (None, 0):
+            continue
+        result.append(
+            CashDifferenceView(
+                date=day,
+                amount=amount(
+                    close.unexplained_difference_iqd,
+                    "unexplained_cash_difference",
+                    close.source_ids,
+                    "FINANCIAL_RULES §3: count - previous count - inflows + outflows; "
+                    "consecutive counts required",
+                    kind="flagged",
+                ),
+            )
+        )
+    return tuple(result)
 
 
 def immediate_payment_capacity(snapshot, party_id):

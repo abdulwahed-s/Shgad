@@ -143,10 +143,16 @@ class ReconcileCollections(LedgerModel):
     collections: Amount
 
 
+class CashDifferenceView(LedgerModel):
+    date: BusinessDate
+    amount: Amount
+
+
 class ReconcileResult(FlagsReport):
     """D58 tool view: flags plus the period's collections total for audits."""
 
     weekly: ReconcileCollections
+    cash_differences: tuple[CashDifferenceView, ...] = ()
 
 
 class PaymentCapacity(LedgerModel):

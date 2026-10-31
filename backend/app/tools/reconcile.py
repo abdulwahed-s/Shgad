@@ -1,7 +1,7 @@
 """Read-only period/type projection of the existing reconciliation service."""
 
 from app.schemas.queries import FlagsReport, ReconcileCollections, ReconcileResult
-from app.services.financial_queries import historical_range
+from app.services.financial_queries import historical_range, reconciliation_differences
 from app.services.reconcile import reconciliation_report
 from app.services.weekly_tool_views import movement_result
 
@@ -14,6 +14,7 @@ def run(
     dates_from_user=False,
     trusted_range=None,
     with_collections=False,
+    with_differences=False,
 ):
     resolved = historical_range(
         clock,
@@ -48,6 +49,9 @@ def run(
             weekly=ReconcileCollections(
                 collections=movement_result(snapshot, resolved).weekly.collections
             ),
+            cash_differences=reconciliation_differences(snapshot, resolved)
+            if with_differences
+            else (),
         ),
         resolved,
         None,

@@ -183,6 +183,37 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
                 include(index, "gross_margin", text("estimated_gross_margin"))
             else:
                 parts.append(text("margin_insufficient_priced_sales"))
+        if "items" in output.result:
+            for item_index, flag in enumerate(output.result["items"]):
+                label = {
+                    "suspected_duplicate": "review_duplicate_payment",
+                    "unmatched": "review_unmatched_payment",
+                    "ambiguous": "review_unmatched_payment",
+                }.get(flag["type"], "review_debts")
+                include(index, f"items.{item_index}.amount", text(label))
+                parts.append(
+                    text("flag_sources").format(ids="، ".join(flag["source_ids"]))
+                )
+            for gap_index, gap in enumerate(output.result.get("cash_differences", ())):
+                include(
+                    index,
+                    f"cash_differences.{gap_index}.amount",
+                    text("unexplained_cash_difference")
+                    + " ("
+                    + "{{date:tool_"
+                    + f"{index}.cash_differences.{gap_index}.date"
+                    + "}}"
+                    + ")",
+                )
+                parts.append(
+                    text("flag_sources").format(
+                        ids="، ".join(gap["amount"]["source_ids"])
+                    )
+                )
+            if output.result.get("cash_differences"):
+                parts.append(text("difference_note"))
+            if not output.result["items"] and not output.result.get("cash_differences"):
+                parts.append(text("no_action_needed"))
         if "tool_plan_cash_sufficiency" in output.warnings and output.result.get("j1"):
             for key in (
                 "cash_on_hand",
@@ -361,8 +392,6 @@ def _template(outputs):
                 )
         elif "items" in data:
             add("weekly.collections", text("collection"))
-            for item_index in range(min(5, len(data["items"]))):
-                add(f"items.{item_index}.amount")
     return " ".join(lines) or text("no_figures")
 
 

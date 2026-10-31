@@ -55,6 +55,7 @@ MESSAGES = {
         "after_recorded_expenses": "بعد المصاريف المسجلة",
         "unpriced_sales_count": "عدد المبيعات بدون كلفة مسجلة",
         "reconciliation_amount": "مبلغ يحتاج مراجعة",
+        "flag_sources": "مصادر القيد: {ids}.",
         "review_unmatched_payment": "راجع الدفعة اللي ما تطابقت وكمل تفاصيلها.",
         "review_duplicate_payment": "راجع القيود المتشابهة قبل أي تعديل.",
         "review_debts": "راجع الديون الباقية وتواريخ استحقاقها.",

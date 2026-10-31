@@ -371,7 +371,6 @@ def test_collections_audit_answers_even_without_flags():
     assert any(f.key.endswith("weekly.collections") for f in response.figures)
 
 
-
 def test_cash_answer_offers_and_templates_only_the_cash_figure():
     response = ask("شكد الكاش بالدرج هسه", understood(intent="cash_on_hand"))
     assert [f.key for f in response.figures] == ["tool_0.upcoming.cash_on_hand"]

@@ -31,7 +31,7 @@ SCOPE = {
     "sales": "historical",
     "period_movements": "historical",
     "estimated_gross_margin": "historical",
-    "reconciliation": "historical",
+    "reconciliation": "summary",
     "weekly_summary": "summary",
     "cash_on_hand": "snapshot",
     "debts": "snapshot",
@@ -235,7 +235,9 @@ def _margin(interpretation, snapshot, clock, period, parties, collectors):
 
 
 def _reconcile(interpretation, snapshot, clock, period, parties, collectors):
-    return [Call("reconcile", _explicit(period), clock, period)], ()
+    return [
+        Call("reconcile", _explicit(period), clock, period, "reconciliation_summary")
+    ], ()
 
 
 def _cash(interpretation, snapshot, clock, period, parties, collectors):
