@@ -53,6 +53,9 @@ Ten ways it can fail, what it does instead, and the tests that prove it: [`FAILU
 
 60 held-out questions that the builders never saw, run **once** on a frozen version of the app.
 
+Measured on `freeze-heldout-v3`; later fixes (this-week and now payment questions,
+flag summaries, expense totals, flexible import) are not part of that measurement.
+
 | Run | Answers | Safe handling | Traceable figures | Joint |
 |---|:-:|:-:|:-:|:-:|
 | v1 | 8/40 | 0/20 | 38/39 | 12/60 |

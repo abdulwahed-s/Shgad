@@ -157,6 +157,21 @@ def test_upcoming_window_from_copied_days():
     assert response.status == "answered"
 
 
+def test_d59_this_week_payments_include_the_thursday_invoice():
+    response = ask(
+        "شكد لازم ادفع للمجاهزين هالاسبوع؟",
+        understood(
+            intent="upcoming_obligations",
+            time={"type": "this_week", "evidence": "هالاسبوع"},
+        ),
+    )
+    assert response.status == "answered"
+    assert period(response) == ("2026-09-28", "2026-10-02")
+    dues = next(f for f in response.figures if f.key.endswith("upcoming.dues_total"))
+    assert dues.amount_iqd == 650000
+    assert dues.source_ids and dues.formula
+
+
 def test_drawings_for_a_month_use_period_movements():
     response = ask(
         "شكد سحبت للبيت بشهر آب",

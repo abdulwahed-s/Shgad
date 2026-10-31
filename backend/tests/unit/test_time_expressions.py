@@ -139,6 +139,18 @@ def test_forward_clarifications(expression, expected):
     assert code(MONDAY, "forward", **expression) == expected
 
 
+@pytest.mark.parametrize(
+    ("today", "expected"),
+    [
+        (date(2026, 9, 28), ("2026-09-28", "2026-10-02")),
+        (date(2026, 10, 2), ("2026-10-02", "2026-10-02")),
+        (date(2026, 9, 26), ("2026-09-26", "2026-10-02")),
+    ],
+)
+def test_d59_forward_this_week_ends_on_friday(today, expected):
+    assert span(BusinessClock(today), "forward", type="this_week") == expected
+
+
 def test_target_day_requires_a_future_day():
     assert span(MONDAY, "target", type="weekday_next", weekday="thu") == (
         "2026-09-28",

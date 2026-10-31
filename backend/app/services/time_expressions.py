@@ -149,6 +149,9 @@ def _future_day(expression, today):
 
 
 def _forward(expression, today):
+    if expression.type == "this_week":
+        # D59 / FINANCIAL_RULES §7a: remaining business week, Friday inclusive.
+        return DateRange(today, today + timedelta(days=(4 - today.weekday()) % 7))
     if expression.type in {"none", "next_n_days"}:
         days = 7 if expression.type == "none" else expression.n
         if days > _FORWARD_LIMIT_DAYS:
