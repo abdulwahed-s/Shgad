@@ -183,6 +183,8 @@ def answers(intent, key, *, per_day=False):
     """Figures that answer an intent whose tool view carries more than was asked."""
     if intent == "cash_on_hand":
         return key == "upcoming.cash_on_hand"
+    if intent == "supplier_sufficiency" and key.startswith("payment_now."):
+        return True
     if intent == "upcoming_obligations":
         # Window totals, positions and (when asked) per-day figures; not invoices.
         parts = key.split(".")
@@ -201,6 +203,8 @@ def quoted_output(output, index, *, per_day=False, intent=None):
     selected = []
     for value in (*output.figures, *output.metrics):
         if not has_evidence(value) or value.kind == "missing":
+            continue
+        if "payment_now" in output.result and not value.key.startswith("payment_now."):
             continue
         if "scenarios" in output.result and not (
             value.key.startswith("j1.") or value.key.endswith("lowest.closing_iqd")
@@ -469,7 +473,7 @@ async def _interpreted(request, *, client, connection, clock, known_at):
             answered,
             behavior="answer",
             intent=understood.intent,
-            tools=planner.TOOLS_BY_INTENT[understood.intent],
+            tools=tuple(dict.fromkeys(call.name for call in decided.calls)),
             counterparty_ids=decided.parties,
             period={"start": decided.period.start, "end": decided.period.end},
         )
@@ -501,14 +505,21 @@ def _stop_response(stop, understood):
 
 def _focused_template(intent, outputs, per_day):
     """A server-written slot draft limited to the figures that answer the intent."""
-    if intent not in {"cash_on_hand", "upcoming_obligations"}:
+    immediate = intent == "supplier_sufficiency" and any(
+        "payment_now" in o.result for o in outputs
+    )
+    if intent not in {"cash_on_hand", "upcoming_obligations"} and not immediate:
         return None
     lines = []
     for index, output in enumerate(outputs):
         for figure in (*output.figures, *output.metrics):
             # Only figures with approved label copy; others stay for the model draft.
             if (
-                answers(intent, figure.key, per_day=per_day)
+                (
+                    figure.key.startswith("payment_now.")
+                    if immediate
+                    else answers(intent, figure.key, per_day=per_day)
+                )
                 and figure.kind != "missing"
                 and has_evidence(figure)
                 and (figure.label_key in MESSAGES or figure.label_key in REUSED)
@@ -536,6 +547,22 @@ async def _narrate(conversation, outputs, used, message, client, debt_list, focu
             render_reply(None, outputs=outputs, debt_list=debt_list), outputs, used
         )
 
+    def complete_answer(drafted):
+        immediate = {
+            f"tool_{i}.{f.key}"
+            for i, output in enumerate(outputs)
+            if "payment_now" in output.result
+            for f in output.figures
+            if f.key.startswith("payment_now.")
+        }
+        if immediate:
+            shown = {
+                f.key if f.key.startswith("tool_") else f"tool_0.{f.key}"
+                for f in drafted.figures
+            }
+            return shown == immediate
+        return bool(drafted.figures or drafted.metrics)
+
     try:
         reply = await client.complete(conversation, tools=(), json_mode=True)
     except LLMUnavailable:
@@ -551,7 +578,7 @@ async def _narrate(conversation, outputs, used, message, client, debt_list, focu
             checked_draft(final.draft_ar, outputs, message), outputs, used
         )
         # A draft that shows no verified figure answers nothing; use the template.
-        return drafted if drafted.figures or drafted.metrics else template()
+        return drafted if complete_answer(drafted) else template()
     except DraftValidationError:
         pass
     revised = None
@@ -582,7 +609,7 @@ async def _narrate(conversation, outputs, used, message, client, debt_list, focu
     if revised:
         try:
             drafted = response(checked_draft(revised, outputs, message), outputs, used)
-            if drafted.figures or drafted.metrics:
+            if complete_answer(drafted):
                 stats = drafted.renderer.model_copy(update={"attempts": 2})
                 return drafted.model_copy(update={"renderer": stats})
         except DraftValidationError:

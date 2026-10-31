@@ -289,7 +289,8 @@ def _sufficiency(interpretation, snapshot, clock, period, parties, collectors):
             {
                 b.obligation.counterparty_id
                 for b in snapshot.balances
-                if b.obligation.kind == "payable" and b.obligation.due_date == target
+                if b.obligation.kind == "payable"
+                and (target == snapshot.day or b.obligation.due_date == target)
             }
         )
         if len(due) > 1:
@@ -300,6 +301,19 @@ def _sufficiency(interpretation, snapshot, clock, period, parties, collectors):
             return clarify("MISSING_DUE_DATE")
         suppliers = [snapshot.party(due[0])]
     snapshot.cash()
+    if target == snapshot.day:
+        if len(suppliers) != 1:
+            return clarify("AMBIGUOUS_COUNTERPARTY", tuple(suppliers))
+        supplier = suppliers[0]
+        return [
+            Call(
+                "get_debts",
+                {"direction": "payable", "counterparty_query": supplier.display_name},
+                clock,
+                plan="payment_now",
+                party=supplier,
+            )
+        ], (supplier,)
     calls = [
         Call(
             "get_debts",

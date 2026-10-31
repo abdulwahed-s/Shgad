@@ -8,12 +8,18 @@ import hashlib
 from collections import Counter
 from datetime import timedelta
 
-from app.schemas.queries import DebtsResult, FlagsReport, ReconcileResult
+from app.schemas.queries import (
+    DebtsResult,
+    FlagsReport,
+    ImmediateDebtsResult,
+    ReconcileResult,
+)
 from app.schemas.tools import Figure, Metric, ToolEnvelope
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
 from app.services.financial_queries import (
     debt_report,
+    immediate_payment_capacity,
     payment_capacity,
     sale_totals,
     sources,
@@ -66,7 +72,20 @@ def _leaves(data, path=""):
 
 
 def _verify_debts(data, snapshot):
-    parsed = DebtsResult.model_validate(data)
+    parsed = (
+        ImmediateDebtsResult if "payment_now" in data else DebtsResult
+    ).model_validate(data)
+    if isinstance(parsed, ImmediateDebtsResult):
+        report = parsed.payables
+        if (
+            report is None
+            or report.filters.counterparty_id is None
+            or report.filters.overdue_only
+            or report.filters.due_start is not None
+            or parsed.payment_now
+            != immediate_payment_capacity(snapshot, report.filters.counterparty_id)
+        ):
+            _reject()
     balances = {b.obligation.obligation_id: b for b in snapshot.balances}
     for report in (parsed.receivables, parsed.payables):
         if report is None:

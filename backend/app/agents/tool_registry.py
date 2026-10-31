@@ -10,7 +10,7 @@ from pydantic import BaseModel, ValidationError
 
 from app.agents.verification import verify_tool_output
 from app.schemas.forecast import Amount
-from app.schemas.queries import DateRangeView
+from app.schemas.queries import DateRangeView, ImmediateDebtsResult
 from app.schemas.tools import (
     DebtsArguments,
     ErrorDetail,
@@ -23,7 +23,12 @@ from app.schemas.tools import (
 )
 from app.services.business_clock import DateRange
 from app.services.errors import FinancialRuleError
-from app.services.financial_queries import QuerySnapshot, historical_range, sources
+from app.services.financial_queries import (
+    QuerySnapshot,
+    historical_range,
+    immediate_payment_capacity,
+    sources,
+)
 from app.services.known_zero import query_evidence
 from app.services.margin import margin_metrics
 from app.services.period_phrases import resolve_period
@@ -45,6 +50,7 @@ PLANS = {
     "cash_sufficiency",
     "period_movements",
     "interpretation",
+    "payment_now",
 }
 
 
@@ -210,6 +216,19 @@ def _invoke(
                     if name == "reconcile" and server_plan == "interpretation"
                     else {}
                 ),
+            )
+        if server_plan == "payment_now":
+            if (
+                name != "get_debts"
+                or party is None
+                or args.direction != "payable"
+                or args.due_period is not None
+                or args.overdue_only
+            ):
+                raise FinancialRuleError("VALIDATION_ERROR")
+            result = ImmediateDebtsResult(
+                **result.model_dump(),
+                payment_now=immediate_payment_capacity(snapshot, party.id),
             )
         data = result.model_dump(mode="json")
         figures, dates = _metadata(result)

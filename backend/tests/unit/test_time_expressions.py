@@ -151,14 +151,14 @@ def test_d59_forward_this_week_ends_on_friday(today, expected):
     assert span(BusinessClock(today), "forward", type="this_week") == expected
 
 
-def test_target_day_requires_a_future_day():
+def test_target_day_accepts_now_and_future_days():
     assert span(MONDAY, "target", type="weekday_next", weekday="thu") == (
         "2026-09-28",
         "2026-10-01",
     )
     assert span(MONDAY, "target", type="tomorrow") == ("2026-09-28", "2026-09-29")
-    assert code(MONDAY, "target", type="none") == "AMBIGUOUS_DATE"
-    assert code(MONDAY, "target", type="today") == "AMBIGUOUS_DATE"
+    assert span(MONDAY, "target", type="none") == ("2026-09-28", "2026-09-28")
+    assert span(MONDAY, "target", type="today") == ("2026-09-28", "2026-09-28")
 
 
 def test_expression_schema_is_closed_and_bounded():

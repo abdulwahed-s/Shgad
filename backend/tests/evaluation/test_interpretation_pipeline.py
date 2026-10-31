@@ -144,6 +144,57 @@ def test_supplier_sufficiency_uses_the_due_supplier_and_named_collection():
     )
 
 
+@pytest.mark.parametrize(
+    "time", [{"type": "today", "evidence": "هسه"}, {"type": "none"}]
+)
+def test_d59_supplier_now_uses_all_unpaid_invoices_and_no_collections(time):
+    from app.services.financial_queries import QuerySnapshot
+
+    as_of = date(2026, 9, 28)
+    history = observed_history("primary", as_of, ROOT / "data")
+    with production_database(
+        history, reference_parties(ROOT / "data"), as_of=as_of
+    ) as db:
+        snapshot = QuerySnapshot(db, clock=BusinessClock(as_of), known_at=cutoff(as_of))
+        due = sum(
+            b.amount_iqd
+            for b in snapshot.balances
+            if b.obligation.kind == "payable"
+            and b.obligation.counterparty_id == "SUP-01"
+        )
+    response = ask(
+        "اكدر ادفع لمجهز الرف كل اللي عليه هسه؟",
+        understood(
+            intent="supplier_sufficiency", party_mentions=["مجهز الرف"], time=time
+        ),
+    )
+    assert response.status == "answered"
+    assert period(response) == ("2026-09-28", "2026-09-28")
+    assert response.interpretation.counterparty_ids == ("SUP-01",)
+    assert response.used_tools == response.interpretation.tools == ("get_debts",)
+    figures = {f.key.split(".", 1)[1]: f for f in response.figures}
+    assert set(figures) == {
+        "payment_now.cash_on_hand",
+        "payment_now.supplier_due",
+        "payment_now.position_confirmed",
+    }
+    assert figures["payment_now.cash_on_hand"].amount_iqd == 420000
+    assert figures["payment_now.supplier_due"].amount_iqd == due
+    assert figures["payment_now.position_confirmed"].amount_iqd == 420000 - due
+    assert all(f.source_ids and f.formula for f in figures.values())
+
+
+def test_d59_supplier_now_without_opening_cash_clarifies():
+    response = ask(
+        "اكدر ادفع لمجهز الرف هسه؟",
+        understood(intent="supplier_sufficiency", party_mentions=["مجهز الرف"]),
+        dataset="missing_opening_balance",
+    )
+    assert response.status == "clarification"
+    assert response.interpretation.reason == "MISSING_OPENING_BALANCE"
+    assert not response.figures
+
+
 def test_upcoming_window_from_copied_days():
     response = ask(
         "شنو علي خلال ٥ ايام الجاية",
@@ -318,6 +369,7 @@ def test_collections_audit_answers_even_without_flags():
     )
     assert response.status == "answered"
     assert any(f.key.endswith("weekly.collections") for f in response.figures)
+
 
 
 def test_cash_answer_offers_and_templates_only_the_cash_figure():

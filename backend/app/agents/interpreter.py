@@ -50,8 +50,10 @@ INTENTS
 - upcoming_obligations: what must be paid and/or will be collected in the next days,
   including "our cash position after the next N days of obligations". per_day is
   true when they want the figures day by day (يوم بيوم، بكل يوم).
-- supplier_sufficiency: can the cash cover paying a supplier on a coming day, or how
-  short will it be, with or without a customer paying first.
+- supplier_sufficiency: can the cash cover paying a supplier now/today or on a
+  coming day, or how short will it be, with or without a customer paying first.
+  Now/today (هسه/اليوم) means time today; omitted time means none. The server
+  compares current cash with all unpaid invoices for an immediate question.
 - weekly_summary: a general overview of how the shop did (لخصلي، شلون الشغل، تقرير).
 - period_movements: totals of owner drawings (فلوس البيت، سحبت لنفسي), shop operating
   expenses (مصاريف المحل، كهرباء، ايجار، أجور), supplier payments (دفعت للمجهز),

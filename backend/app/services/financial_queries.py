@@ -19,6 +19,7 @@ from app.schemas.queries import (
     DebtParty,
     DebtReport,
     DueItem,
+    ImmediatePaymentCapacity,
     OverdueItem,
     PaymentCapacity,
     PositionDay,
@@ -492,6 +493,24 @@ def upcoming_obligations(snapshot, *, days=7, party_id=None):
                 and r.running_with_expected_iqd < 0
             ),
             None,
+        ),
+    )
+
+
+def immediate_payment_capacity(snapshot, party_id):
+    """FINANCIAL_RULES §7 now variant: all unpaid invoices, current cash only."""
+    cash, _ = snapshot.cash()
+    due = debt_report(
+        snapshot, direction="payable", party_id=party_id
+    ).total_outstanding
+    return ImmediatePaymentCapacity(
+        cash_on_hand=cash,
+        supplier_due=due.model_copy(update={"label_key": "supplier_due"}),
+        position_confirmed=amount(
+            cash.amount_iqd - due.amount_iqd,
+            "position_confirmed",
+            sources(cash.source_ids, due.source_ids),
+            "FINANCIAL_RULES §7 now: current cash - all unpaid supplier invoices",
         ),
     )
 

@@ -176,6 +176,8 @@ def resolve_time(expression, clock, *, scope):
     if scope == "forward":
         return _forward(expression, today)
     if scope == "target":
+        if expression.type in {"today", "none"}:
+            return DateRange(today, today)
         if expression.type not in {"tomorrow", "weekday_next", "day"}:
             _fail("AMBIGUOUS_DATE")
         return _forward(expression, today)

@@ -123,6 +123,18 @@ class DebtsResult(LedgerModel):
     upcoming: UpcomingObligations | None
 
 
+class ImmediatePaymentCapacity(LedgerModel):
+    cash_on_hand: Amount
+    supplier_due: Amount
+    position_confirmed: Amount
+
+
+class ImmediateDebtsResult(DebtsResult):
+    """D59 private supplier-now projection; ordinary debt results stay unchanged."""
+
+    payment_now: ImmediatePaymentCapacity
+
+
 class FlagsReport(LedgerModel):
     items: tuple[FlagView, ...]
 

@@ -36,6 +36,8 @@ def debt_evidence(figure, *, snapshot, result):
     from app.services.financial_queries import debt_report
 
     group = figure.key.removesuffix(".total_outstanding")
+    if figure.key == "payment_now.supplier_due":
+        group = "payables"
     report = (result or {}).get(group)
     # Historical reconstructions (an earlier day seen with later knowledge, as in
     # weekly closings) keep their existing evidence rules and get no proof.
