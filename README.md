@@ -47,7 +47,7 @@ worse than no answer.
 - **Every figure has a receipt.** Tap a figure to see its formula and source rows, down to the original CSV cells.
 - **No guessing.** It asks when a name, date or data is unclear, and refuses requests to change records.
 
-Ten ways it can fail, what it does instead, and the tests that prove it: [`FAILURE_MODES.md`](FAILURE_MODES.md).
+Eleven ways it can fail, what it does instead, and the tests that prove it: [`FAILURE_MODES.md`](FAILURE_MODES.md).
 
 ## Results
 
@@ -60,7 +60,7 @@ flag summaries, expense totals, flexible import) are not part of that measuremen
 |---|:-:|:-:|:-:|:-:|
 | v1 | 8/40 | 0/20 | 38/39 | 12/60 |
 | v2 | 6/40 | 14/20 | 22/58 | 10/60 |
-| **v3 (current)** | **39/40** | **20/20** | **170/170** | **56/60** |
+| **v3 (frozen)** | **39/40** | **20/20** | **170/170** | **56/60** |
 | *Target* | *95%* | *95%* | *100%* | *90%* |
 
 Full receipt: [`results/evaluation_heldout_v3_FIRST.md`](results/evaluation_heldout_v3_FIRST.md)
@@ -134,6 +134,7 @@ Besides chat, the app has:
 - quick entry with undo;
 - daily close;
 - CSV import (map → preview → confirm);
+- mapped Iraqi dates, integer IQD separators/suffixes, and existing counterparty names;
 - a review queue for duplicates and unmatched payments;
 - a weekly summary;
 - a three-scenario cash estimate.
@@ -169,12 +170,15 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8154
 
 Try asking `منو بعده بذمته فلوس؟` or `شكد بعنا كاش من أول هالأسبوع لهسه؟`.
 
-The tests pass: backend 1478 (1 skipped) and Flutter 364.
+Latest checks: backend 1,535 passed, 1 skipped; Flutter 369 passed.
+Backend lint/format and Flutter format/analysis pass. The 34 strict canonical-import
+tests remain unchanged and passing.
 
 ## Limits
 
 - **The forecast is weak.** It does worse than a simple seven-day baseline: MAE 978,995 vs 666,064 IQD on the final test. It is a labelled, secondary estimate.
 - **Some answers sound robotic.** When the model's wording fails validation, a fixed template with the same verified figures is used instead.
+- **Expense kinds are not recorded.** Questions about electricity or rent show the period's total recorded operating expenses with an explicit note. Imports require existing accounts and explicit due dates for credit sales and supplier invoices.
 - **No real merchant has used it yet.** It has been tested on synthetic data only.
 - **It runs locally only.** There is no authentication or hosting. The Android build is unverified. OCR, voice and WhatsApp are not built.
 

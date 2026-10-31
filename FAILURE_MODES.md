@@ -6,7 +6,7 @@ All tests below run on the current agent, with a scripted stand-in for the model
 so they check the app's behaviour, not the model's luck. Run them from `backend/`:
 
 ```powershell
-.venv/Scripts/python.exe -m pytest -q tests/evaluation/test_failure_modes.py tests/evaluation/test_interpretation_pipeline.py
+.venv/Scripts/python.exe -m pytest -q tests/evaluation/test_failure_modes.py tests/evaluation/test_interpretation_pipeline.py tests/integration/test_csv_mapping_values.py tests/unit/test_csv_values.py
 ```
 
 ## Handled
@@ -23,6 +23,7 @@ so they check the app's behaviour, not the model's luck. Run them from `backend/
 | 8 | **"How much profit did I make?"** | It answers with *estimated gross margin*, showing how much of the sales have buy prices. It never says "net profit". | `test_a_profit_question_gets_estimated_gross_margin_never_net_profit` |
 | 9 | **An unclear date.** "Monday" is said on a Monday: today or last week? | Asks which one. | `test_past_today_weekday_and_future_history_clarify_from_the_resolver` |
 | 10 | **Messy imports.** The same file is imported twice, rows are suspected duplicates, payments match no debt, or the file is wrong or oversized. | Re-imports add nothing. Suspected duplicates and unmatched payments are flagged for the merchant, never deleted. Bad files are rejected before anything is written. | `test_import_api.py`, `test_reconciliation.py`, `test_file_import.py`, `test_security_limits.py` |
+| 11 | **Mapped names, dates or types cannot be resolved, or a credit sale lacks a due date.** | The preview names the field and reason, lists real ambiguity candidates and disables confirmation for displayed errors. It never creates accounts or invents dates. Iraqi dates, type synonyms and integer IQD separators are normalized by code; decimal amounts fail. | `test_csv_mapping_values.py`, `test_csv_values.py`, `csv_issue_widget_test.dart` |
 
 Two of these were also seen with the live Gemini model in the running app, shown in the
 README's "Stay safe" screenshot:
