@@ -202,6 +202,7 @@ def test_preview_accepts_in_file_obligation_and_partial_collection_atomically(
                 "IQD": "70000",
                 "Party": "CUST-01",
                 "Debt": "MAPPED-DEBT",
+                "Due": "2026-09-30",
             },
             {
                 "Kind": "CREDIT_COLLECTION",
@@ -232,6 +233,7 @@ def test_later_invalid_rows_use_normal_quarantine_on_confirmation(api, ledger, m
         "row": 6,
         "code": "INVALID_AMOUNT",
         "message": "INVALID_AMOUNT",
+        "field": "amount_iqd",
     }
     assert len(read_ledger(ledger).transactions) == 5
 

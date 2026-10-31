@@ -5,7 +5,6 @@ owns every date, the ledger owns every identity, and the existing services own
 every figure. The plan performs no arithmetic on money.
 """
 
-import re
 from dataclasses import dataclass, field
 from datetime import timedelta
 
@@ -13,7 +12,7 @@ from app.schemas.evidence import CounterpartyView
 from app.services.business_clock import BusinessClock, DateRange
 from app.services.errors import FinancialRuleError
 from app.services.financial_queries import QuerySnapshot
-from app.services.reconcile import normalize_name
+from app.services.identity import candidate_ids, generic_mention
 from app.services.time_expressions import resolve_time
 
 TOOLS_BY_INTENT = {
@@ -51,31 +50,6 @@ REASON_KEYS = {
     "OUT_OF_SCOPE": "clarify_request",
 }
 _WEEKDAY_CODES = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
-_ROLE_WORDS = {
-    "ال",
-    "مال",
-    "حق",
-    "المجهز",
-    "مجهز",
-    "للمجهز",
-    "المورد",
-    "مورد",
-    "للمورد",
-    "الزبون",
-    "زبون",
-    "للزبون",
-    "العميل",
-    "عميل",
-    "الزباين",
-    "زباين",
-    "الزبائن",
-    "الزبايين",
-    "المجهزين",
-    "مجهزين",
-    "للمجهزين",
-    "الموردين",
-    "العملاء",
-}
 
 
 @dataclass(frozen=True)
@@ -111,47 +85,13 @@ def clarify(reason, options=()):
     return Stop(reason, REASON_KEYS.get(reason, "clarify_request"), options=options)
 
 
-def _words(value):
-    return re.findall(r"[^\W_]+", normalize_name(value))
-
-
-def _candidates(snapshot, mention, allowed):
-    """Exact name, then substring, then every non-role word of the mention."""
-    named = {
-        key: normalize_name(name)
-        for key, (name, kind) in snapshot.parties.items()
-        if kind in allowed
-    }
-    form = normalize_name(mention)
-    exact = [key for key, name in named.items() if name == form]
-    if exact:
-        return exact
-    partial = [key for key, name in named.items() if form and form in name]
-    if partial:
-        return partial
-    kept = [word for word in _words(mention) if word not in _ROLE_WORDS]
-    if not kept:
-        return []
-    # Word containment, so "ابو علي دفتر ب" names only "ابو علي - دفتر ب".
-    return [
-        key
-        for key, name in named.items()
-        if " ".join(kept) in " ".join(_words(name))
-        or all(word in _words(name) for word in kept)
-    ]
-
-
-def _generic(mention):
-    return all(token in _ROLE_WORDS for token in normalize_name(mention).split())
-
-
 def resolve_parties(snapshot, mentions, allowed):
     """Every mention must name exactly one party; never merge similar names."""
     found = []
     for mention in mentions:
-        if _generic(mention):
+        if generic_mention(mention):
             continue  # "المجهز" / "الزبون" alone names nobody in particular.
-        matches = _candidates(snapshot, mention, allowed)
+        matches = candidate_ids(snapshot.parties, mention, allowed)
         if len(matches) > 1:
             return clarify(
                 "AMBIGUOUS_COUNTERPARTY",

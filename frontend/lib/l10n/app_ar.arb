@@ -202,6 +202,12 @@
     "x-review": "approved Iraqi Arabic review",
     "x-review-sha256": "59abacbd740704c7980da4a1a16c54ea334a1789d728cb4975e9d399a83d04c9"
   },
+  "csvUnknownParty": "هذا الاسم مو موجود بالدفتر؛ استخدم رقم حساب موجود.",
+  "@csvUnknownParty": {"description": "Unknown mapped customer or supplier", "x-review": "approved Iraqi Arabic review", "x-review-date": "2026-10-31", "x-review-sha256": "8df9b71afd8805c442414b294324d44281d5bf49b8e155e97e1a8559eb320e83"},
+  "csvAmbiguousParty": "الاسم يطابق أكثر من حساب؛ اكتب رقم الحساب بالملف.",
+  "@csvAmbiguousParty": {"description": "Ambiguous mapped counterparty with candidates", "x-review": "approved Iraqi Arabic review", "x-review-date": "2026-10-31", "x-review-sha256": "e107cdebc86a9a906a593699d4a9253d3b2b22d140e2df1a76feee577cb64223"},
+  "csvUnknownType": "نوع الحركة مو معروف؛ عدّله بالملف.",
+  "@csvUnknownType": {"description": "Unknown mapped event type", "x-review": "approved Iraqi Arabic review", "x-review-date": "2026-10-31", "x-review-sha256": "8a67561e3164076846c754553bde1b1419ba7f60288ec4e9f8c00326b0c5ff05"},
   "errorParty": "اختار رقم الزبون أو المجهز بالضبط.",
   "@errorParty": {
     "description": "Merchant interface: errorParty",

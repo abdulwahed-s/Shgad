@@ -26,6 +26,24 @@ class MockCsvRemote extends Mock implements CsvRemote {}
 class MockCsvRepository extends Mock implements CsvRepository {}
 
 void main() {
+  test(
+    'mapped row issues preserve their field and real ambiguity candidates',
+    () {
+      final issue = CsvModel.issue({
+        'row': 2,
+        'code': 'AMBIGUOUS_COUNTERPARTY',
+        'message': 'AMBIGUOUS_COUNTERPARTY',
+        'field': 'counterparty_id',
+        'candidates': [
+          {'id': 'CUST-02', 'display_name': 'أبو علي - دفتر أ'},
+          {'id': 'CUST-03', 'display_name': 'ابو علي - دفتر ب'},
+        ],
+      });
+      expect(issue.field, 'counterparty_id');
+      expect(issue.candidates.map((c) => c.id), ['CUST-02', 'CUST-03']);
+      expect(CsvModel.issue({'row': 1, 'code': 'INVALID_DATE'}).field, isNull);
+    },
+  );
   final file = PickedFile(
     'fictional.csv',
     Uint8List.fromList(

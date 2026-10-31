@@ -90,6 +90,7 @@ _ORIGINS = {EventType.CREDIT_SALE, EventType.SUPPLIER_INVOICE}
 @dataclass(frozen=True)
 class _RowProblem(Exception):
     code: str
+    field: str | None = None
 
 
 def _file_rows(path: Path) -> tuple[str, list[dict[str, str]]]:
@@ -179,16 +180,22 @@ def _parse(
 ):
     try:
         occurred_at = parse_timestamp(raw["occurred_at"])
+    except ValueError as exc:
+        raise _RowProblem("INVALID_DATE", "occurred_at") from exc
+    try:
         recorded_at = parse_timestamp(raw.get("recorded_at") or audit_time)
     except ValueError as exc:
-        raise _RowProblem("INVALID_DATE") from exc
+        raise _RowProblem("INVALID_DATE", "recorded_at") from exc
     if raw.get("currency") not in (None, "", "IQD"):
-        raise _RowProblem("INVALID_CURRENCY")
+        raise _RowProblem("INVALID_CURRENCY", "currency")
     try:
         amount = parse_iqd(raw["amount_iqd"])
+    except ValueError as exc:
+        raise _RowProblem("INVALID_AMOUNT", "amount_iqd") from exc
+    try:
         quantity = parse_iqd(raw["quantity"]) if raw["quantity"] else None
     except ValueError as exc:
-        raise _RowProblem("INVALID_AMOUNT") from exc
+        raise _RowProblem("INVALID_AMOUNT", "quantity") from exc
     if raw.get("source_system", source_system) != source_system:
         raise _RowProblem("VALIDATION_ERROR")
     token = hashlib.sha256(f"{source_system}:{raw['source_id']}".encode()).hexdigest()
@@ -216,14 +223,52 @@ def _parse(
             business_date=raw.get("business_date") or None,
         )
     except ValidationError as exc:
-        raise _RowProblem("VALIDATION_ERROR") from exc
+        failure = exc.errors()[0]
+        location = failure["loc"]
+        semantic_field = {
+            "business_date disagrees with Baghdad timestamp": "business_date",
+            "Due dates belong to originating obligations": "due_date",
+            "Obligation references apply only to credit and payment events": (
+                "obligation_id"
+            ),
+            "This event requires a counterparty ID": "counterparty_id",
+            "An originating event requires an obligation ID": "obligation_id",
+            "Sale category and quantity must be supplied together": "quantity"
+            if raw["category_id"]
+            else "category_id",
+            "Category and quantity apply only to sales": "category_id",
+        }.get(str(failure.get("ctx", {}).get("error", "")))
+        field = (
+            str(location[0])
+            if location
+            else semantic_field
+            or (
+                "source_id"
+                if not raw["source_id"]
+                else "counterparty_id"
+                if raw["type"] in _ORIGINS | _PAYMENTS and not raw["counterparty_id"]
+                else "obligation_id"
+                if raw["type"] in _ORIGINS and not raw["obligation_id"]
+                else "quantity"
+                if raw["category_id"] and not raw["quantity"]
+                else "category_id"
+                if raw["quantity"]
+                else "type"
+            )
+        )
+        raise _RowProblem("VALIDATION_ERROR", field) from exc
     late_upload_audit = allow_late_audit and not raw.get("recorded_at")
     if not OBSERVED_START <= row.business_date <= cutoff.date() or (
         recorded_at > cutoff and not late_upload_audit
     ):
-        raise _RowProblem("OUTSIDE_OBSERVED_DATA")
+        raise _RowProblem(
+            "OUTSIDE_OBSERVED_DATA",
+            "business_date" if raw.get("business_date") else "occurred_at",
+        )
     if recorded_at < occurred_at or recorded_at > audit_time:
-        raise _RowProblem("INVALID_DATE")
+        raise _RowProblem(
+            "INVALID_DATE", "recorded_at" if raw.get("recorded_at") else "occurred_at"
+        )
     return row
 
 
@@ -241,21 +286,21 @@ def _check_references(connection, row):
         if party is None or (
             row.type in _PAYMENTS | _ORIGINS and party["kind"] != expected
         ):
-            raise _RowProblem("INVALID_REFERENCE")
+            raise _RowProblem("INVALID_REFERENCE", "counterparty_id")
     if (
         row.category_id
         and not connection.execute(
             "SELECT 1 FROM categories WHERE category_id = ?", (row.category_id,)
         ).fetchone()
     ):
-        raise _RowProblem("INVALID_REFERENCE")
+        raise _RowProblem("INVALID_REFERENCE", "category_id")
     if (
         row.type in _ORIGINS
         and connection.execute(
             "SELECT 1 FROM obligations WHERE obligation_id = ?", (row.obligation_id,)
         ).fetchone()
     ):
-        raise _RowProblem("INVALID_REFERENCE")
+        raise _RowProblem("INVALID_REFERENCE", "obligation_id")
 
 
 def _payment_match(connection, row, audit_time, *, clock):
@@ -352,6 +397,7 @@ def _import_rows(
     source_system="synthetic_csv",
     allow_late_audit=False,
     raw_rows=None,
+    row_errors=None,
 ):
     cutoff = knowledge_cutoff(observed_day(clock))
     audit_time = parse_timestamp(imported_at)
@@ -382,6 +428,8 @@ def _import_rows(
             raw_id = f"{batch_id}-RAW-{number}"
             evidence = raw_rows[number - 1] if raw_rows is not None else raw
             try:
+                if row_errors and number in row_errors:
+                    raise _RowProblem("MAPPED_VALUE_ERROR")
                 row = _parse(
                     raw,
                     batch_id=batch_id,
@@ -420,7 +468,8 @@ def _import_rows(
                         not raw.get("recorded_at") or old.recorded_at == row.recorded_at
                     )
                     raise _RowProblem(
-                        "EXACT_DUPLICATE" if exact else "IDEMPOTENCY_CONFLICT"
+                        "EXACT_DUPLICATE" if exact else "IDEMPOTENCY_CONFLICT",
+                        "source_id",
                     )
                 _check_references(connection, row)
                 match = _payment_match(connection, row, audit_time, clock=clock)
@@ -516,8 +565,15 @@ def _import_rows(
                     accepted += 1
             except _RowProblem as problem:
                 rejected += 1
-                error = ImportErrorDetail(
-                    row=number, code=problem.code, message=problem.code
+                errors = (row_errors or {}).get(number) or (
+                    ImportErrorDetail(
+                        row=number,
+                        code=problem.code,
+                        message=problem.code,
+                        field=(problem.field or "type")
+                        if raw_rows is not None
+                        else None,
+                    ),
                 )
                 insert_record(
                     connection,
@@ -526,7 +582,9 @@ def _import_rows(
                         import_batch_id=batch_id,
                         source_row=number,
                         row_json=json.dumps(evidence, ensure_ascii=False),
-                        errors_json=json.dumps([error.model_dump()]),
+                        errors_json=json.dumps(
+                            [error.model_dump(mode="json") for error in errors]
+                        ),
                         status="rejected",
                     ),
                 )

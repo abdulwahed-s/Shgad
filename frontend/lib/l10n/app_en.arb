@@ -138,6 +138,12 @@
   "@errorDueDate": {
     "description": "Merchant interface: errorDueDate"
   },
+  "csvUnknownParty": "This name is not in the ledger; use an existing account ID.",
+  "@csvUnknownParty": {"description": "Unknown mapped customer or supplier"},
+  "csvAmbiguousParty": "This name matches multiple accounts; enter the exact ID in the file.",
+  "@csvAmbiguousParty": {"description": "Ambiguous mapped counterparty with candidates"},
+  "csvUnknownType": "This event type is unknown; correct it in the file.",
+  "@csvUnknownType": {"description": "Unknown mapped event type"},
   "errorParty": "Choose the exact customer or supplier ID.",
   "@errorParty": {
     "description": "Merchant interface: errorParty"

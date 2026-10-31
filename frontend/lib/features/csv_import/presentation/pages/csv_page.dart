@@ -36,13 +36,23 @@ String csvIssueText(AppLocalizations l, String code) => switch (code) {
   'MAPPING_UNRESOLVED' => l.errorMapping,
   'INVALID_AMOUNT' || 'INVALID_IQD' => l.errorAmount,
   'INVALID_DATE' || 'INVALID_TIMESTAMP' => l.errorDate,
-  'UNKNOWN_COUNTERPARTY' => l.errorParty,
+  'UNKNOWN_COUNTERPARTY' => l.csvUnknownParty,
+  'AMBIGUOUS_COUNTERPARTY' => l.csvAmbiguousParty,
+  'UNKNOWN_TYPE' => l.csvUnknownType,
+  'MISSING_DUE_DATE' => l.errorDueDate,
   'UNKNOWN_CATEGORY' => l.errorCategory,
   'IDEMPOTENCY_CONFLICT' => l.errorIdentity,
   'EXACT_DUPLICATE' => l.csvDuplicate,
   'CURRENCY_NOT_IQD' || 'INVALID_CURRENCY' => l.errorCurrency,
   _ => l.errorValidation,
 };
+
+String csvIssueDetails(AppLocalizations l, CsvIssue issue) => [
+  if (issue.field != null) csvFieldText(l, issue.field!),
+  csvIssueText(l, issue.code),
+  for (final candidate in issue.candidates)
+    '${candidate.displayName} (${candidate.id})',
+].join(' · ');
 
 class CsvPage extends StatelessWidget {
   const CsvPage({super.key});
@@ -133,7 +143,7 @@ class _CsvView extends StatelessWidget {
               Text(
                 l.csvRowError(
                   IqdFormatter.digits(issue.row.toString(), l.localeName),
-                  csvIssueText(l, issue.code),
+                  csvIssueDetails(l, issue),
                 ),
               ),
             const SizedBox(height: AppDimens.md),
@@ -312,7 +322,7 @@ class CsvPreviewRowView extends StatelessWidget {
             exact: true,
           ),
         for (final issue in row.issues)
-          InfoStrip(text: csvIssueText(l, issue.code), error: true),
+          InfoStrip(text: csvIssueDetails(l, issue), error: true),
       ],
     );
   }
@@ -384,7 +394,7 @@ class CsvPreviewTable extends StatelessWidget {
               child: InfoStrip(
                 text: l.csvRowError(
                   IqdFormatter.digits(row.row.toString(), l.localeName),
-                  csvIssueText(l, issue.code),
+                  csvIssueDetails(l, issue),
                 ),
                 error: true,
               ),

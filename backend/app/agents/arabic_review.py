@@ -143,7 +143,26 @@ WEEKLY_APPROVED_MESSAGES = {
 }
 
 
+# D59 is a separate user approval; retain D38/D44 snapshots and their dates.
+D59_REVIEWED_ON = "2026-10-31"
+D59_REVIEWED_BY = "user"
+D59_REVIEW_SOURCE = "explicit_chat_confirmation"
+D59_APPROVED_TEXT_SHA256 = (
+    "9284d4bada86ed3c2a163dd81a436ba8c02b6c00c7a794a006a758ceb1dc8678"
+)
+D59_APPROVED_MESSAGES = {
+    "flag_sources": (
+        "79b9c43f2f3078c9c3a01d41a6776f54102c11e148ed3865f081301b433b29ae"
+    ),
+    "expense_kind_unrecorded": (
+        "b44805a49138c37db1d4f4dcc7df150c8ddd6f6fb71c08ecab5d6430f464212a"
+    ),
+}
+
+
 def review_status(key, text):
     fingerprint = hashlib.sha256(text.encode("utf-8")).hexdigest()
-    expected = APPROVED_MESSAGES.get(key, WEEKLY_APPROVED_MESSAGES.get(key))
+    expected = APPROVED_MESSAGES.get(
+        key, WEEKLY_APPROVED_MESSAGES.get(key, D59_APPROVED_MESSAGES.get(key))
+    )
     return "APPROVED" if expected == fingerprint else "PENDING_REVIEW"

@@ -14,9 +14,16 @@ class CsvColumn {
 }
 
 class CsvIssue {
-  const CsvIssue(this.row, this.code);
+  const CsvIssue(this.row, this.code, {this.field, this.candidates = const []});
   final int row;
   final String code;
+  final String? field;
+  final List<CsvCandidate> candidates;
+}
+
+class CsvCandidate {
+  const CsvCandidate(this.id, this.displayName);
+  final String id, displayName;
 }
 
 class CsvPreviewRow {

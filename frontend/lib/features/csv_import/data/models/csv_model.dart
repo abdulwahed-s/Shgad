@@ -56,8 +56,16 @@ class CsvModel {
     return result;
   }
 
-  static CsvIssue issue(dynamic j) =>
-      CsvIssue(j['row'] as int, j['code'] as String);
+  static CsvIssue issue(dynamic j) => CsvIssue(
+    j['row'] as int,
+    j['code'] as String,
+    field: j['field'] as String?,
+    candidates: (j['candidates'] as List? ?? const [])
+        .map(
+          (c) => CsvCandidate(c['id'] as String, c['display_name'] as String),
+        )
+        .toList(),
+  );
   static CsvPreview preview(Map<String, dynamic> j) => CsvPreview(
     j['mapping_id'] as String,
     (j['columns'] as List)

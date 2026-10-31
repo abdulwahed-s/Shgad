@@ -15,6 +15,7 @@ from pydantic import ValidationError
 from app.db.records import atomic_import
 from app.schemas.csv_mapping import MappingPreview, MappingProposal, PreviewRow
 from app.schemas.imports import ImportErrorDetail
+from app.services.csv_values import normalize_row
 from app.services.errors import FinancialRuleError
 from app.services.import_limits import bounded_import, checkpoint
 from app.services.ingest import (
@@ -85,7 +86,7 @@ def _validate_proposal(value, headers):
         ) from exc
 
 
-def _mapped_input(content, proposal):
+def _mapped_input(content, proposal, connection=None):
     _, original = read_csv_content(content)
     rows = [
         dict.fromkeys(_REQUIRED, "")
@@ -96,6 +97,29 @@ def _mapped_input(content, proposal):
         }
         for raw in original
     ]
+    problems = {}
+    if connection is not None:
+        parties = {
+            r["counterparty_id"]: (r["display_name"], r["kind"])
+            for r in connection.execute("SELECT * FROM counterparties")
+        }
+        normalized = []
+        for number, row in enumerate(rows, 1):
+            checkpoint()
+            value, errors = normalize_row(row, parties)
+            normalized.append(value)
+            if errors:
+                problems[number] = tuple(
+                    ImportErrorDetail(
+                        row=number,
+                        code=code,
+                        message=code,
+                        field=field,
+                        candidates=candidates,
+                    )
+                    for code, field, candidates in errors
+                )
+        rows = normalized
     evidence = [
         {"original": raw, "canonical": mapped}
         for raw, mapped in zip(original, rows, strict=True)
@@ -104,11 +128,13 @@ def _mapped_input(content, proposal):
         [c.model_dump() for c in proposal.columns], ensure_ascii=False, sort_keys=True
     )
     identity = hashlib.sha256(content + b"\0" + columns_json.encode()).hexdigest()
-    return rows, evidence, columns_json, identity
+    return rows, evidence, columns_json, identity, problems
 
 
 def _preview_rows(connection, content, proposal, *, clock, audit, missing):
-    rows, evidence, _, identity = _mapped_input(content, proposal)
+    rows, evidence, _, identity, row_errors = _mapped_input(
+        content, proposal, connection
+    )
     if missing:
         return tuple(
             PreviewRow(
@@ -119,6 +145,7 @@ def _preview_rows(connection, content, proposal, *, clock, audit, missing):
                         row=i,
                         code="MAPPING_UNRESOLVED",
                         message="MAPPING_UNRESOLVED",
+                        field=missing[0],
                     ),
                 ),
             )
@@ -134,6 +161,7 @@ def _preview_rows(connection, content, proposal, *, clock, audit, missing):
             imported_at=audit,
             allow_late_audit=True,
             raw_rows=evidence,
+            row_errors=row_errors,
         )
         problems = {
             r["source_row"]: json.loads(r["errors_json"])
@@ -152,6 +180,8 @@ def _preview_rows(connection, content, proposal, *, clock, audit, missing):
             )
             parsed = None
             try:
+                if number in row_errors:
+                    raise _RowProblem("MAPPED_VALUE_ERROR")
                 transaction = _parse(
                     raw,
                     batch_id="PREVIEW",
@@ -203,7 +233,7 @@ def propose_mapping(
             and not missing
             and all(not r.errors for r in preview_rows),
         )
-        _, _, columns_json, _ = _mapped_input(content, proposal)
+        _, _, columns_json, _, _ = _mapped_input(content, proposal)
         checkpoint()
         connection.execute(
             """INSERT INTO csv_mappings
@@ -251,7 +281,9 @@ def confirm_mapping(connection, mapping_id, *, clock, confirmed_at):
         if existing:
             return get_import_receipt(connection, existing[0], replay=True)
         proposal = MappingProposal(columns=preview.columns)
-        rows, evidence, _, identity = _mapped_input(saved["content"], proposal)
+        rows, evidence, _, identity, row_errors = _mapped_input(
+            saved["content"], proposal, connection
+        )
         receipt = _import_rows(
             connection,
             identity,
@@ -260,6 +292,7 @@ def confirm_mapping(connection, mapping_id, *, clock, confirmed_at):
             imported_at=audit,
             allow_late_audit=True,
             raw_rows=evidence,
+            row_errors=row_errors,
         )
         connection.execute(
             "INSERT INTO mapping_confirmations VALUES (?, ?, ?)",
