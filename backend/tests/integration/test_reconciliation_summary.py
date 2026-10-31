@@ -15,7 +15,8 @@ def summary(db):
         connection=db,
         clock=BusinessClock(date(2026, 9, 28)),
         known_at=datetime.fromisoformat("2026-09-28T23:59:59+03:00"),
-        server_plan="interpretation",
+        # This helper exercises the no-period summary selected by the planner.
+        server_plan="reconciliation_summary",
     )
     assert output.ok, output.error
     return render_reply(None, outputs=[output])

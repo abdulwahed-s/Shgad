@@ -30,7 +30,7 @@ SCOPE = {
     "sales": "historical",
     "period_movements": "historical",
     "estimated_gross_margin": "historical",
-    "reconciliation": "summary",
+    "reconciliation": "historical",
     "weekly_summary": "summary",
     "cash_on_hand": "snapshot",
     "debts": "snapshot",
@@ -129,8 +129,13 @@ def plan(interpretation, *, connection, clock, known_at):
         return clarify(interpretation.reason)
     if intent not in TOOLS_BY_INTENT:
         return clarify("OUT_OF_SCOPE")
+    scope = (
+        "summary"
+        if intent == "reconciliation" and interpretation.time.type == "none"
+        else SCOPE[intent]
+    )
     try:
-        period = resolve_time(interpretation.time, clock, scope=SCOPE[intent])
+        period = resolve_time(interpretation.time, clock, scope=scope)
     except FinancialRuleError as error:
         return clarify(error.code)
     snapshot = QuerySnapshot(connection, clock=clock, known_at=known_at)
@@ -178,9 +183,12 @@ def _margin(interpretation, snapshot, clock, period, parties, collectors):
 
 
 def _reconcile(interpretation, snapshot, clock, period, parties, collectors):
-    return [
-        Call("reconcile", _explicit(period), clock, period, "reconciliation_summary")
-    ], ()
+    kind = (
+        "reconciliation_summary"
+        if interpretation.time.type == "none"
+        else "interpretation"
+    )
+    return [Call("reconcile", _explicit(period), clock, period, kind)], ()
 
 
 def _cash(interpretation, snapshot, clock, period, parties, collectors):

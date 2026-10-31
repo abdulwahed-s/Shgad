@@ -1,0 +1,110 @@
+{
+  "baseline_commit": "01ce749",
+  "business_as_of": "2026-09-03",
+  "question": "دقق تحصيلات امس",
+  "interpretation": {
+    "behavior": "answer",
+    "intent": "reconciliation",
+    "time": {
+      "type": "yesterday",
+      "evidence": "امس"
+    }
+  },
+  "plan": {
+    "intent": "reconciliation",
+    "period": {
+      "start": "2026-09-02",
+      "end": "2026-09-02"
+    },
+    "parties": [],
+    "per_day": false,
+    "calls": [
+      {
+        "name": "reconcile",
+        "arguments": {
+          "period": "explicit",
+          "start_date": "2026-09-02",
+          "end_date": "2026-09-02"
+        },
+        "clock": "2026-09-03",
+        "server_range": {
+          "start": "2026-09-02",
+          "end": "2026-09-02"
+        },
+        "plan": "interpretation",
+        "party": null
+      }
+    ]
+  },
+  "response": {
+    "status": "answered",
+    "reply_ar": "هذا جواب من قالب السجلات الموثقة لأن صياغة النموذج ما توفرت. للفترة من ٠٢/٠٩/٢٠٢٦ إلى ٠٢/٠٩/٢٠٢٦. تحصيل دين: ٣٢ ألف. مبلغ يحتاج مراجعة: ٤٨ ألف. مبلغ يحتاج مراجعة: ٤٨ ألف.",
+    "figures": [
+      {
+        "amount_iqd": 32000,
+        "kind": "calculated",
+        "label_key": "collections",
+        "source_ids": [
+          "DEMO-01-00529"
+        ],
+        "formula": "sum recorded CREDIT_COLLECTION in resolved range",
+        "key": "tool_0.weekly.collections",
+        "query_evidence": null
+      },
+      {
+        "amount_iqd": 48000,
+        "kind": "flagged",
+        "label_key": "reconciliation_amount",
+        "source_ids": [
+          "DEMO-01-00470",
+          "DEMO-01-00529"
+        ],
+        "formula": "original amount - active verified allocations",
+        "key": "tool_0.items.0.amount",
+        "query_evidence": null
+      },
+      {
+        "amount_iqd": 48000,
+        "kind": "flagged",
+        "label_key": "reconciliation_amount",
+        "source_ids": [
+          "DEMO-01-00470",
+          "DEMO-01-00529"
+        ],
+        "formula": "original amount - active verified allocations",
+        "key": "tool_0.items.1.amount",
+        "query_evidence": null
+      }
+    ],
+    "metrics": [],
+    "contexts": [
+      {
+        "range": {
+          "start": "2026-09-02",
+          "end": "2026-09-02"
+        },
+        "counterparty": null
+      }
+    ],
+    "resolved_range": {
+      "start": "2026-09-02",
+      "end": "2026-09-02"
+    },
+    "used_tools": [
+      "reconcile"
+    ],
+    "interpretation": {
+      "behavior": "answer",
+      "intent": "reconciliation",
+      "reason": null,
+      "tools": [
+        "reconcile"
+      ],
+      "counterparty_ids": [],
+      "period": {
+        "start": "2026-09-02",
+        "end": "2026-09-02"
+      }
+    }
+  }
+}

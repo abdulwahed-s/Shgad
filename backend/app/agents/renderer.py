@@ -189,7 +189,10 @@ def _server_context(outputs, contexts, *, figures, metrics, dates, used, debt_li
                 include(index, "gross_margin", text("estimated_gross_margin"))
             else:
                 parts.append(text("margin_insufficient_priced_sales"))
-        if "items" in output.result:
+        if (
+            "items" in output.result
+            and "tool_plan_reconciliation_summary" in output.warnings
+        ):
             for item_index, flag in enumerate(output.result["items"]):
                 label = {
                     "suspected_duplicate": "review_duplicate_payment",
@@ -400,6 +403,9 @@ def _template(outputs):
                 )
         elif "items" in data:
             add("weekly.collections", text("collection"))
+            if "tool_plan_reconciliation_summary" not in output.warnings:
+                for item_index in range(min(5, len(data["items"]))):
+                    add(f"items.{item_index}.amount")
     return " ".join(lines) or text("no_figures")
 
 
