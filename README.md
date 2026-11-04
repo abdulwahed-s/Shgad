@@ -188,10 +188,14 @@ The single training-only regression at `196ca1a` returned **109/150 joint**
 attempts included 72 HTTP 402 responses and one transport failure; it then hit
 the request ceiling. Compared with the earlier 149/150 baseline, four earlier
 questions and the final 37 failed, while the one previously failed question passed.
-These results do not isolate code regressions from provider/budget failures.
-Work stopped without tuning or rerunning; this collection build is not ready to merge.
-The drill also still needs its locally retained demo questions packaged for a
-fresh checkout; its passing local tests do not establish portable CI readiness.
+Offline replay isolated an overdue-balance routing regression, now covered by
+request-evidence and retry tests. The other three early failures followed changed
+provider interpretations or narration under both code versions. No subsequent
+paid training run has been measured; this collection build is not ready to merge.
+The development runner now records each question's provider, HTTP status and
+attempt count without changing grading. The original ten demo questions are
+committed fixtures; `python scripts/collection_drill.py` checks the portable plan
+without credentials or provider calls.
 
 <details>
 <summary><b>Weekly summary and cash estimate (desktop)</b></summary>

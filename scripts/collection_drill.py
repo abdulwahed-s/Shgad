@@ -6,7 +6,6 @@ future data, private questions, or the development check split.
 """
 
 import argparse
-import ast
 import asyncio
 import hashlib
 import json
@@ -21,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "backend"))
 SMOKE = ROOT / "data/evaluation/collection_smoke_v1.jsonl"
-DEMO = ROOT / "docs/mvp_session/post_drill/redrill.py"
+DEMO = ROOT / "data/evaluation/collection_demo_v1.json"
 AS_OF = date(2026, 9, 28)
 MAX_REQUESTS = 36
 
@@ -34,19 +33,10 @@ def plan():
     smoke = [json.loads(line) for line in SMOKE.read_text("utf-8").splitlines()]
     assert len(smoke) == len({q["id"] for q in smoke}) == 20
     assert all(q["authorship"] == "builder-written, not independent" for q in smoke)
-    # Reuse the ten documented D59 demo checks without importing the paid script.
-    tree = ast.parse(DEMO.read_text("utf-8"))
-    values = next(
-        ast.literal_eval(node.value)
-        for node in tree.body
-        if isinstance(node, ast.Assign)
-        and any(
-            isinstance(target, ast.Name) and target.id == "QUESTIONS"
-            for target in node.targets
-        )
-    )
-    questions = [question for key, question in values if key.startswith("demo-")]
+    # The original ten demo checks are packaged unchanged for a fresh checkout.
+    questions = json.loads(DEMO.read_text("utf-8"))
     assert len(questions) == 10, "ORIGINAL_DEMO_COUNT_CHANGED"
+    assert all(isinstance(question, str) and question.strip() for question in questions)
     return smoke, questions
 
 
@@ -491,7 +481,7 @@ def main():
             "entry_voids.csv",
         )
     }
-    args.output.mkdir(exist_ok=False)
+    args.output.mkdir(parents=True, exist_ok=False)
     head = (
         subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT).decode().strip()
     )
