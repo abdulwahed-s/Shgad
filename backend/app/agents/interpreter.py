@@ -71,6 +71,8 @@ INTENTS
   payments (دقق، راجع، مطابقة) even when they also ask for the collections total.
 - collection_priorities: who to follow up with for overdue customer debts
   (منو لازم أطالبه، منو متأخر بالدفع). A plain balance/aging question stays debts.
+  Asking who is overdue and how much remains is debts, overdue_only true, unless
+  the owner explicitly asks for follow-up or ranking. Preserve balance answers.
 - draft_reminder: write a polite payment reminder to a named customer
   (ذكّر، اكتبلي رسالة). Copy the exact name in party_mentions. This drafts text,
   never records a ledger event. Requests for threats/shaming are unsafe_instruction.
@@ -281,6 +283,63 @@ def _months(evidence):
     return {month for pattern, month in _MONTH_WORDS if re.search(pattern, text)}
 
 
+def _specialist_request(interpretation, message):
+    """Require semantic evidence for opt-in specialist routes, not just a label."""
+    if interpretation.behavior != "answer":
+        return interpretation
+    value = _text(message).lower()
+    if interpretation.intent == "collection_priorities":
+        # A negated overdue condition or a demand on the merchant cannot prove
+        # customer collection priorities. Let the existing retry resolve it.
+        if interpretation.direction == "payable" or re.search(
+            r"(?:مو|غير|ما)\s+(?:ال)?متاخر|\bnot\s+(?:overdue|late)\b|يطالبني|يطالبوني|بذمتي",
+            value,
+        ):
+            return None
+        demand = re.search(r"(?<!\w)[وف]?(?:اطالب|طالب)(?:ه|ها|هم)?(?!\w)", value)
+        follow_up = bool(
+            demand
+            or re.search(
+                r"تابع|متابع|اولوي|رتب|ترتيب|follow\s*up|prioriti|rank",
+                value,
+            )
+        )
+        overdue = bool(re.search(r"متاخر|فات\s+موعد|overdue|\blate\b", value))
+        collection = bool(
+            demand
+            or overdue
+            or re.search(r"دين|ديون|زبون|زباين|زبائن|customer|debt|\bowe\b", value)
+        )
+        balance = bool(
+            re.search(
+                r"شكد|(?<!\w)[وفب]?كم(?!\w)|بقي|باقي|رصيد|مبلغ|how\s+much|outstanding|balance|still\s+owe",
+                value,
+            )
+        )
+        if overdue and balance and not follow_up:
+            return interpretation.model_copy(
+                update={"intent": "debts", "overdue_only": True}
+            )
+        return interpretation if collection and (follow_up or overdue) else None
+    if interpretation.intent == "draft_reminder":
+        request = re.search(
+            r"(?<!\w)[وف]?(?:ذكر(?:ني|ه|ها|هم)?|تذكير|رساله|مسج|remind\w*|message|draft)(?!\w)",
+            value,
+        )
+        return interpretation if request else None
+    if interpretation.intent == "daily_brief":
+        current = re.search(r"اليوم|الصبح|صباح|today|morning", value)
+        overview = re.search(
+            r"ملخص|موجز|الوضع|عندي|brief|checklist|overview|status", value
+        )
+        specific = re.search(
+            r"كاش|نقد|فلوس|مبيعات|بيع|ديون|دين|مصروف|سحب|تحصيل|دفع|ارباح|هامش|cash|sales|debt|balance|expense|drawing|margin|profit|collection",
+            value,
+        )
+        return interpretation if current and overview and not specific else None
+    return interpretation
+
+
 def verify(interpretation, message):
     """Return the interpretation only if every copied fragment and integer is proven."""
     if (
@@ -313,7 +372,7 @@ def verify(interpretation, message):
                 return None
     if interpretation.days is not None and interpretation.days not in _numbers(message):
         return None
-    return interpretation
+    return _specialist_request(interpretation, message)
 
 
 def messages(question, *, today, weekday):
