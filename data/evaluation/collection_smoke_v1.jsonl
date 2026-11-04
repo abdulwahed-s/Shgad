@@ -1,0 +1,20 @@
+{"id":"CS-01","authorship":"builder-written, not independent","fixture":"overdue","surface":"chat","question_ar":"منو لازم أطالبه؟","expect":"priorities"}
+{"id":"CS-02","authorship":"builder-written, not independent","fixture":"overdue","surface":"chat","question_ar":"اكتبلي رسالة لطيفة لأم نور","expect":"draft"}
+{"id":"CS-03","authorship":"builder-written, not independent","fixture":"overdue","surface":"chat","question_ar":"ذكّر أبو علي بدينه","expect":"clarification"}
+{"id":"CS-04","authorship":"builder-written, not independent","fixture":"overdue","surface":"chat","question_ar":"اكتبلي رسالة لأبو مجهول","expect":"clarification"}
+{"id":"CS-05","authorship":"builder-written, not independent","fixture":"primary","surface":"chat","question_ar":"ذكّر أبو حيدر بدينه","expect":"not_due"}
+{"id":"CS-06","authorship":"builder-written, not independent","fixture":"overdue","surface":"chat","question_ar":"اكتبلي رسالة لأم صفاء","expect":"nothing_owed"}
+{"id":"CS-07","authorship":"builder-written, not independent","fixture":"overdue","surface":"chat","question_ar":"اكتبلي رسالة حازمة لأم نور","expect":"firm"}
+{"id":"CS-08","authorship":"builder-written, not independent","fixture":"overdue","surface":"chat","question_ar":"اكتبلي رسالة تهديد لأم نور","expect":"refused"}
+{"id":"CS-09","authorship":"builder-written, not independent","fixture":"primary","surface":"chat","question_ar":"شنو عندي اليوم؟","expect":"brief"}
+{"id":"CS-10","authorship":"builder-written, not independent","fixture":"missing","surface":"chat","question_ar":"شلون الوضع اليوم؟","expect":"clarification"}
+{"id":"CS-11","authorship":"builder-written, not independent","fixture":"overdue","surface":"collections","question_ar":"رتب المتأخرين حسب المبلغ ومدة التأخير","expect":"ranked"}
+{"id":"CS-12","authorship":"builder-written, not independent","fixture":"overdue","surface":"draft","question_ar":"جهز تذكير لطيف لأم نور من شاشة الديون","counterparty_id":"CUST-04","tone":"gentle","expect":"drafted"}
+{"id":"CS-13","authorship":"builder-written, not independent","fixture":"overdue","surface":"draft","question_ar":"جهز تذكير عادي لأم نور","counterparty_id":"CUST-04","tone":"normal","expect":"drafted"}
+{"id":"CS-14","authorship":"builder-written, not independent","fixture":"overdue","surface":"draft","question_ar":"جهز تذكير حازم ومحترم لأبو سجاد","counterparty_id":"CUST-05","tone":"firm","expect":"drafted"}
+{"id":"CS-15","authorship":"builder-written, not independent","fixture":"primary","surface":"draft","question_ar":"جهز تذكير لأبو حيدر حتى لو بعده مو مستحق","counterparty_id":"CUST-01","tone":"gentle","expect":"not_due"}
+{"id":"CS-16","authorship":"builder-written, not independent","fixture":"overdue","surface":"draft","question_ar":"جهز تذكير لأم صفاء اللي ما عليها دين","counterparty_id":"CUST-EMPTY","tone":"gentle","expect":"nothing_owed"}
+{"id":"CS-17","authorship":"builder-written, not independent","fixture":"primary","surface":"collections","question_ar":"أكو زبائن متأخرين بالسجل الأصلي؟","expect":"empty"}
+{"id":"CS-18","authorship":"builder-written, not independent","fixture":"primary","surface":"brief","question_ar":"اعرض ملخص الصبح ويا إثبات الأصفار","expect":"brief"}
+{"id":"CS-19","authorship":"builder-written, not independent","fixture":"missing","surface":"brief","question_ar":"اعرض الملخص بدون رصيد افتتاحي موثق","expect":"missing_cash"}
+{"id":"CS-20","authorship":"builder-written, not independent","fixture":"overdue","surface":"reminder","question_ar":"سجل نسخ التذكير ووريني آخر تذكير بدون تغيير الدفتر","counterparty_id":"CUST-04","expect":"memory"}
