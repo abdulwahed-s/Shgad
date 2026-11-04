@@ -43,7 +43,7 @@ worse than no answer.
 ## How Shgad stays honest
 
 - **The AI never types a number.** It writes slots like `{{fig:cash_on_hand}}`, and the server fills them from verified tool output.
-- **The AI never writes to the ledger.** It can only call five read-only, allowlisted tools.
+- **The AI never writes to the ledger.** The chat coordinator keeps five read-only financial tools; specialists have separate, restricted roles.
 - **Every figure has a receipt.** Tap a figure to see its formula and source rows, down to the original CSV cells.
 - **No guessing.** It asks when a name, date or data is unclear, and refuses requests to change records.
 
@@ -108,6 +108,21 @@ It was developed on 200 new reviewed questions: 149/150 on train and 47/49 on ch
 </details>
 
 ## Architecture
+
+Shgad uses a **coordinator + two specialist agents**. The chat coordinator resolves
+the merchant's question and chooses a fixed financial plan. The import specialist
+proposes column mappings for confirmation. The collection specialist drafts polite
+reminders using verified slots; code ranks overdue customers and the merchant
+chooses whether to share a message. All three use the same backend provider client.
+The morning brief is a deterministic report, with no model call.
+
+Collection APIs expose overdue priorities, constrained drafts and a separate
+append-only reminder log. A reminder records a merchant handoff, never delivery or
+payment; it changes no ledger balance. The brief reports cash, today's/week's dues,
+overdue customers and open flags, with source evidence or a verified empty query.
+New reminder wording is pending Iraqi Arabic review. Draft evaluation currently
+uses builder-written tests; no independent draft evaluation or real-merchant
+validation is claimed.
 
 ```mermaid
 flowchart LR

@@ -100,6 +100,46 @@ MESSAGES = {
 }
 
 
+# D61 development copy. No inherited approval: exact new texts remain pending.
+COLLECTION_COPY = {
+    "collection_greeting": "هلا {name}،",
+    "collection_signoff": "ممنونين لتعاونك.",
+    "collection_zaincash": "إذا يناسبك، تكدر تسدد بتحويل زين كاش.",
+    "reminder_gentle": (
+        "حبيت أذكّرك بالمبلغ المتأخر {{fig:overdue_amount}}، "
+        "المستحق بتاريخ {{date:oldest_due}}. من يناسبك تسدده؟"
+    ),
+    "reminder_normal": (
+        "نذكّرك بالمبلغ المتأخر {{fig:overdue_amount}}، "
+        "المستحق بتاريخ {{date:oldest_due}}. يا ريت تخبرنا بموعد مناسب للتسديد."
+    ),
+    "reminder_firm": (
+        "المبلغ {{fig:overdue_amount}} بعده متأخر من تاريخ {{date:oldest_due}}. "
+        "نرجو منك تحدد موعد للتسديد وتخبرنا بيه."
+    ),
+    "collection_nothing_owed": "هالحساب ما عليه دين باقي بالسجلات.",
+    "collection_not_due": (
+        "دين هالحساب بعده مو متأخر؛ أقرب استحقاق بتاريخ {{date:next_due}}."
+    ),
+    "collection_priorities": "الديون المتأخرة، مرتبة حسب المبلغ وبعدين مدة التأخير.",
+    "collection_empty": "ماكو ديون زبائن متأخرة بالسجلات.",
+    "collection_overdue_amount": "المبلغ المتأخر",
+    "collection_days_overdue": "أيام التأخير",
+    "collection_reminded": "آخر تذكير قبل {{fig:reminder_age}} يوم.",
+    "brief_title": "ملخص الصبح",
+    "brief_dues_today": "مستحقات اليوم ويا المتأخر",
+    "brief_dues_week": "المستحقات من اليوم لنهاية أسبوع الشغل",
+    "brief_overdue_count": "عدد الزبائن المتأخرين",
+    "brief_flags_count": "عدد القيود اللي تحتاج مراجعة هالأسبوع",
+}
+MESSAGES.update(
+    {
+        key: DraftMessage(value, status=review_status(key, value))
+        for key, value in COLLECTION_COPY.items()
+    }
+)
+
+
 # Verbatim D45 frontend keys reused by D54, not a new approval or an extension
 # of D38/D44. Hashes are from FRONTEND_ARABIC_APPROVAL_2026-10-20.json.
 REUSED_FRONTEND_LABELS = {

@@ -448,3 +448,39 @@ def render_reply(draft, *, outputs, user_message="", retry=None, debt_list=False
             "renderer": RendererStats(attempts=attempts, fell_back_to_template=True)
         }
     )
+
+
+def render_projected_draft(
+    draft, *, output, figure_keys=None, metric_keys=None, date_keys=None
+):
+    """Render specialist slot aliases drawn solely from one verified envelope.
+
+    Alias mappings are trusted server plans, never provider arguments. This uses
+    the same literal-number, slot and source checks as the coordinator renderer.
+    It deliberately adds no chat context to a customer-facing message.
+    """
+    require_verified(output)
+    originals = (
+        {f.key: f for f in output.figures},
+        {m.key: m for m in output.metrics},
+        output.dates,
+    )
+    maps = (figure_keys or {}, metric_keys or {}, date_keys or {})
+    figures, metrics, dates = (
+        {alias: values[key] for alias, key in mapping.items()}
+        for values, mapping in zip(originals, maps, strict=True)
+    )
+    used = ({}, {}, {})
+    body = _render_body(
+        draft, figures=figures, metrics=metrics, dates=dates, used=used, user_message=""
+    )
+    return RenderedReply(
+        reply_ar=body,
+        figures=tuple(used[0].values()),
+        metrics=tuple(used[1].values()),
+        dates=used[2],
+        contexts=(),
+        resolved_range=output.resolved_range,
+        resolved_counterparty=output.resolved_counterparty,
+        renderer=RendererStats(attempts=1, fell_back_to_template=False),
+    )

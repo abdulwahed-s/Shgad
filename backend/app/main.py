@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.chat import router as chat_router
+from app.api.collections import router as collections_router
 from app.api.daily_close import router as daily_close_router
 from app.api.demo import router as demo_router
 from app.api.entries import router as entries_router
@@ -36,6 +37,7 @@ app.add_middleware(
 register_error_handlers(app)
 app.include_router(health_router)
 app.include_router(chat_router)
+app.include_router(collections_router)
 app.include_router(imports_router)
 app.include_router(entries_router)
 app.include_router(ledger_router)

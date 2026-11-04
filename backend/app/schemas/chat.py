@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field, StringConstraints, model_validator
 
+from app.schemas.collections import CollectionAction, MorningBrief, SourcedCount
 from app.schemas.evidence import CounterpartyView
 from app.schemas.ledger import BusinessDate, LedgerModel, ToolName
 from app.schemas.queries import DateRangeView
@@ -51,7 +52,7 @@ class ChatResponse(LedgerModel):
     status: Literal["answered", "clarification", "refused", "llm_unavailable", "error"]
     reply_ar: str
     figures: tuple[Figure, ...] = ()
-    metrics: tuple[Metric, ...] = ()
+    metrics: tuple[Metric | SourcedCount, ...] = ()
     dates: dict[str, BusinessDate] = Field(default_factory=dict)
     contexts: tuple[ResolvedContext, ...] = ()
     resolved_range: DateRangeView | None = None
@@ -61,6 +62,12 @@ class ChatResponse(LedgerModel):
     used_tools: tuple[ToolName, ...] = ()
     renderer: RendererStats = RendererStats(attempts=1, fell_back_to_template=False)
     interpretation: InterpretationView | None = None
+    collection_action: CollectionAction | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    brief: MorningBrief | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
 
 class DraftAction(LedgerModel):

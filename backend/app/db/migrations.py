@@ -602,7 +602,29 @@ ALTER TABLE transactions_new RENAME TO transactions;
 _SCHEMA_V5 += "\n".join(_v4_triggers.values())
 _SCHEMA_V5 += "\n".join(_v4_transaction_indexes.values())
 
-_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2, _SCHEMA_V3, _SCHEMA_V4, _SCHEMA_V5)
+_SCHEMA_V6 = f"""
+CREATE TABLE reminders (
+    reminder_id INTEGER PRIMARY KEY NOT NULL,
+    counterparty_id TEXT NOT NULL REFERENCES counterparties(counterparty_id),
+    business_date TEXT NOT NULL CHECK ({_date("business_date")}),
+    recorded_at TEXT NOT NULL CHECK ({_timestamp("recorded_at")}),
+    overdue_amount_iqd INTEGER NOT NULL CHECK (overdue_amount_iqd > 0),
+    tone TEXT NOT NULL CHECK (tone IN ('gentle', 'normal', 'firm')),
+    channel TEXT NOT NULL CHECK (channel IN ('whatsapp', 'copy')),
+    edited INTEGER NOT NULL CHECK (edited IN (0, 1))
+) STRICT;
+CREATE INDEX reminders_customer_time ON reminders(counterparty_id, recorded_at);
+CREATE TRIGGER reminder_customer BEFORE INSERT ON reminders
+WHEN NOT EXISTS (SELECT 1 FROM counterparties
+    WHERE counterparty_id = NEW.counterparty_id AND kind = 'customer')
+BEGIN SELECT RAISE(ABORT, 'reminder requires a customer'); END;
+CREATE TRIGGER reminders_immutable_update BEFORE UPDATE ON reminders
+BEGIN SELECT RAISE(ABORT, 'reminders is immutable'); END;
+CREATE TRIGGER reminders_immutable_delete BEFORE DELETE ON reminders
+BEGIN SELECT RAISE(ABORT, 'reminders is immutable'); END;
+"""
+
+_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2, _SCHEMA_V3, _SCHEMA_V4, _SCHEMA_V5, _SCHEMA_V6)
 
 
 def apply_migrations(connection: sqlite3.Connection) -> None:

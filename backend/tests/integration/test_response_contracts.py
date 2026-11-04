@@ -162,7 +162,12 @@ def test_every_implemented_success_response_validates(api, tool_history):
 
 def test_openapi_success_error_models_and_idempotent_entry_response(api):
     spec = api.get("/openapi.json").json()
-    assert set(spec["paths"]) == {path for _, path in CONTRACTS}
+    assert set(spec["paths"]) == {path for _, path in CONTRACTS} | {
+        "/api/collections",
+        "/api/collections/draft",
+        "/api/reminders",
+        "/api/brief",
+    }
     for (method, path), model in CONTRACTS.items():
         operation = spec["paths"][path][method]
         status = "201" if path == "/api/entries" else "200"

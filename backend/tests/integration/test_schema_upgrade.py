@@ -104,7 +104,7 @@ def test_upgrade_preserves_v1_rows_evidence_relationships_and_replays(tmp_path):
         seed_v1(connection)
         before = data_snapshot(connection)
         migrations.apply_migrations(connection)
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 6
         after = data_snapshot(connection)
         for table, rows in before.items():
             assert (
@@ -202,7 +202,7 @@ def test_mapping_upgrade_preserves_populated_v2_and_rolls_back_on_conflict(tmp_p
     assert not connection.in_transaction
     connection.execute("DROP TABLE csv_mappings")
     migrations.apply_migrations(connection)
-    assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 6
     after = data_snapshot(connection)
     for table, rows in before.items():
         assert after[table] == rows
@@ -240,7 +240,7 @@ def test_correction_upgrade_preserves_v3_mappings_and_rolls_back_on_conflict(tmp
     assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
     connection.execute("DROP TABLE entry_corrections")
     migrations.apply_migrations(connection)
-    assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 6
     after = data_snapshot(connection)
     for table, rows in before.items():
         assert after[table] == rows
@@ -281,15 +281,16 @@ def test_precision_upgrade_preserves_v4_evidence_guards_and_replays(tmp_path):
             "WHERE type IN ('trigger', 'index') AND sql IS NOT NULL ORDER BY name"
         ).fetchall()
         migrations.apply_migrations(connection)
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
-        assert data_snapshot(connection) == before
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 6
+        assert data_snapshot(connection) == before | {"reminders": []}
         assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
         assert connection.execute("PRAGMA foreign_keys").fetchone()[0] == 1
         assert connection.execute("PRAGMA recursive_triggers").fetchone()[0] == 1
         assert (
             connection.execute(
                 "SELECT type, name, sql FROM sqlite_schema "
-                "WHERE type IN ('trigger', 'index') AND sql IS NOT NULL ORDER BY name"
+                "WHERE type IN ('trigger', 'index') AND sql IS NOT NULL "
+                "AND tbl_name != 'reminders' ORDER BY name"
             ).fetchall()
             == guards
         )
@@ -297,7 +298,7 @@ def test_precision_upgrade_preserves_v4_evidence_guards_and_replays(tmp_path):
             "SELECT type, name, sql FROM sqlite_schema ORDER BY name"
         ).fetchall()
         migrations.apply_migrations(connection)
-        assert data_snapshot(connection) == before
+        assert data_snapshot(connection) == before | {"reminders": []}
         assert (
             connection.execute(
                 "SELECT type, name, sql FROM sqlite_schema ORDER BY name"

@@ -81,7 +81,7 @@ class RequestSafety:
             path = scope.get("path", "")
             group = (
                 "chat"
-                if path == "/api/chat"
+                if path in {"/api/chat", "/api/collections/draft"}
                 else "import"
                 if path.startswith("/api/imports")
                 else "other"

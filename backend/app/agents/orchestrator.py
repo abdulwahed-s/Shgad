@@ -335,13 +335,14 @@ async def converse(request, *, client, connection, clock, known_at, pipeline=Non
         else _converse
     )
     try:
-        async with asyncio.timeout(CONVERSATION_TIMEOUT_SECONDS):
+        async with asyncio.timeout(CONVERSATION_TIMEOUT_SECONDS) as budget:
             return await run(
                 request,
                 client=client,
                 connection=connection,
                 clock=clock,
                 known_at=known_at,
+                **({"deadline": budget.when()} if run is _interpreted else {}),
             )
     except TimeoutError:
         return fixed("llm_unavailable", "busy")
@@ -359,9 +360,13 @@ def _unavailable(exc):
     return fixed("llm_unavailable", key)
 
 
-async def _interpreted(request, *, client, connection, clock, known_at):
+async def _interpreted(request, *, client, connection, clock, known_at, deadline=None):
     """interpret -> resolve/plan -> fixed read-only tools -> slot draft (D58)."""
-    backstop = answer_policy.refusal(request.message)
+    from app.agents.collection_chat import collection_refusal, collection_turn
+
+    backstop = answer_policy.refusal(request.message) or collection_refusal(
+        request.message
+    )
     if backstop:
         return _with_view(
             safe_response(backstop), behavior="refuse", intent=backstop.key
@@ -376,6 +381,16 @@ async def _interpreted(request, *, client, connection, clock, known_at):
             behavior="clarify",
             intent="out_of_scope",
             reason="OUT_OF_SCOPE",
+        )
+    if understood.intent in {"collection_priorities", "draft_reminder", "daily_brief"}:
+        return await collection_turn(
+            understood,
+            request=request,
+            client=client,
+            connection=connection,
+            clock=clock,
+            known_at=known_at,
+            deadline=deadline,
         )
     was_query_only = connection.execute("PRAGMA query_only").fetchone()[0]
     connection.execute("PRAGMA query_only=ON")
