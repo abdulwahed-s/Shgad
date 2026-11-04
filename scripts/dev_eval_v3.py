@@ -66,13 +66,13 @@ async def run(questions, requirements, client, data_root, withheld="DV3C-"):
         observed = dict(behavior="error")
         catalogue, required, error = {}, set(), None
         try:
+            client.begin_question()
             as_of, history, catalogue, required = references(
                 question, requirements, data_root
             )
             missing = required - catalogue.keys()
             if missing:
                 error = "required_selector_unavailable:" + ",".join(sorted(missing))
-            client.begin_question()
             with production_database(history, parties, as_of=as_of) as connection:
                 observed = await observe(
                     PromptInput(question["question_ar"], question["business_as_of"]),
@@ -113,6 +113,9 @@ async def run(questions, requirements, client, data_root, withheld="DV3C-"):
             )
         )
         if not question["id"].startswith(withheld):
+            receipt = getattr(client, "question_receipt", None)
+            if callable(receipt):
+                rows[-1]["provider_log"] = receipt()
             mark = "PASS" if rows[-1]["joint_correct"] else "FAIL"
             print(f"{question['id']} {mark}", flush=True)
     return rows

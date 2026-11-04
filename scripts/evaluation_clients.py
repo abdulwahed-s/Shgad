@@ -74,9 +74,11 @@ class BudgetedClient(LLMClient):
         self.counts = Counter()
         self.statuses = Counter()
         self.limit_hits = 0
+        self._question_requests = []
 
     def begin_question(self, _=None):
         self.question_attempts = 0
+        self._question_requests = []
         self.reset_routing()
 
     def reset_routing(self):
@@ -99,13 +101,32 @@ class BudgetedClient(LLMClient):
         self.attempts += 1
         self.question_attempts += 1
         self.counts[f"{provider}/{payload['model']}"] += 1
+        record = {
+            "attempt": self.question_attempts,
+            "provider": provider,
+            "http_status": None,
+        }
+        self._question_requests.append(record)
+        transport_record = self.attempt_receipts[-1]
         try:
             response = await super()._request(provider, payload, key)
+            record["http_status"] = response[0]
             self.statuses[str(response[0])] += 1
             return response
         except Exception:
             self.statuses["transport_failure"] += 1
             raise
+        finally:
+            # Headers may have arrived before a malformed/oversize body or read
+            # failure. Preserve that HTTP status without retaining any content.
+            if record["http_status"] is None:
+                record["http_status"] = transport_record["status"]
+
+    def question_receipt(self):
+        return {
+            "attempt_count": len(self._question_requests),
+            "attempts": [dict(record) for record in self._question_requests],
+        }
 
     def receipt(self):
         return dict(
