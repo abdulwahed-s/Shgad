@@ -6,7 +6,7 @@ All tests below run on the current agent, with a scripted stand-in for the model
 so they check the app's behaviour, not the model's luck. Run them from `backend/`:
 
 ```powershell
-.venv/Scripts/python.exe -m pytest -q tests/evaluation/test_failure_modes.py tests/evaluation/test_interpretation_pipeline.py tests/integration/test_csv_mapping_values.py tests/unit/test_csv_values.py
+.venv/Scripts/python.exe -m pytest -q tests/evaluation/test_failure_modes.py tests/evaluation/test_interpretation_pipeline.py tests/integration/test_csv_mapping_values.py tests/unit/test_csv_values.py tests/integration/test_collection_agent.py
 ```
 
 ## Handled
@@ -24,6 +24,9 @@ so they check the app's behaviour, not the model's luck. Run them from `backend/
 | 9 | **An unclear date.** "Monday" is said on a Monday: today or last week? | Asks which one. | `test_past_today_weekday_and_future_history_clarify_from_the_resolver` |
 | 10 | **Messy imports.** The same file is imported twice, rows are suspected duplicates, payments match no debt, or the file is wrong or oversized. | Re-imports add nothing. Suspected duplicates and unmatched payments are flagged for the merchant, never deleted. Bad files are rejected before anything is written. | `test_import_api.py`, `test_reconciliation.py`, `test_file_import.py`, `test_security_limits.py` |
 | 11 | **Mapped names, dates or types cannot be resolved, or a credit sale lacks a due date.** | The preview names the field and reason, lists real ambiguity candidates and disables confirmation for displayed errors. It never creates accounts or invents dates. Iraqi dates, type synonyms and integer IQD separators are normalized by code; decimal amounts fail. | `test_csv_mapping_values.py`, `test_csv_values.py`, `csv_issue_widget_test.dart` |
+| 12 | **A reminder draft types a number or invents a slot/date.** | Reject it, retry once, then use a verified tone template. The server alone fills amounts and dates. Pending templates can be viewed but cannot be shared before Arabic review. | `test_invalid_draft_retries_once_then_tone_template`, `collections_bloc_test.dart` |
+| 13 | **A reminder threatens, shames or insults a customer.** | Reject it, retry once, then use the respectful template. Threat requests in chat are refused before a provider call. | `test_invalid_draft_retries_once_then_tone_template`, `test_ledger_changes_and_threat_requests_refused_before_provider` |
+| 14 | **A reminder is requested for a paid or not-yet-overdue account.** | Return the verified reason, including the due date when applicable. No drafting model call and no reminder-log row. | `test_not_due_and_nothing_owed_never_call_drafter`, `test_not_due_or_paid_customer_never_gets_log` |
 
 Two of these were also seen with the live Gemini model in the running app, shown in the
 README's "Stay safe" screenshot:

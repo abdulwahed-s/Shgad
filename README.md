@@ -47,7 +47,7 @@ worse than no answer.
 - **Every figure has a receipt.** Tap a figure to see its formula and source rows, down to the original CSV cells.
 - **No guessing.** It asks when a name, date or data is unclear, and refuses requests to change records.
 
-Eleven ways it can fail, what it does instead, and the tests that prove it: [`FAILURE_MODES.md`](FAILURE_MODES.md).
+Fourteen ways it can fail, what it does instead, and the tests that prove it: [`FAILURE_MODES.md`](FAILURE_MODES.md).
 
 ## Results
 
@@ -130,6 +130,12 @@ flowchart LR
     I -- unclear / unsafe --> C[Clarify or refuse]
     I --> R[Resolve dates and names]
     R --> P[Fixed plan]
+    P --> CS[Collection specialist]
+    CS --> D[Verified editable reminder]
+    D --> M[Merchant chooses copy or WhatsApp]
+    M --> L[(Separate reminder log)]
+    CSV[CSV upload] --> IS[Import mapping specialist]
+    IS --> Preview[Merchant preview and confirmation]
     P --> T[Read-only tools]
     DB[(SQLite ledger)] --> T
     T --> V[Verify]
@@ -153,6 +159,39 @@ Besides chat, the app has:
 - a review queue for duplicates and unmatched payments;
 - a weekly summary;
 - a three-scenario cash estimate.
+
+## Collection reminders and morning brief
+
+The debts screen lists overdue customers in a deterministic order: amount, age,
+then account ID. A merchant can request a gentle, normal or firm draft, edit it,
+and choose copy or a text-only WhatsApp handoff. The merchant picks the contact;
+the log records the action, not delivery or payment. No phone or wallet number is
+stored. Pending fallback templates remain blocked from sharing until copy review.
+
+<img src="assets/readme/shot-collections.png" width="300" alt="Overdue collection priorities from the synthetic live drill">
+
+*Flutter render of the saved live-drill API response: a separate synthetic overdue
+fixture, 90,000 and 60,000 IQD. Browser access was unavailable during capture.*
+
+The deterministic morning brief sits below today's cash and links to collections.
+It shows today's and this week's dues, overdue totals and open flags, with source
+rows or verified empty queries. Missing opening cash asks for clarification.
+
+A builder-written smoke drill passed 20/20 checks (10 chat, 10 API), followed by
+the ten documented demo questions, on `196ca1a`. Gemini `gemini-3.8-flash` made
+34 requests, all HTTP 200; the canonical demo figures and all financial tables
+were unchanged. This is smoke evidence, not an independent evaluation of reminder
+quality. All new Arabic copy remains pending review; no real merchants took part.
+
+The single training-only regression at `196ca1a` returned **109/150 joint**
+(86/101 historical, 23/49 safe), below the required 148/150. Its 275 provider
+attempts included 72 HTTP 402 responses and one transport failure; it then hit
+the request ceiling. Compared with the earlier 149/150 baseline, four earlier
+questions and the final 37 failed, while the one previously failed question passed.
+These results do not isolate code regressions from provider/budget failures.
+Work stopped without tuning or rerunning; this collection build is not ready to merge.
+The drill also still needs its locally retained demo questions packaged for a
+fresh checkout; its passing local tests do not establish portable CI readiness.
 
 <details>
 <summary><b>Weekly summary and cash estimate (desktop)</b></summary>
@@ -185,10 +224,11 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8154
 
 Try asking `منو بعده بذمته فلوس؟` or `شكد بعنا كاش من أول هالأسبوع لهسه؟`.
 
-Backend checks: 1,550 passed, 1 skipped on both SQLite 3.45.3 and 3.50.4;
-lint and format checks pass. The 34 strict canonical-import tests remain unchanged
-and passing. The last full Windows Flutter checks (31 October) passed 369 tests,
-formatting and analysis. GitHub Actions currently runs backend checks only;
+Backend checks: 1,618 passed, 1 skipped on the installed SQLite runtime;
+lint and format checks pass. The earlier schema repair also passed on SQLite
+3.45.3 and 3.50.4. Windows Flutter checks passed 394 tests, formatting and analysis,
+including the live-response screenshot render test.
+GitHub Actions currently runs backend checks only;
 Flutter screenshot checks use the local Windows environment.
 
 ## Limits
@@ -198,7 +238,7 @@ Flutter screenshot checks use the local Windows environment.
 - **Expense kinds are not recorded.** Questions about electricity or rent show the period's total recorded operating expenses with an explicit note. Imports require existing accounts and explicit due dates for credit sales and supplier invoices.
 - **Record checks depend on the requested period.** With no period, they show this week's flags and daily cash differences with sources. Dated audits show collections and flags for that period.
 - **No real merchant has used it yet.** It has been tested on synthetic data only.
-- **It runs locally only.** There is no authentication or hosting. The Android build is unverified. OCR, voice and WhatsApp are not built.
+- **It runs locally only.** There is no authentication or hosting. The Android build is unverified. OCR, voice and automatic WhatsApp sending are not built; reminders use a merchant-controlled share link.
 
 ## Disclosure
 

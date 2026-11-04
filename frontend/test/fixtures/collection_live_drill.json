@@ -1,0 +1,90 @@
+{
+  "kind": "actual_live_drill_endpoint_response",
+  "commit": "196ca1ad5fce99d2bf61817c44014ccff31e4942",
+  "started_at": "2026-11-04T15:49:56.368520+00:00",
+  "case": "CS-11",
+  "observed_inputs_sha256": {
+    "data/synthetic/observed_90d.csv": "fa9742513683ec5dcfde07acb94e26e0c088123db919e4187a6831292a8ed5cc",
+    "data/synthetic/opening_balance.json": "e0ff347e584c22cf658e627b586b58275f1ef324ca2504d3dd8d90f4e0acb3e8",
+    "data/synthetic/categories.csv": "31cc9f724cf19427489b63d9c995f96ef3b9ed9ca8245b7b20c1de83204ee4d0",
+    "data/synthetic/counterparties.csv": "d3348dcf9615ffc376e0a9e5933661749042088ef43dca9fb14a40b6eff0fde0",
+    "data/synthetic/payment_links.csv": "acd2b15f39d9c501615d1d57f0fff0e1b7c3ef3415ff0f00de725f0826ab5fdd",
+    "data/synthetic/entry_voids.csv": "5ff31826c79ae5fda1730a9fa2e56c6a1a55ed427a90d9a388f403c895e095a0"
+  },
+  "response": {
+    "as_of": "2026-09-28",
+    "total_overdue": {
+      "amount_iqd": 150000,
+      "kind": "calculated",
+      "label_key": "total_outstanding",
+      "source_ids": [
+        "ENT-8db05bfb02544e3d8a7ab69739f09dbf",
+        "ENT-04752593e63f40588ff229126d55cbd7"
+      ],
+      "formula": "FINANCIAL_RULES §5/§11: originals - active verified allocations",
+      "key": "total_overdue",
+      "query_evidence": null
+    },
+    "customer_count": {
+      "key": "overdue_customer_count",
+      "value": 2,
+      "unit": "count",
+      "kind": "calculated",
+      "label_key": "overdue_customer_count",
+      "source_ids": [
+        "ENT-8db05bfb02544e3d8a7ab69739f09dbf",
+        "ENT-04752593e63f40588ff229126d55cbd7"
+      ],
+      "formula": "count distinct customer IDs in verified overdue-only receivables"
+    },
+    "items": [
+      {
+        "counterparty_id": "CUST-05",
+        "display_name": "أبو سجاد",
+        "overdue_amount": {
+          "amount_iqd": 90000,
+          "kind": "calculated",
+          "label_key": "outstanding",
+          "source_ids": [
+            "ENT-04752593e63f40588ff229126d55cbd7"
+          ],
+          "formula": "FINANCIAL_RULES §5/§11: originals - active verified allocations",
+          "key": "overdue_amount",
+          "query_evidence": null
+        },
+        "oldest_due_date": "2026-09-19",
+        "days_overdue": 9,
+        "source_ids": [
+          "ENT-04752593e63f40588ff229126d55cbd7"
+        ],
+        "reminder_count": 0,
+        "last_reminder_business_date": null,
+        "days_since_last_reminder": null
+      },
+      {
+        "counterparty_id": "CUST-04",
+        "display_name": "أم نور",
+        "overdue_amount": {
+          "amount_iqd": 60000,
+          "kind": "calculated",
+          "label_key": "outstanding",
+          "source_ids": [
+            "ENT-8db05bfb02544e3d8a7ab69739f09dbf"
+          ],
+          "formula": "FINANCIAL_RULES §5/§11: originals - active verified allocations",
+          "key": "overdue_amount",
+          "query_evidence": null
+        },
+        "oldest_due_date": "2026-09-20",
+        "days_overdue": 8,
+        "source_ids": [
+          "ENT-8db05bfb02544e3d8a7ab69739f09dbf"
+        ],
+        "reminder_count": 0,
+        "last_reminder_business_date": null,
+        "days_since_last_reminder": null
+      }
+    ]
+  },
+  "captured_at": "2026-11-04T15:54:26.271508+00:00"
+}
