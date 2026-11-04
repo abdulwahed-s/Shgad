@@ -170,9 +170,11 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8154
 
 Try asking `منو بعده بذمته فلوس؟` or `شكد بعنا كاش من أول هالأسبوع لهسه؟`.
 
-Latest checks: backend 1,541 passed, 1 skipped; Flutter 369 passed.
-Backend lint/format and Flutter format/analysis pass. The 34 strict canonical-import
-tests remain unchanged and passing.
+Backend checks: 1,550 passed, 1 skipped on both SQLite 3.45.3 and 3.50.4;
+lint and format checks pass. The 34 strict canonical-import tests remain unchanged
+and passing. The last full Windows Flutter checks (31 October) passed 369 tests,
+formatting and analysis. GitHub Actions currently runs backend checks only;
+Flutter screenshot checks use the local Windows environment.
 
 ## Limits
 

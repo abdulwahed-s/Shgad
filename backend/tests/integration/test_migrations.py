@@ -64,7 +64,7 @@ def test_migrations_create_all_strict_tables_and_are_repeatable(tmp_path):
         connection.execute("SELECT sql FROM sqlite_schema ORDER BY name").fetchall()
         == schema
     )
-    assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
     connection.close()
     reopened = connect_database(path)
     assert reopened.execute("PRAGMA foreign_keys").fetchone()[0] == 1

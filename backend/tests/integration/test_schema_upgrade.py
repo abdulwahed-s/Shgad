@@ -104,7 +104,7 @@ def test_upgrade_preserves_v1_rows_evidence_relationships_and_replays(tmp_path):
         seed_v1(connection)
         before = data_snapshot(connection)
         migrations.apply_migrations(connection)
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
         after = data_snapshot(connection)
         for table, rows in before.items():
             assert (
@@ -202,7 +202,7 @@ def test_mapping_upgrade_preserves_populated_v2_and_rolls_back_on_conflict(tmp_p
     assert not connection.in_transaction
     connection.execute("DROP TABLE csv_mappings")
     migrations.apply_migrations(connection)
-    assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
     after = data_snapshot(connection)
     for table, rows in before.items():
         assert after[table] == rows
@@ -240,10 +240,123 @@ def test_correction_upgrade_preserves_v3_mappings_and_rolls_back_on_conflict(tmp
     assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
     connection.execute("DROP TABLE entry_corrections")
     migrations.apply_migrations(connection)
-    assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
     after = data_snapshot(connection)
     for table, rows in before.items():
         assert after[table] == rows
     assert after["entry_corrections"] == []
     assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
     connection.close()
+
+
+def seed_v4(connection):
+    seed_v1(connection)
+    connection.executescript(
+        "PRAGMA foreign_keys = OFF;\n"
+        + migrations._SCHEMA_V2
+        + migrations._SCHEMA_V3
+        + migrations._SCHEMA_V4
+        + "\nPRAGMA user_version = 4; PRAGMA foreign_keys = ON;"
+    )
+    with connection:
+        connection.execute(
+            "INSERT INTO entry_voids VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                "VOID-PAY",
+                "PAY",
+                "SOURCE-PAY",
+                "merchant-undo",
+                "synthetic correction",
+                "2026-09-28T13:00:00+00:00",
+            ),
+        )
+
+
+def test_precision_upgrade_preserves_v4_evidence_guards_and_replays(tmp_path):
+    with connect_database(tmp_path / "version4.sqlite") as connection:
+        seed_v4(connection)
+        before = data_snapshot(connection)
+        guards = connection.execute(
+            "SELECT type, name, sql FROM sqlite_schema "
+            "WHERE type IN ('trigger', 'index') AND sql IS NOT NULL ORDER BY name"
+        ).fetchall()
+        migrations.apply_migrations(connection)
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
+        assert data_snapshot(connection) == before
+        assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+        assert connection.execute("PRAGMA foreign_keys").fetchone()[0] == 1
+        assert connection.execute("PRAGMA recursive_triggers").fetchone()[0] == 1
+        assert (
+            connection.execute(
+                "SELECT type, name, sql FROM sqlite_schema "
+                "WHERE type IN ('trigger', 'index') AND sql IS NOT NULL ORDER BY name"
+            ).fetchall()
+            == guards
+        )
+        schema = connection.execute(
+            "SELECT type, name, sql FROM sqlite_schema ORDER BY name"
+        ).fetchall()
+        migrations.apply_migrations(connection)
+        assert data_snapshot(connection) == before
+        assert (
+            connection.execute(
+                "SELECT type, name, sql FROM sqlite_schema ORDER BY name"
+            ).fetchall()
+            == schema
+        )
+        with pytest.raises(sqlite3.IntegrityError, match="immutable"):
+            connection.execute("DELETE FROM transactions WHERE transaction_id = 'PAY'")
+        with pytest.raises(sqlite3.IntegrityError, match="immutable"):
+            connection.execute("DELETE FROM entry_voids")
+
+        late = dict(
+            connection.execute(
+                "SELECT * FROM transactions WHERE transaction_id = 'PAY'"
+            ).fetchone()
+        )
+        late.update(
+            transaction_id="LATE",
+            source_id="LATE",
+            source_row=4,
+            occurred_at="2026-09-28T20:59:59.999999+00:00",
+            business_date="2026-09-28",
+            type="CASH_SALE",
+            counterparty_id=None,
+            obligation_id=None,
+            idempotency_key="late-entry",
+            recorded_at="2026-09-29T00:00:00+00:00",
+        )
+        columns = ", ".join(late)
+        values = ", ".join(f":{key}" for key in late)
+        connection.execute(
+            f"INSERT INTO transactions ({columns}) VALUES ({values})", late
+        )
+        assert tuple(
+            connection.execute(
+                "SELECT occurred_at, business_date FROM transactions "
+                "WHERE transaction_id = 'LATE'"
+            ).fetchone()
+        ) == ("2026-09-28T20:59:59.999999+00:00", "2026-09-28")
+
+
+def test_precision_upgrade_failure_rolls_back_v4_schema_data_and_version(tmp_path):
+    with connect_database(tmp_path / "version4.sqlite") as connection:
+        seed_v4(connection)
+        connection.execute("CREATE TABLE transactions_new (legacy TEXT)")
+        before = data_snapshot(connection)
+        schema = connection.execute(
+            "SELECT type, name, sql FROM sqlite_schema ORDER BY name"
+        ).fetchall()
+        with pytest.raises(sqlite3.DatabaseError):
+            migrations.apply_migrations(connection)
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 4
+        assert data_snapshot(connection) == before
+        assert (
+            connection.execute(
+                "SELECT type, name, sql FROM sqlite_schema ORDER BY name"
+            ).fetchall()
+            == schema
+        )
+        assert connection.execute("PRAGMA foreign_keys").fetchone()[0] == 1
+        assert connection.execute("PRAGMA recursive_triggers").fetchone()[0] == 1
+        assert not connection.in_transaction

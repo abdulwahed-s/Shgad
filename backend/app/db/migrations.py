@@ -574,7 +574,35 @@ BEFORE {_operation} ON entry_corrections
 BEGIN SELECT RAISE(ABORT, 'entry_corrections is immutable'); END;
 """
 
-_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2, _SCHEMA_V3, _SCHEMA_V4)
+# SQLite 3.45 rounds fractional seconds near midnight into the following date.
+# Canonical timestamps are UTC; whole seconds determine the Baghdad date without
+# changing the stored microseconds or event ordering. Keep v1-v4 historical SQL.
+_v5_transaction_body = _v2_transaction_body.replace(
+    "date(occurred_at, '+3 hours')",
+    "date(substr(occurred_at, 1, 19), '+3 hours')",
+)
+_v4_schema = _SCHEMA_V1 + _SCHEMA_V2 + _SCHEMA_V3 + _SCHEMA_V4
+_v4_triggers = {
+    match.group(1): match.group(0)
+    for match in re.finditer(r"CREATE TRIGGER (\w+).*?END;", _v4_schema, re.DOTALL)
+}
+_v4_transaction_indexes = {
+    match.group(1): match.group(0)
+    for match in re.finditer(r"CREATE INDEX (\w+) ON transactions[^;]+;", _v4_schema)
+}
+# Drop referring triggers during the rebuild and restore their latest versions.
+# All rows, constraints, indexes, and audit relationships survive atomically.
+_SCHEMA_V5 = "\n".join(f"DROP TRIGGER {name};" for name in _v4_triggers)
+_SCHEMA_V5 += f"""
+CREATE TABLE transactions_new ({_v5_transaction_body}) STRICT;
+INSERT INTO transactions_new SELECT * FROM transactions;
+DROP TABLE transactions;
+ALTER TABLE transactions_new RENAME TO transactions;
+"""
+_SCHEMA_V5 += "\n".join(_v4_triggers.values())
+_SCHEMA_V5 += "\n".join(_v4_transaction_indexes.values())
+
+_MIGRATIONS = (_SCHEMA_V1, _SCHEMA_V2, _SCHEMA_V3, _SCHEMA_V4, _SCHEMA_V5)
 
 
 def apply_migrations(connection: sqlite3.Connection) -> None:
