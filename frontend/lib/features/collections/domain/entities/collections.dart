@@ -68,9 +68,10 @@ class ReminderReceipt {
     this.businessDate,
     this.recordedAt,
     this.amount,
+    this.channel,
   );
   final int id;
-  final String customerId, businessDate, recordedAt;
+  final String customerId, businessDate, recordedAt, channel;
   final Amount amount;
 }
 

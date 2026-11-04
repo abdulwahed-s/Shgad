@@ -23,7 +23,14 @@ class MerchantScaffold extends StatelessWidget {
     final window = MediaQuery.sizeOf(context).width;
     final path = GoRouterState.of(context).uri.path;
     final pushed =
-        taskFlow ?? ['/entry', '/close', '/import', '/sample'].contains(path);
+        taskFlow ??
+        [
+          '/entry',
+          '/close',
+          '/import',
+          '/sample',
+          '/collections',
+        ].contains(path);
     final compact = window < AppDimens.compactBreakpoint;
     final expanded = window >= AppDimens.expandedBreakpoint;
     final scaffold = LayoutBuilder(

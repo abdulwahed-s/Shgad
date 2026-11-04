@@ -1878,5 +1878,171 @@
     "description": "Separate concise use/reset sample action.",
     "x-review": "approved Iraqi Arabic review",
     "x-review-sha256": "2537fa648cbe84696f292c4ad34014c01848ba6f42345a8c298f5bb02d864c8f"
+  },
+  "collectionsTitle": "طالب بديونك",
+  "@collectionsTitle": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionsIntro": "الديون المتأخرة مرتبة حسب المبلغ، وبعدين مدة التأخير.",
+  "@collectionsIntro": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionsEmpty": "ماكو ديون زبائن متأخرة بهالسجلات.",
+  "@collectionsEmpty": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionDraftTitle": "رسالة تذكير",
+  "@collectionDraftTitle": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionTone": "أسلوب الرسالة",
+  "@collectionTone": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionGentle": "لطيف",
+  "@collectionGentle": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionNormal": "عادي",
+  "@collectionNormal": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionFirm": "حازم",
+  "@collectionFirm": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionDraftField": "نص الرسالة",
+  "@collectionDraftField": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionPrepare": "جهّز رسالة",
+  "@collectionPrepare": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionOpenWhatsapp": "افتح واتساب",
+  "@collectionOpenWhatsapp": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionCopy": "انسخ",
+  "@collectionCopy": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionReview": "راجع الاسم والمبلغ قبل ما تشارك الرسالة.",
+  "@collectionReview": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionTemplatePending": "قالب الرسالة بانتظار مراجعة الصياغة.",
+  "@collectionTemplatePending": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionNeverReminded": "بعد ما تذكّر بهالدفتر",
+  "@collectionNeverReminded": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionLastReminded": "آخر تذكير قبل {days} يوم",
+  "@collectionLastReminded": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionHandoffLogged": "انحفظ التذكير بهالدفتر. فتح واتساب ما يأكد وصول الرسالة.",
+  "@collectionHandoffLogged": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionCopiedLogged": "اننسخت الرسالة وانحفظ التذكير بهالدفتر.",
+  "@collectionCopiedLogged": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionLogFailed": "الرسالة انفتحت أو اننسخت، بس التذكير ما انحفظ. جرّب تحفظه مرة ثانية.",
+  "@collectionLogFailed": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionRetryLog": "احفظ التذكير",
+  "@collectionRetryLog": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionShareFailed": "ما انفتح واتساب. تكدر تنسخ الرسالة.",
+  "@collectionShareFailed": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionNoOverdue": "هالحساب ما عليه دين متأخر.",
+  "@collectionNoOverdue": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionShareNotice": "واتساب يفتح حتى تختار جهة الاتصال؛ إنت تقرر تدز الرسالة.",
+  "@collectionShareNotice": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionNoDraft": "اختار زبون حتى نجهز رسالة.",
+  "@collectionNoDraft": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "collectionOverdueAmount": "المبلغ المتأخر",
+  "@collectionOverdueAmount": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "morningBriefTitle": "ملخص الصبح",
+  "@morningBriefTitle": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "briefDuesToday": "مستحقات اليوم ويا المتأخر",
+  "@briefDuesToday": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "briefDuesWeek": "المستحقات لنهاية أسبوع الشغل",
+  "@briefDuesWeek": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "briefOverdueCustomers": "الزبائن المتأخرين",
+  "@briefOverdueCustomers": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "briefOpenFlags": "قيود تحتاج مراجعة هالأسبوع",
+  "@briefOpenFlags": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "briefCollect": "طالب بالمتأخرين",
+  "@briefCollect": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
+  },
+  "briefOverdueTotal": "مجموع الديون المتأخرة",
+  "@briefOverdueTotal": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "x-review": "pending Iraqi Arabic review"
   }
+
 }

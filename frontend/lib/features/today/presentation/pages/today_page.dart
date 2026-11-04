@@ -13,6 +13,7 @@ import '../../../../core/widgets/report_view.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/today.dart';
 import '../bloc/today_bloc.dart';
+import '../../../collections/presentation/widgets/morning_brief_card.dart';
 
 class TodayPage extends StatelessWidget {
   const TodayPage({super.key});
@@ -56,6 +57,8 @@ class _TodayView extends StatelessWidget {
                         ),
                   onTap: () => openEvidence(context, data.cash),
                 ),
+                const SizedBox(height: AppDimens.lg),
+                const MorningBriefCard(),
                 const SizedBox(height: AppDimens.lg),
                 ActionGroup(
                   children: [

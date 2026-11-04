@@ -65,6 +65,11 @@ class _DebtsViewState extends State<_DebtsView> {
                 ],
               ),
               const SizedBox(height: AppDimens.xl),
+              TextAction(
+                text: l.collectionsTitle,
+                onPressed: () => context.push('/collections'),
+              ),
+              const SizedBox(height: AppDimens.md),
               if (expanded)
                 ScreenColumns(
                   start: DebtSectionView(

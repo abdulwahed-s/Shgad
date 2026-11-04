@@ -84,6 +84,12 @@ def test_brief_chat_has_same_values_no_narration_completion(ledger, j1_shop):
         "overdue_total": 0,
     }
     assert len(client.calls) == 1
+    assert (
+        result.model_dump(mode="json")["metrics"][0]["query_evidence"][
+            "matching_obligations"
+        ]
+        == 0
+    )
 
 
 def test_brief_new_response_models_and_provenance_openapi(api, j1_shop):

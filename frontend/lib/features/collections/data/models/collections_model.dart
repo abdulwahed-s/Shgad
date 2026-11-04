@@ -1,6 +1,5 @@
-import 'dart:convert';
 import '../../../../core/data/amount_model.dart';
-import '../../../../core/domain/known_zero_query.dart';
+import '../../../../core/data/metric_proof_model.dart';
 import '../../domain/entities/collections.dart';
 
 class CollectionsModel {
@@ -23,44 +22,17 @@ class CollectionsModel {
   );
 
   static CountEvidence count(dynamic j) {
-    final value = j['value'];
-    if (value is! int || value < 0)
+    final map = Map<String, dynamic>.from(j as Map);
+    final value = map['value'];
+    if (value is! int || value < 0) {
       throw const FormatException('Invalid sourced count');
-    final sources = List<String>.from(j['source_ids'] as List);
-    final rawProof = j['query_evidence'];
-    KnownZeroQuery? proof;
-    if (rawProof != null) {
-      final q = Map<String, dynamic>.from(rawProof as Map);
-      if (value != 0 ||
-          sources.isNotEmpty ||
-          DateTime.tryParse(q['known_at'] as String) == null)
-        throw const FormatException('Invalid count proof');
-      final String start, end;
-      if (q['tool'] == 'get_debts' &&
-          q['matching_obligations'] == 0 &&
-          q['filters'] is Map) {
-        start = end = q['as_of'] as String;
-      } else if (q['tool'] == 'reconcile' &&
-          q['matching_flags'] == 0 &&
-          q['period'] is Map) {
-        start = q['period']['start'] as String;
-        end = q['period']['end'] as String;
-      } else {
-        throw const FormatException('Unknown count proof');
-      }
-      if (DateTime.tryParse(start) == null || DateTime.tryParse(end) == null)
-        throw const FormatException('Invalid proof period');
-      proof = KnownZeroQuery(
-        tool: q['tool'] as String,
-        start: start,
-        end: end,
-        matchingRows: 0,
-        originalQuery: jsonEncode(q),
-      );
     }
-    if (sources.isEmpty && proof == null)
+    final sources = List<String>.from(map['source_ids'] as List);
+    final proof = parseMetricProof(map);
+    if (sources.isEmpty && proof == null) {
       throw const FormatException('Count evidence missing');
-    return CountEvidence(value, sources, j['formula'] as String, proof);
+    }
+    return CountEvidence(value, sources, map['formula'] as String, proof);
   }
 
   static CollectionDraft draft(Map<String, dynamic> j) => CollectionDraft(
@@ -81,6 +53,7 @@ class CollectionsModel {
     j['business_date'] as String,
     j['recorded_at'] as String,
     parseAmount(j['overdue_amount']),
+    j['channel'] as String,
   );
 
   static MorningBriefData brief(Map<String, dynamic> j) => MorningBriefData(

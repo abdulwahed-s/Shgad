@@ -68,6 +68,13 @@ import '../../features/today/data/repositories/today_repository_impl.dart';
 import '../../features/today/domain/repositories/today_repository.dart';
 import '../../features/today/domain/usecases/load_today.dart';
 import '../../features/today/presentation/bloc/today_bloc.dart';
+import '../../features/collections/data/datasources/collections_remote.dart';
+import '../../features/collections/data/repositories/collections_repository_impl.dart';
+import '../../features/collections/data/repositories/reminder_sharing_impl.dart';
+import '../../features/collections/domain/repositories/collections_repository.dart';
+import '../../features/collections/domain/usecases/collections_usecases.dart';
+import '../../features/collections/presentation/bloc/collections_bloc.dart';
+import '../../features/collections/presentation/bloc/draft_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -104,6 +111,35 @@ void configureDependencies() {
     () => CheckConnectivity(getIt()),
   );
   getIt.registerLazySingleton<TodayRemote>(() => TodayRemote(getIt()));
+  getIt.registerLazySingleton<CollectionsRemote>(
+    () => CollectionsRemote(getIt()),
+  );
+  getIt.registerLazySingleton<CollectionsRepository>(
+    () => CollectionsRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<ReminderSharingRepository>(
+    ReminderSharingImpl.new,
+  );
+  getIt.registerLazySingleton<LoadCollections>(() => LoadCollections(getIt()));
+  getIt.registerLazySingleton<LoadMorningBrief>(
+    () => LoadMorningBrief(getIt()),
+  );
+  getIt.registerLazySingleton<MakeReminderDraft>(
+    () => MakeReminderDraft(getIt()),
+  );
+  getIt.registerLazySingleton<ShareReminderText>(
+    () => ShareReminderText(getIt()),
+  );
+  getIt.registerLazySingleton<LogReminder>(() => LogReminder(getIt()));
+  getIt.registerFactory<CollectionsBloc>(
+    () => CollectionsBloc(getIt(), getIt(), getIt(), getIt()),
+  );
+  getIt.registerFactory<MorningBriefBloc>(
+    () => MorningBriefBloc(getIt(), getIt(), getIt(), getIt()),
+  );
+  getIt.registerFactory<DraftBloc>(
+    () => DraftBloc(getIt(), getIt(), getIt(), getIt(), getIt()),
+  );
   getIt.registerLazySingleton<TodayRepository>(
     () => TodayRepositoryImpl(getIt(), getIt()),
   );

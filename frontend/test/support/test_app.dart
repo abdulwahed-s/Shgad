@@ -7,6 +7,7 @@ import 'package:shgad/core/domain/picked_file.dart';
 import 'package:shgad/features/csv_import/data/datasources/csv_picker.dart';
 import '../core_test.dart' show MemoryCache, WireAdapter;
 import 'fixtures.dart';
+import 'collection_fixtures.dart';
 
 class RecordedCsvPicker implements CsvPicker {
   @override
@@ -33,7 +34,9 @@ class RecordedApi {
     requests.add(request);
     final path = request.path;
     final Object body;
-    if (path == '/health') {
+    if (path == '/api/brief') {
+      body = morningBriefJson();
+    } else if (path == '/health') {
       body = {'status': 'ok', 'version': '0.1.0'};
     } else if (path == '/api/meta') {
       body = {

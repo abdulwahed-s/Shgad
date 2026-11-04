@@ -1324,5 +1324,139 @@
   "restoreSample": "Reset sample shop",
   "@restoreSample": {
     "description": "Separate concise use/reset sample action."
+  },
+  "collectionsTitle": "Follow up overdue debts",
+  "@collectionsTitle": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionsIntro": "Overdue debts, ordered by amount and then time overdue.",
+  "@collectionsIntro": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionsEmpty": "No overdue customer debts in these records.",
+  "@collectionsEmpty": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionDraftTitle": "Payment reminder",
+  "@collectionDraftTitle": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionTone": "Message tone",
+  "@collectionTone": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionGentle": "Gentle",
+  "@collectionGentle": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionNormal": "Normal",
+  "@collectionNormal": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionFirm": "Firm",
+  "@collectionFirm": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionDraftField": "Message text",
+  "@collectionDraftField": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionPrepare": "Prepare reminder",
+  "@collectionPrepare": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionOpenWhatsapp": "Open WhatsApp",
+  "@collectionOpenWhatsapp": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionCopy": "Copy",
+  "@collectionCopy": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionReview": "Review the name and amount before sharing.",
+  "@collectionReview": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionTemplatePending": "This template is awaiting wording approval.",
+  "@collectionTemplatePending": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionNeverReminded": "No reminder recorded yet",
+  "@collectionNeverReminded": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionLastReminded": "Last reminded {days} days ago",
+  "@collectionLastReminded": {
+    "description": "Collection reminder or deterministic morning brief.",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "collectionHandoffLogged": "Reminder recorded. Opening WhatsApp does not confirm delivery.",
+  "@collectionHandoffLogged": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionCopiedLogged": "Message copied and reminder recorded.",
+  "@collectionCopiedLogged": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionLogFailed": "The message was opened or copied, but its log was not saved. Retry saving the log.",
+  "@collectionLogFailed": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionRetryLog": "Save reminder log",
+  "@collectionRetryLog": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionShareFailed": "WhatsApp did not open. You can copy the message.",
+  "@collectionShareFailed": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionNoOverdue": "This customer has no overdue debt.",
+  "@collectionNoOverdue": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionShareNotice": "Choose the contact in WhatsApp; you decide whether to send.",
+  "@collectionShareNotice": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionNoDraft": "Choose a customer to prepare a reminder.",
+  "@collectionNoDraft": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "collectionOverdueAmount": "Overdue amount",
+  "@collectionOverdueAmount": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "morningBriefTitle": "Morning brief",
+  "@morningBriefTitle": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "briefDuesToday": "Due today, including overdue",
+  "@briefDuesToday": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "briefDuesWeek": "Due through this business week",
+  "@briefDuesWeek": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "briefOverdueCustomers": "Overdue customers",
+  "@briefOverdueCustomers": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "briefOpenFlags": "Records to review this week",
+  "@briefOpenFlags": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "briefCollect": "Follow up overdue customers",
+  "@briefCollect": {
+    "description": "Collection reminder or deterministic morning brief."
+  },
+  "briefOverdueTotal": "Total overdue debts",
+  "@briefOverdueTotal": {
+    "description": "Collection reminder or deterministic morning brief."
   }
+
 }

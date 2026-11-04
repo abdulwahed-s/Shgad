@@ -16,6 +16,7 @@ import '../features/forecast/presentation/pages/forecast_page.dart';
 import '../features/sample_shop/presentation/pages/sample_page.dart';
 import '../features/csv_import/presentation/pages/csv_page.dart';
 import '../features/flags/presentation/pages/flags_page.dart';
+import '../features/collections/presentation/pages/collections_page.dart';
 
 GoRouter createRouter() => GoRouter(
   routes: [
@@ -30,6 +31,18 @@ GoRouter createRouter() => GoRouter(
     GoRoute(
       path: '/debts',
       pageBuilder: (context, state) => _fade(context, state, const DebtsPage()),
+    ),
+    GoRoute(
+      path: '/collections',
+      pageBuilder: (context, state) => _fade(
+        context,
+        state,
+        CollectionsPage(
+          key: ValueKey(state.uri.toString()),
+          customerId: state.uri.queryParameters['customer'],
+          tone: state.uri.queryParameters['tone'] ?? 'gentle',
+        ),
+      ),
     ),
     GoRoute(
       path: '/entry',

@@ -1,4 +1,17 @@
 import '../../../../core/domain/amount.dart';
+import '../../../../core/domain/known_zero_query.dart';
+
+class ChatCollectionAction {
+  const ChatCollectionAction(this.kind, this.customerId, this.tone);
+  final String kind, tone;
+  final String? customerId;
+  String get location => Uri(
+    path: '/collections',
+    queryParameters: kind == 'draft' && customerId != null
+        ? {'customer': customerId!, 'tone': tone}
+        : null,
+  ).toString();
+}
 
 class SourcedMetric {
   const SourcedMetric(
@@ -7,11 +20,13 @@ class SourcedMetric {
     this.kind,
     this.label,
     this.sources,
-    this.formula,
-  );
+    this.formula, {
+    this.queryEvidence,
+  });
   final int? value;
   final String unit, kind, label, formula;
   final List<String> sources;
+  final KnownZeroQuery? queryEvidence;
 }
 
 class ChatContext {
@@ -35,6 +50,7 @@ class ChatReply {
     required this.options,
     required this.resolved,
     required this.template,
+    this.collectionAction,
   });
   final String status, text;
   final List<Amount> figures;
@@ -43,6 +59,7 @@ class ChatReply {
   final List<ChatOption> options;
   final ChatContext? resolved;
   final bool template;
+  final ChatCollectionAction? collectionAction;
 }
 
 class ChatTurn {

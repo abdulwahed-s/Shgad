@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/domain/evidence_request.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/di/injection.dart';
 import '../../../../core/constants/app_dimens.dart';
@@ -220,8 +222,14 @@ class ChatEvidence extends StatelessWidget {
               Text(amountLabel(l, metric.label)),
               StatusLabel(kind: metric.kind),
               TextButton(
-                onPressed: () =>
-                    openSourceEvidence(context, metric.sources, metric.formula),
+                onPressed: () => context.push(
+                  '/evidence',
+                  extra: EvidenceRequest(
+                    metric.sources,
+                    metric.formula,
+                    queryEvidence: metric.queryEvidence,
+                  ),
+                ),
                 child: Text(
                   metric.value == null
                       ? l.missing
@@ -241,6 +249,13 @@ class ChatEvidence extends StatelessWidget {
             ],
           ),
         if (reply.template) InfoStrip(text: l.templateReply),
+        if (reply.collectionAction != null)
+          SecondaryButton(
+            text: reply.collectionAction!.kind == 'draft'
+                ? l.collectionDraftTitle
+                : l.collectionsTitle,
+            onPressed: () => context.push(reply.collectionAction!.location),
+          ),
         for (final option in reply.options)
           SecondaryButton(
             text: option.label,

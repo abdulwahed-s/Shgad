@@ -1,4 +1,5 @@
 import '../../../../core/data/amount_model.dart';
+import '../../../../core/data/metric_proof_model.dart';
 import '../../domain/entities/chat_reply.dart';
 
 class ChatModel {
@@ -21,6 +22,9 @@ class ChatModel {
             m['label_key'] as String,
             List<String>.from(m['source_ids'] as List),
             m['formula'] as String,
+            queryEvidence: parseMetricProof(
+              Map<String, dynamic>.from(m as Map),
+            ),
           ),
         )
         .toList(),
@@ -34,5 +38,12 @@ class ChatModel {
         ? null
         : context(j['resolved_range'], j['resolved_counterparty']),
     template: j['renderer']?['fell_back_to_template'] == true,
+    collectionAction: j['collection_action'] == null
+        ? null
+        : ChatCollectionAction(
+            j['collection_action']['kind'] as String,
+            j['collection_action']['counterparty_id'] as String?,
+            j['collection_action']['tone'] as String,
+          ),
   );
 }
