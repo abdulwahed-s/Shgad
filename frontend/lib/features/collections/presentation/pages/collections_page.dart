@@ -88,13 +88,10 @@ class _CollectionsView extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       Text(
-                        p.daysSinceReminder == null
+                        p.lastReminderDate == null
                             ? l.collectionNeverReminded
                             : l.collectionLastReminded(
-                                IqdFormatter.digits(
-                                  p.daysSinceReminder.toString(),
-                                  l.localeName,
-                                ),
+                                formatDate(p.lastReminderDate!, l.localeName),
                               ),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),

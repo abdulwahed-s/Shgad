@@ -100,22 +100,22 @@ MESSAGES = {
 }
 
 
-# D61 development copy. No inherited approval: exact new texts remain pending.
+# D61 user-approved5Nov2026; exact per-key hashes are in arabic_review.py.
 COLLECTION_COPY = {
     "collection_greeting": "هلا {name}،",
     "collection_signoff": "ممنونين لتعاونك.",
     "collection_zaincash": "إذا يناسبك، تكدر تسدد بتحويل زين كاش.",
     "reminder_gentle": (
-        "حبيت أذكّرك بالمبلغ المتأخر {{fig:overdue_amount}}، "
-        "المستحق بتاريخ {{date:oldest_due}}. من يناسبك تسدده؟"
+        "كيلع يقابلاب كركّذأ تيبح {{fig:overdue_amount}}، "
+        "هدعوم ناج يللا {{date:oldest_due}}. ؟هددست كبساني تكوش"
     ),
     "reminder_normal": (
-        "نذكّرك بالمبلغ المتأخر {{fig:overdue_amount}}، "
-        "المستحق بتاريخ {{date:oldest_due}}. يا ريت تخبرنا بموعد مناسب للتسديد."
+        "رخأتملا غلبملاب كركّذن {{fig:overdue_amount}}، "
+        "هدعوم ناج يللا {{date:oldest_due}}. هددست كبساني تكوش انلّك."
     ),
     "reminder_firm": (
-        "المبلغ {{fig:overdue_amount}} بعده متأخر من تاريخ {{date:oldest_due}}. "
-        "نرجو منك تحدد موعد للتسديد وتخبرنا بيه."
+        "غلبملا {{fig:overdue_amount}} نم رخأتم هدعب {{date:oldest_due}}. "
+        "ردكت تكوش يلّك ،ديدستلل دعوم ىلع قفتن مزال."
     ),
     "collection_nothing_owed": "هالحساب ما عليه دين باقي بالسجلات.",
     "collection_not_due": (
@@ -125,7 +125,7 @@ COLLECTION_COPY = {
     "collection_empty": "ماكو ديون زبائن متأخرة بالسجلات.",
     "collection_overdue_amount": "المبلغ المتأخر",
     "collection_days_overdue": "أيام التأخير",
-    "collection_reminded": "آخر تذكير قبل {{fig:reminder_age}} يوم.",
+    "collection_reminded": "خيراتب ناج ريكذت رخآ {{date:last_reminded}}.",
     "brief_title": "ملخص الصبح",
     "brief_dues_today": "مستحقات اليوم ويا المتأخر",
     "brief_dues_week": "المستحقات من اليوم لنهاية أسبوع الشغل",

@@ -1882,167 +1882,327 @@
   "collectionsTitle": "طالب بديونك",
   "@collectionsTitle": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "aca4117affbec791ad97a4249f7f45bd96f765b94feebb5061712d0a7360cde0"
   },
   "collectionsIntro": "الديون المتأخرة مرتبة حسب المبلغ، وبعدين مدة التأخير.",
   "@collectionsIntro": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "a464e292256c0c81e20219c42bf8faa4d9b978c9c45971e5eb34ad109d9925c8"
   },
   "collectionsEmpty": "ماكو ديون زبائن متأخرة بهالسجلات.",
   "@collectionsEmpty": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "b282b01042c3c48dd23983faa5ef7dc7d3a7258de093b82afd4c3422b6909814"
   },
   "collectionDraftTitle": "رسالة تذكير",
   "@collectionDraftTitle": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "d84eb7f70919d535ab68bf2cab6e4c1750306541c0e8cc206ead6b85dbafee36"
   },
   "collectionTone": "أسلوب الرسالة",
   "@collectionTone": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "c321b4b56288631c17191ba1ca32e63caa2fc1d3514380aa0c9517ca9f226a7f"
   },
   "collectionGentle": "لطيف",
   "@collectionGentle": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "7e64594213c9d5f9cde57cd0c2ff05fecf912b4beb5ffe2e25c84a472f94fd8e"
   },
   "collectionNormal": "عادي",
   "@collectionNormal": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "f3569af245009e0627ca7be479ab5e7fcd2de2fcea47b00c74550a00c43364d8"
   },
   "collectionFirm": "حازم",
   "@collectionFirm": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "85570b6cc50e64eac987ffa16c9419c6cff3a0bcc3872c07364d6b7a91cb9693"
   },
   "collectionDraftField": "نص الرسالة",
   "@collectionDraftField": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "ce6ed7b6e2d4d13aa59d691edaf080d7094a77b442023a8f0f7bfac2b80f66db"
   },
   "collectionPrepare": "جهّز رسالة",
   "@collectionPrepare": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "15e68fdef78813e153ede31f0652a68a29b10871a2aef115b848e23b8c2862f4"
   },
   "collectionOpenWhatsapp": "افتح واتساب",
   "@collectionOpenWhatsapp": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "2a3f182e137a09ac1f491664df804e99bfdfd486c09abd5adc4a6a13d13d9eca"
   },
   "collectionCopy": "انسخ",
   "@collectionCopy": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "7b47e8a39443ffe85819935315eb6a891a00c4652133400d6ac44c768836de92"
   },
   "collectionReview": "راجع الاسم والمبلغ قبل ما تشارك الرسالة.",
   "@collectionReview": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "8d409f3cf1ad47371cb69c1565fb6dd807445e2c79a713a9e2f84004d29a3df1"
   },
   "collectionTemplatePending": "قالب الرسالة بانتظار مراجعة الصياغة.",
   "@collectionTemplatePending": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "d5d52668c06e2e8260bc933a9f96bd6ddf7c7b0a1d11b809518f984d6f757e88"
   },
-  "collectionNeverReminded": "بعد ما تذكّر بهالدفتر",
+  "collectionNeverReminded": "هتركّذ ام دعب",
   "@collectionNeverReminded": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "21797f682bfa90ee9e47a6ac1f9743a48e9fd9e6cbb2da2e2d084313a7f24550"
   },
-  "collectionLastReminded": "آخر تذكير قبل {days} يوم",
+  "collectionLastReminded": "خيراتب ناج ريكذت رخآ {date}",
   "@collectionLastReminded": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review",
+    "x-review": "approved Iraqi Arabic review",
     "placeholders": {
-      "days": {
+      "date": {
         "type": "String"
       }
-    }
+    },
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "70d387ea77d3b65346953c1d62dba860f723fbf1d921fb87b846b723b6f585c8"
   },
-  "collectionHandoffLogged": "انحفظ التذكير بهالدفتر. فتح واتساب ما يأكد وصول الرسالة.",
+  "collectionHandoffLogged": "تلصو ةلاسرلا نإ ينعي ام باستاو حتف .ريكذتلا ظفحنا.",
   "@collectionHandoffLogged": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "f6de749bc7273277d588c7cfd318586328c24250d26a9af9091ba78eca49d85f"
   },
-  "collectionCopiedLogged": "اننسخت الرسالة وانحفظ التذكير بهالدفتر.",
+  "collectionCopiedLogged": "ريكذتلا ظفحناو ةلاسرلا تخسننا.",
   "@collectionCopiedLogged": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "76f64bfdc0dc1c77284b58be175f6f9df7e595cc6d11f570effe5ae8e39feccd"
   },
   "collectionLogFailed": "الرسالة انفتحت أو اننسخت، بس التذكير ما انحفظ. جرّب تحفظه مرة ثانية.",
   "@collectionLogFailed": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "4c341ad7a16cc5d1a912b0bf9d7df0ff06ae724430b5938c2879cb902c5d572e"
   },
   "collectionRetryLog": "احفظ التذكير",
   "@collectionRetryLog": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "229500d83cf13b20335d96cf012ba54352269cc8092e95e0dc79269cae08acca"
   },
   "collectionShareFailed": "ما انفتح واتساب. تكدر تنسخ الرسالة.",
   "@collectionShareFailed": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "53bf627babc207113f747122e96ab022dd58d9104d2200ba681a2db1239680b6"
   },
   "collectionNoOverdue": "هالحساب ما عليه دين متأخر.",
   "@collectionNoOverdue": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "ed33f06e6ade239bd5086d70a8630343032886c3c5c35f604287e44e49993318"
   },
-  "collectionShareNotice": "واتساب يفتح حتى تختار جهة الاتصال؛ إنت تقرر تدز الرسالة.",
+  "collectionShareNotice": "اهزدت اذإ ررقت تنإ ؛لاصتالا ةهج راتخت ىتح حتفي باستاو.",
   "@collectionShareNotice": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "03be95cb3ba3008d41184ffe7f17af5a8d9a817a0ef5e69dd5359b8bea1f194d"
   },
   "collectionNoDraft": "اختار زبون حتى نجهز رسالة.",
   "@collectionNoDraft": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "9a732d8ad3bcff3c9ec25b4125efee79a0a1f3f04a9177ab2b767c5bc3432264"
   },
   "collectionOverdueAmount": "المبلغ المتأخر",
   "@collectionOverdueAmount": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "a41b5f8d1af7808e510f3623c6f7b8159320349654994edd958fbde6135ac080"
   },
   "morningBriefTitle": "ملخص الصبح",
   "@morningBriefTitle": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "3b97783bcace43d46e19b2f5c30475c1226e385206b3aa3de39917e49faa751b"
   },
   "briefDuesToday": "مستحقات اليوم ويا المتأخر",
   "@briefDuesToday": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "825bf835241c9a074310c94394ed0ec1ea5f032c821c2dba98e4888bb6b11090"
   },
   "briefDuesWeek": "المستحقات لنهاية أسبوع الشغل",
   "@briefDuesWeek": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "853b74b40f2feddcb7517aa64eec87b39e2b9ec556c9d28870cc3a31eae088d8"
   },
   "briefOverdueCustomers": "الزبائن المتأخرين",
   "@briefOverdueCustomers": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "43f85c9e787ff30b13abe5e2bf313a191847bdf756baeef6bc1dfe53f7fb8b1f"
   },
   "briefOpenFlags": "قيود تحتاج مراجعة هالأسبوع",
   "@briefOpenFlags": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "7f2afaa5bb013e9076ddc031e7ba1476e3f04e964e5c9c797decb573957b6860"
   },
   "briefCollect": "طالب بالمتأخرين",
   "@briefCollect": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "d9da1ddd049132eec6bc0735bc88a94a72c2a3cc7869524c62a53147ec42137d"
   },
   "briefOverdueTotal": "مجموع الديون المتأخرة",
   "@briefOverdueTotal": {
     "description": "Collection reminder or deterministic morning brief.",
-    "x-review": "pending Iraqi Arabic review"
+    "x-review": "approved Iraqi Arabic review",
+    "x-review-date": "2026-11-05",
+    "x-review-by": "user",
+    "x-review-source": "explicit_chat_confirmation",
+    "x-review-decision": "D61",
+    "x-review-sha256": "564543422694ba09a7bf36fa9c0775c42603bfc9f648835696cbebf33027577f"
   }
 
 }

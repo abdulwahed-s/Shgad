@@ -57,8 +57,7 @@ class CollectionDraft {
   final bool template;
   final List<Amount> figures;
   final Map<String, String> dates;
-  bool get canShare =>
-      status == 'drafted' && (!template || reviewStatus == 'APPROVED');
+  bool get canShare => status == 'drafted' && reviewStatus == 'APPROVED';
 }
 
 class ReminderReceipt {

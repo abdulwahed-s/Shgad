@@ -5,6 +5,7 @@ import 'package:shgad/app/app.dart';
 import 'package:shgad/app/di/injection.dart';
 import 'package:shgad/core/domain/snapshot.dart';
 import 'package:shgad/core/error/app_failure.dart';
+import 'package:shgad/core/utils/date_formatter.dart';
 import 'package:shgad/core/utils/result.dart';
 import 'package:shgad/core/widgets/failure_view.dart';
 import 'package:shgad/features/collections/data/models/collections_model.dart';
@@ -13,12 +14,14 @@ import 'package:shgad/features/collections/domain/repositories/collections_repos
 import 'package:shgad/features/collections/presentation/pages/collections_page.dart';
 import 'package:shgad/l10n/generated/app_localizations.dart';
 import 'collections_bloc_test.dart' show FakeCollectionsRepository, FakeSharing;
-import 'collections_model_test.dart' show collectionsJson;
+import 'collections_model_test.dart' show collectionCustomer, collectionsJson;
 import 'support/test_app.dart';
 
 class WidgetCollections extends FakeCollectionsRepository {
   bool empty = false, failed = false;
   int loads = 0;
+  String? lastReminderDate = '2026-09-27';
+  int? reminderAge = 1;
   @override
   Future<Result<Snapshot<Collections>>> load() async {
     loads++;
@@ -28,6 +31,13 @@ class WidgetCollections extends FakeCollectionsRepository {
             Snapshot(
               CollectionsModel.collections({
                 ...collectionsJson(),
+                'items': [
+                  {
+                    ...collectionCustomer(),
+                    'last_reminder_business_date': lastReminderDate,
+                    'days_since_last_reminder': reminderAge,
+                  },
+                ],
                 if (empty) 'items': <Object>[],
               }),
               '2026-11-04T10:00:00Z',
@@ -120,11 +130,51 @@ void main() {
       );
     });
   }
+  testWidgets(
+    'last reminder displays the server date instead of elapsed days',
+    (tester) async {
+      repo.reminderAge = 999;
+      await open(tester);
+      final l = AppLocalizations.of(
+        tester.element(find.byType(CollectionsPage)),
+      );
+      expect(
+        find.text(
+          l.collectionLastReminded(formatDate('2026-09-27', l.localeName)),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+  testWidgets('missing reminder date stays unknown even with an age value', (
+    tester,
+  ) async {
+    repo.lastReminderDate = null;
+    repo.reminderAge = 4;
+    await open(tester);
+    final l = AppLocalizations.of(tester.element(find.byType(CollectionsPage)));
+    expect(find.text(l.collectionNeverReminded), findsOneWidget);
+  });
   testWidgets('empty collection state', (tester) async {
     repo.empty = true;
     await open(tester);
     expect(find.byKey(const ValueKey('collections_empty')), findsOneWidget);
   });
+  testWidgets(
+    'pending fixed copy blocks model handoff and shows review notice',
+    (tester) async {
+      repo.pendingFixedCopy = true;
+      await open(tester);
+      await tap(tester, find.byKey(const ValueKey('draft_CUST-01')));
+      final l = AppLocalizations.of(
+        tester.element(find.byKey(const ValueKey('collection_draft_text'))),
+      );
+      expect(find.text(l.collectionTemplatePending), findsOneWidget);
+      await tap(tester, find.byKey(const ValueKey('collection_copy')));
+      expect(sharing.texts, isEmpty);
+      expect(repo.actions, isEmpty);
+    },
+  );
   testWidgets('error collection state', (tester) async {
     repo.failed = true;
     await open(tester);

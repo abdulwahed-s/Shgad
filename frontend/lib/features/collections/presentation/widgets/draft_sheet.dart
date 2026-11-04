@@ -100,7 +100,8 @@ class ReminderDraftSheet extends StatelessWidget {
               ),
               const SizedBox(height: AppDimens.md),
               InfoStrip(text: l.collectionReview),
-              if (v.draft!.template && v.draft!.reviewStatus != 'APPROVED')
+              if (v.draft!.status == 'drafted' &&
+                  v.draft!.reviewStatus != 'APPROVED')
                 InfoStrip(text: l.collectionTemplatePending),
               const SizedBox(height: AppDimens.lg),
               ActionGroup(

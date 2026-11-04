@@ -1385,11 +1385,11 @@
   "@collectionNeverReminded": {
     "description": "Collection reminder or deterministic morning brief."
   },
-  "collectionLastReminded": "Last reminded {days} days ago",
+  "collectionLastReminded": "Last reminded on {date}",
   "@collectionLastReminded": {
     "description": "Collection reminder or deterministic morning brief.",
     "placeholders": {
-      "days": {
+      "date": {
         "type": "String"
       }
     }

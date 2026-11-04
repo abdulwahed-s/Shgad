@@ -112,7 +112,7 @@ def test_invalid_draft_retries_once_then_tone_template(
     assert body["draft_kind"] == "template", body
     assert body["renderer"] == {"attempts": 2, "fell_back_to_template": True}
     assert body["figures"][0]["amount_iqd"] == 47000
-    assert body["review_status"] == "PENDING_REVIEW"
+    assert body["review_status"] == "APPROVED"
     assert len(client.calls) == 2
     assert "الشرطة" not in body["text"] and "المحكمة" not in body["text"]
     assert tuple(ledger.iterdump()) == before

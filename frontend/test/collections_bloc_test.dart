@@ -24,6 +24,7 @@ class FakeConnection implements ConnectionRepository {
 
 class FakeCollectionsRepository implements CollectionsRepository {
   bool template = false, failDraft = false, failLog = false;
+  bool pendingFixedCopy = false;
   final actions = <ReminderAction>[];
   @override
   Future<Result<CollectionDraft>> draft(String id, String tone) async =>
@@ -32,6 +33,7 @@ class FakeCollectionsRepository implements CollectionsRepository {
       : Success(
           CollectionsModel.draft({
             ...collectionDraftJson(template: template),
+            if (pendingFixedCopy) 'review_status': 'PENDING_REVIEW',
             'tone': tone,
           }),
         );

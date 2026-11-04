@@ -11,6 +11,7 @@ import unicodedata
 
 from pydantic import ValidationError
 
+from app.agents.arabic_review import review_status
 from app.agents.llm_client import LLMUnavailable, strict_json, unfenced
 from app.agents.messages_ar import text
 from app.agents.renderer import DraftValidationError, render_projected_draft
@@ -53,6 +54,14 @@ _MONTHS = re.compile(
     r"(?<!\w)(?:ب?اب|مايس|اليوم|باجر|باچر|بكره|غدا|امس|البارحه|هسه|tomorrow|today|yesterday)(?!\w)",
     re.I,
 )
+
+
+def _copy_status(*keys):
+    return (
+        "APPROVED"
+        if all(review_status(key, text(key)) == "APPROVED" for key in keys)
+        else "PENDING_REVIEW"
+    )
 
 
 def _safe_body(body, names, *, has_partial_payment=False, reminder_count=0):
@@ -139,6 +148,7 @@ async def create_draft(
                     counterparty=party,
                     tone=request.tone,
                     text=text("collection_nothing_owed"),
+                    review_status=_copy_status("collection_nothing_owed"),
                 )
             index, _ = waiting
             rendered = render_projected_draft(
@@ -154,6 +164,7 @@ async def create_draft(
                 tone=request.tone,
                 text=rendered.reply_ar,
                 dates=rendered.dates,
+                review_status=_copy_status("collection_not_due"),
             )
         index, selected = indexed
         memory = get_reminders(
@@ -255,6 +266,12 @@ async def create_draft(
             dates=rendered.dates,
             renderer=RendererStats(
                 attempts=max(1, attempts), fell_back_to_template=fallback
+            ),
+            review_status=_copy_status(
+                "collection_greeting",
+                "collection_signoff",
+                "collection_zaincash",
+                *(("reminder_" + request.tone,) if fallback else ()),
             ),
         )
     finally:

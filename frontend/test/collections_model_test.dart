@@ -48,7 +48,7 @@ Map<String, dynamic> collectionDraftJson({bool template = false}) => {
   'metrics': [],
   'dates': {'oldest_due': '2026-09-20'},
   'renderer': {'attempts': 1, 'fell_back_to_template': template},
-  'review_status': 'PENDING_REVIEW',
+  'review_status': template ? 'PENDING_REVIEW' : 'APPROVED',
 };
 
 void main() {
@@ -76,6 +76,20 @@ void main() {
     expect(model.text, collectionDraftJson()['text']);
     expect(model.canShare, isTrue);
     expect(template.canShare, isFalse);
+    final approvedTemplate = CollectionsModel.draft({
+      ...collectionDraftJson(template: true),
+      'review_status': 'APPROVED',
+    });
+    expect(approvedTemplate.canShare, isTrue);
+  });
+
+  test('pending fixed copy blocks a model body from sharing', () {
+    final draft = CollectionsModel.draft({
+      ...collectionDraftJson(),
+      'review_status': 'PENDING_REVIEW',
+    });
+    expect(draft.template, isFalse);
+    expect(draft.canShare, isFalse);
   });
 
   test('count zero retains exact empty flag proof', () {

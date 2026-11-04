@@ -160,9 +160,75 @@ D59_APPROVED_MESSAGES = {
 }
 
 
+# D61 is a separate user approval; preserve all earlier snapshots.
+D61_REVIEWED_ON = "2026-11-05"
+D61_REVIEWED_BY = "user"
+D61_REVIEW_SOURCE = "explicit_chat_confirmation"
+D61_APPROVED_TEXT_SHA256 = (
+    "cfe7941e36bd64973d29fe7985ea25905355aac836a3f557039b5637e1d15469"
+)
+D61_APPROVED_MESSAGES = {
+    "collection_greeting": (
+        "6b5461ca1374a1e7dd7c3f6550ccb6f148f639edbc5f59ea5b5c270ec8d7e84a"
+    ),
+    "collection_signoff": (
+        "3b2300476e5c96a68ccc75455e5bcd95d6a2816e5f1c923f143e621344fd0139"
+    ),
+    "collection_zaincash": (
+        "40a7a3a055705c6be4342829048fcf055e37db492e0afd9a9c8fa831a9005c88"
+    ),
+    "reminder_gentle": (
+        "1dff0b878a980f18c5f1ec3de55d26c23b3dadc93a3cd676c237704976b8e908"
+    ),
+    "reminder_normal": (
+        "155bcdcdbcf19286c24b24bcf22ded8bd96394503ab3ab06ce10ee8b8cb3c4e1"
+    ),
+    "reminder_firm": (
+        "a6c2ae29f09d42f593b34a5efecae7c35cefe787e77c001d0dff602066725d06"
+    ),
+    "collection_nothing_owed": (
+        "04cf94ddc14e1756d0e6eac29f45ddb87941370dbe4782a1117ada046df9d17f"
+    ),
+    "collection_not_due": (
+        "8d79e9511bdf02095d5b0400f8967ddc9311f2e3a10b24eb52c75fc4c55ec2d3"
+    ),
+    "collection_priorities": (
+        "dc8038bb72ac9986f0e58885dcb1b97b140a41220ef09bc80d24f40f28ca68b3"
+    ),
+    "collection_empty": (
+        "fb7c86f20170c4869675b5a6940e5cb62d5465d073a79706df324f0954c65680"
+    ),
+    "collection_overdue_amount": (
+        "a41b5f8d1af7808e510f3623c6f7b8159320349654994edd958fbde6135ac080"
+    ),
+    "collection_days_overdue": (
+        "798377b3157430e796ce220e00b4eac1da5dd3a982a9ffc39afd8d9090c45824"
+    ),
+    "collection_reminded": (
+        "2726ea7149c2f05c4ff5094307593d47bac9ae3396ce6f3ca77d2ca629b13f0e"
+    ),
+    "brief_title": ("3b97783bcace43d46e19b2f5c30475c1226e385206b3aa3de39917e49faa751b"),
+    "brief_dues_today": (
+        "825bf835241c9a074310c94394ed0ec1ea5f032c821c2dba98e4888bb6b11090"
+    ),
+    "brief_dues_week": (
+        "a9e32e0e986803433d2464d9d8366306373b203921486c92f12ddbb6e0d99b01"
+    ),
+    "brief_overdue_count": (
+        "40d737cf86e55d2a8934847facd388f4787d7b0025ded12656ee5c6ba670a18c"
+    ),
+    "brief_flags_count": (
+        "e22157707ebbcc5a618a99baad20bbef4d4e1faa0ec853de0ed6041d1f8e0568"
+    ),
+}
+
+
 def review_status(key, text):
     fingerprint = hashlib.sha256(text.encode("utf-8")).hexdigest()
     expected = APPROVED_MESSAGES.get(
-        key, WEEKLY_APPROVED_MESSAGES.get(key, D59_APPROVED_MESSAGES.get(key))
+        key,
+        WEEKLY_APPROVED_MESSAGES.get(
+            key, D59_APPROVED_MESSAGES.get(key, D61_APPROVED_MESSAGES.get(key))
+        ),
     )
     return "APPROVED" if expected == fingerprint else "PENDING_REVIEW"

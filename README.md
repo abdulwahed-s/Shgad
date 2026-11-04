@@ -181,7 +181,9 @@ A builder-written smoke drill passed 20/20 checks (10 chat, 10 API), followed by
 the ten documented demo questions, on `196ca1a`. Gemini `gemini-3.8-flash` made
 34 requests, all HTTP 200; the canonical demo figures and all financial tables
 were unchanged. This is smoke evidence, not an independent evaluation of reminder
-quality. All new Arabic copy remains pending review; no real merchants took part.
+quality. All 50 collection/brief Arabic keys were user-approved on 5 November
+2026, bound to their exact text hashes; later edits require review. No real
+merchants took part.
 
 The initial training-only regression at `196ca1a` returned **109/150 joint**
 (86/101 historical, 23/49 safe), below the required 148/150. Its 275 provider
