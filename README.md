@@ -183,15 +183,23 @@ the ten documented demo questions, on `196ca1a`. Gemini `gemini-3.8-flash` made
 were unchanged. This is smoke evidence, not an independent evaluation of reminder
 quality. All new Arabic copy remains pending review; no real merchants took part.
 
-The single training-only regression at `196ca1a` returned **109/150 joint**
+The initial training-only regression at `196ca1a` returned **109/150 joint**
 (86/101 historical, 23/49 safe), below the required 148/150. Its 275 provider
 attempts included 72 HTTP 402 responses and one transport failure; it then hit
 the request ceiling. Compared with the earlier 149/150 baseline, four earlier
 questions and the final 37 failed, while the one previously failed question passed.
 Offline replay isolated an overdue-balance routing regression, now covered by
 request-evidence and retry tests. The other three early failures followed changed
-provider interpretations or narration under both code versions. No subsequent
-paid training run has been measured; this collection build is not ready to merge.
+provider interpretations or narration under both code versions.
+
+After the offline correction and billing confirmation, one additional training
+run at `43162aa` returned **150/150 joint** (101/101 historical, 49/49 safe).
+It used 251 Gemini `gemini-3.8-flash` requests, all HTTP 200, within the 275-call
+cap, with no fallback or limit hits. There were no new regressions against the
+149/150 baseline; its one failed question passed. Questions, expected answers
+and grading were unchanged. These are results on seen development training
+questions; they do not establish independent reminder quality or unseen accuracy.
+
 The development runner now records each question's provider, HTTP status and
 attempt count without changing grading. The original ten demo questions are
 committed fixtures; `python scripts/collection_drill.py` checks the portable plan
