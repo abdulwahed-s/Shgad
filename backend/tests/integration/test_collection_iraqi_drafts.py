@@ -51,9 +51,30 @@ def test_iraqi_draft_keeps_exact_slots_and_never_changes_ledger(
                 name=body["counterparty"]["display_name"]
             ),
             rendered_body,
-            APPROVAL["backend"]["collection_signoff"],
             APPROVAL["backend"]["collection_zaincash"],
+            APPROVAL["backend"]["collection_signoff"],
         ]
     )
     assert len(client.calls) == 1
     assert tuple(ledger.iterdump()) == before
+
+
+def test_rejected_draft_fallback_keeps_the_signoff_last(
+    api, ledger, debt_factory, monkeypatch
+):
+    debt_factory("LATE", 47000, "2026-09-20")
+    ledger.commit()
+    client = Scripted("47000", "47000")
+    monkeypatch.setitem(app.dependency_overrides, llm_client, lambda: client)
+
+    response = draft(api, tone="firm")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["renderer"] == {"attempts": 2, "fell_back_to_template": True}
+    assert body["review_status"] == "APPROVED"
+    assert body["text"].splitlines()[-2:] == [
+        APPROVAL["backend"]["collection_zaincash"],
+        APPROVAL["backend"]["collection_signoff"],
+    ]
+    assert len(client.calls) == 2

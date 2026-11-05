@@ -257,8 +257,8 @@ async def create_draft(
             (
                 text("collection_greeting").format(name=party.display_name),
                 rendered.reply_ar,
-                text("collection_signoff"),
                 text("collection_zaincash"),
+                text("collection_signoff"),
             )
         )
         return CollectionDraft(
