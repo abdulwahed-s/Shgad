@@ -2019,7 +2019,7 @@
     "x-review-decision": "D61",
     "x-review-sha256": "d5d52668c06e2e8260bc933a9f96bd6ddf7c7b0a1d11b809518f984d6f757e88"
   },
-  "collectionNeverReminded": "هتركّذ ام دعب",
+  "collectionNeverReminded": "بعد ما ذكّرته",
   "@collectionNeverReminded": {
     "description": "Collection reminder or deterministic morning brief.",
     "x-review": "approved Iraqi Arabic review",
@@ -2027,9 +2027,9 @@
     "x-review-by": "user",
     "x-review-source": "explicit_chat_confirmation",
     "x-review-decision": "D61",
-    "x-review-sha256": "21797f682bfa90ee9e47a6ac1f9743a48e9fd9e6cbb2da2e2d084313a7f24550"
+    "x-review-sha256": "ee2a3f1ebcf6aaf0476e76fbc61650953f34e7c110286f02ea7944209cc2dbea"
   },
-  "collectionLastReminded": "خيراتب ناج ريكذت رخآ {date}",
+  "collectionLastReminded": "آخر تذكير جان بتاريخ {date}",
   "@collectionLastReminded": {
     "description": "Collection reminder or deterministic morning brief.",
     "x-review": "approved Iraqi Arabic review",
@@ -2042,9 +2042,9 @@
     "x-review-by": "user",
     "x-review-source": "explicit_chat_confirmation",
     "x-review-decision": "D61",
-    "x-review-sha256": "70d387ea77d3b65346953c1d62dba860f723fbf1d921fb87b846b723b6f585c8"
+    "x-review-sha256": "eedf78b8d1973d7bf6e6c8b119593ff4360a376d735afd96768445d68160137b"
   },
-  "collectionHandoffLogged": "تلصو ةلاسرلا نإ ينعي ام باستاو حتف .ريكذتلا ظفحنا.",
+  "collectionHandoffLogged": "انحفظ التذكير. فتح واتساب ما يعني إن الرسالة وصلت.",
   "@collectionHandoffLogged": {
     "description": "Collection reminder or deterministic morning brief.",
     "x-review": "approved Iraqi Arabic review",
@@ -2052,9 +2052,9 @@
     "x-review-by": "user",
     "x-review-source": "explicit_chat_confirmation",
     "x-review-decision": "D61",
-    "x-review-sha256": "f6de749bc7273277d588c7cfd318586328c24250d26a9af9091ba78eca49d85f"
+    "x-review-sha256": "d13f905f37533f3af551a4179db7300f9e7dd5d88a66e3f1ab487a90e9f6b481"
   },
-  "collectionCopiedLogged": "ريكذتلا ظفحناو ةلاسرلا تخسننا.",
+  "collectionCopiedLogged": "اننسخت الرسالة وانحفظ التذكير.",
   "@collectionCopiedLogged": {
     "description": "Collection reminder or deterministic morning brief.",
     "x-review": "approved Iraqi Arabic review",
@@ -2062,7 +2062,7 @@
     "x-review-by": "user",
     "x-review-source": "explicit_chat_confirmation",
     "x-review-decision": "D61",
-    "x-review-sha256": "76f64bfdc0dc1c77284b58be175f6f9df7e595cc6d11f570effe5ae8e39feccd"
+    "x-review-sha256": "3c204c879f87cc694f290ee3bb97f252806d6fadc86a6e58edd1ece678e4175d"
   },
   "collectionLogFailed": "الرسالة انفتحت أو اننسخت، بس التذكير ما انحفظ. جرّب تحفظه مرة ثانية.",
   "@collectionLogFailed": {
@@ -2104,7 +2104,7 @@
     "x-review-decision": "D61",
     "x-review-sha256": "ed33f06e6ade239bd5086d70a8630343032886c3c5c35f604287e44e49993318"
   },
-  "collectionShareNotice": "اهزدت اذإ ررقت تنإ ؛لاصتالا ةهج راتخت ىتح حتفي باستاو.",
+  "collectionShareNotice": "واتساب يفتح حتى تختار جهة الاتصال؛ إنت تقرر إذا تدزها.",
   "@collectionShareNotice": {
     "description": "Collection reminder or deterministic morning brief.",
     "x-review": "approved Iraqi Arabic review",
@@ -2112,7 +2112,7 @@
     "x-review-by": "user",
     "x-review-source": "explicit_chat_confirmation",
     "x-review-decision": "D61",
-    "x-review-sha256": "03be95cb3ba3008d41184ffe7f17af5a8d9a817a0ef5e69dd5359b8bea1f194d"
+    "x-review-sha256": "d92d13d5312d0600c83145bd4aa7db80d3b91d6e3454f78b5156437b526a8317"
   },
   "collectionNoDraft": "اختار زبون حتى نجهز رسالة.",
   "@collectionNoDraft": {

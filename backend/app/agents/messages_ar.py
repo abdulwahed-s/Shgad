@@ -106,16 +106,16 @@ COLLECTION_COPY = {
     "collection_signoff": "ممنونين لتعاونك.",
     "collection_zaincash": "إذا يناسبك، تكدر تسدد بتحويل زين كاش.",
     "reminder_gentle": (
-        "كيلع يقابلاب كركّذأ تيبح {{fig:overdue_amount}}، "
-        "هدعوم ناج يللا {{date:oldest_due}}. ؟هددست كبساني تكوش"
+        "حبيت أذكّرك بالباقي عليك {{fig:overdue_amount}}، اللي جان موعده "
+        "{{date:oldest_due}}. شوكت يناسبك تسدده؟"
     ),
     "reminder_normal": (
-        "رخأتملا غلبملاب كركّذن {{fig:overdue_amount}}، "
-        "هدعوم ناج يللا {{date:oldest_due}}. هددست كبساني تكوش انلّك."
+        "نذكّرك بالمبلغ المتأخر {{fig:overdue_amount}}، اللي جان موعده "
+        "{{date:oldest_due}}. كلّنا شوكت يناسبك تسدده."
     ),
     "reminder_firm": (
-        "غلبملا {{fig:overdue_amount}} نم رخأتم هدعب {{date:oldest_due}}. "
-        "ردكت تكوش يلّك ،ديدستلل دعوم ىلع قفتن مزال."
+        "المبلغ {{fig:overdue_amount}} بعده متأخر من {{date:oldest_due}}. "
+        "لازم نتفق على موعد للتسديد، كلّي شوكت تكدر."
     ),
     "collection_nothing_owed": "هالحساب ما عليه دين باقي بالسجلات.",
     "collection_not_due": (
@@ -125,7 +125,7 @@ COLLECTION_COPY = {
     "collection_empty": "ماكو ديون زبائن متأخرة بالسجلات.",
     "collection_overdue_amount": "المبلغ المتأخر",
     "collection_days_overdue": "أيام التأخير",
-    "collection_reminded": "خيراتب ناج ريكذت رخآ {{date:last_reminded}}.",
+    "collection_reminded": "آخر تذكير جان بتاريخ {{date:last_reminded}}.",
     "brief_title": "ملخص الصبح",
     "brief_dues_today": "مستحقات اليوم ويا المتأخر",
     "brief_dues_week": "المستحقات من اليوم لنهاية أسبوع الشغل",

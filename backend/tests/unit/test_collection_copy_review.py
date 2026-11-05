@@ -8,28 +8,28 @@ from app.agents.arabic_review import review_status
 from app.agents.messages_ar import COLLECTION_COPY, MESSAGES
 
 ROOT = Path(__file__).resolve().parents[3]
-EXACT_BACKEND = {
-    "reminder_gentle": (
-        "كيلع يقابلاب كركّذأ تيبح {{fig:overdue_amount}}، "
-        "هدعوم ناج يللا {{date:oldest_due}}. ؟هددست كبساني تكوش"
-    ),
-    "reminder_normal": (
-        "رخأتملا غلبملاب كركّذن {{fig:overdue_amount}}، "
-        "هدعوم ناج يللا {{date:oldest_due}}. هددست كبساني تكوش انلّك."
-    ),
-    "reminder_firm": (
-        "غلبملا {{fig:overdue_amount}} نم رخأتم هدعب {{date:oldest_due}}. "
-        "ردكت تكوش يلّك ،ديدستلل دعوم ىلع قفتن مزال."
-    ),
-    "collection_reminded": "خيراتب ناج ريكذت رخآ {{date:last_reminded}}.",
-}
-EXACT_FRONTEND = {
-    "collectionLastReminded": "خيراتب ناج ريكذت رخآ {date}",
-    "collectionNeverReminded": "هتركّذ ام دعب",
-    "collectionHandoffLogged": "تلصو ةلاسرلا نإ ينعي ام باستاو حتف .ريكذتلا ظفحنا.",
-    "collectionCopiedLogged": "ريكذتلا ظفحناو ةلاسرلا تخسننا.",
-    "collectionShareNotice": "اهزدت اذإ ررقت تنإ ؛لاصتالا ةهج راتخت ىتح حتفي باستاو.",
-}
+# Byte-identical copy of the user's local D61 correction file. Commit the
+# fixture so this guard also runs in a fresh checkout (docs/ stays local).
+APPROVED_PATH = ROOT / "backend/tests/fixtures/APPROVED_COPY_FIX_2026-11-05.json"
+APPROVED_BYTES = APPROVED_PATH.read_bytes()
+APPROVED_COPY = json.loads(APPROVED_BYTES)
+EXACT_BACKEND = APPROVED_COPY["backend"]
+EXACT_FRONTEND = APPROVED_COPY["frontend"]
+
+
+def test_user_json_correction_matches_every_source_value_exactly():
+    assert hashlib.sha256(APPROVED_BYTES).hexdigest() == (
+        "916df90e3de59339954b776cc06ddfa828a0cc09740b3e0a943579f05e443b6b"
+    )
+    local_source = (
+        ROOT / "docs/mvp_session/collection_agent/APPROVED_COPY_FIX_2026-11-05.json"
+    )
+    if local_source.exists():
+        assert APPROVED_BYTES == local_source.read_bytes()
+    arb = json.loads((ROOT / "frontend/lib/l10n/app_ar.arb").read_bytes())
+    for area, source in (("backend", COLLECTION_COPY), ("frontend", arb)):
+        for key, value in APPROVED_COPY[area].items():
+            assert source[key].encode("utf-8") == value.encode("utf-8"), key
 
 
 def test_d61_exact_backend_texts_are_user_approved_and_edits_lose_approval():

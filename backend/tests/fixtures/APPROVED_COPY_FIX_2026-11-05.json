@@ -1,0 +1,16 @@
+{
+  "note": "User-approved 5 Nov 2026. Exact text in logical (typing) order. Copy each value byte-for-byte from this file; do not retype or paste from a terminal.",
+  "backend": {
+    "reminder_gentle": "حبيت أذكّرك بالباقي عليك {{fig:overdue_amount}}، اللي جان موعده {{date:oldest_due}}. شوكت يناسبك تسدده؟",
+    "reminder_normal": "نذكّرك بالمبلغ المتأخر {{fig:overdue_amount}}، اللي جان موعده {{date:oldest_due}}. كلّنا شوكت يناسبك تسدده.",
+    "reminder_firm": "المبلغ {{fig:overdue_amount}} بعده متأخر من {{date:oldest_due}}. لازم نتفق على موعد للتسديد، كلّي شوكت تكدر.",
+    "collection_reminded": "آخر تذكير جان بتاريخ {{date:last_reminded}}."
+  },
+  "frontend": {
+    "collectionLastReminded": "آخر تذكير جان بتاريخ {date}",
+    "collectionNeverReminded": "بعد ما ذكّرته",
+    "collectionHandoffLogged": "انحفظ التذكير. فتح واتساب ما يعني إن الرسالة وصلت.",
+    "collectionCopiedLogged": "اننسخت الرسالة وانحفظ التذكير.",
+    "collectionShareNotice": "واتساب يفتح حتى تختار جهة الاتصال؛ إنت تقرر إذا تدزها."
+  }
+}

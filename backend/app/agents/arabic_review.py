@@ -165,7 +165,7 @@ D61_REVIEWED_ON = "2026-11-05"
 D61_REVIEWED_BY = "user"
 D61_REVIEW_SOURCE = "explicit_chat_confirmation"
 D61_APPROVED_TEXT_SHA256 = (
-    "cfe7941e36bd64973d29fe7985ea25905355aac836a3f557039b5637e1d15469"
+    "3195bdf897bdd3c13a87c7f2e97182e029403ec5cc6ead800f9eff26fb43d736"
 )
 D61_APPROVED_MESSAGES = {
     "collection_greeting": (
@@ -178,13 +178,13 @@ D61_APPROVED_MESSAGES = {
         "40a7a3a055705c6be4342829048fcf055e37db492e0afd9a9c8fa831a9005c88"
     ),
     "reminder_gentle": (
-        "1dff0b878a980f18c5f1ec3de55d26c23b3dadc93a3cd676c237704976b8e908"
+        "f9afcf3c1012e43451a37f573d1d671c6a617aea8fd7c562edfef6cf9f65d1fe"
     ),
     "reminder_normal": (
-        "155bcdcdbcf19286c24b24bcf22ded8bd96394503ab3ab06ce10ee8b8cb3c4e1"
+        "5912899ab518e091bd7c3d9eb17e08ee10b7e9083b1211ce4dc916904de141d2"
     ),
     "reminder_firm": (
-        "a6c2ae29f09d42f593b34a5efecae7c35cefe787e77c001d0dff602066725d06"
+        "af1bb8fc294e289d167c09351c22049e9985fe9ba2616df424d7480bd996cc35"
     ),
     "collection_nothing_owed": (
         "04cf94ddc14e1756d0e6eac29f45ddb87941370dbe4782a1117ada046df9d17f"
@@ -205,7 +205,7 @@ D61_APPROVED_MESSAGES = {
         "798377b3157430e796ce220e00b4eac1da5dd3a982a9ffc39afd8d9090c45824"
     ),
     "collection_reminded": (
-        "2726ea7149c2f05c4ff5094307593d47bac9ae3396ce6f3ca77d2ca629b13f0e"
+        "e32ce3350bb4cf4272848afa1a7533d378fe51f35fa421b95d788063b3c3e75b"
     ),
     "brief_title": ("3b97783bcace43d46e19b2f5c30475c1226e385206b3aa3de39917e49faa751b"),
     "brief_dues_today": (
