@@ -103,19 +103,19 @@ MESSAGES = {
 # D61 user-approved5Nov2026; exact per-key hashes are in arabic_review.py.
 COLLECTION_COPY = {
     "collection_greeting": "هلا {name}،",
-    "collection_signoff": "ممنونين لتعاونك.",
-    "collection_zaincash": "إذا يناسبك، تكدر تسدد بتحويل زين كاش.",
+    "collection_signoff": "عاشت إيدك.",
+    "collection_zaincash": "وإذا أريح إلك، تكدر تدزّهن عالزين كاش.",
     "reminder_gentle": (
-        "حبيت أذكّرك بالباقي عليك {{fig:overdue_amount}}، اللي جان موعده "
-        "{{date:oldest_due}}. شوكت يناسبك تسدده؟"
+        "بس حبيت أذكّرك، بعد باقي عليك {{fig:overdue_amount}}، وموعده جان "
+        "{{date:oldest_due}}. شوكت يناسبك تسدّه؟"
     ),
     "reminder_normal": (
-        "نذكّرك بالمبلغ المتأخر {{fig:overdue_amount}}، اللي جان موعده "
-        "{{date:oldest_due}}. كلّنا شوكت يناسبك تسدده."
+        "بعد بذمّتك {{fig:overdue_amount}}، وموعده جان {{date:oldest_due}}. "
+        "گِلّي شوكت تكدر تسدّه."
     ),
     "reminder_firm": (
-        "المبلغ {{fig:overdue_amount}} بعده متأخر من {{date:oldest_due}}. "
-        "لازم نتفق على موعد للتسديد، كلّي شوكت تكدر."
+        "بعد بذمّتك {{fig:overdue_amount}}، وموعده جان {{date:oldest_due}}. "
+        "خلّ نتّفق على يوم تسدّه بيه، گِلّي شوكت تكدر."
     ),
     "collection_nothing_owed": "هالحساب ما عليه دين باقي بالسجلات.",
     "collection_not_due": (

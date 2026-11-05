@@ -1,0 +1,22 @@
+{
+  "decision": "D61",
+  "status": "APPROVED",
+  "reviewed_on": "2026-11-05",
+  "reviewed_by": "user",
+  "review_source": "explicit_chat_confirmation_of_five_proposed_backend_values",
+  "approved_backend_sha256": "1dc1f0b3354ca961daff989fde8c5886b4a67d921cca5ff1e16d62a90667e82e",
+  "backend": {
+    "reminder_gentle": "بس حبيت أذكّرك، بعد باقي عليك {{fig:overdue_amount}}، وموعده جان {{date:oldest_due}}. شوكت يناسبك تسدّه؟",
+    "reminder_normal": "بعد بذمّتك {{fig:overdue_amount}}، وموعده جان {{date:oldest_due}}. گِلّي شوكت تكدر تسدّه.",
+    "reminder_firm": "بعد بذمّتك {{fig:overdue_amount}}، وموعده جان {{date:oldest_due}}. خلّ نتّفق على يوم تسدّه بيه، گِلّي شوكت تكدر.",
+    "collection_signoff": "عاشت إيدك.",
+    "collection_zaincash": "وإذا أريح إلك، تكدر تدزّهن عالزين كاش."
+  },
+  "superseded_backend": {
+    "reminder_gentle": "حبيت أذكّرك بالباقي عليك {{fig:overdue_amount}}، اللي جان موعده {{date:oldest_due}}. شوكت يناسبك تسدده؟",
+    "reminder_normal": "نذكّرك بالمبلغ المتأخر {{fig:overdue_amount}}، اللي جان موعده {{date:oldest_due}}. كلّنا شوكت يناسبك تسدده.",
+    "reminder_firm": "المبلغ {{fig:overdue_amount}} بعده متأخر من {{date:oldest_due}}. لازم نتفق على موعد للتسديد، كلّي شوكت تكدر.",
+    "collection_signoff": "ممنونين لتعاونك.",
+    "collection_zaincash": "إذا يناسبك، تكدر تسدد بتحويل زين كاش."
+  }
+}

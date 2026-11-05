@@ -5,3 +5,4 @@
 /backend/tests/evaluation/fixtures/*.json text eol=lf
 # Keep the user's canonical copy file byte-identical on every checkout.
 /backend/tests/fixtures/APPROVED_COPY_FIX_2026-11-05.json -text
+/backend/tests/fixtures/APPROVED_IRAQI_COPY_2026-11-05.json -text

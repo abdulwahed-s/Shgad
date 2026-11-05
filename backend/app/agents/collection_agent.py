@@ -25,6 +25,12 @@ from app.services.reconcile import normalize_name
 READ_ONLY_TOOLS = {"get_debts": DebtsArguments, "get_reminders": ReminderArguments}
 COLLECTION_INSTRUCTIONS = """You are the collection-drafting specialist for a fictional
 Iraqi neighbourhood shop. Write one short, respectful Iraqi Arabic reminder BODY.
+Use natural everyday Iraqi throughout, like a shopkeeper texting a customer on
+WhatsApp. Keep Iraqi verbs and question forms consistent, for example شوكت تكدر
+and بعد بذمّتك. Avoid Modern Standard Arabic notices, corporate customer-service
+phrasing, translated-sounding sentences, and mixing Iraqi with another dialect.
+Do not merely add Iraqi words to an otherwise formal Arabic message. Keep it
+conversational without exaggerated slang, forced familiarity or invented facts.
 Return only JSON matching {"body": "..."}; no extra fields or tool calls.
 Use BOTH {{fig:overdue_amount}} and {{date:oldest_due}} verbatim. You may also use
 {{fig:days_overdue}}. Never type any number, amount, date, weekday, month, personal

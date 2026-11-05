@@ -223,12 +223,41 @@ D61_APPROVED_MESSAGES = {
 }
 
 
+# Supplemental D61 approval of five exact Iraqi replacements, 5 Nov 2026.
+# Keep the original D61 snapshot and its date intact.
+D61_IRAQI_REVIEWED_ON = "2026-11-05"
+D61_IRAQI_REVIEWED_BY = "user"
+D61_IRAQI_REVIEW_SOURCE = "explicit_chat_confirmation"
+D61_IRAQI_APPROVED_TEXT_SHA256 = (
+    "1dc1f0b3354ca961daff989fde8c5886b4a67d921cca5ff1e16d62a90667e82e"
+)
+D61_IRAQI_APPROVED_MESSAGES = {
+    "reminder_gentle": (
+        "9ead59e4eb91905629486bd31752ed7dbb30522b110ffeb13474f42686ed6502"
+    ),
+    "reminder_normal": (
+        "54c05532bb0a1abe3acc9dee9b65e61d23ae7547ae40e221df3ddbad694e1d6f"
+    ),
+    "reminder_firm": (
+        "f39be2c33f774127e75505cf61d88af3067a5370e3bb7c3366891eb4606d36dc"
+    ),
+    "collection_signoff": (
+        "6fa2618bdc30ec6c50e3b82f274b2cbae1399c575c9df4b960c05a5b99c2ee08"
+    ),
+    "collection_zaincash": (
+        "398945ce9433b67fc72c8262554d47758bd6e7df281d69cfa2a695fe7b4a5761"
+    ),
+}
+
+
 def review_status(key, text):
     fingerprint = hashlib.sha256(text.encode("utf-8")).hexdigest()
-    expected = APPROVED_MESSAGES.get(
-        key,
-        WEEKLY_APPROVED_MESSAGES.get(
-            key, D59_APPROVED_MESSAGES.get(key, D61_APPROVED_MESSAGES.get(key))
-        ),
-    )
+    expected = D61_IRAQI_APPROVED_MESSAGES.get(key)
+    if expected is None:
+        expected = APPROVED_MESSAGES.get(
+            key,
+            WEEKLY_APPROVED_MESSAGES.get(
+                key, D59_APPROVED_MESSAGES.get(key, D61_APPROVED_MESSAGES.get(key))
+            ),
+        )
     return "APPROVED" if expected == fingerprint else "PENDING_REVIEW"

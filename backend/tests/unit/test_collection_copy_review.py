@@ -1,4 +1,4 @@
-"""D61 user approval5Nov2026 binds exact supplied text, including character order."""
+"""D61 exact text stays bound across the original and supplemental approvals."""
 
 import hashlib
 import json
@@ -15,6 +15,11 @@ APPROVED_BYTES = APPROVED_PATH.read_bytes()
 APPROVED_COPY = json.loads(APPROVED_BYTES)
 EXACT_BACKEND = APPROVED_COPY["backend"]
 EXACT_FRONTEND = APPROVED_COPY["frontend"]
+IRAQI_APPROVAL = json.loads(
+    (ROOT / "backend/tests/fixtures/APPROVED_IRAQI_COPY_2026-11-05.json").read_bytes()
+)
+# The user explicitly approved these five replacements; retain the earlier bytes.
+CURRENT_BACKEND = {**EXACT_BACKEND, **IRAQI_APPROVAL["backend"]}
 
 
 def test_user_json_correction_matches_every_source_value_exactly():
@@ -29,7 +34,8 @@ def test_user_json_correction_matches_every_source_value_exactly():
     arb = json.loads((ROOT / "frontend/lib/l10n/app_ar.arb").read_bytes())
     for area, source in (("backend", COLLECTION_COPY), ("frontend", arb)):
         for key, value in APPROVED_COPY[area].items():
-            assert source[key].encode("utf-8") == value.encode("utf-8"), key
+            current = CURRENT_BACKEND[key] if area == "backend" else value
+            assert source[key].encode("utf-8") == current.encode("utf-8"), key
 
 
 def test_d61_exact_backend_texts_are_user_approved_and_edits_lose_approval():
@@ -41,7 +47,7 @@ def test_d61_exact_backend_texts_are_user_approved_and_edits_lose_approval():
     )
 
     assert D61_REVIEWED_ON == "2026-11-05" and D61_REVIEWED_BY == "user"
-    assert {key: COLLECTION_COPY[key] for key in EXACT_BACKEND} == EXACT_BACKEND
+    assert {key: COLLECTION_COPY[key] for key in CURRENT_BACKEND} == CURRENT_BACKEND
     assert set(D61_APPROVED_MESSAGES) == set(COLLECTION_COPY)
     assert len(D61_APPROVED_MESSAGES) == 18
     for key, value in COLLECTION_COPY.items():
@@ -49,11 +55,62 @@ def test_d61_exact_backend_texts_are_user_approved_and_edits_lose_approval():
         assert review_status(key, value + " changed") == "PENDING_REVIEW"
         assert review_status("unreviewed_" + key, value) == "PENDING_REVIEW"
     canonical = json.dumps(
-        COLLECTION_COPY, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        {**COLLECTION_COPY, **IRAQI_APPROVAL["superseded_backend"]},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
     )
     assert hashlib.sha256(canonical.encode()).hexdigest() == D61_APPROVED_TEXT_SHA256
     assert "{{date:last_reminded}}" in COLLECTION_COPY["collection_reminded"]
     assert "reminder_age" not in COLLECTION_COPY["collection_reminded"]
+
+
+def test_supplemental_iraqi_approval_binds_only_the_five_reviewed_values():
+    from app.agents.arabic_review import (
+        D61_APPROVED_MESSAGES,
+        D61_IRAQI_APPROVED_MESSAGES,
+        D61_IRAQI_APPROVED_TEXT_SHA256,
+        D61_IRAQI_REVIEWED_BY,
+        D61_IRAQI_REVIEWED_ON,
+    )
+
+    assert IRAQI_APPROVAL["status"] == "APPROVED"
+    assert IRAQI_APPROVAL["decision"] == "D61"
+    assert IRAQI_APPROVAL["reviewed_on"] == D61_IRAQI_REVIEWED_ON == "2026-11-05"
+    assert IRAQI_APPROVAL["reviewed_by"] == D61_IRAQI_REVIEWED_BY == "user"
+    values = IRAQI_APPROVAL["backend"]
+    assert (
+        set(values)
+        == set(IRAQI_APPROVAL["superseded_backend"])
+        == {
+            "reminder_gentle",
+            "reminder_normal",
+            "reminder_firm",
+            "collection_signoff",
+            "collection_zaincash",
+        }
+    )
+    canonical = json.dumps(
+        values, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    assert (
+        hashlib.sha256(canonical.encode()).hexdigest()
+        == IRAQI_APPROVAL["approved_backend_sha256"]
+        == D61_IRAQI_APPROVED_TEXT_SHA256
+        == "1dc1f0b3354ca961daff989fde8c5886b4a67d921cca5ff1e16d62a90667e82e"
+    )
+    assert D61_IRAQI_APPROVED_MESSAGES == {
+        key: hashlib.sha256(value.encode()).hexdigest() for key, value in values.items()
+    }
+    for key, value in values.items():
+        assert COLLECTION_COPY[key].encode() == value.encode(), key
+        assert review_status(key, value) == "APPROVED"
+        assert review_status(key, value + " changed") == "PENDING_REVIEW"
+        previous = IRAQI_APPROVAL["superseded_backend"][key]
+        assert (
+            hashlib.sha256(previous.encode()).hexdigest() == D61_APPROVED_MESSAGES[key]
+        )
+        assert review_status(key, previous) == "PENDING_REVIEW"
 
 
 def test_d61_frontend_exact_text_and_all_32_approval_hashes():
